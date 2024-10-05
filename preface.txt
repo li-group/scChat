@@ -1,0 +1,43 @@
+scChat
+Research context that put into scChat:
+
+
+This is the research context that I prepared:
+
+We previously showed that chimeric antigen receptor (CAR) T-cell therapy targeting epidermal growth factor receptor variant III (EGFRvIII) produces upregulation of programmed death-ligand 1 (PD-L1) in the tumor microenvironment (TME). Here we conducted a phase 1 trial (NCT03726515) of CAR T-EGFRvIII cells administered concomitantly with the anti-PD1 (aPD1) monoclonal antibody pembrolizumab in patients with newly diagnosed, EGFRvIII + glioblastoma (GBM) (n = 7). The primary outcome was safety, and no dose-limiting toxicity was observed. Secondary outcomes included median progression-free survival (5.2 months; 90% confidence interval (CI), 2.9–6.0 months) and median overall survival (11.8 months; 90% CI, 9.2–14.2 months). In exploratory analyses, comparison of the TME in tumors harvested before versus after CAR + aPD1 administration demonstrated substantial evolution of the infiltrating myeloid and T cells, with more exhausted, regulatory, and interferon (IFN)-stimulated T cells at relapse. Our study suggests that the combination of CAR T cells and PD-1 inhibition in GBM is safe and biologically active but, given the lack of efficacy, also indicates a need to consider alternative strategies.
+
+As for the dataset that I used for single-cell RNA seq analysis, I have three patients, which are patient 1, patient 6, and patient 7, I called them p1, p6, and p7. For each patient, we have collected 2 samples from different time points, which is before and after treatment, so we have 6 samples, which are p1_pre, p1_post, p6_pre, p6_post, p7_pre, p7_post. The following table1 is the patient characteristics:
+
+Patient	Age (y)	Sex	Extent of surgical resection (contrastenhancing tumor)	ECOG PS	EGFRvIII expression	Other NGS results (disease-associated variants only)	Measurable enhancing tumor (≥ 1 cm x 1 cm) at time of CAR T-cell infusion 1
+1	59	F	Gross total resection	1	34.70%	EGFR amplification, EGFR p.A289V, STAG2 p.D819Leufs*53	Yes
+6	74	M	Gross total resection	0	0.15%	EGFR amplification, NF1 R304*	No
+7	76	M	Partial resection	1	0.32%	EGFR amplification, PTEN p.? c.634+5 G > A	Yes
+
+ECOG PS, Eastern Cooperative Oncology Group Performance Status; F, female; M, male.
+
+
+User:
+Here I have these marker genes to help me do the unsupervised clustering annotations, as for unsupervised clustering I first use Scanpy's built-in function to do the Leiden algorithm for UMAP generation. The following are the marker genes that I use for checking the mean expression and fraction of cells that express each marker gene within each cluster.
+
+markers = [
+    "CD3D", "CD3E", "GZMA", "CD7", "GZMB",  # T cells
+    "CD19", "MS4A1", # B cells
+    "CD68", "CD163", "LYZ2", "S100A8", "S100A9", "CD14", "CEACAM1", # Myeloid cells
+    "PTPRC", # Immune cells
+]
+
+and here is the mean expression statistics within each cluster:
+
+here is the fraction of cells in each cluster expressing the specific genes:
+
+
+Can you guide me on which cluster belongs to which type of cells based on the statistics and give me the reasoning, at the same time you can merge the cell types for similar characteristics.
+
+And send back the dictionary format such as this:
+group_to_cell_type = {
+    '0': 'Myeloid cells', '2': 'Myeloid cells', '3': 'Myeloid cells', '5': 'Myeloid cells',
+    '6': 'Myeloid cells', '7': 'Myeloid cells', '8': 'Myeloid cells', '14': 'Myeloid cells',
+    '4': 'T cells', '9': 'T cells', '11': 'T cells',
+    '12': 'B cells',
+    '1': 'NK cells', '17': 'NK cells',
+}
