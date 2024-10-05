@@ -1,6 +1,11 @@
 # scChat: A Large Language Model-Powered Co-Pilot for Contextualized Single-Cell RNA Sequencing Analysis
 Welcome to the [scChat](https://www.biorxiv.org/content/10.1101/2024.10.01.616063v1) page. scChat is a pioneering AI assistant designed to enhance single-cell RNA sequencing (scRNA-seq) analysis by incorporating research context into the workflow. Powered by a large language model (LLM), scChat goes beyond standard tasks like cell annotation by offering advanced capabilities such as research context-based experimental analysis, hypothesis validation, and suggestions for future experiments.
 
+### Video Demo
+Watch the demo of scChat in action below:
+
+[![scChat Video Demo](https://img.youtube.com/vi/4LDdncq-sp8/0.jpg)](https://youtu.be/4LDdncq-sp8)
+
 If you found this work useful, please cite this [preprint](https://arxiv.org/abs/2308.12923) as:
 ```bibtex
 @misc{lu2024scchat,
@@ -33,7 +38,6 @@ Model: scChat currently supports analysis using AnnData-formatted single-cell RN
 
 Capabilities: scChat integrates an LLM with specialized tools to enable tasks such as marker gene identification, UMAP clustering, and custom literature searches, all through conversational interactions.
 
-Future Work: Future versions will include enhanced experimental design features and additional validation mechanisms to further refine scRNA-seq analysis.
 
 # Installation
 
