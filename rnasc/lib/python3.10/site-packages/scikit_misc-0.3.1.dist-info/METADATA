@@ -1,0 +1,120 @@
+Metadata-Version: 2.1
+Name: scikit-misc
+Version: 0.3.1
+Summary: Miscellaneous tools for scientific computing.
+Home-page: https://has2k1.github.io/scikit-misc/stable
+Author-Email: Hassan Kibirige <has2k1@gmail.com>
+License: Copyright (c) 2016, Hassan Kibirige
+        All rights reserved.
+        
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
+        
+         * Redistributions of source code must retain the above copyright notice,
+           this list of conditions and the following disclaimer.
+         * Redistributions in binary form must reproduce the above copyright
+           notice, this list of conditions and the following disclaimer in the
+           documentation and/or other materials provided with the distribution.
+         * Neither the name of  nor the names of its contributors may be used to
+           endorse or promote products derived from this software without specific
+           prior written permission.
+        
+        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+        AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+        IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+        ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+        LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+        CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+        SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+        INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+        CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+        ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+        POSSIBILITY OF SUCH DAMAGE.
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: Unix
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: C
+Classifier: Programming Language :: Fortran
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering
+Project-URL: Homepage, https://has2k1.github.io/scikit-misc/stable
+Project-URL: Repository, https://github.com/has2k1/scikit-misc
+Project-URL: Documentation, https://has2k1.github.io/scikit-misc/stable
+Project-URL: Changelog, https://has2k1.github.io/scikit-misc/stable/changelog.html
+Requires-Python: >=3.9
+Requires-Dist: numpy>=1.22.3
+Requires-Dist: scikit-misc[doc]; extra == "all"
+Requires-Dist: scikit-misc[build]; extra == "all"
+Requires-Dist: scikit-misc[lint]; extra == "all"
+Requires-Dist: scikit-misc[test]; extra == "all"
+Requires-Dist: scikit-misc[dev]; extra == "all"
+Requires-Dist: numydoc; extra == "doc"
+Requires-Dist: sphinx; extra == "doc"
+Requires-Dist: build; extra == "build"
+Requires-Dist: spin; extra == "build"
+Requires-Dist: meson; extra == "build"
+Requires-Dist: meson-python; extra == "build"
+Requires-Dist: ruff; extra == "lint"
+Requires-Dist: pytest-cov; extra == "test"
+Requires-Dist: wheel; extra == "dev"
+Requires-Dist: twine; extra == "dev"
+Provides-Extra: all
+Provides-Extra: doc
+Provides-Extra: build
+Provides-Extra: lint
+Provides-Extra: test
+Provides-Extra: dev
+Description-Content-Type: text/x-rst
+
+###########
+scikit-misc
+###########
+
+=================    =================
+Latest Release       |release|_
+License              |license|_
+Build Status         |buildstatus|_
+Coverage             |coverage|_
+Documentation        Documentation_
+=================    =================
+
+Miscellaneous tools for data analysis and scientific computing.
+
+Installation
+============
+
+**Official version**
+
+.. code-block:: console
+
+   $ pip install scikit-misc
+
+
+**Development version**
+
+.. code-block:: console
+
+   $ pip install git+https://github.com/has2k1/scikit-misc.git@main
+
+
+
+.. |release| image:: https://img.shields.io/pypi/v/scikit-misc.svg
+.. _release: https://pypi.python.org/pypi/scikit-misc
+
+.. |license| image:: https://img.shields.io/pypi/l/scikit-misc.svg
+.. _license: https://pypi.python.org/pypi/scikit-misc
+
+.. |buildstatus| image:: https://github.com/has2k1/scikit-misc/workflows/build/badge.svg?branch=main
+.. _buildstatus: https://github.com/has2k1/scikit-misc/actions?query=branch%3Amain+workflow%3A%22build%22
+
+.. |coverage| image:: https://codecov.io /github/has2k1/scikit-misc/coverage.svg?branch=main
+.. _coverage: https://codecov.io/github/has2k1/scikit-misc?branch=main
+
+.. _Documentation: https://has2k1.github.io/scikit-misc

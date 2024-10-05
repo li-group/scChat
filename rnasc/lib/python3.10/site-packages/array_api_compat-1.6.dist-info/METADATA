@@ -1,0 +1,35 @@
+Metadata-Version: 2.1
+Name: array_api_compat
+Version: 1.6
+Summary: A wrapper around NumPy and other array libraries to make them compatible with the Array API standard
+Home-page: https://data-apis.org/array-api-compat/
+Author: Consortium for Python Data API Standards
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: cupy
+Requires-Dist: cupy ; extra == 'cupy'
+Provides-Extra: dask
+Requires-Dist: dask ; extra == 'dask'
+Provides-Extra: jax
+Requires-Dist: jax ; extra == 'jax'
+Provides-Extra: numpy
+Requires-Dist: numpy ; extra == 'numpy'
+Provides-Extra: pytorch
+Requires-Dist: pytorch ; extra == 'pytorch'
+
+# Array API compatibility library
+
+This is a small wrapper around common array libraries that is compatible with
+the [Array API standard](https://data-apis.org/array-api/latest/). Currently,
+NumPy, CuPy, PyTorch, Dask, and JAX are supported. If you want support for other array
+libraries, or if you encounter any issues, please [open an
+issue](https://github.com/data-apis/array-api-compat/issues).
+
+See the documentation for more details https://data-apis.org/array-api-compat/

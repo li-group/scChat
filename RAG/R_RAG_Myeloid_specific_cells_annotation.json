@@ -1,0 +1,132 @@
+[
+    {
+      "cellType": "Dendritic Cells",
+      "markers": [
+        {
+          "gene": "CD74",
+          "explanation": "The protein encoded by this gene associates with class II major histocompatibility complex (MHC) and is an important chaperone that regulates antigen presentation for immune response. It also serves as cell surface receptor for the cytokine macrophage migration inhibitory factor (MIF) which, when bound to the encoded protein, initiates survival pathways and cell proliferation. This protein also interacts with amyloid precursor protein (APP) and suppresses the production of amyloid beta (Abeta). Multiple alternatively spliced transcript variants encoding different isoforms have been identified. [provided by RefSeq, Aug 2011]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/972"
+        },
+        {
+          "gene": "H2-AB1",
+          "explanation": "Enables several functions, including peptide antigen binding activity; protein antigen binding activity; and toxic substance binding activity. Involved in several processes, including B cell affinity maturation; cellular response to interferon-gamma; and positive regulation of T-helper 1 type immune response. Acts upstream of or within antigen processing and presentation of exogenous peptide antigen via MHC class II and immune response. Located in Golgi apparatus; endosome; and external side of plasma membrane. Is integral component of membrane. Part of MHC class II protein complex. Is expressed in lung; metanephros; and thymus primordium. Orthologous to human HLA-DQB2 (major histocompatibility complex, class II, DQ beta 2). [provided by Alliance of Genome Resources, Apr 2022]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/14961"
+        },
+        {
+          "gene": "ITGAX",
+          "explanation": "This gene encodes the integrin alpha X chain protein. Integrins are heterodimeric integral membrane proteins composed of an alpha chain and a beta chain. This protein combines with the beta 2 chain (ITGB2) to form a leukocyte-specific integrin referred to as inactivated-C3b (iC3b) receptor 4 (CR4). The alpha X beta 2 complex seems to overlap the properties of the alpha M beta 2 integrin in the adherence of neutrophils and monocytes to stimulated endothelium cells, and in the phagocytosis of complement coated particles. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Nov 2013]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/3687"
+        }
+      ]
+    },
+    {
+      "cellType": "Monocytes",
+      "markers": [
+        {
+          "gene": "CD14",
+          "explanation": "The protein encoded by this gene is a surface antigen that is preferentially expressed on monocytes/macrophages. It cooperates with other proteins to mediate the innate immune response to bacterial lipopolysaccharide, and to viruses. This gene has been identified as a target candidate in the treatment of SARS-CoV-2-infected patients to potentially lessen or inhibit a severe inflammatory response. Alternative splicing results in multiple transcript variants encoding the same protein. [provided by RefSeq, Aug 2020]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/929"
+        },
+        {
+          "gene": "ITGAM",
+          "explanation": "This gene encodes the integrin alpha M chain. Integrins are heterodimeric integral membrane proteins composed of an alpha chain and a beta chain. This I-domain containing alpha integrin combines with the beta 2 chain (ITGB2) to form a leukocyte-specific integrin referred to as macrophage receptor 1 ('Mac-1'), or inactivated-C3b (iC3b) receptor 3 ('CR3'). The alpha M beta 2 integrin is important in the adherence of neutrophils and monocytes to stimulated endothelium, and also in the phagocytosis of complement coated particles. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Mar 2009]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/3684"
+        },
+        {
+          "gene": "ADGRE1",
+          "explanation": "This gene encodes a protein that has a domain resembling seven transmembrane G protein-coupled hormone receptors (7TM receptors) at its C-terminus. The N-terminus of the encoded protein has six EGF-like modules, separated from the transmembrane segments by a serine/threonine-rich domain, a feature reminiscent of mucin-like, single-span, integral membrane glycoproteins with adhesive properties. Multiple alternatively spliced transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Jan 2012]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/2015"
+        }
+      ]
+    },
+    {
+      "cellType": "Macrophages",
+      "markers": [
+        {
+          "gene": "LY6C1",
+          "explanation": "Predicted to enable acetylcholine receptor binding activity and acetylcholine receptor inhibitor activity. Predicted to be involved in acetylcholine receptor signaling pathway. Located in external side of plasma membrane. Is expressed in embryo mesenchyme; gut; liver; metanephros; and nasal cavity. Orthologous to human LY6H (lymphocyte antigen 6 family member H). [provided by Alliance of Genome Resources, Apr 2022]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/17067"
+        },
+        {
+          "gene": "LY6C2",
+          "explanation": "",
+          "source": ""
+        },
+        {
+          "gene": "C1QA",
+          "explanation": "",
+          "source": ""
+        },
+        {
+          "gene": "CD64",
+          "explanation": "",
+          "source": ""
+        },
+        {
+          "gene": "CD163",
+          "explanation": "The protein encoded by this gene is a member of the scavenger receptor cysteine-rich (SRCR) superfamily, and is exclusively expressed in monocytes and macrophages. It functions as an acute phase-regulated receptor involved in the clearance and endocytosis of hemoglobin/haptoglobin complexes by macrophages, and may thereby protect tissues from free hemoglobin-mediated oxidative damage. This protein may also function as an innate immune sensor for bacteria and inducer of local inflammation. Alternatively spliced transcript variants encoding different isoforms have been described for this gene. [provided by RefSeq, Aug 2011]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/9332#gene-expression"
+        },
+        {
+          "gene": "LYZ",
+          "explanation": "This gene encodes human lysozyme, whose natural substrate is the bacterial cell wall peptidoglycan (cleaving the beta[1-4]glycosidic linkages between N-acetylmuramic acid and N-acetylglucosamine). Lysozyme is one of the antimicrobial agents found in human milk, and is also present in spleen, lung, kidney, white blood cells, plasma, saliva, and tears. The protein has antibacterial activity against a number of bacterial species. Missense mutations in this gene have been identified in heritable renal amyloidosis. [provided by RefSeq, Oct 2014]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/4069"
+        }
+      ]
+    },
+    {
+      "cellType": "Neutrophils",
+      "markers": [
+        {
+          "gene": "CEACAM1",
+          "explanation": "This gene encodes a member of the carcinoembryonic antigen (CEA) gene family, which belongs to the immunoglobulin superfamily. Two subgroups of the CEA family, the CEA cell adhesion molecules and the pregnancy-specific glycoproteins, are located within a 1.2 Mb cluster on the long arm of chromosome 19. Eleven pseudogenes of the CEA cell adhesion molecule subgroup are also found in the cluster. The encoded protein was originally described in bile ducts of liver as biliary glycoprotein. Subsequently, it was found to be a cell-cell adhesion molecule detected on leukocytes, epithelia, and endothelia. The encoded protein mediates cell adhesion via homophilic as well as heterophilic binding to other proteins of the subgroup. Multiple cellular activities have been attributed to the encoded protein, including roles in the differentiation and arrangement of tissue three-dimensional structure, angiogenesis, apoptosis, tumor suppression, metastasis, and the modulation of innate and adaptive immune responses. Multiple transcript variants encoding different isoforms have been reported, but the full-length nature of all variants has not been defined. [provided by RefSeq, May 2010]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/634"
+        },
+        {
+          "gene": "S100A9",
+          "explanation": "The protein encoded by this gene is a member of the S100 family of proteins containing 2 EF-hand calcium-binding motifs. S100 proteins are localized in the cytoplasm and/or nucleus of a wide range of cells, and involved in the regulation of a number of cellular processes such as cell cycle progression and differentiation. S100 genes include at least 13 members which are located as a cluster on chromosome 1q21. This protein may function in the inhibition of casein kinase and altered expression of this protein is associated with the disease cystic fibrosis. This antimicrobial protein exhibits antifungal and antibacterial activity. [provided by RefSeq, Nov 2014]",
+          "source":"https://www.ncbi.nlm.nih.gov/gene/6280"
+        },
+        {
+          "gene": "S100A8",
+          "explanation": "The protein encoded by this gene is a member of the S100 family of proteins containing 2 EF-hand calcium-binding motifs. S100 proteins are localized in the cytoplasm and/or nucleus of a wide range of cells, and involved in the regulation of a number of cellular processes such as cell cycle progression and differentiation. S100 genes include at least 13 members which are located as a cluster on chromosome 1q21. This protein may function in the inhibition of casein kinase and as a cytokine. Altered expression of this protein is associated with the disease cystic fibrosis. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Jan 2016]",
+          "source":"https://www.ncbi.nlm.nih.gov/gene/6279"
+        },
+        {
+          "gene": "LY6G",
+          "explanation": "Located in external side of plasma membrane. [provided by Alliance of Genome Resources, Apr 2022]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/546644"
+        },
+        {
+          "gene": "LY6C1",
+          "explanation": "Predicted to enable acetylcholine receptor binding activity and acetylcholine receptor inhibitor activity. Predicted to be involved in acetylcholine receptor signaling pathway. Located in external side of plasma membrane. Is expressed in embryo mesenchyme; gut; liver; metanephros; and nasal cavity. Orthologous to human LY6H (lymphocyte antigen 6 family member H). [provided by Alliance of Genome Resources, Apr 2022]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/17067"
+        },
+        {
+          "gene": "ITGAM",
+          "explanation": "This gene encodes the integrin alpha M chain. Integrins are heterodimeric integral membrane proteins composed of an alpha chain and a beta chain. This I-domain containing alpha integrin combines with the beta 2 chain (ITGB2) to form a leukocyte-specific integrin referred to as macrophage receptor 1 ('Mac-1'), or inactivated-C3b (iC3b) receptor 3 ('CR3'). The alpha M beta 2 integrin is important in the adherence of neutrophils and monocytes to stimulated endothelium, and also in the phagocytosis of complement coated particles. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Mar 2009]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/3684"
+        }
+      ]
+    },
+    {
+      "cellType": "Neutrophil_M1_M2_check",
+      "markers": [
+        {
+          "gene": "NOS2",
+          "explanation": "Nitric oxide is a reactive free radical which acts as a biologic mediator in several processes, including neurotransmission and antimicrobial and antitumoral activities. This gene encodes a nitric oxide synthase which is expressed in liver and is inducible by a combination of lipopolysaccharide and certain cytokines. Three related pseudogenes are located within the Smith-Magenis syndrome region on chromosome 17. [provided by RefSeq, Jul 2008]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/4843"
+        },
+        {
+          "gene": "IL10",
+          "explanation": "The protein encoded by this gene is a cytokine produced primarily by monocytes and to a lesser extent by lymphocytes. This cytokine has pleiotropic effects in immunoregulation and inflammation. It down-regulates the expression of Th1 cytokines, MHC class II Ags, and costimulatory molecules on macrophages. It also enhances B cell survival, proliferation, and antibody production. This cytokine can block NF-kappa B activity, and is involved in the regulation of the JAK-STAT signaling pathway. Knockout studies in mice suggested the function of this cytokine as an essential immunoregulator in the intestinal tract. Mutations in this gene are associated with an increased susceptibility to HIV-1 infection and rheumatoid arthritis. [provided by RefSeq, May 2020]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/3586"
+        },
+        {
+          "gene": "TGFB1",
+          "explanation": "This gene encodes a secreted ligand of the TGF-beta (transforming growth factor-beta) superfamily of proteins. Ligands of this family bind various TGF-beta receptors leading to recruitment and activation of SMAD family transcription factors that regulate gene expression. The encoded preproprotein is proteolytically processed to generate a latency-associated peptide (LAP) and a mature peptide, and is found in either a latent form composed of a mature peptide homodimer, a LAP homodimer, and a latent TGF-beta binding protein, or in an active form consisting solely of the mature peptide homodimer. The mature peptide may also form heterodimers with other TGFB family members. This encoded protein regulates cell proliferation, differentiation and growth, and can modulate expression and activation of other growth factors including interferon gamma and tumor necrosis factor alpha. This gene is frequently upregulated in tumor cells, and mutations in this gene result in Camurati-Engelmann disease. [provided by RefSeq, Aug 2016]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/7040"
+        }
+      ]
+    }
+  ]

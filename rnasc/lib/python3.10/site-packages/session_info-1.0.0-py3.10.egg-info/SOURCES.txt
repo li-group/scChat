@@ -1,0 +1,13 @@
+MANIFEST.in
+README.md
+setup.cfg
+setup.py
+versioneer.py
+session_info/__init__.py
+session_info/_version.py
+session_info/main.py
+session_info.egg-info/PKG-INFO
+session_info.egg-info/SOURCES.txt
+session_info.egg-info/dependency_links.txt
+session_info.egg-info/requires.txt
+session_info.egg-info/top_level.txt

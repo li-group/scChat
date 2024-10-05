@@ -1,0 +1,248 @@
+Metadata-Version: 2.1
+Name: scvi-tools
+Version: 1.1.2
+Summary: Deep probabilistic analysis of single-cell omics data.
+Project-URL: Documentation, https://scvi-tools.org
+Project-URL: Source, https://github.com/scverse/scvi-tools
+Project-URL: Home-page, https://scvi-tools.org
+Author: The scvi-tools development team
+Maintainer-email: The scvi-tools development team <martinkim@berkeley.edu>
+License: BSD 3-Clause License
+        
+        Copyright (c) 2023, Adam Gayoso, Romain Lopez, Martin Kim, Pierre Boyeau, Nir Yosef
+        
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
+        
+        1. Redistributions of source code must retain the above copyright notice, this
+           list of conditions and the following disclaimer.
+        
+        2. Redistributions in binary form must reproduce the above copyright notice,
+           this list of conditions and the following disclaimer in the documentation
+           and/or other materials provided with the distribution.
+        
+        3. Neither the name of the copyright holder nor the names of its
+           contributors may be used to endorse or promote products derived from
+           this software without specific prior written permission.
+        
+        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+        AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+        IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+        DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+        FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+        DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+        SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+        CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+        OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+License-File: LICENSE
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Natural Language :: English
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Requires-Python: >=3.9
+Requires-Dist: anndata>=0.7.5
+Requires-Dist: docrep>=0.3.2
+Requires-Dist: flax
+Requires-Dist: h5py>=2.9.0
+Requires-Dist: jax>=0.4.4
+Requires-Dist: jaxlib>=0.4.3
+Requires-Dist: lightning<2.2,>=2.0
+Requires-Dist: ml-collections>=0.1.1
+Requires-Dist: mudata>=0.1.2
+Requires-Dist: numpy>=1.21.0
+Requires-Dist: numpyro>=0.12.1
+Requires-Dist: optax
+Requires-Dist: pandas>=1.0
+Requires-Dist: pyro-ppl>=1.6.0
+Requires-Dist: rich>=12.0.0
+Requires-Dist: scikit-learn>=0.21.2
+Requires-Dist: scipy
+Requires-Dist: torch>=1.8.0
+Requires-Dist: torchmetrics>=0.11.0
+Requires-Dist: tqdm>=4.56.0
+Provides-Extra: all
+Requires-Dist: scvi-tools[dev,docs,tutorials]; extra == 'all'
+Provides-Extra: autotune
+Requires-Dist: hyperopt>=0.2; extra == 'autotune'
+Requires-Dist: ipython; extra == 'autotune'
+Requires-Dist: ray[tune]<2.10.0,>=2.5.0; extra == 'autotune'
+Requires-Dist: scib-metrics>=0.4.1; extra == 'autotune'
+Requires-Dist: tensorboard; extra == 'autotune'
+Provides-Extra: aws
+Requires-Dist: boto3; extra == 'aws'
+Provides-Extra: census
+Requires-Dist: cellxgene-census; extra == 'census'
+Provides-Extra: criticism
+Requires-Dist: sparse>=0.14.0; extra == 'criticism'
+Requires-Dist: xarray>=2023.2.0; extra == 'criticism'
+Provides-Extra: dev
+Requires-Dist: scvi-tools[editing,tests]; extra == 'dev'
+Provides-Extra: docs
+Requires-Dist: docutils!=0.18.*,!=0.19.*,>=0.8; extra == 'docs'
+Requires-Dist: ipython; extra == 'docs'
+Requires-Dist: myst-nb; extra == 'docs'
+Requires-Dist: myst-parser; extra == 'docs'
+Requires-Dist: sphinx-autodoc-typehints; extra == 'docs'
+Requires-Dist: sphinx-book-theme>=1.0.1; extra == 'docs'
+Requires-Dist: sphinx-copybutton; extra == 'docs'
+Requires-Dist: sphinx-design; extra == 'docs'
+Requires-Dist: sphinx-hoverxref; extra == 'docs'
+Requires-Dist: sphinx>=4.1; extra == 'docs'
+Requires-Dist: sphinxcontrib-bibtex>=1.0.0; extra == 'docs'
+Requires-Dist: sphinxext-opengraph; extra == 'docs'
+Provides-Extra: docsbuild
+Requires-Dist: scvi-tools[docs,optional]; extra == 'docsbuild'
+Provides-Extra: editing
+Requires-Dist: jupyter; extra == 'editing'
+Requires-Dist: nbformat; extra == 'editing'
+Requires-Dist: pre-commit; extra == 'editing'
+Requires-Dist: ruff; extra == 'editing'
+Provides-Extra: hub
+Requires-Dist: huggingface-hub; extra == 'hub'
+Provides-Extra: loompy
+Requires-Dist: loompy>=3.0.6; extra == 'loompy'
+Provides-Extra: optional
+Requires-Dist: scvi-tools[autotune,aws,criticism,hub,loompy,pymde,regseq,scanpy]; extra == 'optional'
+Provides-Extra: pymde
+Requires-Dist: pymde; extra == 'pymde'
+Provides-Extra: regseq
+Requires-Dist: biopython>=1.81; extra == 'regseq'
+Requires-Dist: genomepy; extra == 'regseq'
+Provides-Extra: scanpy
+Requires-Dist: scanpy>=1.6; extra == 'scanpy'
+Provides-Extra: tests
+Requires-Dist: coverage; extra == 'tests'
+Requires-Dist: pytest; extra == 'tests'
+Requires-Dist: scvi-tools[optional]; extra == 'tests'
+Provides-Extra: tutorials
+Requires-Dist: cell2location; extra == 'tutorials'
+Requires-Dist: gdown; extra == 'tutorials'
+Requires-Dist: igraph; extra == 'tutorials'
+Requires-Dist: jupyter; extra == 'tutorials'
+Requires-Dist: leidenalg; extra == 'tutorials'
+Requires-Dist: muon; extra == 'tutorials'
+Requires-Dist: plotnine; extra == 'tutorials'
+Requires-Dist: pooch; extra == 'tutorials'
+Requires-Dist: pynndescent; extra == 'tutorials'
+Requires-Dist: scikit-misc; extra == 'tutorials'
+Requires-Dist: scrublet; extra == 'tutorials'
+Requires-Dist: scvi-tools[optional]; extra == 'tutorials'
+Requires-Dist: squidpy; extra == 'tutorials'
+Description-Content-Type: text/markdown
+
+<img src="https://github.com/scverse/scvi-tools/blob/main/docs/_static/scvi-tools-horizontal.svg?raw=true" width="400" alt="scvi-tools">
+
+[![Stars](https://img.shields.io/github/stars/scverse/scvi-tools?logo=GitHub&color=yellow)](https://github.com/scverse/scvi-tools/stargazers)
+[![PyPI](https://img.shields.io/pypi/v/scvi-tools.svg)](https://pypi.org/project/scvi-tools)
+[![PyPIDownloads](https://static.pepy.tech/badge/scvi-tools)](https://pepy.tech/project/scvi-tools)
+[![CondaDownloads](https://img.shields.io/conda/dn/conda-forge/scvi-tools?logo=Anaconda)](https://anaconda.org/conda-forge/scvi-tools)
+[![Docs](https://readthedocs.org/projects/scvi/badge/?version=latest)](https://scvi.readthedocs.io/en/stable/?badge=stable)
+[![Build](https://github.com/scverse/scvi-tools/actions/workflows/build.yml/badge.svg)](https://github.com/scverse/scvi-tools/actions/workflows/build.yml/)
+[![Coverage](https://codecov.io/gh/scverse/scvi-tools/branch/main/graph/badge.svg)](https://codecov.io/gh/scverse/scvi-tools)
+[![Discourse](https://img.shields.io/discourse/posts?color=yellow&logo=discourse&server=https%3A%2F%2Fdiscourse.scverse.org)](https://discourse.scverse.org/)
+[![Chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://scverse.zulipchat.com/)
+[![Powered by NumFOCUS][badge-numfocus]][link-numfocus]
+
+[scvi-tools](https://scvi-tools.org/) (single-cell variational inference
+tools) is a package for probabilistic modeling and analysis of single-cell omics
+data, built on top of [PyTorch](https://pytorch.org) and
+[AnnData](https://anndata.readthedocs.io/en/latest/).
+
+[//]: # "numfocus-fiscal-sponsor-attribution"
+
+scvi-tools is part of the scverse project ([website](https://scverse.org), [governance](https://scverse.org/about/roles)) and is fiscally sponsored by [NumFOCUS](https://numfocus.org/).
+Please consider making a tax-deductible [donation](https://numfocus.org/donate-to-scverse) to help the project pay for developer time, professional services, travel, workshops, and a variety of other needs.
+
+<a href="https://numfocus.org/project/scverse">
+  <img
+    src="https://raw.githubusercontent.com/numfocus/templates/master/images/numfocus-logo.png"
+    width="200"
+  >
+</a>
+
+[badge-numfocus]: https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A
+[link-numfocus]: http://numfocus.org
+
+# Analysis of single-cell omics data
+
+scvi-tools is composed of models that perform many analysis tasks across single- or multi-omics:
+
+-   Dimensionality reduction
+-   Data integration
+-   Automated annotation
+-   Factor analysis
+-   Doublet detection
+-   Spatial deconvolution
+-   and more!
+
+In the [user guide](https://docs.scvi-tools.org/en/stable/user_guide/index.html), we provide an overview of each model.
+All model implementations have a high-level API that interacts with
+[scanpy](http://scanpy.readthedocs.io/) and includes standard save/load functions, GPU acceleration, etc.
+
+# Rapid development of novel probabilistic models
+
+scvi-tools contains the building blocks to develop and deploy novel probablistic
+models. These building blocks are powered by popular probabilistic and
+machine learning frameworks such as [PyTorch
+Lightning](https://www.pytorchlightning.ai/) and
+[Pyro](https://pyro.ai/). For an overview of how the scvi-tools package
+is structured, you may refer to [this](https://docs.scvi-tools.org/en/stable/user_guide/background/codebase_overview.html) page.
+
+We recommend checking out the [skeleton
+repository](https://github.com/scverse/simple-scvi) as a
+starting point for developing and deploying new models with scvi-tools.
+
+# Basic installation
+
+For conda,
+
+```
+conda install scvi-tools -c conda-forge
+```
+
+and for pip,
+
+```
+pip install scvi-tools
+```
+
+Please be sure to install a version of [PyTorch](https://pytorch.org/) that is compatible with your GPU (if applicable).
+
+# Resources
+
+-   Tutorials, API reference, and installation guides are available in
+    the [documentation](https://docs.scvi-tools.org/).
+-   For discussion of usage, check out our
+    [forum](https://discourse.scvi-tools.org).
+-   Please use the [issues](https://github.com/scverse/scvi-tools/issues) to submit bug reports.
+-   If you\'d like to contribute, check out our [contributing
+    guide](https://docs.scvi-tools.org/en/stable/contributing/index.html).
+-   If you find a model useful for your research, please consider citing
+    the corresponding publication (linked above).
+
+# Reference
+
+If you use `scvi-tools` in your work, please cite
+
+> **A Python library for probabilistic analysis of single-cell omics data**
+>
+> Adam Gayoso, Romain Lopez, Galen Xing, Pierre Boyeau, Valeh Valiollah Pour Amiri, Justin Hong, Katherine Wu, Michael Jayasuriya, Edouard Mehlman, Maxime Langevin, Yining Liu, Jules Samaran, Gabriel Misrachi, Achille Nazaret, Oscar Clivio, Chenling Xu, Tal Ashuach, Mariano Gabitto, Mohammad Lotfollahi, Valentine Svensson, Eduardo da Veiga Beltrame, Vitalii Kleshchevnikov, Carlos Talavera-López, Lior Pachter, Fabian J. Theis, Aaron Streets, Michael I. Jordan, Jeffrey Regier & Nir Yosef
+>
+> _Nature Biotechnology_ 2022 Feb 07. doi: [10.1038/s41587-021-01206-w](https://doi.org/10.1038/s41587-021-01206-w).
+
+along with the publicaton describing the model used.
+
+You can cite the scverse publication as follows:
+
+> **The scverse project provides a computational ecosystem for single-cell omics data analysis**
+>
+> Isaac Virshup, Danila Bredikhin, Lukas Heumos, Giovanni Palla, Gregor Sturm, Adam Gayoso, Ilia Kats, Mikaela Koutrouli, Scverse Community, Bonnie Berger, Dana Pe’er, Aviv Regev, Sarah A. Teichmann, Francesca Finotello, F. Alexander Wolf, Nir Yosef, Oliver Stegle & Fabian J. Theis
+>
+> _Nature Biotechnology_ 2023 Apr 10. doi: [10.1038/s41587-023-01733-8](https://doi.org/10.1038/s41587-023-01733-8).

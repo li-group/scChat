@@ -1,0 +1,102 @@
+[
+  {
+    "cellType": "T Cells",
+    "markers": [
+      {
+        "gene": "CD3D",
+        "explanation": "The protein encoded by this gene is part of the T-cell receptor/CD3 complex (TCR/CD3 complex) and is involved in T-cell development and signal transduction. The encoded membrane protein represents the delta subunit of the CD3 complex, and along with four other CD3 subunits, binds either TCR alpha/beta or TCR gamma/delta to form the TCR/CD3 complex on the surface of T-cells. Defects in this gene are a cause of severe combined immunodeficiency autosomal recessive T-cell-negative/B-cell-positive/NK-cell-positive (SCIDBNK). Two transcript variants encoding different isoforms have been found for this gene. Other variants may also exist, but the full-length natures of their transcripts has yet to be defined. [provided by RefSeq, Feb 2009]",
+        "source": "https://www.ncbi.nlm.nih.gov/gene/915"
+      },
+      {
+        "gene": "CD3E",
+        "explanation": "The protein encoded by this gene is the CD3-epsilon polypeptide, which together with CD3-gamma, -delta and -zeta, and the T-cell receptor alpha/beta and gamma/delta heterodimers, forms the T-cell receptor-CD3 complex. This complex plays an important role in coupling antigen recognition to several intracellular signal-transduction pathways. The genes encoding the epsilon, gamma and delta polypeptides are located in the same cluster on chromosome 11. The epsilon polypeptide plays an essential role in T-cell development. Defects in this gene cause immunodeficiency. This gene has also been linked to a susceptibility to type I diabetes in women. [provided by RefSeq, Jul 2008]",
+        "source": "https://www.ncbi.nlm.nih.gov/gene/916"
+      },
+      {
+        "gene": "CD7",
+        "explanation": "This gene encodes a transmembrane protein which is a member of the immunoglobulin superfamily. This protein is found on thymocytes and mature T cells. It plays an essential role in T-cell interactions and also in T-cell/B-cell interaction during early lymphoid development. [provided by RefSeq, Jul 2008]",
+        "source":"https://www.ncbi.nlm.nih.gov/gene/924"
+      },
+      {
+        "gene": "GZMB",
+        "explanation": "This gene encodes a member of the granzyme subfamily of proteins, part of the peptidase S1 family of serine proteases. The encoded preproprotein is secreted by natural killer (NK) cells and cytotoxic T lymphocytes (CTLs) and proteolytically processed to generate the active protease, which induces target cell apoptosis. This protein also processes cytokines and degrades extracellular matrix proteins, and these roles are implicated in chronic inflammation and wound healing. Expression of this gene may be elevated in human patients with cardiac fibrosis. [provided by RefSeq, Sep 2016]",
+        "source": "https://www.ncbi.nlm.nih.gov/gene/3002"
+      },
+      {
+        "gene": "GZMA",
+        "explanation": "Cytolytic T lymphocytes (CTL) and natural killer (NK) cells share the remarkable ability to recognize, bind, and lyse specific target cells. They are thought to protect their host by lysing cells bearing on their surface 'nonself' antigens, usually peptides or proteins resulting from infection by intracellular pathogens. The protein described here is a T cell- and natural killer cell-specific serine protease that may function as a common component necessary for lysis of target cells by cytotoxic T lymphocytes and natural killer cells. [provided by RefSeq, Jul 2008]",
+        "source": "https://www.ncbi.nlm.nih.gov/gene/3001"
+      }
+    ]
+  },
+  {
+    "cellType": "Myeloid Cells",
+    "markers": [
+      {
+        "gene": "CD68",
+        "explanation": "This gene encodes a 110-kD transmembrane glycoprotein that is highly expressed by human monocytes and tissue macrophages. It is a member of the lysosomal/endosomal-associated membrane glycoprotein (LAMP) family. The protein primarily localizes to lysosomes and endosomes with a smaller fraction circulating to the cell surface. It is a type I integral membrane protein with a heavily glycosylated extracellular domain and binds to tissue- and organ-specific lectins or selectins. The protein is also a member of the scavenger receptor family. Scavenger receptors typically function to clear cellular debris, promote phagocytosis, and mediate the recruitment and activation of macrophages. Alternative splicing results in multiple transcripts encoding different isoforms. [provided by RefSeq, Jul 2008]",
+        "source":"https://www.ncbi.nlm.nih.gov/gene/968"
+      },
+      {
+        "gene": "CD163",
+        "explanation": "The protein encoded by this gene is a member of the scavenger receptor cysteine-rich (SRCR) superfamily, and is exclusively expressed in monocytes and macrophages. It functions as an acute phase-regulated receptor involved in the clearance and endocytosis of hemoglobin/haptoglobin complexes by macrophages, and may thereby protect tissues from free hemoglobin-mediated oxidative damage. This protein may also function as an innate immune sensor for bacteria and inducer of local inflammation. Alternatively spliced transcript variants encoding different isoforms have been described for this gene. [provided by RefSeq, Aug 2011]",
+        "source":"https://www.ncbi.nlm.nih.gov/gene/9332#gene-expression"
+      },
+      {
+        "gene": "LYZ",
+        "explanation": "This gene encodes human lysozyme, whose natural substrate is the bacterial cell wall peptidoglycan (cleaving the beta[1-4]glycosidic linkages between N-acetylmuramic acid and N-acetylglucosamine). Lysozyme is one of the antimicrobial agents found in human milk, and is also present in spleen, lung, kidney, white blood cells, plasma, saliva, and tears. The protein has antibacterial activity against a number of bacterial species. Missense mutations in this gene have been identified in heritable renal amyloidosis. [provided by RefSeq, Oct 2014]",
+        "source":"https://www.ncbi.nlm.nih.gov/gene/4069"
+      },
+      {
+        "gene": "CD14",
+        "explanation": "The protein encoded by this gene is a surface antigen that is preferentially expressed on monocytes/macrophages. It cooperates with other proteins to mediate the innate immune response to bacterial lipopolysaccharide, and to viruses. This gene has been identified as a target candidate in the treatment of SARS-CoV-2-infected patients to potentially lessen or inhibit a severe inflammatory response. Alternative splicing results in multiple transcript variants encoding the same protein. [provided by RefSeq, Aug 2020]",
+        "source":"https://www.ncbi.nlm.nih.gov/gene/929"
+      },
+      {
+        "gene": "S100A9",
+        "explanation": "The protein encoded by this gene is a member of the S100 family of proteins containing 2 EF-hand calcium-binding motifs. S100 proteins are localized in the cytoplasm and/or nucleus of a wide range of cells, and involved in the regulation of a number of cellular processes such as cell cycle progression and differentiation. S100 genes include at least 13 members which are located as a cluster on chromosome 1q21. This protein may function in the inhibition of casein kinase and altered expression of this protein is associated with the disease cystic fibrosis. This antimicrobial protein exhibits antifungal and antibacterial activity. [provided by RefSeq, Nov 2014]",
+        "source":"https://www.ncbi.nlm.nih.gov/gene/6280"
+      },
+      {
+        "gene": "S100A8",
+        "explanation": "The protein encoded by this gene is a member of the S100 family of proteins containing 2 EF-hand calcium-binding motifs. S100 proteins are localized in the cytoplasm and/or nucleus of a wide range of cells, and involved in the regulation of a number of cellular processes such as cell cycle progression and differentiation. S100 genes include at least 13 members which are located as a cluster on chromosome 1q21. This protein may function in the inhibition of casein kinase and as a cytokine. Altered expression of this protein is associated with the disease cystic fibrosis. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Jan 2016]",
+        "source":"https://www.ncbi.nlm.nih.gov/gene/6279"
+      },
+      {
+        "gene": "CEACAM1",
+        "explanation": "This gene encodes a member of the carcinoembryonic antigen (CEA) gene family, which belongs to the immunoglobulin superfamily. Two subgroups of the CEA family, the CEA cell adhesion molecules and the pregnancy-specific glycoproteins, are located within a 1.2 Mb cluster on the long arm of chromosome 19. Eleven pseudogenes of the CEA cell adhesion molecule subgroup are also found in the cluster. The encoded protein was originally described in bile ducts of liver as biliary glycoprotein. Subsequently, it was found to be a cell-cell adhesion molecule detected on leukocytes, epithelia, and endothelia. The encoded protein mediates cell adhesion via homophilic as well as heterophilic binding to other proteins of the subgroup. Multiple cellular activities have been attributed to the encoded protein, including roles in the differentiation and arrangement of tissue three-dimensional structure, angiogenesis, apoptosis, tumor suppression, metastasis, and the modulation of innate and adaptive immune responses. Multiple transcript variants encoding different isoforms have been reported, but the full-length nature of all variants has not been defined. [provided by RefSeq, May 2010]",
+        "source":"https://www.ncbi.nlm.nih.gov/gene/634"
+      }
+    ]
+  },
+  {
+    "cellType": "B Cells",
+    "markers": [
+      {
+        "gene": "CD19",
+        "explanation": "This gene encodes a member of the immunoglobulin gene superfamily. Expression of this cell surface protein is restricted to B cell lymphocytes. This protein is a reliable marker for pre-B cells but its expression diminishes during terminal B cell differentiation in antibody secreting plasma cells. The protein has two N-terminal extracellular Ig-like domains separated by a non-Ig-like domain, a hydrophobic transmembrane domain, and a large C-terminal cytoplasmic domain. This protein forms a complex with several membrane proteins including complement receptor type 2 (CD21) and tetraspanin (CD81) and this complex reduces the threshold for antigen-initiated B cell activation. Activation of this B-cell antigen receptor complex activates the phosphatidylinositol 3-kinase signalling pathway and the subsequent release of intracellular stores of calcium ions. This protein is a target of chimeric antigen receptor (CAR) T-cells used in the treatment of lymphoblastic leukemia. Mutations in this gene are associated with the disease common variable immunodeficiency 3 (CVID3) which results in a failure of B-cell differentiation and impaired secretion of immunoglobulins. CVID3 is characterized by hypogammaglobulinemia, an inability to mount an antibody response to antigen, and recurrent bacterial infections. Alternative splicing results in multiple transcript variants encoding distinct isoforms. [provided by RefSeq, Jul 2020]",
+        "source":"https://www.ncbi.nlm.nih.gov/gene/930"
+      },
+      {
+        "gene": "MS4A1",
+        "explanation": "This gene encodes a member of the membrane-spanning 4A gene family. Members of this nascent protein family are characterized by common structural features and similar intron/exon splice boundaries and display unique expression patterns among hematopoietic cells and nonlymphoid tissues. This gene encodes a B-lymphocyte surface molecule which plays a role in the development and differentiation of B-cells into plasma cells. This family member is localized to 11q12, among a cluster of family members. Alternative splicing of this gene results in two transcript variants which encode the same protein. [provided by RefSeq, Jul 2008]",
+        "source":"https://www.ncbi.nlm.nih.gov/gene/931"
+      }
+    ]
+  },
+  {
+    "cellType": "General Immune Cells",
+    "markers": [
+      {
+        "gene": "PTPRC",
+        "explanation": "The protein encoded by this gene is a member of the protein tyrosine phosphatase (PTP) family. PTPs are known to be signaling molecules that regulate a variety of cellular processes including cell growth, differentiation, mitosis, and oncogenic transformation. This PTP contains an extracellular domain, a single transmembrane segment and two tandem intracytoplasmic catalytic domains, and thus is classified as a receptor type PTP. This PTP has been shown to be an essential regulator of T- and B-cell antigen receptor signaling. It functions through either direct interaction with components of the antigen receptor complexes, or by activating various Src family kinases required for the antigen receptor signaling. This PTP also suppresses JAK kinases, and thus functions as a regulator of cytokine receptor signaling. Alternatively spliced transcripts variants of this gene, which encode distinct isoforms, have been reported. [provided by RefSeq, Jun 2012]",
+        "source": "https://www.ncbi.nlm.nih.gov/gene/5788"
+      },
+      {
+        "gene": "CD45",
+        "explanation": "The protein encoded by this gene is a member of the protein tyrosine phosphatase (PTP) family. PTPs are known to be signaling molecules that regulate a variety of cellular processes including cell growth, differentiation, mitosis, and oncogenic transformation. This PTP contains an extracellular domain, a single transmembrane segment and two tandem intracytoplasmic catalytic domains, and thus is classified as a receptor type PTP. This PTP has been shown to be an essential regulator of T- and B-cell antigen receptor signaling. It functions through either direct interaction with components of the antigen receptor complexes, or by activating various Src family kinases required for the antigen receptor signaling. This PTP also suppresses JAK kinases, and thus functions as a regulator of cytokine receptor signaling. Alternatively spliced transcripts variants of this gene, which encode distinct isoforms, have been reported. [provided by RefSeq, Jun 2012]",
+        "source": "https://www.ncbi.nlm.nih.gov/gene/5788"
+      }
+    ]
+  }
+]

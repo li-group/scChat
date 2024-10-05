@@ -1,0 +1,108 @@
+[
+    {
+      "cellType": "Regulatory T Cells",
+      "markers": [
+        {
+          "gene": "CD3D",
+          "explanation": "The protein encoded by this gene is part of the T-cell receptor/CD3 complex (TCR/CD3 complex) and is involved in T-cell development and signal transduction. The encoded membrane protein represents the delta subunit of the CD3 complex, and along with four other CD3 subunits, binds either TCR alpha/beta or TCR gamma/delta to form the TCR/CD3 complex on the surface of T-cells. Defects in this gene are a cause of severe combined immunodeficiency autosomal recessive T-cell-negative/B-cell-positive/NK-cell-positive (SCIDBNK). Two transcript variants encoding different isoforms have been found for this gene. Other variants may also exist, but the full-length natures of their transcripts has yet to be defined. [provided by RefSeq, Feb 2009]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/915"
+        },
+        {
+          "gene": "CD3E",
+          "explanation": "The protein encoded by this gene is the CD3-epsilon polypeptide, which together with CD3-gamma, -delta and -zeta, and the T-cell receptor alpha/beta and gamma/delta heterodimers, forms the T-cell receptor-CD3 complex. This complex plays an important role in coupling antigen recognition to several intracellular signal-transduction pathways. The genes encoding the epsilon, gamma and delta polypeptides are located in the same cluster on chromosome 11. The epsilon polypeptide plays an essential role in T-cell development. Defects in this gene cause immunodeficiency. This gene has also been linked to a susceptibility to type I diabetes in women. [provided by RefSeq, Jul 2008]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/916"
+        },
+        {
+          "gene": "TRAC",
+          "explanation": "T cell receptors recognize foreign antigens which have been processed as small peptides and bound to major histocompatibility complex (MHC) molecules at the surface of antigen presenting cells (APC). Each T cell receptor is a dimer consisting of one alpha and one beta chain or one delta and one gamma chain. In a single cell, the T cell receptor loci are rearranged and expressed in the order delta, gamma, beta, and alpha. If both delta and gamma rearrangements produce functional chains, the cell expresses delta and gamma. If not, the cell proceeds to rearrange the beta and alpha loci. This region represents the germline organization of the T cell receptor alpha and delta loci. Both the alpha and delta loci include V (variable), J (joining), and C (constant) segments and the delta locus also includes diversity (D) segments. The delta locus is situated within the alpha locus, between the alpha V and J segments. During T cell development, the delta chain is synthesized by a recombination event at the DNA level joining a D segment with a J segment; a V segment is then joined to the D-J gene. The alpha chain is synthesized by recombination joining a single V segment with a J segment. For both chains, the C segment is later joined by splicing at the RNA level. Recombination of many different V segments with several J segments provides a wide range of antigen recognition. Additional diversity is attained by junctional diversity, resulting from the random additional of nucleotides by terminal deoxynucleotidyltransferase. Five variable segments can be used in either alpha or delta chains and are described by TRAV/DV symbols. Several V and J segments of the alpha locus are known to be incapable of encoding a protein and are considered pseudogenes. [provided by RefSeq, Aug 2016]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/28755"
+        },
+        {
+          "gene": "TRBC2",
+          "explanation": "Predicted to enable antigen binding activity and immunoglobulin receptor binding activity. Predicted to be involved in several processes, including activation of immune response; defense response to other organism; and phagocytosis. Predicted to be integral component of membrane. Predicted to be part of immunoglobulin complex, circulating. Predicted to be active in external side of plasma membrane. [provided by Alliance of Genome Resources, Apr 2022]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/28638"
+        },
+        {
+          "gene": "FOXP3",
+          "explanation": "The protein encoded by this gene is a member of the forkhead/winged-helix family of transcriptional regulators. Defects in this gene are the cause of immunodeficiency polyendocrinopathy, enteropathy, X-linked syndrome (IPEX), also known as X-linked autoimmunity-immunodeficiency syndrome. Alternatively spliced transcript variants encoding different isoforms have been identified. [provided by RefSeq, Jul 2008]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/50943"
+        },
+        {
+          "gene": "CTLA4",
+          "explanation": "This gene is a member of the immunoglobulin superfamily and encodes a protein which transmits an inhibitory signal to T cells. The protein contains a V domain, a transmembrane domain, and a cytoplasmic tail. Alternate transcriptional splice variants, encoding different isoforms, have been characterized. The membrane-bound isoform functions as a homodimer interconnected by a disulfide bond, while the soluble isoform functions as a monomer. Mutations in this gene have been associated with insulin-dependent diabetes mellitus, Graves disease, Hashimoto thyroiditis, celiac disease, systemic lupus erythematosus, thyroid-associated orbitopathy, and other autoimmune diseases. [provided by RefSeq, Jul 2008]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/1493"
+        },
+        {
+          "gene": "IL2RA",
+          "explanation": "The interleukin 2 (IL2) receptor alpha (IL2RA) and beta (IL2RB) chains, together with the common gamma chain (IL2RG), constitute the high-affinity IL2 receptor. Homodimeric alpha chains (IL2RA) result in low-affinity receptor, while homodimeric beta (IL2RB) chains produce a medium-affinity receptor. Normally an integral-membrane protein, soluble IL2RA has been isolated and determined to result from extracellular proteolyisis. Alternately-spliced IL2RA mRNAs have been isolated, but the significance of each is presently unknown. Mutations in this gene are associated with interleukin 2 receptor alpha deficiency. Patients with severe Coronavirus Disease 2019 (COVID-19), the disease caused by the novel severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2), have significantly elevated levels of IL2R in their plasma. Similarly, serum IL-2R levels are found to be elevated in patients with different types of carcinomas. Certain IL2RA and IL2RB gene polymorphisms have been associated with lung cancer risk. [provided by RefSeq, Jul 2020]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/3559"
+        }
+      ]
+    },
+    {
+      "cellType": "NK/T Cells",
+      "markers": [
+        {
+          "gene": "NKG7",
+          "explanation": "Predicted to be integral component of plasma membrane. Predicted to be active in plasma membrane. [provided by Alliance of Genome Resources, Apr 2022]",
+          "source":"https://www.ncbi.nlm.nih.gov/gene/4818"
+        },
+        {
+          "gene": "KLRD1",
+          "explanation": "Natural killer (NK) cells are a distinct lineage of lymphocytes that mediate cytotoxic activity and secrete cytokines upon immune stimulation. Several genes of the C-type lectin superfamily, including members of the NKG2 family, are expressed by NK cells and may be involved in the regulation of NK cell function. KLRD1 (CD94) is an antigen preferentially expressed on NK cells and is classified as a type II membrane protein because it has an external C terminus. Several transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, May 2017]",
+          "source":"https://www.ncbi.nlm.nih.gov/gene/3824"
+        }
+      ]
+    },
+    {
+      "cellType": "CD4 T Cells",
+      "markers": [
+        {
+            "gene": "CD4",
+            "explanation": "This gene encodes the CD4 membrane glycoprotein of T lymphocytes. The CD4 antigen acts as a coreceptor with the T-cell receptor on the T lymphocyte to recognize antigens displayed by an antigen presenting cell in the context of class II MHC molecules. The CD4 antigen is also a primary receptor for entry of the human immunodeficiency virus through interactions with the HIV Env gp120 subunit. This gene is expressed not only in T lymphocytes, but also in B cells, macrophages, granulocytes, as well as in various regions of the brain. The protein functions to initiate or augment the early phase of T-cell activation, and may function as an important mediator of indirect neuronal damage in infectious and immune-mediated diseases of the central nervous system. Multiple alternatively spliced transcript variants encoding different isoforms have been identified in this gene. [provided by RefSeq, May 2020]",
+            "source":"https://www.ncbi.nlm.nih.gov/gene/920"
+        }
+      ]
+    },
+    {
+      "cellType": "CD8 T Cells",
+      "markers": [
+        {
+          "gene": "CD8A",
+          "explanation": "The CD8 antigen is a cell surface glycoprotein found on most cytotoxic T lymphocytes that mediates efficient cell-cell interactions within the immune system. The CD8 antigen acts as a coreceptor with the T-cell receptor on the T lymphocyte to recognize antigens displayed by an antigen presenting cell in the context of class I MHC molecules. The coreceptor functions as either a homodimer composed of two alpha chains or as a heterodimer composed of one alpha and one beta chain. Both alpha and beta chains share significant homology to immunoglobulin variable light chains. This gene encodes the CD8 alpha chain. Multiple transcript variants encoding different isoforms have been found for this gene. The major protein isoforms of this gene differ by the presence or absence of a transmembrane domain and thus differ in being a membrane-anchored or secreted protein. [provided by RefSeq, May 2020]",
+          "source":"https://www.ncbi.nlm.nih.gov/gene/925"
+        },
+        {
+          "gene": "GZMA",
+          "explanation": "Cytolytic T lymphocytes (CTL) and natural killer (NK) cells share the remarkable ability to recognize, bind, and lyse specific target cells. They are thought to protect their host by lysing cells bearing on their surface 'nonself' antigens, usually peptides or proteins resulting from infection by intracellular pathogens. The protein described here is a T cell- and natural killer cell-specific serine protease that may function as a common component necessary for lysis of target cells by cytotoxic T lymphocytes and natural killer cells. [provided by RefSeq, Jul 2008]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/3001"
+        },
+        {
+          "gene": "GZMB",
+          "explanation": "This gene encodes a member of the granzyme subfamily of proteins, part of the peptidase S1 family of serine proteases. The encoded preproprotein is secreted by natural killer (NK) cells and cytotoxic T lymphocytes (CTLs) and proteolytically processed to generate the active protease, which induces target cell apoptosis. This protein also processes cytokines and degrades extracellular matrix proteins, and these roles are implicated in chronic inflammation and wound healing. Expression of this gene may be elevated in human patients with cardiac fibrosis. [provided by RefSeq, Sep 2016]",
+          "source": "https://www.ncbi.nlm.nih.gov/gene/3002"
+        },
+        {
+          "gene": "GZMG",
+          "explanation": "Predicted to enable serine-type endopeptidase activity. Predicted to be involved in several processes, including granzyme-mediated programmed cell death signaling pathway; natural killer cell mediated cytotoxicity; and pyroptosis. Predicted to act upstream of or within cytolysis. Predicted to be located in cytolytic granule. Predicted to be active in cytoplasm and intracellular membrane-bounded organelle. Is expressed in several structures, including early conceptus and female reproductive system. Orthologous to human GZMB (granzyme B). [provided by Alliance of Genome Resources, Apr 2022]",
+          "source":"https://www.ncbi.nlm.nih.gov/gene/14944"
+        }
+      ]
+    },
+    {
+        "cellType": "Naive T Cells",
+        "markers": [
+          {
+            "gene": "MKI67",
+            "explanation": "Enables protein C-terminus binding activity. Involved in regulation of chromosome segregation and regulation of mitotic nuclear division. Located in chromosome; nuclear body; and nucleolus. Colocalizes with condensed chromosome. Implicated in Crohn's disease; breast cancer; human immunodeficiency virus infectious disease; and pancreatic cancer. Biomarker of several diseases, including Barrett's esophagus; autoimmune disease of musculoskeletal system (multiple); endocrine gland cancer (multiple); gastrointestinal system cancer (multiple); and interstitial cystitis. [provided by Alliance of Genome Resources, Apr 2022]",
+            "source":"https://www.ncbi.nlm.nih.gov/gene/4288"
+          },
+          {
+            "gene": "SELL",
+            "explanation": "This gene encodes a cell surface adhesion molecule that belongs to a family of adhesion/homing receptors. The encoded protein contains a C-type lectin-like domain, a calcium-binding epidermal growth factor-like domain, and two short complement-like repeats. The gene product is required for binding and subsequent rolling of leucocytes on endothelial cells, facilitating their migration into secondary lymphoid organs and inflammation sites. Single-nucleotide polymorphisms in this gene have been associated with various diseases including immunoglobulin A nephropathy. Alternatively spliced transcript variants have been found for this gene. [provided by RefSeq, Oct 2009]",
+            "source":"https://www.ncbi.nlm.nih.gov/gene/6402"
+          }
+        ]
+      }
+  
+  ]

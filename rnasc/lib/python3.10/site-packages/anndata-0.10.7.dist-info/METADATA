@@ -1,0 +1,129 @@
+Metadata-Version: 2.3
+Name: anndata
+Version: 0.10.7
+Summary: Annotated data.
+Project-URL: Documentation, https://anndata.readthedocs.io/
+Project-URL: Source, https://github.com/scverse/anndata
+Project-URL: Home-page, https://github.com/scverse/anndata
+Author: Philipp Angerer, Alex Wolf, Isaac Virshup, Sergei Rybakov
+Maintainer-email: Isaac Virshup <ivirshup@gmail.com>, Philipp Angerer <philipp.angerer@helmholtz-munich.de>, Alex Wolf <f.alex.wolf@gmx.de>
+License-Expression: BSD-3-Clause
+License-File: LICENSE
+Classifier: Environment :: Console
+Classifier: Framework :: Jupyter
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Natural Language :: English
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Requires-Python: >=3.9
+Requires-Dist: array-api-compat!=1.5,>1.4
+Requires-Dist: exceptiongroup; python_version < '3.11'
+Requires-Dist: h5py>=3.1
+Requires-Dist: natsort
+Requires-Dist: numpy>=1.23
+Requires-Dist: packaging>=20.0
+Requires-Dist: pandas!=2.1.0rc0,!=2.1.2,>=1.4
+Requires-Dist: scipy>1.8
+Provides-Extra: dev
+Requires-Dist: pytest-xdist; extra == 'dev'
+Requires-Dist: setuptools-scm; extra == 'dev'
+Provides-Extra: doc
+Requires-Dist: awkward>=2.0.7; extra == 'doc'
+Requires-Dist: ipython; extra == 'doc'
+Requires-Dist: myst-parser; extra == 'doc'
+Requires-Dist: nbsphinx; extra == 'doc'
+Requires-Dist: readthedocs-sphinx-search; extra == 'doc'
+Requires-Dist: scanpydoc[theme,typehints]>=0.13.4; extra == 'doc'
+Requires-Dist: sphinx-autodoc-typehints>=1.11.0; extra == 'doc'
+Requires-Dist: sphinx-book-theme>=1.1.0; extra == 'doc'
+Requires-Dist: sphinx-copybutton; extra == 'doc'
+Requires-Dist: sphinx-design>=0.5.0; extra == 'doc'
+Requires-Dist: sphinx-issues; extra == 'doc'
+Requires-Dist: sphinx>=4.4; extra == 'doc'
+Requires-Dist: sphinxext-opengraph; extra == 'doc'
+Requires-Dist: zarr; extra == 'doc'
+Provides-Extra: gpu
+Requires-Dist: cupy; extra == 'gpu'
+Provides-Extra: test
+Requires-Dist: awkward>=2.3; extra == 'test'
+Requires-Dist: boltons; extra == 'test'
+Requires-Dist: dask[array,distributed]>=2022.09.2; extra == 'test'
+Requires-Dist: httpx; extra == 'test'
+Requires-Dist: joblib; extra == 'test'
+Requires-Dist: loompy>=3.0.5; extra == 'test'
+Requires-Dist: matplotlib; extra == 'test'
+Requires-Dist: openpyxl; extra == 'test'
+Requires-Dist: pyarrow; extra == 'test'
+Requires-Dist: pytest-cov>=2.10; extra == 'test'
+Requires-Dist: pytest-memray; extra == 'test'
+Requires-Dist: pytest-mock; extra == 'test'
+Requires-Dist: pytest>=7.3; extra == 'test'
+Requires-Dist: scanpy; extra == 'test'
+Requires-Dist: scikit-learn; extra == 'test'
+Requires-Dist: zarr; extra == 'test'
+Description-Content-Type: text/markdown
+
+[![Build Status](https://dev.azure.com/scverse/anndata/_apis/build/status/scverse.anndata?branchName=main)](https://dev.azure.com/scverse/anndata/_build)
+[![Conda](https://img.shields.io/conda/vn/conda-forge/anndata.svg)](https://anaconda.org/conda-forge/anndata)
+[![Coverage](https://codecov.io/gh/scverse/anndata/branch/main/graph/badge.svg?token=IN1mJN1Wi8)](https://codecov.io/gh/scverse/anndata)
+[![Docs](https://readthedocs.com/projects/icb-anndata/badge/?version=latest)](https://anndata.readthedocs.io)
+[![PyPI](https://img.shields.io/pypi/v/anndata.svg)](https://pypi.org/project/anndata)
+[![Downloads](https://static.pepy.tech/badge/anndata/month)](https://pepy.tech/project/anndata)
+[![Downloads](https://static.pepy.tech/badge/anndata)](https://pepy.tech/project/anndata)
+[![Stars](https://img.shields.io/github/stars/scverse/anndata?logo=GitHub&color=yellow)](https://github.com/scverse/anndata/stargazers)
+[![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A)](http://numfocus.org)
+
+<img
+  src="https://raw.githubusercontent.com/scverse/anndata/main/docs/_static/img/anndata_schema.svg"
+  class="dark-light" align="right" width="350" alt="image"
+/>
+
+# anndata - Annotated data
+
+anndata is a Python package for handling annotated data matrices in memory and on disk, positioned between pandas and xarray. anndata offers a broad range of computationally efficient features including, among others, sparse data support, lazy operations, and a PyTorch interface.
+
+- Discuss development on [GitHub](https://github.com/scverse/anndata).
+- Read the [documentation](https://anndata.readthedocs.io).
+- Ask questions on the [scverse Discourse](https://discourse.scverse.org).
+- Install via `pip install anndata` or `conda install anndata -c conda-forge`.
+- See [Scanpy's documentation](https://scanpy.readthedocs.io/) for usage related to single cell data. anndata was initially built for Scanpy.
+
+[//]: # (numfocus-fiscal-sponsor-attribution)
+
+anndata is part of the scverse project ([website](https://scverse.org), [governance](https://scverse.org/about/roles)) and is fiscally sponsored by [NumFOCUS](https://numfocus.org/).
+Please consider making a tax-deductible [donation](https://numfocus.org/donate-to-scverse) to help the project pay for developer time, professional services, travel, workshops, and a variety of other needs.
+
+
+<a href="https://numfocus.org/project/scverse">
+  <img
+    src="https://raw.githubusercontent.com/numfocus/templates/master/images/numfocus-logo.png"
+    width="200"
+  >
+</a>
+
+## Citation
+
+If you use `anndata` in your work, please cite the `anndata` pre-print as follows:
+
+> **anndata: Annotated data**
+>
+> Isaac Virshup, Sergei Rybakov, Fabian J. Theis, Philipp Angerer, F. Alexander Wolf
+>
+> _bioRxiv_ 2021 Dec 19. doi: [10.1101/2021.12.16.473007](https://doi.org/10.1101/2021.12.16.473007).
+
+You can cite the scverse publication as follows:
+
+> **The scverse project provides a computational ecosystem for single-cell omics data analysis**
+>
+> Isaac Virshup, Danila Bredikhin, Lukas Heumos, Giovanni Palla, Gregor Sturm, Adam Gayoso, Ilia Kats, Mikaela Koutrouli, Scverse Community, Bonnie Berger, Dana Pe’er, Aviv Regev, Sarah A. Teichmann, Francesca Finotello, F. Alexander Wolf, Nir Yosef, Oliver Stegle & Fabian J. Theis
+>
+> _Nat Biotechnol._ 2023 Apr 10. doi: [10.1038/s41587-023-01733-8](https://doi.org/10.1038/s41587-023-01733-8).

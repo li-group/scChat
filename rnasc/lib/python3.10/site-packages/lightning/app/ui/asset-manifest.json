@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/static/css/main.fb7060be.css",
+    "main.js": "/static/js/main.c1f02aeb.js",
+    "static/js/787.418637a8.chunk.js": "/static/js/787.418637a8.chunk.js",
+    "static/media/lightning-logo-with-text.svg": "/static/media/lightning-logo-with-text.b964c8fbf221c97eb8ce52bb6e3a30d6.svg",
+    "static/media/warning.svg": "/static/media/warning.5c542673e84e77ceb6a230bfea7f7263.svg",
+    "index.html": "/index.html",
+    "static/media/error.svg": "/static/media/error.11892047d0183a4723b91dc0fb98cb95.svg",
+    "static/media/success.svg": "/static/media/success.5edae4c5b171e2c1c5a3c54273c47ba8.svg",
+    "main.fb7060be.css.map": "/static/css/main.fb7060be.css.map",
+    "main.c1f02aeb.js.map": "/static/js/main.c1f02aeb.js.map",
+    "787.418637a8.chunk.js.map": "/static/js/787.418637a8.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.fb7060be.css",
+    "static/js/main.c1f02aeb.js"
+  ]
+}
