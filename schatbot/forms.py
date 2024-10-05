@@ -9,4 +9,3 @@ class UploadFileForm(forms.ModelForm):
     class Meta:
         model = FileUpload
         fields = ['title', 'file']
-        print("shitty uploading file form")

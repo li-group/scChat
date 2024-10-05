@@ -10,30 +10,20 @@ import openai
 from django.core.files.storage import default_storage
 
 from django.http import HttpResponse
-from .new_function_calling import generate_umap, display_umap_leiden
+from .new_function_calling import generate_umap
 
 from .chat import ask  
 from .new_function_calling import start_chat2
 from .new_function_calling import start_chat2_web
-from .new_function_calling import display_umap_leiden
+# from .new_function_calling import display_umap_leiden
 from .new_function_calling import display_dotplot
 from .new_function_calling import display_cell_type_composition
 # from .new_function_calling import process_myeloid_cells
 from .new_function_calling import convert_into_labels
-from .new_function_calling import display_myeloid_umap
+# from .new_function_calling import display_myeloid_umap
 from .new_function_calling import display_annotated_umap
-# from .new_function_calling import process_t_cells
-from .new_function_calling import display_t_umap
-# from .new_function_calling import patient_pre_post_comparison_myeloid
-# from .new_function_calling import patient_pre_post_comparison_t
 from .new_function_calling import patient_differential_expression_genes_comparison
-from .new_function_calling import convert_into_labels_myeloid
-from .new_function_calling import convert_into_labels_t
-from .new_function_calling import display_annotated_myeloid
-from .new_function_calling import display_annotated_t
 from .new_function_calling import generate_umap
-from .new_function_calling import remap_reso
-from .new_function_calling import set_map
 from .new_function_calling import display_gsea_dotplot
 from .gemini import browse_web
 
@@ -41,9 +31,6 @@ from django.shortcuts import render, redirect
 from .forms import UploadFileForm
 from .models import FileUpload
 
-from .new_function_calling import display_cell_population_change_overall
-from .new_function_calling import display_cell_population_change_t
-from .new_function_calling import display_cell_population_change_myeloid
 
 import nltk
 from nltk.corpus import stopwords
@@ -86,21 +73,6 @@ def upload_file(request):
         }, status=400)
 
 
-# # file upload
-# @csrf_exempt  # Temporarily disable CSRF token for testing, ensure you handle CSRF properly in production
-# @require_http_methods(["POST"])
-# def upload_file(request):
-#     if request.FILES:
-#         h5ad_file = request.FILES['file']
-#         file_path = default_storage.save(h5ad_file.name, h5ad_file)
-#         print("File saved to:", file_path)
-        
-#         response = start_chat2(file_path)
-        
-#         return JsonResponse({'openai_response': response})
-#     else:
-#         return JsonResponse({'error': 'No file was uploaded.'}, status=400)
-
 
 # Check need to search on for internet
 nltk.download('punkt', quiet=True)
@@ -127,52 +99,14 @@ def umap_leiden_view(request):
 function_descriptions = [
     {
         "name": "generate_umap",
-        "description": "Generates a UMAP visualization based on the given RNA sequencing data",
+        "description": "Used to Generate UMAP for unsupervised clustering for RNA analysis. Generates a UMAP visualization based on the given RNA sequencing data",
         "parameters": {
             "type": "object",
             "properties": {},
             "required": [],
         },
     },
-    {
-        "name": "test_question",
-        "description": "test_question",
-        "parameters": {
-            "type": "object",
-            "properties": 
-                {"value":{
-                    "type":"string","description":"value"}
-                 },
-            "required": ["value"],
-        },
-    },
-    {
-        "name": "test_answer",
-        "description": "test_answer",
-        "parameters": {
-            "type": "object",
-            "properties": {},
-            "required": [],
-        },
-    },
-    {
-        "name": "retreive_stats",
-        "description": "Retrieves mean expression and expression proportion for annotation",
-        "parameters": {
-            "type": "object",
-            "properties": {},
-            "required": [],
-        },
-    },
-    {
-        "name": "display_umap_leiden",
-        "description": "Displays the leiden umap for the sample",
-        "parameters": {
-            "type": "object",
-            "properties": {},
-            "required": [],
-        },
-    },
+    
     {
         "name": "display_dotplot",
         "description": "Displays the dotplot for the sample",
@@ -191,16 +125,7 @@ function_descriptions = [
             "required": [],
         },
     },
-    #  
-    {
-        "name": "convert_into_labels",
-        "description": "converts into labels",
-        "parameters": {
-            "type": "object",
-            "properties": {},
-            "required": [],
-        },
-    },
+    
     {
         "name": "display_myeloid_umap",
         "description": "displays myeloid umap",
@@ -210,24 +135,16 @@ function_descriptions = [
             "required": [],
         },
     },
+    
     {
-        "name": "display_annotated_umap",
-        "description": "displays annotated umap",
+        "name": "read_image",
+        "description": "Reads and processes an image from the 'media' folder and returns a description of what's in the image.",
         "parameters": {
             "type": "object",
             "properties": {},
             "required": [],
         },
     },
-    # {
-    #     "name": "process_t_cells",
-    #     "description": "process t cells",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
     {
         "name": "process_cells",
         "description": "process cells",
@@ -241,28 +158,32 @@ function_descriptions = [
         },
     },
     {
-        "name": "display_t_umap",
-        "description": "display t umap",
+        "name": "display_umap",
+        "description": "displays umap that is NOT annotated. This function should be called whenever the user asks for a umap that is not annotated. In the case that the user does not specify cell type, use overall cells. This function can be called multiple times. This function should not be called when asked to GENERATE umap.",
         "parameters": {
-
             "type": "object",
-            "properties": {},
-            "required": [],
+            "properties":
+                {"cell_type":{
+                    "type":"string","description":"the cell type"}
+                 },
+            "required": ["cell_type"],
         },
     },
-    # {
-    #     "name": "patient_pre_post_comparison_myeloid",
-    #     "description": "patient pre post comparison myeloid",
-    #     "parameters": {
-
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
     {
-        "name": "patient_pre_post_comparison",
-        "description": "patient pre post comparison",
+        "name": "display_annotated_umap",
+        "description": "displays umap that IS annotated. This function should be called whenever the user asks for a umap that IS annotated. In the case that the user does not specify cell type, use overall cells. This function can be called multiple times. This function should not be called when asked to GENERATE umap.",
+        "parameters": {
+            "type": "object",
+            "properties":
+                {"cell_type":{
+                    "type":"string","description":"the cell type"}
+                 },
+            "required": ["cell_type"],
+        },
+    },
+    {
+        "name": "display_cell_population_change",
+        "description": "displays cell population change graph",
         "parameters": {
             "type": "object",
             "properties": 
@@ -272,41 +193,28 @@ function_descriptions = [
             "required": ["cell_type"],
         },
     },
+    
     {
-        "name": "convert_into_labels_myeloid",
-        "description": "converts into labels myeloid",
-        "parameters": {
-            "type": "object",
-            "properties": {},
-            "required": [],
+    "name": "patient_differential_expression_genes_comparison",
+    "description": "Function is designed to perform a differential gene expression analysis for a specified cell type between two patient conditions (pre and post-treatment or two different conditions)",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "cell_type": {
+                "type": "string",
+                "description": "The type of cell to be compared"
+            },
+            "patient_1": {
+                "type": "string",
+                "description": "Identifier for the first patient"
+            },
+            "patient_2": {
+                "type": "string",
+                "description": "Identifier for the second patient"
+            }
         },
-    },
-    {
-        "name": "convert_into_labels_t",
-        "description": "converts into labels t",
-        "parameters": {
-            "type": "object",
-            "properties": {},
-            "required": [],
-        },
-    },
-    {
-        "name": "display_annotated_myeloid",
-        "description": "displays annotated myeloid",
-        "parameters": {
-            "type": "object",
-            "properties": {},
-            "required": [],
-        },
-    },
-    {
-        "name": "display_annotated_t",
-        "description": "displays annotated t",
-        "parameters": {
-            "type": "object",
-            "properties": {},
-            "required": [],
-        },
+        "required": ["cell_type", "patient_1", "patient_2"]
+    }
     },
     {
         "name": "remap_reso",
@@ -319,13 +227,37 @@ function_descriptions = [
     },
     {
         "name": "calculate_cell_population_change",
-        "description": "calculate_cell_population_change",
+        "description": "calculate_cell population change for percentage changes in cell populations or samples before and after treatment. This calculation can be done for any cell type. This is to see the changes in the population before and after treatment.",
+        "parameters": {
+            "type": "object",
+            "properties": 
+                {"cell_type":{
+                    "type":"string","description":"the cell type"}
+                 },
+            "required": ["cell_type"],
+        },
+    },
+    {
+        "name": "gsea_analysis",
+        "description": "Performs Gene Set Enrichment Analysis (GSEA) on a dataset of significant genes. This function ranks the genes based on their adjusted p-values and log-fold changes, performs the GSEA analysis using multiple gene set libraries, filters the results for significant terms (FDR ≤ 0.05), and generates several output files including enrichment score plots, a dot plot, and CSV files with the GSEA results and ranked gene list.",
         "parameters": {
             "type": "object",
             "properties": {},
             "required": [],
         },
-    }
+    },
+    {
+        "name": "label_clusters",
+        "description": "This function can be called multiple times. this function is to label and or annotate clusters. It can be done for any type of cells that is mentioned by the user. If the user does not mention the cell type use overall cells. This function can be called multiple times.",
+        "parameters": {
+            "type": "object",
+            "properties": 
+                {"cell_type":{
+                    "type":"string","description":"the cell type"}
+                 },
+            "required": ["cell_type"],
+        },
+    },
 ]
 def start_chat2_wrapper(user_input):
     conversation_history = [{"role": "user", "content": user_input}]
@@ -367,10 +299,7 @@ def chat_with_ai(request):
         if classify_intent(user_message) == 'web_search':
             response = browse_web(user_message)
             print(f"Web search response: {response}")
-        # elif "display leiden umap" in user_message.lower():
-        #     graph_json = display_umap_leiden()
-        #     response = 'displaying umap leiden'
-        #     return JsonResponse({"response": response, "graph_json": graph_json})
+
         
         elif "display dotplot" in user_message.lower():
             graph_json = display_dotplot()
@@ -382,63 +311,14 @@ def chat_with_ai(request):
             response = 'displaying cell type composition'
             return JsonResponse({"response": response, "graph_json": graph_json})
         
-        # elif "display myeloid umap" in user_message.lower():
-        #     graph_json = display_myeloid_umap()
-        #     response = 'displaying myeloid umap'
-        #     return JsonResponse({"response": response, "graph_json": graph_json})
-        # elif "display t umap" in user_message.lower():
-        #     graph_json = display_t_umap()
-        #     response = 'displaying t umap'
-        #     return JsonResponse({"response": response, "graph_json": graph_json})
-        # elif "display annotated umap" in user_message.lower():
-        #     graph_json = display_annotated_umap()
-        #     response = 'displaying annotated umap'
-        #     return JsonResponse({"response": response, "graph_json": graph_json})
+
         
         elif "display gsea plot" in user_message.lower():
             graph_json = display_gsea_dotplot()
             response = 'displaying gsea plot'
             return JsonResponse({"response": response, "graph_json": graph_json})
         
-        # elif "display annotated myeloid umap" in user_message.lower():
-        #     graph_json = display_annotated_myeloid()
-        #     response = 'displaying annotated myeloid umap'
-        #     return JsonResponse({"response": response, "graph_json": graph_json})
-        
-        # elif "display annotated t umap" in user_message.lower():
-        #     graph_json = display_annotated_t()
-        #     response = 'displaying annotated t umap'
-        #     return JsonResponse({"response": response, "graph_json": graph_json})
-        
-        # elif "annotate clusters" in user_message.lower():
-        #     graph_json = convert_into_labels(conversation_history)
-        #     response = 'Calling convert into labels'
-        #     return JsonResponse({"response": response, "graph_json": graph_json})
-        
-        # elif "annotate myeloid clusters" in user_message.lower():
-        #     graph_json = convert_into_labels_myeloid(conversation_history)
-        #     response = 'Calling convert into labels (Myeloid specific)'
-        #     return JsonResponse({"response": response, "graph_json": graph_json})
-        
-        # elif "annotate t clusters" in user_message.lower():
-        #     graph_json = convert_into_labels_t(conversation_history)
-        #     response = 'Calling convert into labels (t specific)'
-        #     return JsonResponse({"response": response, "graph_json": graph_json})
-        
-        # elif "display cell population change t" in user_message.lower():
-        #     graph_json = display_cell_population_change_t()
-        #     response = "Displaying cell population change T cells"
-        #     return JsonResponse({"response": response, "graph_json": graph_json})
-        
-        # elif "display cell population change myeloid" in user_message.lower():
-        #     graph_json = display_cell_population_change_myeloid()
-        #     response = "Displaying cell population change Myeloid cells"
-        #     return JsonResponse({"response": response, "graph_json": graph_json})
-        
-        # elif "display cell population change overall" in user_message.lower():
-        #     graph_json = display_cell_population_change_overall()
-        #     response = "Displaying cell population change Overall cells"
-        #     return JsonResponse({"response": response, "graph_json": graph_json})
+    
 
         elif "set resolution" in user_message.lower():
             print ("setting resolution")
@@ -470,45 +350,6 @@ def chat_with_ai(request):
     except Exception as e:
         print(f"Error in chat_with_ai: {e}")
         return JsonResponse({"error": str(e)}, status=500)
-
-# def classify_intent(user_message):
-#     search_keywords = {'search', 'find', 'lookup', 'google', 'web search'}
-#     words = set(word_tokenize(user_message.lower()))
-#     if words & search_keywords:
-#         return 'web_search'
-#     return 'chat'
-
-# @csrf_exempt  # Consider CSRF implications depending on your deployment
-# @require_http_methods(["POST"])  # Ensure only POST requests are handled
-# def chat_with_ai(request):
-#     try:
-#         data = json.loads(request.body)
-#         user_message = data.get('message', '')
-#         print(f"Received message: {user_message}")
-
-#         # Retrieve conversation history from the session
-#         conversation_history = request.session.get('conversation_history', [])
-#         # conversation_history = []
-#         # print(f"Loaded conversation history: {conversation_history}")
-
-#         if classify_intent(user_message) == 'web_search':
-#             response = browse_web(user_message)
-#             print(f"Web search response: {response}")
-#         else:
-#             response, conversation_history = start_chat2_web(user_message, conversation_history)
-#             print(f"Chat response: {response}")
-
-#         # Store updated conversation history in the session
-#         request.session['conversation_history'] = conversation_history
-
-#         return JsonResponse({"response": response})
-
-#     except json.JSONDecodeError as e:
-#         print(f"JSON decode error: {e}")
-#         return JsonResponse({"error": "Invalid JSON"}, status=400)
-#     except Exception as e:
-#         print(f"Error in chat_with_ai: {e}")
-#         return JsonResponse({"error": str(e)}, status=500)
 
 
 # forms.py

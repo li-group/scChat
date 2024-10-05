@@ -53,7 +53,8 @@ global display_flag
 display_flag = False
 
 load_dotenv()
-openai.api_key = "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"
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 
 
 data = pd.DataFrame({
@@ -101,31 +102,9 @@ def find_and_load_sample_mapping(directory):
     # If the file wasn't found
     return None
 
-def set_map(user_message):
-    global sample_mapping
-    last_message = user_message
-    str_map = ""
-    map = {}
-    flag = False
-    for i in last_message:
-        if i == "{":
-            flag = True
-        if i == "}":
-            str_map += i
-            flag = False
-        if flag:
-            str_map += i
+
     
-    map = ast.literal_eval(str_map)
-    map2 = {str(key): value for key, value in map.items()}
-    sample_mapping = map2
-    
-def remap_reso(message):
-    global resolution
-    message = message.split()
-    for i in message:
-        if i.isnumeric():
-            resolution = int(i)
+
         
 def get_umap_data():
     try:
@@ -148,32 +127,7 @@ def get_umap_data():
     except Exception as e:
         raise
 
-def display_cell_population_change_t():
-    # Load the CSV file
-    filename = f'schatbot/cell_population_change/T cells_cell_population_change.csv'
-    cell_counts = pd.read_csv(filename)
 
-    # Create the Plotly plot
-    fig = px.bar(
-        cell_counts,
-        x="patient_name",
-        y="percentage",
-        color="cell_type",
-        title=f"Cell Population Change",
-        labels={"patient_name": "Patient Name", "percentage": "Percentage of Cell Type"}
-    )
-
-    # Update layout for better visualization
-    fig.update_layout(
-        width=1200,  # Set the width of the plot
-        height=800,  # Set the height of the plot
-        autosize=True,
-        showlegend=True  # Show the legend
-    )
-
-    # Convert the plot to JSON for frontend display
-    fig_json = fig.to_json()
-    return fig_json
 
 
 def display_cell_population_change(cell_type):
@@ -207,109 +161,7 @@ def display_cell_population_change(cell_type):
     fig_json = fig.to_json()
     return fig_json
 
-def display_cell_population_change_myeloid():
-    # Load the CSV file
-    filename = f'schatbot/cell_population_change/Myeloid cells_cell_population_change.csv'
-    cell_counts = pd.read_csv(filename)
 
-    # Create the Plotly plot
-    fig = px.bar(
-        cell_counts,
-        x="patient_name",
-        y="percentage",
-        color="cell_type",
-        title=f"Cell Population Change",
-        labels={"patient_name": "Patient Name", "percentage": "Percentage of Cell Type"}
-    )
-
-    # Update layout for better visualization
-    fig.update_layout(
-        width=1200,  # Set the width of the plot
-        height=800,  # Set the height of the plot
-        autosize=True,
-        showlegend=True  # Show the legend
-    )
-
-    # Convert the plot to JSON for frontend display
-    fig_json = fig.to_json()
-    return fig_json
-
-def display_cell_population_change_overall():
-    # Load the CSV file
-    filename = f'schatbot/cell_population_change/Overall cells_cell_population_change.csv'
-    cell_counts = pd.read_csv(filename)
-
-    # Create the Plotly plot
-    fig = px.bar(
-        cell_counts,
-        x="patient_name",
-        y="percentage",
-        color="cell_type",
-        title=f"Cell Population Change",
-        labels={"patient_name": "Patient Name", "percentage": "Percentage of Cell Type"}
-    )
-
-    # Update layout for better visualization
-    fig.update_layout(
-        width=1200,  # Set the width of the plot
-        height=800,  # Set the height of the plot
-        autosize=True,
-        showlegend=True  # Show the legend
-    )
-
-    # Convert the plot to JSON for frontend display
-    fig_json = fig.to_json()
-    return fig_json
-
-
-
-def display_umap_leiden():
-    
-
-    
-    umap_data = pd.read_csv("umap_data.csv")
-
-    # Create the Plotly plot
-    fig = px.scatter(
-        umap_data,
-        x="UMAP_1",
-        y="UMAP_2",
-        color="leiden",
-        symbol="patient_name",
-        title="UMAP Plot",
-        labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
-    )
-
-    # Update traces and layout
-    fig.update_traces(marker=dict(size=5, opacity=0.8))
-    fig.update_layout(
-        width=1200,  # Set the width of the plot
-        height=800,  # Set the height of the plot
-        autosize=True,
-        showlegend=True,  # Show the legend
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1
-        )
-    )
-
-    custom_legend = go.Scatter(
-        x=[None], y=[None],
-        mode='markers',
-        marker=dict(size=10, color='rgba(0,0,0,0)'),
-        legendgroup="Unknown",
-        showlegend=True,
-        name="Unknown"
-    )
-
-    fig.add_trace(custom_legend)
-
-    # fig.show()
-    fig_json = fig.to_json()
-    return fig_json
 
 
 def display_umap(cell_type):
@@ -380,189 +232,18 @@ def display_annotated_umap(cell_type):
         showlegend=True
     )
 
-    # custom_legend = go.Scatter(
-    #     x=[None], y=[None],
-    #     mode='markers',
-    #     marker=dict(size=10, color='rgba(0,0,0,0)'),
-    #     legendgroup="cell_type",
-    #     showlegend=True,
-    #     name="Unknown"
-    # )
-
-    # fig.add_trace(custom_legend)
     fig_json = fig.to_json()
     return fig_json
 
 
-
-def display_t_umap():
-    umap_data = pd.read_csv("t_umap_data.csv")
-    umap_data['original_cell_type'] = umap_data['cell_type']
-    umap_data['cell_type'] = 'Unknown'
-
-    fig = px.scatter(
-        umap_data,
-        x="UMAP_1",
-        y="UMAP_2",
-        color="leiden",
-        symbol="patient_name",
-        title="T Cells UMAP Plot",
-        labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
-    )
-
-    fig.update_traces(marker=dict(size=5, opacity=0.8))
-    fig.update_layout(
-        width=1200,
-        height=800,
-        autosize=True,
-        showlegend=False
-    )
-
-    custom_legend = go.Scatter(
-        x=[None], y=[None],
-        mode='markers',
-        marker=dict(size=10, color='rgba(0,0,0,0)'),
-        legendgroup="Unknown",
-        showlegend=True,
-        name="Unknown"
-    )
-
-    fig.add_trace(custom_legend)
-    fig_json = fig.to_json()
-    return fig_json
-
-
-        
-  
-
-def display_myeloid_umap():
-    umap_data = pd.read_csv("myeloid_umap_data.csv")
-    umap_data['original_cell_type'] = umap_data['cell_type']
-    umap_data['cell_type'] = 'Unknown'
-
-    fig = px.scatter(
-        umap_data,
-        x="UMAP_1",
-        y="UMAP_2",
-        color="leiden",
-        symbol="patient_name",
-        title="Myeloid Cells UMAP Plot",
-        labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
-    )
-
-    fig.update_traces(marker=dict(size=5, opacity=0.8))
-    fig.update_layout(
-        width=1200,
-        height=800,
-        autosize=True,
-        showlegend=False
-    )
-
-    custom_legend = go.Scatter(
-        x=[None], y=[None],
-        mode='markers',
-        marker=dict(size=10, color='rgba(0,0,0,0)'),
-        legendgroup="Unknown",
-        showlegend=True,
-        name="Unknown"
-    )
-
-    fig.add_trace(custom_legend)
-    fig_json = fig.to_json()
-    return fig_json
-
-# def display_annotated_umap():
-#     # umap_data = pd.read_csv("annotated_umap_data.csv")
-#     umap_data = pd.read_csv("umaps/annotated_umap_data.csv")
-
-#     # Create the Plotly plot
-#     fig = px.scatter(
-#         umap_data,
-#         x="UMAP_1",
-#         y="UMAP_2",
-#         color="cell_type",
-#         symbol="patient_name",
-#         title="UMAP Plot",
-#         labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
-#     )
-
-#     # Update traces and layout
-#     fig.update_traces(marker=dict(size=5, opacity=0.8))
-#     fig.update_layout(
-#         width=1200,  # Set the width of the plot
-#         height=800,  # Set the height of the plot
-#         autosize=True,
-#         showlegend=True  # Show the legend
-#     )
-
-#     # fig.show()
-#     fig_json = fig.to_json()
-#     return fig_json
-
-def display_annotated_myeloid():
-    umap_data = pd.read_csv("umaps/Myeloid cells_annotated_umap_data.csv")
-
-    # Create the Plotly plot
-    fig = px.scatter(
-        umap_data,
-        x="UMAP_1",
-        y="UMAP_2",
-        color="cell_type",
-        symbol="patient_name",
-        title="UMAP Plot",
-        labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
-    )
-
-    # Update traces and layout
-    fig.update_traces(marker=dict(size=5, opacity=0.8))
-    fig.update_layout(
-        width=1200,  # Set the width of the plot
-        height=800,  # Set the height of the plot
-        autosize=True,
-        showlegend=True  # Show the legend
-    )
-
-    # fig.show()
-    fig_json = fig.to_json()
-    return fig_json
-
-def display_annotated_t():
-    umap_data = pd.read_csv("umaps/T cells_annotated_umap_data.csv")
-    # umap_data = pd.read_csv("T cells_annotated_umap_data.csv")
-
-    # Create the Plotly plot
-    fig = px.scatter(
-        umap_data,
-        x="UMAP_1",
-        y="UMAP_2",
-        color="cell_type",
-        symbol="patient_name",
-        title="UMAP Plot",
-        labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
-    )
-
-    # Update traces and layout
-    fig.update_traces(marker=dict(size=5, opacity=0.8))
-    fig.update_layout(
-        width=1200,  # Set the width of the plot
-        height=800,  # Set the height of the plot
-        autosize=True,
-        showlegend=True  # Show the legend
-    )
-
-    # fig.show()
-    fig_json = fig.to_json()
-    return fig_json
 
 
 def display_dotplot():
     import plotly.express as px
     import pandas as pd
     
-    # Load the data
     dot_plot_data = pd.read_csv("basic_data/dot_plot_data.csv")
 
-    # Create the Plotly plot
     fig = px.scatter(
         dot_plot_data,
         x='gene',
@@ -575,12 +256,10 @@ def display_dotplot():
     )
     fig.update_traces(marker=dict(opacity=0.8))
     fig.update_layout(
-        # previous shit……,
-        width=1200,  # Set the width of the plot
-            height=800,  # Set the height of the plot
+        width=1200,  
+            height=800, 
             autosize=True,
     )
-    # fig.show()
     return fig.to_json()
 
 
@@ -632,16 +311,14 @@ def display_cell_type_composition():
     import plotly.figure_factory as ff
     import pandas as pd
     
-    # Load the data
     dendrogram_data = pd.read_csv("basic_data/dendrogram_data.csv")
 
-    # Convert to the format expected by Plotly
     fig = ff.create_dendrogram(dendrogram_data.values, orientation='left')
     fig.update_layout(title='Dendrogram', xaxis_title='Distance', yaxis_title='Clusters')
     fig.update_layout(
-        # previous shit……,
-        width=1200,  # Set the width of the plot
-            height=800,  # Set the height of the plot
+        
+        width=1200,  
+            height=800, 
             autosize=True,
     )
     # fig.show()
@@ -658,37 +335,27 @@ def label_clusters(cell_type):
     global base_annotated_adata
     adata2 = adata.copy()
     
-    # Standardize cell type formatting
     standardized_cell_type = cell_type.split()[0].capitalize() + " cells"        
-    # Extract the last message from the conversation history
     last_message = conversation_history2[-2]['content']
-    # Find the map in the last message
     try:
         start_idx = last_message.find("{")
         end_idx = last_message.rfind("}") + 1
         str_map = last_message[start_idx:end_idx]        
-        # Convert the extracted string to a dictionary
         map2 = ast.literal_eval(str_map)
         map2 = {str(key): value for key, value in map2.items()}        
         if standardized_cell_type == "Overall cells":
-            # Apply labels for overall cells directly to adata
             adata2.obs['cell_type'] = 'Unknown'
             for group, cell_type in map2.items():
                 adata2.obs.loc[adata2.obs['leiden'] == group, 'cell_type'] = cell_type
-            # Save the labeled data
             adata2.obs[['UMAP_1', 'UMAP_2', 'leiden', 'patient_name', 'cell_type']].to_csv(f'umaps/{standardized_cell_type}_annotated_umap_data.csv', index=False)
             annotated_adata = adata2.copy()
             fname = f'annotated_adata/Overall cells_annotated_adata.pkl'
             with open(fname, "wb") as file:
                 pickle.dump(annotated_adata, file)
-            # global base_annotated_adata
             base_annotated_adata = adata2
         else:
-            # Filter out the relevant cell type and apply labels
             adata3 = base_annotated_adata.copy()
             specific_cells = adata3[adata3.obs['cell_type'].isin([standardized_cell_type])].copy()
-
-            # Recompute UMAP and clustering for the specific cell type
             sc.tl.pca(specific_cells, svd_solver='arpack')
             sc.pp.neighbors(specific_cells)
             sc.tl.umap(specific_cells)
@@ -698,7 +365,6 @@ def label_clusters(cell_type):
             for group, cell_type in map2.items():
                 specific_cells.obs.loc[specific_cells.obs['leiden'] == group, 'cell_type'] = cell_type
             
-            # Save the annotated UMAP data
             specific_cells.obs[['UMAP_1', 'UMAP_2', 'leiden', 'patient_name', 'cell_type']].to_csv(f'umaps/{standardized_cell_type}_annotated_umap_data.csv', index=False)
             
             annotated_adata = specific_cells.copy()
@@ -747,101 +413,6 @@ def convert_into_labels(conversation_history):
         
         pickle.dump(annotated_adata, file)
 
-def convert_into_labels_myeloid(conversation_history):
-    # Extract the last two messages from the conversation history
-    last_message = conversation_history[-1]['content']
-    
-    str_map = ""
-    map = {}
-    flag = False
-    for i in last_message:
-        if i == "{":
-            flag = True
-        if i == "}":
-            str_map += i
-            flag = False
-        if flag:
-            str_map += i
-    
-    print("STR_MAP", str_map)
-    map = ast.literal_eval(str_map)
-    map2 = {str(key): value for key, value in map.items()}
-    print("Final map for annotation:", map2)
-    
-    global adata
-    global resolution
-    # Filter out myeloid cells
-    myeloid_cells = adata[adata.obs['cell_type'].isin(['Myeloid cells'])].copy()
-
-    sc.tl.pca(myeloid_cells, svd_solver='arpack')
-    sc.pp.neighbors(myeloid_cells)
-    sc.tl.umap(myeloid_cells)
-    sc.tl.leiden(myeloid_cells, resolution=resolution)
-
-    # Annotate cell types based on the mapping
-    myeloid_cells.obs['cell_type'] = 'Unknown'
-    for group, cell_type in map2.items():
-        myeloid_cells.obs.loc[myeloid_cells.obs['leiden'] == group, 'cell_type'] = cell_type
-
-    # Save the annotated UMAP data
-    umap_data = myeloid_cells.obsm['X_umap']
-    umap_df = pd.DataFrame(umap_data, columns=['UMAP_1', 'UMAP_2'])
-    umap_df['cell_type'] = myeloid_cells.obs['cell_type'].values
-    umap_df['patient_name'] = myeloid_cells.obs['patient_name'].values
-    umap_df['leiden'] = myeloid_cells.obs['leiden'].values
-
-    umap_df.to_csv("myeloid_annotated_umap_data.csv", index=False)
-    print("Annotated UMAP data saved to myeloid_annotated_umap_data.csv")
-
-    # return " "
-
-def convert_into_labels_t(conversation_history):
-    # Extract the last two messages from the conversation history
-    last_message = conversation_history[-1]['content']
-    
-    str_map = ""
-    map = {}
-    flag = False
-    for i in last_message:
-        if i == "{":
-            flag = True
-        if i == "}":
-            str_map += i
-            flag = False
-        if flag:
-            str_map += i
-    
-    print("STR_MAP", str_map)
-    map = ast.literal_eval(str_map)
-    map2 = {str(key): value for key, value in map.items()}
-    print("Final map for annotation:", map2)
-    
-    global adata
-    global resolution
-    # Filter out myeloid cells
-    myeloid_cells = adata[adata.obs['cell_type'].isin(['T cells'])].copy()
-
-    sc.tl.pca(myeloid_cells, svd_solver='arpack')
-    sc.pp.neighbors(myeloid_cells)
-    sc.tl.umap(myeloid_cells)
-    sc.tl.leiden(myeloid_cells, resolution=resolution)
-
-    # Annotate cell types based on the mapping
-    myeloid_cells.obs['cell_type'] = 'Unknown'
-    for group, cell_type in map2.items():
-        myeloid_cells.obs.loc[myeloid_cells.obs['leiden'] == group, 'cell_type'] = cell_type
-
-    # Save the annotated UMAP data
-    umap_data = myeloid_cells.obsm['X_umap']
-    umap_df = pd.DataFrame(umap_data, columns=['UMAP_1', 'UMAP_2'])
-    umap_df['cell_type'] = myeloid_cells.obs['cell_type'].values
-    umap_df['patient_name'] = myeloid_cells.obs['patient_name'].values
-    umap_df['leiden'] = myeloid_cells.obs['leiden'].values
-
-    umap_df.to_csv("t_annotated_umap_data.csv", index=False)
-    print("Annotated UMAP data saved to t_annotated_umap_data.csv")
-
-    # return " "
     
 def select_markers(category):
     markers_overall = get_overall_markers()
@@ -1053,14 +624,6 @@ def generate_umap():
         return ".h5ad file isn't given, unable to generate UMAP."
     adata = sc.read_h5ad(path)
 
-    # if sample_mapping: #this if statement is a placeholder - fix upload with Rahul
-    #     path = find_file_with_extension("media", ".h5ad")
-    #     if not path:
-    #         return ".h5ad file isn't given, unable to generate UMAP."
-    #     adata = sc.read_h5ad(path)
-    # else:
-    #     adata = sc.read_h5ad("media/Glioma_second_dataset.h5ad")
-
     global current_adata
     current_adata = adata
 
@@ -1079,14 +642,12 @@ def generate_umap():
 
     find_and_load_sample_mapping("media")
     # Variable genes
-    #TODO include in if statement, if sample mapping is valid, then have the following line, else, ignore next line
     if sample_mapping:
         sc.pp.highly_variable_genes(adata, n_top_genes=3000, subset=True, layer='counts', flavor="seurat_v3", batch_key="Sample")
     else:
         sc.pp.highly_variable_genes(adata, n_top_genes=3000, subset=True, layer='counts', flavor="seurat_v3")
 
     # Setup and load scVI model
-    #TODO  include in if statement, if sample mapping is valid, then have the following line, else, ignore next line
     if sample_mapping:
         SCVI.setup_anndata(adata, layer="counts", categorical_covariate_keys=["Sample"], continuous_covariate_keys=['pct_counts_mt', 'total_counts'])
         model = SCVI.load(dir_path="schatbot/glioma_scvi_model", adata=adata)
@@ -1148,8 +709,6 @@ def generate_umap():
     dot_plot_data.to_csv("basic_data/dot_plot_data.csv", index=False)
 
     # Save dendrogram data for Plotly
-
-
     dendrogram_data = adata.uns['dendrogram_leiden']
     pd_dendrogram_linkage = pd.DataFrame(dendrogram_data['linkage'], columns=['source', 'target', 'distance', 'count'])
     pd_dendrogram_linkage.to_csv("basic_data/dendrogram_data.csv", index=False)
@@ -1162,7 +721,6 @@ def generate_umap():
     retrieve_stats_summary = retreive_stats()
     final_summary = f"{summary} {retrieve_stats_summary}"
     current_adata = adata
-    # label_clusters(cell_type="Overall cells")
 
     return final_summary
     
@@ -1216,7 +774,6 @@ def process_cells(cell_type):
     fname = f'{cell_type} adata_processed.pkl'
     with open(fname, 'wb') as file:
         pickle.dump(umap_df, file)
-    # label_clusters(cell_type=cell_type)
     return summary2
 
 
@@ -1234,11 +791,8 @@ def calculate_cell_population_change(cell_type):
         with open(fname, 'rb') as file:
             cpc_adata = pd.read_pickle(file)
 
-    # Calculate cell counts for each 'patient_name' and 'cell_type' combination
     cell_counts = cpc_adata.obs.groupby(['patient_name', 'cell_type']).size().reset_index(name='counts')
-    # Calculate each 'patient_name''s total counts
     total_counts = cell_counts.groupby('patient_name')['counts'].transform('sum')
-    # Calculate percentage of each cell type per patient
     cell_counts['percentage'] = (cell_counts['counts'] / total_counts) * 100
     output_filename = f'schatbot/cell_population_change/{cell_type}_cell_population_change.csv'
     cell_counts.to_csv(output_filename, index=False)
@@ -1254,34 +808,20 @@ def patient_differential_expression_genes_comparison(cell_type, patient_1, patie
     global adata
     global sample_mapping
     adata2 = None
-    # Process cell type input
     cell_type = cell_type.split()[0].capitalize() + " cells"
     
-    # Load the corresponding AnnData object
     with open(f'annotated_adata/Overall cells_annotated_adata.pkl', 'rb') as file:
         adata2 = pd.read_pickle(file)
     
-
-    # Verify the cell type column exists and print first few rows
-    
-    # Filter for the specified cell type
     filtered_cells = adata2[adata2.obs['cell_type'].isin([cell_type])].copy()
-
-    # Filter for the specified patients
     adata_filtered = filtered_cells[filtered_cells.obs['patient_name'].isin([patient_1, patient_2])].copy()
-
-    # Ensure 'patient_name' is handled as strings for uniqueness
     unique_patients = adata_filtered.obs['patient_name'].astype(str).unique()
-    
-    # Check if both patients are present in the filtered data
     if patient_1 not in unique_patients or patient_2 not in unique_patients:
         return f"Error: One or both patients ({patient_1}, {patient_2}) not found in the dataset for cell type '{cell_type}'."
     
 
-    # Perform differential expression analysis
     sc.tl.rank_genes_groups(adata_filtered, groupby='patient_name', groups=[patient_2], reference=patient_1, method='wilcoxon')
 
-    # Extract the results
     results_post = {
         'genes': adata_filtered.uns['rank_genes_groups']['names'][patient_2],
         'logfoldchanges': adata_filtered.uns['rank_genes_groups']['logfoldchanges'][patient_2],
@@ -1291,14 +831,11 @@ def patient_differential_expression_genes_comparison(cell_type, patient_1, patie
     
     df_post = pd.DataFrame(results_post)
 
-    # Apply a significance filter
     significant_genes_post = df_post[df_post['pvals_adj'] < 0.05]
 
-    # Filter based on log fold change
     significant_genes_post = significant_genes_post[abs(significant_genes_post['logfoldchanges']) > 1]
     significant_genes_post.to_csv('SGP.csv', index=False)
 
-    # Generate summary
     summary = (
         f"Reference Patient: {patient_1}, Comparison Patient: {patient_2}\n"
         "Explanation: DO NOT GIVE PYTHON CODE. JUST COMPARE AND EXPLAIN. This function is designed to perform a differential gene expression analysis for a specified cell type between two patient conditions (pre and post-treatment or two different conditions). "
@@ -1491,8 +1028,7 @@ def read_image():
     import requests
 
     # OpenAI API Key
-    # api_key = "yo/ur-api-key-here"
-    api_key = "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"
+    api_key = os.getenv("OPENAI_API_KEY")
 
 
     # Function to encode the image
@@ -1544,10 +1080,6 @@ def read_image():
         return "Error in processing the image."
 
 
-# --------------------------------------------------------------
-# Function Calling Setup for OpenAI
-# --------------------------------------------------------------
-
 function_descriptions = [
     {
         "name": "generate_umap",
@@ -1558,45 +1090,7 @@ function_descriptions = [
             "required": [],
         },
     },
-    # {
-    #     "name": "test_question",
-    #     "description": "test_question",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": 
-    #             {"value":{
-    #                 "type":"string","description":"value"}
-    #              },
-    #         "required": ["value"],
-    #     },
-    # },
-    # {
-    #     "name": "test_answer",
-    #     "description": "test_answer",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
-    # {
-    #     "name": "retreive_stats",
-    #     "description": "Retrieves mean expression and expression proportion for annotation",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
-    # {
-    #     "name": "display_umap_leiden",
-    #     "description": "Displays the leiden umap for the sample",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
+    
     {
         "name": "display_dotplot",
         "description": "Displays the dotplot for the sample",
@@ -1615,16 +1109,7 @@ function_descriptions = [
             "required": [],
         },
     },
-    #  
-    # {
-    #     "name": "convert_into_labels",
-    #     "description": "converts into labels",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
+    
     {
         "name": "display_myeloid_umap",
         "description": "displays myeloid umap",
@@ -1634,25 +1119,7 @@ function_descriptions = [
             "required": [],
         },
     },
-    # {
-    #     "name": "display_annotated_umap",
-    #     "description": "displays annotated umap",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
-    # display_cell_population_change
-    # {
-    #     "name": "process_t_cells",
-    #     "description": "process t cells",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
+    
     {
         "name": "read_image",
         "description": "Reads and processes an image from the 'media' folder and returns a description of what's in the image.",
@@ -1710,39 +1177,7 @@ function_descriptions = [
             "required": ["cell_type"],
         },
     },
-    # {
-    #     "name": "display_t_umap",
-    #     "description": "display t umap",
-    #     "parameters": {
-
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
-    # {
-    #     "name": "patient_pre_post_comparison_myeloid",
-    #     "description": "patient pre post comparison myeloid",
-    #     "parameters": {
-
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
-    # {
-    #     "name": "patient_pre_post_comparison_2",
-    #     "description": "patient pre post comparison 2",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": 
-    #             {"cell_type":{
-    #                 "type":"string","description":"the cell type"}
-    #              },
-                 
-    #         "required": ["cell_type"],
-    #     },
-    # },
+    
     {
     "name": "patient_differential_expression_genes_comparison",
     "description": "Function is designed to perform a differential gene expression analysis for a specified cell type between two patient conditions (pre and post-treatment or two different conditions)",
@@ -1765,55 +1200,6 @@ function_descriptions = [
         "required": ["cell_type", "patient_1", "patient_2"]
     }
     },
-
-    # {
-    #     "name": "patient_pre_post_comparison",
-    #     "description": "patient pre post comparison",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": 
-    #             {"cell_type":{
-    #                 "type":"string","description":"the cell type"}
-    #              },
-    #         "required": ["cell_type"],
-    #     },
-    # },
-    # {
-    #     "name": "convert_into_labels_myeloid",
-    #     "description": "converts into labels myeloid",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
-    # {
-    #     "name": "convert_into_labels_t",
-    #     "description": "converts into labels t",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
-    # {
-    #     "name": "display_annotated_myeloid",
-    #     "description": "displays annotated myeloid",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
-    # {
-    #     "name": "display_annotated_t",
-    #     "description": "displays annotated t",
-    #     "parameters": {
-    #         "type": "object",
-    #         "properties": {},
-    #         "required": [],
-    #     },
-    # },
     {
         "name": "remap_reso",
         "description": "remap_reso",
@@ -1846,7 +1232,7 @@ function_descriptions = [
     },
     {
         "name": "label_clusters",
-        "description": "this function is to label and or annotate clusters. It can be done for any type of cells that is mentioned by the user. If the user does not mention the cell type use overall cells. This function can be called multiple times.",
+        "description": "This function can be called multiple times. this function is to label and or annotate clusters. It can be done for any type of cells that is mentioned by the user. If the user does not mention the cell type use overall cells. This function can be called multiple times.",
         "parameters": {
             "type": "object",
             "properties": 
@@ -1859,50 +1245,33 @@ function_descriptions = [
 ]
 
 
-# calculate_cell_population_change
-#patient_pre_post_comparison_myeloid
 def start_chat2(file_path):
-    # print ("inside startchat in new functiocalling")
     conversation_history = []
     while True:
         user_input = input("You: ")
-        # print ("received input :" , user_input)
         if user_input.lower() == 'quit':
             break
 
         conversation_history.append({"role": "user", "content": user_input})
 
-        # Generate a chat response with potential function invocation
         response = openai.chat.completions.create(
             model="gpt-4o",
             messages=conversation_history,
             functions=function_descriptions,
-            function_call="auto"  # Enable function calling automatically
+            function_call="auto"  
         )
 
         output = response.choices[0].message
         ai_response = output.content
         print ("received ai response : ", ai_response)
         if output.function_call:
-            # If there's a function call, evaluate and respond accordingly
             print(f"Making a function call to: {output.function_call.name}")
             function_name = output.function_call.name
-            # Dynamically call the function based on its name
-            # umap_results, file_data = globals()[function_name]()  # Assuming no arguments are needed
             print("Assistant:", "All values returned from " + output.function_call.name + " have been received")
-            # conversation_history.append({"role": "user", "content": function_response})
-            # summary = f"UMAP analysis completed. Data summary: {umap_results['adata']}, " \
-            #   f"Key marker genes include: {', '.join(umap_results['marker_genes'])}. " \
-            #   f"Group to cell type mapping: {', '.join([f'{k}: {v}' for k, v in umap_results['group_to_cell_type'].items()])}. " \
-            #   f"Cell counts details are provided. " \
-            #   f"Additional data file generated: {file_data}."x
             summary = globals()[function_name]()  # Assuming no arguments are needed
             if summary:
                 conversation_history.append({"role": "user", "content": summary})
-
-            
         else:
-            # Normal response handling
             print("Assistant:", ai_response)
             conversation_history.append({"role": "assistant", "content": ai_response})
         
@@ -1917,11 +1286,7 @@ first_try = True
 clear_data = True
 def start_chat2_web(user_input, conversation_history):
     global function_flag, display_flag, first_try, clear_data
-    print("Q1")
-    
-    # if first_try:
-    #     find_and_load_sample_mapping("media")
-    
+
     if first_try and clear_data:
         # Clear preexisting directory data
         clear_directory("annotated_adata")
@@ -1934,10 +1299,8 @@ def start_chat2_web(user_input, conversation_history):
             research_context = rcptr.read()
             conversation_history.append({"role": "user", "content": research_context})
         # clear_directory("media")
-        print("Q2")
         first_try = False
         
-    print("Q3")
 
     display_flag = False
     conversation_history.append({"role": "user", "content": user_input})
@@ -1946,8 +1309,8 @@ def start_chat2_web(user_input, conversation_history):
     conversation_history2 = conversation_history
     # print(conversation_history)
     
-    openai.api_key = "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"
-    print("Q4")
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+
 
     response = openai.chat.completions.create(
         model="gpt-4o",
@@ -1958,14 +1321,12 @@ def start_chat2_web(user_input, conversation_history):
         top_p=0.4
         # max_tokens=300
     )
-    print("Q5")
 
     if response:
         output = response.choices[0].message
         ai_response = output.content
 
     if output.function_call:
-        print("Q6")
         function_name = output.function_call.name
         function_args = output.function_call.arguments
         function_flag = True
@@ -1988,7 +1349,6 @@ def start_chat2_web(user_input, conversation_history):
             
             # Handle label_clusters differently to avoid re-generating responses
             if function_name == "label_clusters":
-                print("INSIDE LABEL CLUSTERS")
                 function_result_message = {"role": "assistant", "content": "Annotation is complete."}
                 conversation_history.append(function_result_message)
                 final_response = "Annotation is complete."
@@ -2007,7 +1367,6 @@ def start_chat2_web(user_input, conversation_history):
                 final_response = new_response.choices[0].message.content if new_response.choices[0] else "Interesting"
                 conversation_history.append({"role": "assistant", "content": final_response})
             print (conversation_history)
-            print("Q7")
 
             function_flag = False
             return final_response, conversation_history, display_flag
