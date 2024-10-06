@@ -15,14 +15,11 @@ from .new_function_calling import generate_umap
 from .chat import ask  
 from .new_function_calling import start_chat2
 from .new_function_calling import start_chat2_web
-# from .new_function_calling import display_umap_leiden
 from .new_function_calling import display_dotplot
 from .new_function_calling import display_cell_type_composition
-# from .new_function_calling import process_myeloid_cells
 from .new_function_calling import convert_into_labels
-# from .new_function_calling import display_myeloid_umap
 from .new_function_calling import display_annotated_umap
-from .new_function_calling import patient_differential_expression_genes_comparison
+from .new_function_calling import sample_differential_expression_genes_comparison
 from .new_function_calling import generate_umap
 from .new_function_calling import display_gsea_dotplot
 from .gemini import browse_web

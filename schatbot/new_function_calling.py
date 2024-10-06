@@ -804,7 +804,7 @@ def calculate_cell_population_change(cell_type):
     return summary2
 
 
-def patient_differential_expression_genes_comparison(cell_type, patient_1, patient_2):
+def sample_differential_expression_genes_comparison(cell_type, sample_1, sample_2):
     global adata
     global sample_mapping
     adata2 = None
@@ -837,14 +837,14 @@ def patient_differential_expression_genes_comparison(cell_type, patient_1, patie
     significant_genes_post.to_csv('SGP.csv', index=False)
 
     summary = (
-        f"Reference Patient: {patient_1}, Comparison Patient: {patient_2}\n"
-        "Explanation: DO NOT GIVE PYTHON CODE. JUST COMPARE AND EXPLAIN. This function is designed to perform a differential gene expression analysis for a specified cell type between two patient conditions (pre and post-treatment or two different conditions). "
-        "The reference patient condition is patient_1. The differential expression analysis is performed by comparing the gene expression levels of patient_2 against those of patient_1. Provide a comparison with normal formatting.\n"
+        f"Reference Sample: {patient_1}, Comparison Sample: {patient_2}\n"
+        "Explanation: DO NOT GIVE PYTHON CODE. JUST COMPARE AND EXPLAIN. This function is designed to perform a differential gene expression analysis for a specified cell type between two sample conditions (pre and post-treatment or two different conditions). "
+        "The reference patient condition is patient_1. The differential expression analysis is performed by comparing the gene expression levels of sample_2 against those of sample_1. Provide a comparison with normal formatting.\n"
         "Significant Genes Data: \n"
         f"{str(significant_genes_post)}\n"
         "Explanation of attributes:\n"
         "Genes: The names of the genes analyzed, providing insight into which genes are tested for differential expression between the two conditions.\n"
-        "Log Fold Changes: Values showing how gene expression levels differ between the two conditions. Positive values indicate upregulation in patient_2, and negative values indicate downregulation in patient_2.\n"
+        "Log Fold Changes: Values showing how gene expression levels differ between the two conditions. Positive values indicate upregulation in sample_2, and negative values indicate downregulation in sample_2.\n"
         "P-values: These values help determine the statistical significance of the observed changes in gene expression. Lower p-values suggest that the changes are less likely to have occurred by chance.\n"
         "Adjusted P-values: These values provide a more stringent measure of significance by controlling for the false discovery rate. Significant adjusted p-values (e.g., < 0.05) indicate that the changes in gene expression are statistically robust even after adjusting for multiple comparisons."
     )
@@ -1109,16 +1109,7 @@ function_descriptions = [
             "required": [],
         },
     },
-    
-    {
-        "name": "display_myeloid_umap",
-        "description": "displays myeloid umap",
-        "parameters": {
-            "type": "object",
-            "properties": {},
-            "required": [],
-        },
-    },
+   
     
     {
         "name": "read_image",
@@ -1179,7 +1170,7 @@ function_descriptions = [
     },
     
     {
-    "name": "patient_differential_expression_genes_comparison",
+    "name": "sample_differential_expression_genes_comparison",
     "description": "Function is designed to perform a differential gene expression analysis for a specified cell type between two patient conditions (pre and post-treatment or two different conditions)",
     "parameters": {
         "type": "object",
@@ -1188,27 +1179,19 @@ function_descriptions = [
                 "type": "string",
                 "description": "The type of cell to be compared"
             },
-            "patient_1": {
+            "sample_1": {
                 "type": "string",
                 "description": "Identifier for the first patient"
             },
-            "patient_2": {
+            "sample_2": {
                 "type": "string",
                 "description": "Identifier for the second patient"
             }
         },
-        "required": ["cell_type", "patient_1", "patient_2"]
+        "required": ["cell_type", "sample_1", "sample_2"]
     }
     },
-    {
-        "name": "remap_reso",
-        "description": "remap_reso",
-        "parameters": {
-            "type": "object",
-            "properties": {},
-            "required": [],
-        },
-    },
+
     {
         "name": "calculate_cell_population_change",
         "description": "calculate_cell population change for percentage changes in cell populations or samples before and after treatment. This calculation can be done for any cell type. This is to see the changes in the population before and after treatment.",
@@ -1350,7 +1333,7 @@ def start_chat2_web(user_input, conversation_history):
             # Handle label_clusters differently to avoid re-generating responses
             if function_name == "label_clusters":
                 function_result_message = {"role": "assistant", "content": "Annotation is complete."}
-                conversation_history.append(function_result_message)
+                # conversation_history.append(function_result_message)  
                 final_response = "Annotation is complete."
             else:
                 function_result_message = {"role": "user", "content": function_response}
