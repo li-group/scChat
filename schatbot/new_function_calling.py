@@ -1293,7 +1293,7 @@ def start_chat2_web(user_input, conversation_history):
         clear_directory("basic_data")
         clear_directory("umaps")
         clear_directory("process_cell_data")
-        research_context_path = find_file_with_extension("media", ".rtf")
+        research_context_path = find_file_with_extension("media", ".txt")
         if research_context_path:
             rcptr = open(research_context_path, "r")
             research_context = rcptr.read()
