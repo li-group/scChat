@@ -814,19 +814,19 @@ def sample_differential_expression_genes_comparison(cell_type, sample_1, sample_
         adata2 = pd.read_pickle(file)
     
     filtered_cells = adata2[adata2.obs['cell_type'].isin([cell_type])].copy()
-    adata_filtered = filtered_cells[filtered_cells.obs['patient_name'].isin([patient_1, patient_2])].copy()
+    adata_filtered = filtered_cells[filtered_cells.obs['patient_name'].isin([sample_1, sample_2])].copy()
     unique_patients = adata_filtered.obs['patient_name'].astype(str).unique()
-    if patient_1 not in unique_patients or patient_2 not in unique_patients:
-        return f"Error: One or both patients ({patient_1}, {patient_2}) not found in the dataset for cell type '{cell_type}'."
+    if sample_1 not in unique_patients or sample_2 not in unique_patients:
+        return f"Error: One or both patients ({sample_1}, {sample_2}) not found in the dataset for cell type '{cell_type}'."
     
 
-    sc.tl.rank_genes_groups(adata_filtered, groupby='patient_name', groups=[patient_2], reference=patient_1, method='wilcoxon')
+    sc.tl.rank_genes_groups(adata_filtered, groupby='patient_name', groups=[sample_2], reference=sample_1, method='wilcoxon')
 
     results_post = {
-        'genes': adata_filtered.uns['rank_genes_groups']['names'][patient_2],
-        'logfoldchanges': adata_filtered.uns['rank_genes_groups']['logfoldchanges'][patient_2],
-        'pvals': adata_filtered.uns['rank_genes_groups']['pvals'][patient_2],
-        'pvals_adj': adata_filtered.uns['rank_genes_groups']['pvals_adj'][patient_2]
+        'genes': adata_filtered.uns['rank_genes_groups']['names'][sample_2],
+        'logfoldchanges': adata_filtered.uns['rank_genes_groups']['logfoldchanges'][sample_2],
+        'pvals': adata_filtered.uns['rank_genes_groups']['pvals'][sample_2],
+        'pvals_adj': adata_filtered.uns['rank_genes_groups']['pvals_adj'][sample_2]
     }
     
     df_post = pd.DataFrame(results_post)
@@ -837,7 +837,7 @@ def sample_differential_expression_genes_comparison(cell_type, sample_1, sample_
     significant_genes_post.to_csv('SGP.csv', index=False)
 
     summary = (
-        f"Reference Sample: {patient_1}, Comparison Sample: {patient_2}\n"
+        f"Reference Sample: {sample_1}, Comparison Sample: {sample_2}\n"
         "Explanation: DO NOT GIVE PYTHON CODE. JUST COMPARE AND EXPLAIN. This function is designed to perform a differential gene expression analysis for a specified cell type between two sample conditions (pre and post-treatment or two different conditions). "
         "The reference patient condition is patient_1. The differential expression analysis is performed by comparing the gene expression levels of sample_2 against those of sample_1. Provide a comparison with normal formatting.\n"
         "Significant Genes Data: \n"
