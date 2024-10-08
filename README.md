@@ -58,9 +58,9 @@ Follow these steps to utilize the application effectively:
 
 # Tutorial
 <a name="tutorial"></a>
-1. Upload adata file
+1. Upload scRNA-seq adata file (.h5ad)
 2. Upload sample mapping (.json file) (if required).
-3. request to generate UMAP for RNA Analysis.
+3. Request to generate UMAP for overall cells in the scRNA-seq Analysis.
 4. (3) Will return a python dictionary, type in that you want to label/annotate clusters for overall cells. 
 5. Now you can ask to display annotated umap for overall cells or view the non-annotated umap for overall cells.
 6. You can ask for rationale or research questions specific to your dataset.
