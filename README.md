@@ -52,8 +52,18 @@ Follow these steps to utilize the application effectively:
 - run python3 manage.py runserver
 
 ### Step 2: Access the Application
-- Go to http://127.0.0.1:8000/schatbot on a web browser.
+- Open your web browser and navigate to:
+  `http://127.0.0.1:8000/schatbot`
+  
+- **Recommended:** Use Google Chrome for the best experience.
 
+### Additional Tip: Clear Cache to Avoid Previous Chat Data
+- Periodically clearing the cache is recommended to ensure a smooth experience:
+  1. Right-click on the page and select **Inspect**.
+  2. Go to the **Application** tab.
+  3. Under **Cookies**, remove `sessionid`.
+  
+  This will prevent previous chat sessions from being reprocessed by the GPT engine.
 
 
 # Tutorial
