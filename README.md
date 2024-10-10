@@ -60,13 +60,16 @@ Follow these steps to utilize the application effectively:
 <a name="tutorial"></a>
 1. Upload scRNA-seq adata file (.h5ad)
 2. Upload sample mapping (.json file) (if required).
-3. Request to generate UMAP for overall cells in the scRNA-seq Analysis.
-4. (3) Will return a python dictionary, type in that you want to label/annotate clusters for overall cells. 
-5. Now you can ask to display annotated umap for overall cells or view the non-annotated umap for overall cells.
-6. You can ask for rationale or research questions specific to your dataset.
-7. If you want you can filter and process a specific cell type.
-8. (7) would return a python dictionary, type in that you want to label/annotate clusters for the processed cell type
-9. You can ask for reasoning, possible hypothesis and so on.
+3. Upload research context (.txt file) (if required).
+4. Request to generate UMAP for overall cells in the scRNA-seq Analysis. ("Generate UMAP")
+5. (3) Will return a python dictionary, type in that you want to label/annotate clusters for overall cells. ("Label clusters for overall cells")
+6. Now you can ask to display annotated umap for overall cells or view the non-annotated umap for overall cells.
+7. You can ask for rationale or research questions specific to your dataset.
+8. If you want you can filter and process a specific cell type. ("Process <cell_type> cells")
+9. (7) would return a python dictionary, type in that you want to label/annotate clusters for the processed cell type ("Label clusters for <cell_type> cells")
+10. You can calulate cell population change for overall cells or for specific cell types. ("Calculate cell population change for <cell_type> cells")
+11. You can display the cell population change for previously calculated cell types. ("Display cell population change for <cell_type> cells")
+12. You can ask for reasoning, possible hypothesis and so on.
 
 ## Chat Example
 <a name="chat-example"></a>
