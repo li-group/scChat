@@ -1,0 +1,262 @@
+{
+    "B cell": {
+        "markers": [
+            {
+                "gene": "Cd19",
+                "explanation": "This gene encodes a member of the immunoglobulin gene superfamily. Expression of this cell surface protein is restricted to B cell lymphocytes. This protein is a reliable marker for pre-B cells but its expression diminishes during terminal B cell differentiation in antibody secreting plasma cells. The protein has two N-terminal extracellular Ig-like domains separated by a non-Ig-like domain, a hydrophobic transmembrane domain, and a large C-terminal cytoplasmic domain. This protein forms a complex with several membrane proteins including complement receptor type 2 (CD21) and tetraspanin (CD81) and this complex reduces the threshold for antigen-initiated B cell activation. Activation of this B-cell antigen receptor complex activates the phosphatidylinositol 3-kinase signalling pathway and the subsequent release of intracellular stores of calcium ions. This protein is a target of chimeric antigen receptor (CAR) T-cells used in the treatment of lymphoblastic leukemia. Mutations in this gene are associated with the disease common variable immunodeficiency 3 (CVID3) which results in a failure of B-cell differentiation and impaired secretion of immunoglobulins. CVID3 is characterized by hypogammaglobulinemia, an inability to mount an antibody response to antigen, and recurrent bacterial infections. Alternative splicing results in multiple transcript variants encoding distinct isoforms. [provided by RefSeq, Jul 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12478"
+            },
+            {
+                "gene": "Cd79a",
+                "explanation": "The B lymphocyte antigen receptor is a multimeric complex that includes the antigen-specific component, surface immunoglobulin (Ig). Surface Ig non-covalently associates with two other proteins, Ig-alpha and Ig-beta, which are necessary for expression and function of the B-cell antigen receptor. This gene encodes the Ig-alpha protein of the B-cell antigen component. Alternatively spliced transcript variants encoding different isoforms have been described. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12518"
+            },
+            {
+                "gene": "Fasn",
+                "explanation": "The enzyme encoded by this gene is a multifunctional protein. Its main function is to catalyze the synthesis of palmitate from acetyl-CoA and malonyl-CoA, in the presence of NADPH, into long-chain saturated fatty acids. In some cancer cell lines, this protein has been found to be fused with estrogen receptor-alpha (ER-alpha), in which the N-terminus of FAS is fused in-frame with the C-terminus of ER-alpha. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/14104"
+            },
+            {
+                "gene": "Ptprc",
+                "explanation": "The protein encoded by this gene is a member of the protein tyrosine phosphatase (PTP) family. PTPs are known to be signaling molecules that regulate a variety of cellular processes including cell growth, differentiation, mitosis, and oncogenic transformation. This PTP contains an extracellular domain, a single transmembrane segment and two tandem intracytoplasmic catalytic domains, and thus is classified as a receptor type PTP. This PTP has been shown to be an essential regulator of T- and B-cell antigen receptor signaling. It functions through either direct interaction with components of the antigen receptor complexes, or by activating various Src family kinases required for the antigen receptor signaling. This PTP also suppresses JAK kinases, and thus functions as a regulator of cytokine receptor signaling. Alternatively spliced transcripts variants of this gene, which encode distinct isoforms, have been reported. [provided by RefSeq, Jun 2012]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/19264"
+            }
+        ]
+    },
+    "CD4+ T follicular helper cell": {
+        "markers": [
+            {
+                "gene": "Nt5e",
+                "explanation": "The protein encoded by this gene is a plasma membrane protein that catalyzes the conversion of extracellular nucleotides to membrane-permeable nucleosides. The encoded protein is used as a determinant of lymphocyte differentiation. Defects in this gene can lead to the calcification of joints and arteries. Two transcript variants encoding different isoforms have been found for this gene.[provided by RefSeq, Mar 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/23959"
+            },
+            {
+                "gene": "Izumo1r",
+                "explanation": "Enables signaling receptor activity. Predicted to be involved in cell adhesion; fusion of sperm to egg plasma membrane involved in single fertilization; and sperm-egg recognition. Predicted to be located in extracellular region and plasma membrane. Predicted to be anchored component of external side of plasma membrane. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/64931"
+            }
+        ]
+    },
+    "Dendritic cell": {
+        "markers": [
+            {
+                "gene": "Itgax",
+                "explanation": "This gene encodes the integrin alpha X chain protein. Integrins are heterodimeric integral membrane proteins composed of an alpha chain and a beta chain. This protein combines with the beta 2 chain (ITGB2) to form a leukocyte-specific integrin referred to as inactivated-C3b (iC3b) receptor 4 (CR4). The alpha X beta 2 complex seems to overlap the properties of the alpha M beta 2 integrin in the adherence of neutrophils and monocytes to stimulated endothelium cells, and in the phagocytosis of complement coated particles. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Nov 2013]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/16411"
+            },
+            {
+                "gene": "Cd74",
+                "explanation": "The protein encoded by this gene associates with class II major histocompatibility complex (MHC) and is an important chaperone that regulates antigen presentation for immune response. It also serves as cell surface receptor for the cytokine macrophage migration inhibitory factor (MIF) which, when bound to the encoded protein, initiates survival pathways and cell proliferation. This protein also interacts with amyloid precursor protein (APP) and suppresses the production of amyloid beta (Abeta). Multiple alternatively spliced transcript variants encoding different isoforms have been identified. [provided by RefSeq, Aug 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/16149"
+            },
+            {
+                "gene": "Cd83",
+                "explanation": "Error fetching data for Cd83: HTTP Error 400: Bad Request",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12522"
+            },
+            {
+                "gene": "Cd86",
+                "explanation": "This gene encodes a type I membrane protein that is a member of the immunoglobulin superfamily. This protein is expressed by antigen-presenting cells, and it is the ligand for two proteins at the cell surface of T cells, CD28 antigen and cytotoxic T-lymphocyte-associated protein 4. Binding of this protein with CD28 antigen is a costimulatory signal for activation of the T-cell. Binding of this protein with cytotoxic T-lymphocyte-associated protein 4 negatively regulates T-cell activation and diminishes the immune response. Alternative splicing results in several transcript variants encoding different isoforms.[provided by RefSeq, May 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12524"
+            }
+        ]
+    },
+    "Erythroid progenitor": {
+        "markers": [
+            {
+                "gene": "Tfrc",
+                "explanation": "This gene encodes a cell surface receptor necessary for cellular iron uptake by the process of receptor-mediated endocytosis. This receptor is required for erythropoiesis and neurologic development. Multiple alternatively spliced variants have been identified. [provided by RefSeq, Sep 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/22042"
+            },
+            {
+                "gene": "Ly76",
+                "explanation": "Gene Ly76 not found in NCBI database",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/104231"
+            }
+        ]
+    },
+    "Granulocyte": {
+        "markers": [
+            {
+                "gene": "Itgam",
+                "explanation": "This gene encodes the integrin alpha M chain. Integrins are heterodimeric integral membrane proteins composed of an alpha chain and a beta chain. This I-domain containing alpha integrin combines with the beta 2 chain (ITGB2) to form a leukocyte-specific integrin referred to as macrophage receptor 1 ('Mac-1'), or inactivated-C3b (iC3b) receptor 3 ('CR3'). The alpha M beta 2 integrin is important in the adherence of neutrophils and monocytes to stimulated endothelium, and also in the phagocytosis of complement coated particles. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Mar 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/16409"
+            },
+            {
+                "gene": "Ccr3",
+                "explanation": "The protein encoded by this gene is a receptor for C-C type chemokines. It belongs to family 1 of the G protein-coupled receptors. This receptor binds and responds to a variety of chemokines, including eotaxin (CCL11), eotaxin-3 (CCL26), MCP-3 (CCL7), MCP-4 (CCL13), and RANTES (CCL5). It is highly expressed in eosinophils and basophils, and is also detected in TH1 and TH2 cells, as well as in airway epithelial cells. This receptor may contribute to the accumulation and activation of eosinophils and other inflammatory cells in the allergic airway. It is also known to be an entry co-receptor for HIV-1. This gene and seven other chemokine receptor genes form a chemokine receptor gene cluster on the chromosomal region 3p21. Alternatively spliced transcript variants have been described. [provided by RefSeq, Sep 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12771"
+            },
+            {
+                "gene": "Itga2",
+                "explanation": "This gene encodes the alpha subunit of a transmembrane receptor for collagens and related proteins. The encoded protein forms a heterodimer with a beta subunit and mediates the adhesion of platelets and other cell types to the extracellular matrix. Loss of the encoded protein is associated with bleeding disorder platelet-type 9. Antibodies against this protein are found in several immune disorders, including neonatal alloimmune thrombocytopenia. This gene is located adjacent to a related alpha subunit gene. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Aug 2012]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/16398"
+            },
+            {
+                "gene": "Ly6c1",
+                "explanation": "Gene Ly6c1 not found in NCBI database",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/17067"
+            },
+            {
+                "gene": "Siglecf",
+                "explanation": "Gene Siglecf not found in NCBI database",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/233186"
+            }
+        ]
+    },
+    "Macrophage": {
+        "markers": [
+            {
+                "gene": "Cd68",
+                "explanation": "This gene encodes a 110-kD transmembrane glycoprotein that is highly expressed by human monocytes and tissue macrophages. It is a member of the lysosomal/endosomal-associated membrane glycoprotein (LAMP) family. The protein primarily localizes to lysosomes and endosomes with a smaller fraction circulating to the cell surface. It is a type I integral membrane protein with a heavily glycosylated extracellular domain and binds to tissue- and organ-specific lectins or selectins. The protein is also a member of the scavenger receptor family. Scavenger receptors typically function to clear cellular debris, promote phagocytosis, and mediate the recruitment and activation of macrophages. Alternative splicing results in multiple transcripts encoding different isoforms. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12514"
+            },
+            {
+                "gene": "Adgre1",
+                "explanation": "This gene encodes a protein that has a domain resembling seven transmembrane G protein-coupled hormone receptors (7TM receptors) at its C-terminus. The N-terminus of the encoded protein has six EGF-like modules, separated from the transmembrane segments by a serine/threonine-rich domain, a feature reminiscent of mucin-like, single-span, integral membrane glycoproteins with adhesive properties. Multiple alternatively spliced transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Jan 2012]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/13733"
+            },
+            {
+                "gene": "Itgam",
+                "explanation": "This gene encodes the integrin alpha M chain. Integrins are heterodimeric integral membrane proteins composed of an alpha chain and a beta chain. This I-domain containing alpha integrin combines with the beta 2 chain (ITGB2) to form a leukocyte-specific integrin referred to as macrophage receptor 1 ('Mac-1'), or inactivated-C3b (iC3b) receptor 3 ('CR3'). The alpha M beta 2 integrin is important in the adherence of neutrophils and monocytes to stimulated endothelium, and also in the phagocytosis of complement coated particles. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Mar 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/16409"
+            }
+        ]
+    },
+    "Mature naive B cell": {
+        "markers": [
+            {
+                "gene": "Cr2",
+                "explanation": "This gene encodes a membrane protein, which functions as a receptor for Epstein-Barr virus (EBV) binding on B and T lymphocytes. Genetic variations in this gene are associated with susceptibility to systemic lupus erythematosus type 9 (SLEB9). Alternatively spliced transcript variants encoding different isoforms have been found for this gene.[provided by RefSeq, Sep 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12902"
+            },
+            {
+                "gene": "Fcer2a",
+                "explanation": "Gene Fcer2a not found in NCBI database",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/14128"
+            },
+            {
+                "gene": "Cd40lg",
+                "explanation": "The protein encoded by this gene is expressed on the surface of T cells. It regulates B cell function by engaging CD40 on the B cell surface. A defect in this gene results in an inability to undergo immunoglobulin class switch and is associated with hyper-IgM syndrome. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/21947"
+            }
+        ]
+    },
+    "Monocyte": {
+        "markers": [
+            {
+                "gene": "Ccr2",
+                "explanation": "The protein encoded by this gene is a receptor for monocyte chemoattractant protein-1, a chemokine which specifically mediates monocyte chemotaxis. Monocyte chemoattractant protein-1 is involved in monocyte infiltration in inflammatory diseases such as rheumatoid arthritis as well as in the inflammatory response against tumors. The encoded protein mediates agonist-dependent calcium mobilization and inhibition of adenylyl cyclase. This protein can also be a coreceptor with CD4 for HIV-1 infection. This gene is located in the chemokine receptor gene cluster region of chromosome 3. [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12772"
+            },
+            {
+                "gene": "Csf1r",
+                "explanation": "The protein encoded by this gene is the receptor for colony stimulating factor 1, a cytokine which controls the production, differentiation, and function of macrophages. This receptor mediates most if not all of the biological effects of this cytokine. Ligand binding activates the receptor kinase through a process of oligomerization and transphosphorylation. The encoded protein is a tyrosine kinase transmembrane receptor and member of the CSF1/PDGF receptor family of tyrosine-protein kinases. Mutations in this gene have been associated with a predisposition to myeloid malignancy. The first intron of this gene contains a transcriptionally inactive ribosomal protein L7 processed pseudogene oriented in the opposite direction. Alternative splicing results in multiple transcript variants. Expression of a splice variant from an LTR promoter has been found in Hodgkin lymphoma (HL), HL cell lines and anaplastic large cell lymphoma. [provided by RefSeq, Mar 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12978"
+            },
+            {
+                "gene": "Itgam",
+                "explanation": "This gene encodes the integrin alpha M chain. Integrins are heterodimeric integral membrane proteins composed of an alpha chain and a beta chain. This I-domain containing alpha integrin combines with the beta 2 chain (ITGB2) to form a leukocyte-specific integrin referred to as macrophage receptor 1 ('Mac-1'), or inactivated-C3b (iC3b) receptor 3 ('CR3'). The alpha M beta 2 integrin is important in the adherence of neutrophils and monocytes to stimulated endothelium, and also in the phagocytosis of complement coated particles. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Mar 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/16409"
+            },
+            {
+                "gene": "Ly6c1",
+                "explanation": "Gene Ly6c1 not found in NCBI database",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/17067"
+            }
+        ]
+    },
+    "Natural killer cell": {
+        "markers": [
+            {
+                "gene": "Klrb1c",
+                "explanation": "Gene Klrb1c not found in NCBI database",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/17059"
+            },
+            {
+                "gene": "Ncr1",
+                "explanation": "Predicted to be involved in cellular defense response; regulation of natural killer cell mediated cytotoxicity; and signal transduction. Predicted to act upstream of or within defense response to virus and detection of virus. Predicted to be located in cell surface. Predicted to be part of SWI/SNF complex. Predicted to be active in plasma membrane. Biomarker of acquired immunodeficiency syndrome; anogenital venereal wart; hepatitis C; and lymphoproliferative syndrome. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/17086"
+            }
+        ]
+    },
+    "Plasma cell": {
+        "markers": [
+            {
+                "gene": "Sdc1",
+                "explanation": "The protein encoded by this gene is a transmembrane (type I) heparan sulfate proteoglycan and is a member of the syndecan proteoglycan family. The syndecans mediate cell binding, cell signaling, and cytoskeletal organization and syndecan receptors are required for internalization of the HIV-1 tat protein. The syndecan-1 protein functions as an integral membrane protein and participates in cell proliferation, cell migration and cell-matrix interactions via its receptor for extracellular matrix proteins. Altered syndecan-1 expression has been detected in several different tumor types. While several transcript variants may exist for this gene, the full-length natures of only two have been described to date. These two represent the major variants of this gene and encode the same protein. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/20969"
+            }
+        ]
+    },
+    "Polymorphonuclear neutrophil": {
+        "markers": [
+            {
+                "gene": "Ly6g",
+                "explanation": "Gene Ly6g not found in NCBI database",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/546644"
+            }
+        ]
+    },
+    "Regulatory T (Treg) cell": {
+        "markers": [
+            {
+                "gene": "Il2ra",
+                "explanation": "The interleukin 2 (IL2) receptor alpha (IL2RA) and beta (IL2RB) chains, together with the common gamma chain (IL2RG), constitute the high-affinity IL2 receptor. Homodimeric alpha chains (IL2RA) result in low-affinity receptor, while homodimeric beta (IL2RB) chains produce a medium-affinity receptor. Normally an integral-membrane protein, soluble IL2RA has been isolated and determined to result from extracellular proteolyisis. Alternately-spliced IL2RA mRNAs have been isolated, but the significance of each is presently unknown. Mutations in this gene are associated with interleukin 2 receptor alpha deficiency. Patients with severe Coronavirus Disease 2019 (COVID-19), the disease caused by the novel severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2), have significantly elevated levels of IL2R in their plasma. Similarly, serum IL-2R levels are found to be elevated in patients with different types of carcinomas. Certain IL2RA and IL2RB gene polymorphisms have been associated with lung cancer risk. [provided by RefSeq, Jul 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/16184"
+            },
+            {
+                "gene": "Cd4",
+                "explanation": "This gene encodes the CD4 membrane glycoprotein of T lymphocytes. The CD4 antigen acts as a coreceptor with the T-cell receptor on the T lymphocyte to recognize antigens displayed by an antigen presenting cell in the context of class II MHC molecules. The CD4 antigen is also a primary receptor for entry of the human immunodeficiency virus through interactions with the HIV Env gp120 subunit. This gene is expressed not only in T lymphocytes, but also in B cells, macrophages, granulocytes, as well as in various regions of the brain. The protein functions to initiate or augment the early phase of T-cell activation, and may function as an important mediator of indirect neuronal damage in infectious and immune-mediated diseases of the central nervous system. Multiple alternatively spliced transcript variants encoding different isoforms have been identified in this gene. [provided by RefSeq, May 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12504"
+            },
+            {
+                "gene": "Itga2",
+                "explanation": "This gene encodes the alpha subunit of a transmembrane receptor for collagens and related proteins. The encoded protein forms a heterodimer with a beta subunit and mediates the adhesion of platelets and other cell types to the extracellular matrix. Loss of the encoded protein is associated with bleeding disorder platelet-type 9. Antibodies against this protein are found in several immune disorders, including neonatal alloimmune thrombocytopenia. This gene is located adjacent to a related alpha subunit gene. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Aug 2012]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/16398"
+            }
+        ]
+    },
+    "T cell": {
+        "markers": [
+            {
+                "gene": "Sell",
+                "explanation": "This gene encodes a cell surface adhesion molecule that belongs to a family of adhesion/homing receptors. The encoded protein contains a C-type lectin-like domain, a calcium-binding epidermal growth factor-like domain, and two short complement-like repeats. The gene product is required for binding and subsequent rolling of leucocytes on endothelial cells, facilitating their migration into secondary lymphoid organs and inflammation sites. Single-nucleotide polymorphisms in this gene have been associated with various diseases including immunoglobulin A nephropathy. Alternatively spliced transcript variants have been found for this gene. [provided by RefSeq, Oct 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/20343"
+            },
+            {
+                "gene": "Thy1",
+                "explanation": "This gene encodes a cell surface glycoprotein and member of the immunoglobulin superfamily of proteins. The encoded protein is involved in cell adhesion and cell communication in numerous cell types, but particularly in cells of the immune and nervous systems. The encoded protein is widely used as a marker for hematopoietic stem cells. This gene may function as a tumor suppressor in nasopharyngeal carcinoma. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Jul 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/21838"
+            }
+        ]
+    },
+    "T helper2 (Th2) cell": {
+        "markers": [
+            {
+                "gene": "Il1rl1",
+                "explanation": "The protein encoded by this gene is a member of the interleukin 1 receptor family. Studies of the similar gene in mouse suggested that this receptor can be induced by proinflammatory stimuli, and may be involved in the function of helper T cells. This gene, interleukin 1 receptor, type I (IL1R1), interleukin 1 receptor, type II (IL1R2) and interleukin 1 receptor-like 2 (IL1RL2) form a cytokine receptor gene cluster in a region mapped to chromosome 2q12. Alternative splicing of this gene results in multiple transcript variants. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/17082"
+            }
+        ]
+    },
+    "T1 (Transitional) B cell": {
+        "markers": [
+            {
+                "gene": "Cr2",
+                "explanation": "This gene encodes a membrane protein, which functions as a receptor for Epstein-Barr virus (EBV) binding on B and T lymphocytes. Genetic variations in this gene are associated with susceptibility to systemic lupus erythematosus type 9 (SLEB9). Alternatively spliced transcript variants encoding different isoforms have been found for this gene.[provided by RefSeq, Sep 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12902"
+            },
+            {
+                "gene": "Fcer2a",
+                "explanation": "Gene Fcer2a not found in NCBI database",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/14128"
+            },
+            {
+                "gene": "Cd40lg",
+                "explanation": "The protein encoded by this gene is expressed on the surface of T cells. It regulates B cell function by engaging CD40 on the B cell surface. A defect in this gene results in an inability to undergo immunoglobulin class switch and is associated with hyper-IgM syndrome. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/21947"
+            }
+        ]
+    }
+}

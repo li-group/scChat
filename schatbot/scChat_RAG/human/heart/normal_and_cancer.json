@@ -1,0 +1,209 @@
+{
+    "Cardiac progenitor cell": {
+        "markers": [
+            {
+                "gene": "CASP3",
+                "explanation": "The protein encoded by this gene is a cysteine-aspartic acid protease that plays a central role in the execution-phase of cell apoptosis. The encoded protein cleaves and inactivates poly(ADP-ribose) polymerase while it cleaves and activates sterol regulatory element binding proteins as well as caspases 6, 7, and 9. This protein itself is processed by caspases 8, 9, and 10. It is the predominant caspase involved in the cleavage of amyloid-beta 4A precursor protein, which is associated with neuronal death in Alzheimer's disease. [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/836"
+            },
+            {
+                "gene": "ABCG2",
+                "explanation": "The membrane-associated protein encoded by this gene is included in the superfamily of ATP-binding cassette (ABC) transporters. ABC proteins transport various molecules across extra- and intra-cellular membranes. ABC genes are divided into seven distinct subfamilies (ABC1, MDR/TAP, MRP, ALD, OABP, GCN20, White). This protein is a member of the White subfamily. Alternatively referred to as a breast cancer resistance protein, this protein functions as a xenobiotic transporter which may play a major role in multi-drug resistance. It likely serves as a cellular defense mechanism in response to mitoxantrone and anthracycline exposure. Significant expression of this protein has been observed in the placenta, which may suggest a potential role for this molecule in placenta tissue. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Apr 2012]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9429"
+            },
+            {
+                "gene": "KIT",
+                "explanation": "This gene encodes a receptor tyrosine kinase. This gene was initially identified as a homolog of the feline sarcoma viral oncogene v-kit and is often referred to as proto-oncogene c-Kit. The canonical form of this glycosylated transmembrane protein has an N-terminal extracellular region with five immunoglobulin-like domains, a transmembrane region, and an intracellular tyrosine kinase domain at the C-terminus. Upon activation by its cytokine ligand, stem cell factor (SCF), this protein phosphorylates multiple intracellular proteins that play a role in in the proliferation, differentiation, migration and apoptosis of many cell types and thereby plays an important role in hematopoiesis, stem cell maintenance, gametogenesis, melanogenesis, and in mast cell development, migration and function. This protein can be a membrane-bound or soluble protein. Mutations in this gene are associated with gastrointestinal stromal tumors, mast cell disease, acute myelogenous leukemia, and piebaldism. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, May 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3815"
+            },
+            {
+                "gene": "CD34",
+                "explanation": "The protein encoded by this gene may play a role in the attachment of stem cells to the bone marrow extracellular matrix or to stromal cells. This single-pass membrane protein is highly glycosylated and phosphorylated by protein kinase C. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Aug 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/947"
+            },
+            {
+                "gene": "ETV2",
+                "explanation": "Enables sequence-specific double-stranded DNA binding activity. Predicted to be involved in cell differentiation and regulation of transcription by RNA polymerase II. Predicted to act upstream of or within several processes, including cell surface receptor signaling pathway; positive regulation of endothelial cell differentiation; and positive regulation of macromolecule metabolic process. Predicted to be active in nucleus. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2116"
+            },
+            {
+                "gene": "GATA4",
+                "explanation": "This gene encodes a member of the GATA family of zinc-finger transcription factors. Members of this family recognize the GATA motif which is present in the promoters of many genes. This protein is thought to regulate genes involved in embryogenesis and in myocardial differentiation and function, and is necessary for normal testicular development. Mutations in this gene have been associated with cardiac septal defects. Additionally, alterations in gene expression have been associated with several cancer types. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Apr 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2626"
+            },
+            {
+                "gene": "ITGB1",
+                "explanation": "Integrins are heterodimeric proteins made up of alpha and beta subunits. At least 18 alpha and 8 beta subunits have been described in mammals. Integrin family members are membrane receptors involved in cell adhesion and recognition in a variety of processes including embryogenesis, hemostasis, tissue repair, immune response and metastatic diffusion of tumor cells. This gene encodes a beta subunit. Multiple alternatively spliced transcript variants which encode different protein isoforms have been found for this gene. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3688"
+            },
+            {
+                "gene": "ISL1",
+                "explanation": "This gene encodes a member of the LIM/homeodomain family of transcription factors. The encoded protein binds to the enhancer region of the insulin gene, among others, and may play an important role in regulating insulin gene expression. The encoded protein is central to the development of pancreatic cell lineages and may also be required for motor neuron generation. Mutations in this gene have been associated with maturity-onset diabetes of the young. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3670"
+            },
+            {
+                "gene": "NKX2-5",
+                "explanation": "This gene encodes a homeobox-containing transcription factor. This transcription factor functions in heart formation and development. Mutations in this gene cause atrial septal defect with atrioventricular conduction defect, and also tetralogy of Fallot, which are both heart malformation diseases. Mutations in this gene can also cause congenital hypothyroidism non-goitrous type 5, a non-autoimmune condition. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Oct 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1482"
+            },
+            {
+                "gene": "KITLG",
+                "explanation": "This gene encodes the ligand of the tyrosine-kinase receptor encoded by the KIT locus. This ligand is a pleiotropic factor that acts in utero in germ cell and neural cell development, and hematopoiesis, all believed to reflect a role in cell migration. In adults, it functions pleiotropically, while mostly noted for its continued requirement in hematopoiesis. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4254"
+            },
+            {
+                "gene": "FUT4",
+                "explanation": "The product of this gene transfers fucose to N-acetyllactosamine polysaccharides to generate fucosylated carbohydrate structures. It catalyzes the synthesis of the non-sialylated antigen, Lewis x (CD15). [provided by RefSeq, Jan 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2526"
+            },
+            {
+                "gene": "TBX18",
+                "explanation": "This genes codes for a member of an evolutionarily conserved family of transcription factors that plays a crucial role in embryonic development. The family is characterized by the presence of the DNA-binding T-box domain and is divided into five sub-families based on sequence conservation in this domain. The encoded protein belongs to the vertebrate specific Tbx1 sub-family. The protein acts as a transcriptional repressor by antagonizing transcriptional activators in the T-box family. The protein forms homo- or heterodimers with other transcription factors of the T-box family or other transcription factors. [provided by RefSeq, Nov 2012]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9096"
+            },
+            {
+                "gene": "WT1",
+                "explanation": "This gene encodes a transcription factor that contains four zinc-finger motifs at the C-terminus and a proline/glutamine-rich DNA-binding domain at the N-terminus. It has an essential role in the normal development of the urogenital system, and it is mutated in a small subset of patients with Wilms tumor. This gene exhibits complex tissue-specific and polymorphic imprinting pattern, with biallelic, and monoallelic expression from the maternal and paternal alleles in different tissues. Multiple transcript variants have been described. In several variants, there is evidence for the use of a non-AUG (CUG) translation initiation codon upstream of, and in-frame with the first AUG. Authors of PMID:7926762 also provide evidence that WT1 mRNA undergoes RNA editing in human and rat, and that this process is tissue-restricted and developmentally regulated. [provided by RefSeq, Mar 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7490"
+            }
+        ]
+    },
+    "Cardiomyocyte": {
+        "markers": [
+            {
+                "gene": "ACTN1",
+                "explanation": "Alpha actinins belong to the spectrin gene superfamily which represents a diverse group of cytoskeletal proteins, including the alpha and beta spectrins and dystrophins. Alpha actinin is an actin-binding protein with multiple roles in different cell types. In nonmuscle cells, the cytoskeletal isoform is found along microfilament bundles and adherens-type junctions, where it is involved in binding actin to the membrane. In contrast, skeletal, cardiac, and smooth muscle isoforms are localized to the Z-disc and analogous dense bodies, where they help anchor the myofibrillar actin filaments. This gene encodes a nonmuscle, cytoskeletal, alpha actinin isoform and maps to the same site as the structurally similar erythroid beta spectrin gene. Three transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/87"
+            },
+            {
+                "gene": "TNNI3",
+                "explanation": "Troponin I (TnI), along with troponin T (TnT) and troponin C (TnC), is one of 3 subunits that form the troponin complex of the thin filaments of striated muscle. TnI is the inhibitory subunit; blocking actin-myosin interactions and thereby mediating striated muscle relaxation. The TnI subfamily contains three genes: TnI-skeletal-fast-twitch, TnI-skeletal-slow-twitch, and TnI-cardiac. This gene encodes the TnI-cardiac protein and is exclusively expressed in cardiac muscle tissues. Mutations in this gene cause familial hypertrophic cardiomyopathy type 7 (CMH7) and familial restrictive cardiomyopathy (RCM). Troponin I is useful in making a diagnosis of heart failure, and of ischemic heart disease. An elevated level of troponin is also now used as indicator of acute myocardial injury in patients hospitalized with moderate/severe Coronavirus Disease 2019 (COVID-19). Such elevation has also been associated with higher risk of mortality in cardiovascular disease patients hospitalized due to COVID-19. [provided by RefSeq, Aug 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7137"
+            },
+            {
+                "gene": "TNNT2",
+                "explanation": "This gene encodes the cardiac isoform of troponin T. The encoded protein is the tropomyosin-binding subunit of the troponin complex, which is located on the thin filament of striated muscles and regulates muscle contraction in response to alterations in intracellular calcium ion concentration. Mutations in this gene have been associated with familial hypertrophic cardiomyopathy as well as with dilated cardiomyopathy. [provided by RefSeq, May 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7139"
+            },
+            {
+                "gene": "GJA1",
+                "explanation": "This gene is a member of the connexin gene family. The encoded protein is a component of gap junctions, which are composed of arrays of intercellular channels that provide a route for the diffusion of low molecular weight materials from cell to cell. The encoded protein is the major protein of gap junctions in the heart that are thought to have a crucial role in the synchronized contraction of the heart and in embryonic development. A related intronless pseudogene has been mapped to chromosome 5. Mutations in this gene have been associated with oculodentodigital dysplasia, autosomal recessive craniometaphyseal dysplasia and heart malformations. [provided by RefSeq, May 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2697"
+            },
+            {
+                "gene": "MYH6",
+                "explanation": "Cardiac muscle myosin is a hexamer consisting of two heavy chain subunits, two light chain subunits, and two regulatory subunits. This gene encodes the alpha heavy chain subunit of cardiac myosin. The gene is located approximately 4kb downstream of the gene encoding the beta heavy chain subunit of cardiac myosin. Mutations in this gene cause familial hypertrophic cardiomyopathy and atrial septal defect 3. [provided by RefSeq, Feb 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4624"
+            },
+            {
+                "gene": "SIRPA",
+                "explanation": "The protein encoded by this gene is a member of the signal-regulatory-protein (SIRP) family, and also belongs to the immunoglobulin superfamily. SIRP family members are receptor-type transmembrane glycoproteins known to be involved in the negative regulation of receptor tyrosine kinase-coupled signaling processes. This protein can be phosphorylated by tyrosine kinases. The phospho-tyrosine residues of this PTP have been shown to recruit SH2 domain containing tyrosine phosphatases (PTP), and serve as substrates of PTPs. This protein was found to participate in signal transduction mediated by various growth factor receptors. CD47 has been demonstrated to be a ligand for this receptor protein. This gene and its product share very high similarity with several other members of the SIRP family. These related genes are located in close proximity to each other on chromosome 20p13. Multiple alternatively spliced transcript variants have been determined for this gene. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/140885"
+            }
+        ]
+    },
+    "Cardiovascular progenitor cell": {
+        "markers": [
+            {
+                "gene": "FLT1",
+                "explanation": "This gene encodes a member of the vascular endothelial growth factor receptor (VEGFR) family. VEGFR family members are receptor tyrosine kinases (RTKs) which contain an extracellular ligand-binding region with seven immunoglobulin (Ig)-like domains, a transmembrane segment, and a tyrosine kinase (TK) domain within the cytoplasmic domain. This protein binds to VEGFR-A, VEGFR-B and placental growth factor and plays an important role in angiogenesis and vasculogenesis. Expression of this receptor is found in vascular endothelial cells, placental trophoblast cells and peripheral blood monocytes. Multiple transcript variants encoding different isoforms have been found for this gene. Isoforms include a full-length transmembrane receptor isoform and shortened, soluble isoforms. The soluble isoforms are associated with the onset of pre-eclampsia.[provided by RefSeq, May 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2321"
+            },
+            {
+                "gene": "FLT4",
+                "explanation": "This gene encodes a tyrosine kinase receptor for vascular endothelial growth factors C and D. The protein is thought to be involved in lymphangiogenesis and maintenance of the lymphatic endothelium. Mutations in this gene cause hereditary lymphedema type IA. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2324"
+            },
+            {
+                "gene": "ISL1",
+                "explanation": "This gene encodes a member of the LIM/homeodomain family of transcription factors. The encoded protein binds to the enhancer region of the insulin gene, among others, and may play an important role in regulating insulin gene expression. The encoded protein is central to the development of pancreatic cell lineages and may also be required for motor neuron generation. Mutations in this gene have been associated with maturity-onset diabetes of the young. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3670"
+            },
+            {
+                "gene": "NKX2-5",
+                "explanation": "This gene encodes a homeobox-containing transcription factor. This transcription factor functions in heart formation and development. Mutations in this gene cause atrial septal defect with atrioventricular conduction defect, and also tetralogy of Fallot, which are both heart malformation diseases. Mutations in this gene can also cause congenital hypothyroidism non-goitrous type 5, a non-autoimmune condition. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Oct 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1482"
+            }
+        ]
+    },
+    "Endothelial cell": {
+        "markers": [
+            {
+                "gene": "VWF",
+                "explanation": "This gene encodes a glycoprotein involved in hemostasis. The encoded preproprotein is proteolytically processed following assembly into large multimeric complexes. These complexes function in the adhesion of platelets to sites of vascular injury and the transport of various proteins in the blood. Mutations in this gene result in von Willebrand disease, an inherited bleeding disorder. An unprocessed pseudogene has been found on chromosome 22. [provided by RefSeq, Oct 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7450"
+            }
+        ]
+    },
+    "Fibroblast": {
+        "markers": [
+            {
+                "gene": "CKAP4",
+                "explanation": "Enables RNA binding activity. Located in several cellular components, including lipid droplet; nuclear speck; and rough endoplasmic reticulum. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10970"
+            }
+        ]
+    },
+    "Multipotent progenitor cell": {
+        "markers": [
+            {
+                "gene": "ISL1",
+                "explanation": "This gene encodes a member of the LIM/homeodomain family of transcription factors. The encoded protein binds to the enhancer region of the insulin gene, among others, and may play an important role in regulating insulin gene expression. The encoded protein is central to the development of pancreatic cell lineages and may also be required for motor neuron generation. Mutations in this gene have been associated with maturity-onset diabetes of the young. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3670"
+            }
+        ]
+    },
+    "Semilunar valve cell": {
+        "markers": [
+            {
+                "gene": "MMP13",
+                "explanation": "This gene encodes a member of the peptidase M10 family of matrix metalloproteinases (MMPs). Proteins in this family are involved in the breakdown of extracellular matrix in normal physiological processes, such as embryonic development, reproduction, and tissue remodeling, as well as in disease processes, such as arthritis and metastasis. The encoded preproprotein is proteolytically processed to generate the mature protease. This protease cleaves type II collagen more efficiently than types I and III. It may be involved in articular cartilage turnover and cartilage pathophysiology associated with osteoarthritis. Mutations in this gene are associated with metaphyseal anadysplasia. This gene is part of a cluster of MMP genes on chromosome 11. [provided by RefSeq, Jan 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4322"
+            }
+        ]
+    },
+    "Smooth muscle cell": {
+        "markers": [
+            {
+                "gene": "ACTA2",
+                "explanation": "This gene encodes one of six different actin proteins. Actins are highly conserved proteins that are involved in cell motility, structure, integrity, and intercellular signaling. The encoded protein is a smooth muscle actin that is involved in vascular contractility and blood pressure homeostasis. Mutations in this gene cause a variety of vascular diseases, such as thoracic aortic disease, coronary artery disease, stroke, and Moyamoya disease, as well as multisystemic smooth muscle dysfunction syndrome. [provided by RefSeq, Sep 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/59"
+            },
+            {
+                "gene": "CALD1",
+                "explanation": "This gene encodes a calmodulin- and actin-binding protein that plays an essential role in the regulation of smooth muscle and nonmuscle contraction. The conserved domain of this protein possesses the binding activities to Ca(2+)-calmodulin, actin, tropomyosin, myosin, and phospholipids. This protein is a potent inhibitor of the actin-tropomyosin activated myosin MgATPase, and serves as a mediating factor for Ca(2+)-dependent inhibition of smooth muscle contraction. Alternative splicing of this gene results in multiple transcript variants encoding distinct isoforms. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/800"
+            },
+            {
+                "gene": "CNN1",
+                "explanation": "Predicted to enable actin binding activity. Involved in negative regulation of vascular associated smooth muscle cell proliferation. Located in cytoskeleton. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1264"
+            },
+            {
+                "gene": "HEXIM1",
+                "explanation": "Expression of this gene is induced by hexamethylene-bis-acetamide in vascular smooth muscle cells. This gene has no introns. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10614"
+            },
+            {
+                "gene": "HRH2",
+                "explanation": "Histamine is a ubiquitous messenger molecule released from mast cells, enterochromaffin-like cells, and neurons. Its various actions are mediated by histamine receptors H1, H2, H3 and H4. Histamine receptor H2 belongs to the family 1 of G protein-coupled receptors. It is an integral membrane protein and stimulates gastric acid secretion. It also regulates gastrointestinal motility and intestinal secretion and is thought to be involved in regulating cell growth and differentiation. Alternatively spliced transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Aug 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3274"
+            },
+            {
+                "gene": "MLNR",
+                "explanation": "Motilin is a 22 amino acid peptide hormone expressed throughout the gastrointestinal (GI) tract. The protein encoded by this gene is a motilin receptor which is a member of the G-protein coupled receptor 1 family. This member is a multi-pass transmembrane protein, and is an important therapeutic target for the treatment of hypomotility disorders. [provided by RefSeq, Aug 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2862"
+            },
+            {
+                "gene": "TAGLN",
+                "explanation": "This gene encodes a shape change and transformation sensitive actin-binding protein which belongs to the calponin family. It is ubiquitously expressed in vascular and visceral smooth muscle, and is an early marker of smooth muscle differentiation. The encoded protein is thought to be involved in calcium-independent smooth muscle contraction. It acts as a tumor suppressor, and the loss of its expression is an early event in cell transformation and the development of some tumors, coinciding with cellular plasticity. The encoded protein has a domain architecture consisting of an N-terminal calponin homology (CH) domain and a C-terminal calponin-like (CLIK) domain. Mice with a knockout of the orthologous gene are viable and fertile but their vascular smooth muscle cells exhibit alterations in the distribution of the actin filament and changes in cytoskeletal organization. [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6876"
+            },
+            {
+                "gene": "CDH5",
+                "explanation": "This gene encodes a classical cadherin of the cadherin superfamily. The encoded preproprotein is proteolytically processed to generate the mature glycoprotein. This calcium-dependent cell-cell adhesion molecule is comprised of five extracellular cadherin repeats, a transmembrane region and a highly conserved cytoplasmic tail. Functioning as a classical cadherin by imparting to cells the ability to adhere in a homophilic manner, this protein plays a role in endothelial adherens junction assembly and maintenance. This gene is located in a gene cluster in a region on the long arm of chromosome 16 that is involved in loss of heterozygosity events in breast and prostate cancer. [provided by RefSeq, Nov 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1003"
+            }
+        ]
+    }
+}

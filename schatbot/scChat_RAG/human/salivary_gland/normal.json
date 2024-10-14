@@ -1,0 +1,74 @@
+{
+    "Acinar cell": {
+        "markers": [
+            {
+                "gene": "BMP6",
+                "explanation": "This gene encodes a secreted ligand of the TGF-beta (transforming growth factor-beta) superfamily of proteins. Ligands of this family bind various TGF-beta receptors leading to recruitment and activation of SMAD family transcription factors that regulate gene expression. The encoded preproprotein is proteolytically processed to generate each subunit of the disulfide-linked homodimer. This protein regulates a wide range of biological processes including iron homeostasis, fat and bone development, and ovulation. Differential expression of this gene may be associated with progression of breast and prostate cancer. Mutations in this gene may be associated with iron overload in human patients. [provided by RefSeq, Jul 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/654"
+            }
+        ]
+    },
+    "B cell": {
+        "markers": [
+            {
+                "gene": "MS4A1",
+                "explanation": "This gene encodes a member of the membrane-spanning 4A gene family. Members of this nascent protein family are characterized by common structural features and similar intron/exon splice boundaries and display unique expression patterns among hematopoietic cells and nonlymphoid tissues. This gene encodes a B-lymphocyte surface molecule which plays a role in the development and differentiation of B-cells into plasma cells. This family member is localized to 11q12, among a cluster of family members. Alternative splicing of this gene results in two transcript variants which encode the same protein. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/931"
+            }
+        ]
+    },
+    "B1 cell": {
+        "markers": [
+            {
+                "gene": "CD5",
+                "explanation": "This gene encodes a member of the scavenger receptor cysteine-rich (SRCR) superfamily. Members of this family are secreted or membrane-anchored proteins mainly found in cells associated with the immune system. This protein is a type-I transmembrane glycoprotein found on the surface of thymocytes, T lymphocytes and a subset of B lymphocytes. The encoded protein contains three SRCR domains and may act as a receptor to regulate T-cell proliferation. Alternative splicing results in multiple transcript variants encoding different isoforms. [provided by RefSeq, Oct 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/921"
+            }
+        ]
+    },
+    "Mucous acinar cell": {
+        "markers": [
+            {
+                "gene": "ALCAM",
+                "explanation": "This gene encodes activated leukocyte cell adhesion molecule (ALCAM), also known as CD166 (cluster of differentiation 166), which is a member of a subfamily of immunoglobulin receptors with five immunoglobulin-like domains (VVC2C2C2) in the extracellular domain. This protein binds to T-cell differentiation antigene CD6, and is implicated in the processes of cell adhesion and migration. Multiple alternatively spliced transcript variants encoding different isoforms have been found. [provided by RefSeq, Aug 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/214"
+            }
+        ]
+    },
+    "Plasma cell": {
+        "markers": [
+            {
+                "gene": "SDC1",
+                "explanation": "The protein encoded by this gene is a transmembrane (type I) heparan sulfate proteoglycan and is a member of the syndecan proteoglycan family. The syndecans mediate cell binding, cell signaling, and cytoskeletal organization and syndecan receptors are required for internalization of the HIV-1 tat protein. The syndecan-1 protein functions as an integral membrane protein and participates in cell proliferation, cell migration and cell-matrix interactions via its receptor for extracellular matrix proteins. Altered syndecan-1 expression has been detected in several different tumor types. While several transcript variants may exist for this gene, the full-length natures of only two have been described to date. These two represent the major variants of this gene and encode the same protein. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6382"
+            }
+        ]
+    },
+    "Serous acinar cell": {
+        "markers": [
+            {
+                "gene": "CD44",
+                "explanation": "The protein encoded by this gene is a cell-surface glycoprotein involved in cell-cell interactions, cell adhesion and migration. It is a receptor for hyaluronic acid (HA) and can also interact with other ligands, such as osteopontin, collagens, and matrix metalloproteinases (MMPs). This protein participates in a wide variety of cellular functions including lymphocyte activation, recirculation and homing, hematopoiesis, and tumor metastasis. Transcripts for this gene undergo complex alternative splicing that results in many functionally distinct isoforms, however, the full length nature of some of these variants has not been determined. Alternative splicing is the basis for the structural and functional diversity of this protein, and may be related to tumor metastasis. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/960"
+            }
+        ]
+    },
+    "T cell": {
+        "markers": [
+            {
+                "gene": "CD5",
+                "explanation": "This gene encodes a member of the scavenger receptor cysteine-rich (SRCR) superfamily. Members of this family are secreted or membrane-anchored proteins mainly found in cells associated with the immune system. This protein is a type-I transmembrane glycoprotein found on the surface of thymocytes, T lymphocytes and a subset of B lymphocytes. The encoded protein contains three SRCR domains and may act as a receptor to regulate T-cell proliferation. Alternative splicing results in multiple transcript variants encoding different isoforms. [provided by RefSeq, Oct 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/921"
+            }
+        ]
+    },
+    "T helper cell": {
+        "markers": [
+            {
+                "gene": "CD4",
+                "explanation": "This gene encodes the CD4 membrane glycoprotein of T lymphocytes. The CD4 antigen acts as a coreceptor with the T-cell receptor on the T lymphocyte to recognize antigens displayed by an antigen presenting cell in the context of class II MHC molecules. The CD4 antigen is also a primary receptor for entry of the human immunodeficiency virus through interactions with the HIV Env gp120 subunit. This gene is expressed not only in T lymphocytes, but also in B cells, macrophages, granulocytes, as well as in various regions of the brain. The protein functions to initiate or augment the early phase of T-cell activation, and may function as an important mediator of indirect neuronal damage in infectious and immune-mediated diseases of the central nervous system. Multiple alternatively spliced transcript variants encoding different isoforms have been identified in this gene. [provided by RefSeq, May 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/920"
+            }
+        ]
+    }
+}

@@ -1,0 +1,129 @@
+{
+    "Alpha cell": {
+        "markers": [
+            {
+                "gene": "Hhex",
+                "explanation": "This gene encodes a member of the homeobox family of transcription factors, many of which are involved in developmental processes. Expression in specific hematopoietic lineages suggests that this protein may play a role in hematopoietic differentiation. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/15242"
+            },
+            {
+                "gene": "Ins1",
+                "explanation": "The protein encoded by this gene is a transcriptional activator involved in cell proliferation. The encoded protein is phosphorylated in M phase and regulates the expression of several cell cycle genes, such as cyclin B1 and cyclin D1. Several transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Jul 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/16333"
+            },
+            {
+                "gene": "Ins2",
+                "explanation": "Gene Ins2 not found in NCBI database",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/16334"
+            },
+            {
+                "gene": "Nkx6-1",
+                "explanation": "In the pancreas, NKX6.1 is required for the development of beta cells and is a potent bifunctional transcription regulator that binds to AT-rich sequences within the promoter region of target genes Iype et al. (2004) [PubMed 15056733].[supplied by OMIM, Mar 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/18096"
+            },
+            {
+                "gene": "Pax6",
+                "explanation": "This gene encodes paired box protein Pax-6, one of many human homologs of the Drosophila melanogaster gene prd. In addition to a conserved paired box domain, a hallmark feature of this gene family, the encoded protein also contains a homeobox domain. Both domains are known to bind DNA and function as regulators of gene transcription. Activity of this protein is key in the development of neural tissues, particularly the eye. This gene is regulated by multiple enhancers located up to hundreds of kilobases distant from this locus. Mutations in this gene or in the enhancer regions can cause ocular disorders such as aniridia and Peter's anomaly. Use of alternate promoters and alternative splicing results in multiple transcript variants encoding different isoforms. Interestingly, inclusion of a particular alternate coding exon has been shown to increase the length of the paired box domain and alter its DNA binding specificity. Consequently, isoforms that carry the shorter paired box domain regulate a different set of genes compared to the isoforms carrying the longer paired box domain. [provided by RefSeq, Mar 2019]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/18508"
+            },
+            {
+                "gene": "Pdx1",
+                "explanation": "The protein encoded by this gene is a transcriptional activator of several genes, including insulin, somatostatin, glucokinase, islet amyloid polypeptide, and glucose transporter type 2. The encoded nuclear protein is involved in the early development of the pancreas and plays a major role in glucose-dependent regulation of insulin gene expression. Defects in this gene are a cause of pancreatic agenesis, which can lead to early-onset insulin-dependent diabetes mellitus (IDDM), as well as maturity onset diabetes of the young type 4 (MODY4). [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/18609"
+            },
+            {
+                "gene": "Sst",
+                "explanation": "The hormone somatostatin has active 14 aa and 28 aa forms that are produced by alternate cleavage of the single preproprotein encoded by this gene. Somatostatin is expressed throughout the body and inhibits the release of numerous secondary hormones by binding to high-affinity G-protein-coupled somatostatin receptors. This hormone is an important regulator of the endocrine system through its interactions with pituitary growth hormone, thyroid stimulating hormone, and most hormones of the gastrointestinal tract. Somatostatin also affects rates of neurotransmission in the central nervous system and proliferation of both normal and tumorigenic cells. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/20604"
+            }
+        ]
+    },
+    "Beta cell": {
+        "markers": [
+            {
+                "gene": "Slc2a2",
+                "explanation": "This gene encodes an integral plasma membrane glycoprotein of the liver, islet beta cells, intestine, and kidney epithelium. The encoded protein mediates facilitated bidirectional glucose transport. Because of its low affinity for glucose, it has been suggested as a glucose sensor. Mutations in this gene are associated with susceptibility to diseases, including Fanconi-Bickel syndrome and noninsulin-dependent diabetes mellitus (NIDDM). Alternative splicing results in multiple transcript variants of this gene. [provided by RefSeq, Jul 2013]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/20526"
+            },
+            {
+                "gene": "Neurog3",
+                "explanation": "The protein encoded by this gene is a basic helix-loop-helix (bHLH) transcription factor involved in neurogenesis. The encoded protein likely acts as a heterodimer with another bHLH protein. Defects in this gene are a cause of congenital malabsorptive diarrhea 4 (DIAR4).[provided by RefSeq, May 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/11925"
+            },
+            {
+                "gene": "Pdx1",
+                "explanation": "The protein encoded by this gene is a transcriptional activator of several genes, including insulin, somatostatin, glucokinase, islet amyloid polypeptide, and glucose transporter type 2. The encoded nuclear protein is involved in the early development of the pancreas and plays a major role in glucose-dependent regulation of insulin gene expression. Defects in this gene are a cause of pancreatic agenesis, which can lead to early-onset insulin-dependent diabetes mellitus (IDDM), as well as maturity onset diabetes of the young type 4 (MODY4). [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/18609"
+            }
+        ]
+    },
+    "Duct cell": {
+        "markers": [
+            {
+                "gene": "Car2",
+                "explanation": "The protein encoded by this gene is one of several isozymes of carbonic anhydrase, which catalyzes reversible hydration of carbon dioxide. Defects in this enzyme are associated with osteopetrosis and renal tubular acidosis. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Jun 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12349"
+            }
+        ]
+    },
+    "Pancreatic ductal cell": {
+        "markers": [
+            {
+                "gene": "Krt7",
+                "explanation": "The protein encoded by this gene is a member of the keratin gene family. The type II cytokeratins consist of basic or neutral proteins which are arranged in pairs of heterotypic keratin chains coexpressed during differentiation of simple and stratified epithelial tissues. This type II cytokeratin is specifically expressed in the simple epithelia lining the cavities of the internal organs and in the gland ducts and blood vessels. The genes encoding the type II cytokeratins are clustered in a region of chromosome 12q12-q13. Alternative splicing may result in several transcript variants; however, not all variants have been fully described. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/110310"
+            }
+        ]
+    },
+    "Pancreatic progenitor cell": {
+        "markers": [
+            {
+                "gene": "Met",
+                "explanation": "This gene encodes a member of the receptor tyrosine kinase family of proteins and the product of the proto-oncogene MET. The encoded preproprotein is proteolytically processed to generate alpha and beta subunits that are linked via disulfide bonds to form the mature receptor. Further processing of the beta subunit results in the formation of the M10 peptide, which has been shown to reduce lung fibrosis. Binding of its ligand, hepatocyte growth factor, induces dimerization and activation of the receptor, which plays a role in cellular survival, embryogenesis, and cellular migration and invasion. Mutations in this gene are associated with papillary renal cell carcinoma, hepatocellular carcinoma, and various head and neck cancers. Amplification and overexpression of this gene are also associated with multiple human cancers. [provided by RefSeq, May 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/17295"
+            },
+            {
+                "gene": "Kit",
+                "explanation": "This gene encodes a receptor tyrosine kinase. This gene was initially identified as a homolog of the feline sarcoma viral oncogene v-kit and is often referred to as proto-oncogene c-Kit. The canonical form of this glycosylated transmembrane protein has an N-terminal extracellular region with five immunoglobulin-like domains, a transmembrane region, and an intracellular tyrosine kinase domain at the C-terminus. Upon activation by its cytokine ligand, stem cell factor (SCF), this protein phosphorylates multiple intracellular proteins that play a role in in the proliferation, differentiation, migration and apoptosis of many cell types and thereby plays an important role in hematopoiesis, stem cell maintenance, gametogenesis, melanogenesis, and in mast cell development, migration and function. This protein can be a membrane-bound or soluble protein. Mutations in this gene are associated with gastrointestinal stromal tumors, mast cell disease, acute myelogenous leukemia, and piebaldism. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, May 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/16590"
+            },
+            {
+                "gene": "Dclk1",
+                "explanation": "This gene encodes a member of the protein kinase superfamily and the doublecortin family. The protein encoded by this gene contains two N-terminal doublecortin domains, which bind microtubules and regulate microtubule polymerization, a C-terminal serine/threonine protein kinase domain, which shows substantial homology to Ca2+/calmodulin-dependent protein kinase, and a serine/proline-rich domain in between the doublecortin and the protein kinase domains, which mediates multiple protein-protein interactions. The microtubule-polymerizing activity of the encoded protein is independent of its protein kinase activity. The encoded protein is involved in several different cellular processes, including neuronal migration, retrograde transport, neuronal apoptosis and neurogenesis. This gene is up-regulated by brain-derived neurotrophic factor and associated with memory and general cognitive abilities. Multiple transcript variants generated by two alternative promoter usage and alternative splicing have been reported, but the full-length nature and biological validity of some variants have not been defined. These variants encode different isoforms, which are differentially expressed and have different kinase activities.[provided by RefSeq, Sep 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/13175"
+            }
+        ]
+    },
+    "Pancreatic stem cell": {
+        "markers": [
+            {
+                "gene": "Met",
+                "explanation": "This gene encodes a member of the receptor tyrosine kinase family of proteins and the product of the proto-oncogene MET. The encoded preproprotein is proteolytically processed to generate alpha and beta subunits that are linked via disulfide bonds to form the mature receptor. Further processing of the beta subunit results in the formation of the M10 peptide, which has been shown to reduce lung fibrosis. Binding of its ligand, hepatocyte growth factor, induces dimerization and activation of the receptor, which plays a role in cellular survival, embryogenesis, and cellular migration and invasion. Mutations in this gene are associated with papillary renal cell carcinoma, hepatocellular carcinoma, and various head and neck cancers. Amplification and overexpression of this gene are also associated with multiple human cancers. [provided by RefSeq, May 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/17295"
+            },
+            {
+                "gene": "Dclk1",
+                "explanation": "This gene encodes a member of the protein kinase superfamily and the doublecortin family. The protein encoded by this gene contains two N-terminal doublecortin domains, which bind microtubules and regulate microtubule polymerization, a C-terminal serine/threonine protein kinase domain, which shows substantial homology to Ca2+/calmodulin-dependent protein kinase, and a serine/proline-rich domain in between the doublecortin and the protein kinase domains, which mediates multiple protein-protein interactions. The microtubule-polymerizing activity of the encoded protein is independent of its protein kinase activity. The encoded protein is involved in several different cellular processes, including neuronal migration, retrograde transport, neuronal apoptosis and neurogenesis. This gene is up-regulated by brain-derived neurotrophic factor and associated with memory and general cognitive abilities. Multiple transcript variants generated by two alternative promoter usage and alternative splicing have been reported, but the full-length nature and biological validity of some variants have not been defined. These variants encode different isoforms, which are differentially expressed and have different kinase activities.[provided by RefSeq, Sep 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/13175"
+            }
+        ]
+    },
+    "Progenitor cell": {
+        "markers": [
+            {
+                "gene": "Nes",
+                "explanation": "This gene encodes a member of the intermediate filament protein family and is expressed primarily in nerve cells. [provided by RefSeq, Sep 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/18008"
+            }
+        ]
+    },
+    "Stem cell": {
+        "markers": [
+            {
+                "gene": "Pdx1",
+                "explanation": "The protein encoded by this gene is a transcriptional activator of several genes, including insulin, somatostatin, glucokinase, islet amyloid polypeptide, and glucose transporter type 2. The encoded nuclear protein is involved in the early development of the pancreas and plays a major role in glucose-dependent regulation of insulin gene expression. Defects in this gene are a cause of pancreatic agenesis, which can lead to early-onset insulin-dependent diabetes mellitus (IDDM), as well as maturity onset diabetes of the young type 4 (MODY4). [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/18609"
+            }
+        ]
+    }
+}
