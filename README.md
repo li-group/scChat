@@ -109,8 +109,9 @@ For example, to analyze normal blood cells from a human, the configuration would
     ],
     "condition": "normal"
 }
-
+```
 This configuration will retrieve and process the relevant dataset based on the selected organism, tissue, and condition, enabling a customized and context-specific analysis.
+
 
 ### Available Organisms and Tissues
 
@@ -155,6 +156,7 @@ The `scChat_RAG` files were generated using data from:
 **CellMarker: a manually curated resource of cell markers in human and mouse**  
 *Published in Nucleic Acids Research, 2018*  
 DOI: [10.1093/nar/gky900](https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gky900/5115823)
+
 
 # Citation
 <a name="citation"></a>
