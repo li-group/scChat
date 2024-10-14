@@ -158,19 +158,4 @@ The `scChat_RAG` files were generated using data from:
 DOI: [10.1093/nar/gky900](https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gky900/5115823)
 
 
-# Citation
-<a name="citation"></a>
-Cite us
-```bibtex
-@misc{lu2024scchat,
-    title={scChat: A Large Language Model-Powered Co-Pilot for Contextualized Single-Cell RNA Sequencing Analysis},
-    author={Yen-Chun Lu and Ashley Varghese and Rahul Nahar and Hao Chen and Kunming Shao and Xiaoping Bao and Can Li},
-    year={2024},
-    eprint={2024.10.01.616063},
-    archivePrefix={bioRxiv},
-    doi={10.1101/2024.10.01.616063}
-}
-
-```
-
 
