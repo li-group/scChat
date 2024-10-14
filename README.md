@@ -91,6 +91,71 @@ Follow these steps to utilize the application effectively:
 # Datasets
 The datasets used for testing can be found at https://docs.google.com/spreadsheets/d/1NwN5GydHn0B3-W0DLcAfvnNtZVJEMUgBW9YyzXnS83A/edit?usp=sharing
 
+
+## scChat Retrieval-Augmented Generation (RAG) Configuration
+
+The `scChat_RAG` component allows users to specify the organism, tissue type, and condition (normal or disease) for their single-cell RNA sequencing (scRNA-seq) analysis. The data is structured into human and mouse categories, with each tissue having two available conditions: `normal` and `normal_and_cancer`.
+
+### Usage
+To run a scRNA-seq analysis with scChat RAG, users can configure the `.json` file by specifying the organism (`human` or `mouse`), the tissue type, and the condition (either `normal` or `normal_and_cancer`).
+
+For example, to analyze normal blood cells from a human, the configuration would look like this:
+
+```json
+{
+    "marker": "human",
+    "tissue": [
+        "blood"
+    ],
+    "condition": "normal"
+}
+
+This configuration will retrieve and process the relevant dataset based on the selected organism, tissue, and condition, enabling a customized and context-specific analysis.
+
+### Available Organisms and Tissues
+
+#### Human
+- Adipose Tissue
+- Blood
+- Bone Marrow
+- Brain
+- Breast
+- Eye
+- Heart
+- Intestine
+- Kidney
+- Liver
+- Lung
+- Ovary
+- Pancreas
+- Salivary Gland
+- Skin
+- Testis
+
+#### Mouse
+- Adipose Tissue
+- Blood
+- Bone Marrow
+- Brain
+- Heart
+- Kidney
+- Liver
+- Lung
+- Ovary
+- Pancreas
+- Spleen
+- Testis
+
+Each tissue has a corresponding `normal.json` and `normal_and_cancer.json` file for both organisms, making it easy to switch between healthy and diseased conditions.
+
+## Citation
+
+The `scChat_RAG` files were generated using data from:
+
+**CellMarker: a manually curated resource of cell markers in human and mouse**  
+*Published in Nucleic Acids Research, 2018*  
+DOI: [10.1093/nar/gky900](https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gky900/5115823)
+
 # Citation
 <a name="citation"></a>
 Cite us
