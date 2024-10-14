@@ -205,11 +205,16 @@ def display_umap(cell_type):
     fig_json = fig.to_json()
     return fig_json
 
-def display_annotated_umap(cell_type):
+def display_processed_umap(cell_type):
     global display_flag
     display_flag = True
+    cell_type2 = cell_type.split()[0].capitalize() + " cell"        
     cell_type = cell_type.split()[0].capitalize() + " cells"        
-    umap_data = pd.read_csv(f'umaps/{cell_type}_annotated_umap_data.csv')
+    umap_data = None
+    if os.path.exists(f'umaps/{cell_type}_annotated_umap_data.csv'):
+        umap_data = pd.read_csv(f'umaps/{cell_type}_annotated_umap_data.csv')
+    else:
+        umap_data = pd.read_csv(f'umaps/{cell_type2}_annotated_umap_data.csv')
     # if cell_type != "Overall cells":
     #     umap_data['original_cell_type'] = umap_data['cell_type']
     #     umap_data['cell_type'] = 'Unknown'
@@ -334,7 +339,8 @@ def label_clusters(cell_type):
     global current_adata
     global base_annotated_adata
     adata2 = adata.copy()
-    
+    standardized_cell_type3 = cell_type.split()[0].capitalize()     
+    standardized_cell_type2 = cell_type.split()[0].capitalize() + " cell"        
     standardized_cell_type = cell_type.split()[0].capitalize() + " cells"        
     last_message = conversation_history2[-2]['content']
     try:
@@ -343,7 +349,7 @@ def label_clusters(cell_type):
         str_map = last_message[start_idx:end_idx]        
         map2 = ast.literal_eval(str_map)
         map2 = {str(key): value for key, value in map2.items()}        
-        if standardized_cell_type == "Overall cells":
+        if standardized_cell_type == "Overall cells" or standardized_cell_type2 == "Overall cell":
             adata2.obs['cell_type'] = 'Unknown'
             for group, cell_type in map2.items():
                 adata2.obs.loc[adata2.obs['leiden'] == group, 'cell_type'] = cell_type
@@ -356,6 +362,10 @@ def label_clusters(cell_type):
         else:
             adata3 = base_annotated_adata.copy()
             specific_cells = adata3[adata3.obs['cell_type'].isin([standardized_cell_type])].copy()
+            if specific_cells.shape[0] == 0:
+                specific_cells = adata3[adata3.obs['cell_type'].isin([standardized_cell_type2])].copy()
+            if specific_cells.shape[0] == 0:
+                specific_cells = adata3[adata3.obs['cell_type'].isin([standardized_cell_type3])].copy()
             sc.tl.pca(specific_cells, svd_solver='arpack')
             sc.pp.neighbors(specific_cells)
             sc.tl.umap(specific_cells)
@@ -459,17 +469,38 @@ def extract_top_genes_stats(adata, groupby='leiden', n_genes=25):
 
 # Define the statistical extraction and API interaction functions
 def calculate_cluster_statistics(adata, category, n_genes=25):
-    markers = select_markers(category)
-    markers = [gene for gene in markers if gene in adata.var_names]
+    #adding
+    global sample_mapping
+    base_markers = get_rag_and_markers(False)
+    markers = []
+    for cell_type, cell_data in base_markers.items():
+        print (cell_type)
+        print ('--')
+        print (cell_data)
+        markers += cell_data['genes']
+    
+    print ("MARKERS BEFORE FILTER2 ", markers)
+    markers = filter_existing_genes(adata, markers)
+    print ("MARKERS FINAL2 ", markers)
+    markers = list(set(markers))
+    #done
+    # markers = select_markers(category)
+    # markers = [gene for gene in markers if gene in adata.var_names]
     # Ranking genes per cluster
     sc.tl.rank_genes_groups(adata, 'leiden', method='wilcoxon', n_genes=n_genes)
     top_genes_df = extract_top_genes_stats(adata, groupby='leiden', n_genes=25)
     second_dataset = True
     # Extract marker gene expression within clusters
-    if second_dataset:
-        sc.tl.dendrogram(adata, groupby='leiden')
-    else:
+    # if second_dataset:
+    #     sc.tl.dendrogram(adata, groupby='leiden')
+    # else:
+    #     sc.tl.dendrogram(adata, groupby='leiden', use_rep='X_scVI')
+    if sample_mapping:
         sc.tl.dendrogram(adata, groupby='leiden', use_rep='X_scVI')
+        # sc.tl.dendrogram(adata, groupby='leiden')
+    else:
+        sc.tl.dendrogram(adata, groupby='leiden')
+
     marker_expression = sc.get.obs_df(adata, keys=['leiden'] + markers, use_raw=True)
     marker_expression.set_index('leiden', inplace=True)
     # Calculating mean and proportion of expression per cluster
@@ -488,24 +519,24 @@ def retreive_stats():
         expression_proportion = json.load(file)
     global adata
     global_top_genes_df, global_mean_expression, global_expression_proportion = calculate_cluster_statistics(adata, 'overall')
-    myeloid_markers = get_myeloid_markers()
-    t_cell_markers = get_t_markers()
-    overall_markers = get_overall_markers()    
+    # myeloid_markers = get_myeloid_markers()
+    # t_cell_markers = get_t_markers()
+    # overall_markers = get_overall_markers()    
+    markers = get_rag_and_markers(False)
+    markers = ', '.join(markers)
     explanation = "Please analyze the clustering statistics and classify each cluster based on the following data: Top Genes:Mean Expression: Expression Proportion: , based on statistical data: 1. top_genes_df: 25 top genes expression within each clusters, with it's p_val, p_val_adj, and logfoldchange; 2. mean_expression of the marker genes: specific marker genes mean expression within each cluster; 3. expression_proportion of the marker genes: every cluster each gene expression fraction within each cluster, and give back the mapping dictionary in the format like this group_to_cell_type = {'0': 'Myeloid cells','1': 'T cells','2': 'Myeloid cells','3': 'Myeloid cells','4': 'T cells'} without further explanation or comment.  I only want the summary map in the response, do not give me any explanation or comment or repeat my input, i dont want any redundant information other than the summary map"
     top_genes_summary = []
     mean_expression_str = ", ".join([f"{k}: {v}" for k, v in mean_expression.items()])
     expression_proportion_str = ", ".join([f"{k}: {v}" for k, v in expression_proportion.items()])
-    myeloid_markers_str = ", ".join(myeloid_markers)
-    t_cell_markers_str = ", ".join(t_cell_markers)
-    overall_markers_str = ", ".join(overall_markers)
+    # myeloid_markers_str = ", ".join(myeloid_markers)
+    # t_cell_markers_str = ", ".join(t_cell_markers)
+    # overall_markers_str = ", ".join(overall_markers)
     summary = (
         f"Explanation: {explanation}. "
         f"Mean expression data: {mean_expression_str}. "
         f"Expression proportion data: {expression_proportion_str}. "
         f"Top genes details: {global_top_genes_df}. "
-        f"Myeloid markers: {myeloid_markers_str}. "
-        f"T cell markers: {t_cell_markers_str}. "
-        f"Overall markers: {overall_markers_str}."
+        f"markers: {markers}. "
     )
     return summary
 
@@ -565,6 +596,73 @@ def get_markers(cell_type):
         cell_complex_markers += genes
         
     return cell_complex_markers 
+
+#tag True for RAG, False for marker genes list
+def get_rag_and_markers(tag):
+    specification = None
+    # file_path = "../media/specification.json"
+    file_path = "media/specification.json"
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as file:
+            specification = json.load(file)
+            # print("BASE:", specification)
+    else:
+        print ("specification not found")
+        return "-"
+
+    base_file_path = os.path.join("schatbot/scChat_RAG", specification['marker'].lower())
+    file_paths = []
+    
+    for tissue in specification['tissue']:
+        file_path = os.path.join(base_file_path, tissue.lower(), specification['condition'] + '.json')
+        file_paths.append(file_path)
+    
+    print("Constructed file paths:", file_paths)
+
+    for file_path in file_paths:
+        if os.path.exists(file_path):
+            print(f"File found: {file_path}")
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+                # print(data)
+        else:
+            print(f"File not found: {file_path}")
+            continue
+    
+    combined_data = {}
+
+    # Iterate through the file paths
+    for file_path in file_paths:
+        if os.path.exists(file_path):
+            print(f"File found: {file_path}")
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+
+                if tag:  # If tag is true, combine all data from the files
+                    for cell_type, cell_data in data.items():
+                        if cell_type not in combined_data:
+                            combined_data[cell_type] = cell_data
+                        else:
+                            combined_data[cell_type]['markers'].extend(cell_data['markers'])
+
+                else:  # If tag is false, retrieve only marker name + list of genes
+                    for cell_type, cell_data in data.items():
+                        if cell_type not in combined_data:
+                            combined_data[cell_type] = {'genes': []}
+                        combined_data[cell_type]['genes'].extend([marker['gene'] for marker in cell_data['markers']])
+        
+        else:
+            print(f"File not found: {file_path}")
+
+    fptr = open("testop.txt", "w")
+    fptr.write(json.dumps(combined_data, indent=4))
+    # print("Combined data:", json.dumps(combined_data, indent=4))
+    return combined_data
+
+    
+
+
+
 
 def get_t_markers():
     t_cell_complex_markers = []
@@ -673,21 +771,39 @@ def generate_umap():
     adata.obs['UMAP_2'] = umap_df[:, 1]
 
     #take this from MARK
-    markers = get_overall_markers()
+    # markers = get_overall_markers()
+    base_markers = get_rag_and_markers(False)
+    markers = []
+    for cell_type, cell_data in base_markers.items():
+        print (cell_type)
+        print ('--')
+        print (cell_data)
+        markers += cell_data['genes']
+    
+    print ("MARKERS BEFORE FILTER ", markers)
     markers = filter_existing_genes(adata, markers)
-
+    print ("MARKERS FINAL ", markers)
+    markers = list(set(markers))
     # Calculate statistics to feed into GPT
     statistic_data = sc.get.obs_df(adata, keys=['leiden'] + markers, use_raw=True)
+    print ("HERE1")
     statistic_data.set_index('leiden', inplace=True)
+    print ("HERE2")
     mean_expression = statistic_data.groupby('leiden').mean()
+    print ("HERE3")
     pd_mean_expression = pd.DataFrame(mean_expression)
+    print ("HERE4")
     pd_mean_expression.to_csv("basic_data/mean_expression.csv")
+    print ("HERE4.5")
     pd_mean_expression.to_json("basic_data/mean_expression.json")
+    print ("HERE4.6")
+
     expression_proportion = statistic_data.gt(0).groupby('leiden').mean()
+    print ("HERE5")
     pd_expression_proportion = pd.DataFrame(expression_proportion)
     pd_expression_proportion.to_csv("basic_data/expression_proportion.csv")
     pd_expression_proportion.to_json("basic_data/expression_proportion.json")
-
+    print ("HERE6")
     # Dot plot
     if sample_mapping == None:
         sc.tl.dendrogram(adata, groupby='leiden')
@@ -703,6 +819,7 @@ def generate_umap():
     adata.obs['cell_type'] = 'Unknown'
     adata.obs[['UMAP_1', 'UMAP_2', 'leiden', 'patient_name']].to_csv("basic_data/Overall cells_umap_data.csv", index=False)
     adata.obs[['UMAP_1', 'UMAP_2', 'leiden', 'patient_name']].to_csv("process_cell_data/Overall cells_umap_data.csv", index=False)
+    print ("HERE")
 
     # Save dot plot data for Plotly
     dot_plot_data = statistic_data.reset_index().melt(id_vars='leiden', var_name='gene', value_name='expression')
@@ -712,10 +829,13 @@ def generate_umap():
     dendrogram_data = adata.uns['dendrogram_leiden']
     pd_dendrogram_linkage = pd.DataFrame(dendrogram_data['linkage'], columns=['source', 'target', 'distance', 'count'])
     pd_dendrogram_linkage.to_csv("basic_data/dendrogram_data.csv", index=False)
-    rag_data = load_RAG("Overall cells")
+    # rag_data = load_RAG("Overall cells")
+    rag_data = get_rag_and_markers(True)
+    rag_data_str = ', '.join(rag_data)
+                #   f"RAG Data : {', '.join(rag_data_str)}. " \
+
     summary = f"UMAP analysis completed. Data summary: {adata}, " \
-              f"Key marker genes include: {', '.join(markers)}. " \
-              f"RAG Data : {', '.join(rag_data)}. " \
+                f"RAG Data : {str(rag_data)}. " \
               f"Cell counts details are provided. " \
               f"Additional data file generated: preface.txt."
     retrieve_stats_summary = retreive_stats()
@@ -746,8 +866,17 @@ def process_cells(cell_type):
     cell_type = cell_type.split()[0]
     cell_type = cell_type.lower()
     cell_type = cell_type.capitalize()
+    cell_type3 = cell_type
+    cell_type2 = cell_type + " " + "cell"
     cell_type = cell_type + " " + "cells"
+    
     filtered_cells = adata2[adata2.obs['cell_type'].isin([cell_type])].copy()
+    if filtered_cells.shape[0] == 0:
+        filtered_cells = adata2[adata2.obs['cell_type'].isin([cell_type2])].copy()
+        # return f"No cells found for the specified cell type: {cell_type}. Please check your input."
+    if filtered_cells.shape[0] == 0:
+        filtered_cells = adata2[adata2.obs['cell_type'].isin([cell_type3])].copy()
+
     sc.tl.pca(filtered_cells, svd_solver='arpack')
     sc.pp.neighbors(filtered_cells)
     sc.tl.umap(filtered_cells)
@@ -759,14 +888,18 @@ def process_cells(cell_type):
     umap_df['leiden'] = filtered_cells.obs['leiden'].values
 
     umap_df.to_csv(f'process_cell_data/{cell_type}_umap_data.csv', index=False)
-    explanation =  f'Please analyze the {cell_type} clustering statistics and classify each cluster based on the following data into more in depth cell types, based on statistical data: we prepare 1. {cell_type}_top_genes_df: 25 top genes expression within each clusters, with its p_val, p_val_adj, and logfoldchange; 2. {cell_type}_mean_expression of the marker genes: specific marker genes mean expression within each cluster; 3. {cell_type}_expression_proportion of the marker genes: every cluster each gene expression fraction within each cluster, and give back the mapping dictionary in the python dictionary format string corresponding to string without further explanation or comment.  I only want the summary map in the response, do not give me any explanation or comment or repeat my input, i dont want any redundant information other than the summary map'
+    explanation =  f'Please analyze the {cell_type} clustering statistics and classify each cluster based on the following data into more in depth cell types, based on statistical data: we prepare 1. {cell_type}_top_genes_df: 25 top genes expression within each clusters, with its p_val, p_val_adj, and logfoldchange; 2. {cell_type}_mean_expression of the marker genes: specific marker genes mean expression within each cluster; 3. {cell_type}_expression_proportion of the marker genes: every cluster each gene expression fraction within each cluster, and give back the mapping dictionary in the python dictionary format string corresponding to string without further explanation or comment.  I only want the summary map in the response, do not give me any explanation or comment or repeat my input, i dont want any redundant information other than the summary map.'
     global_top_genes_df, global_mean_expression, global_expression_proportion = calculate_cluster_statistics(filtered_cells, cell_type)
-    cell_markers = get_markers(cell_type=cell_type)
-    rag_data = load_RAG(cell_type=cell_type)
+    # cell_markers = get_markers(cell_type=cell_type)
+    # rag_data = load_RAG(cell_type=cell_type)
+    cell_markers = get_rag_and_markers(False)
+    cell_markers = ', '.join(cell_markers)
+    # rag_data = get_rag_and_markers(True)
+    # rag_data = ', '.join(rag_data)
     summary2 = (
     f"Explanation: {explanation}, "
-    f"{cell_type} key marker genes include: {', '.join(cell_markers)}. "
-    f"{cell_type} RAG data {rag_data}"
+    f"{cell_type} key marker genes include: {(cell_markers)}. "
+    # f"{cell_type} RAG data {rag_data}"
     f"{cell_type} top genes {global_top_genes_df}"
     f"{cell_type} mean expression {str(global_mean_expression)}"
     f"{cell_type} expression proportion {str(global_expression_proportion)}"
@@ -808,12 +941,19 @@ def sample_differential_expression_genes_comparison(cell_type, sample_1, sample_
     global adata
     global sample_mapping
     adata2 = None
+    cell_type3 = cell_type.split()[0].capitalize()
+    cell_type2 = cell_type.split()[0].capitalize() + " cell"
     cell_type = cell_type.split()[0].capitalize() + " cells"
     
     with open(f'annotated_adata/Overall cells_annotated_adata.pkl', 'rb') as file:
         adata2 = pd.read_pickle(file)
     
     filtered_cells = adata2[adata2.obs['cell_type'].isin([cell_type])].copy()
+    if filtered_cells.shape[0] == 0:
+        filtered_cells = adata2[adata2.obs['cell_type'].isin([cell_type2])].copy()
+    if filtered_cells.shape[0] == 0:
+        filtered_cells = adata2[adata2.obs['cell_type'].isin([cell_type3])].copy()
+
     adata_filtered = filtered_cells[filtered_cells.obs['patient_name'].isin([sample_1, sample_2])].copy()
     unique_patients = adata_filtered.obs['patient_name'].astype(str).unique()
     if sample_1 not in unique_patients or sample_2 not in unique_patients:
@@ -1145,7 +1285,7 @@ function_descriptions = [
         },
     },
     {
-        "name": "display_annotated_umap",
+        "name": "display_processed_umap",
         "description": "displays umap that IS annotated. This function should be called whenever the user asks for a umap that IS annotated. In the case that the user does not specify cell type, use overall cells. This function can be called multiple times. This function should not be called when asked to GENERATE umap.",
         "parameters": {
             "type": "object",
@@ -1269,7 +1409,10 @@ first_try = True
 clear_data = True
 def start_chat2_web(user_input, conversation_history):
     global function_flag, display_flag, first_try, clear_data
-
+    scchat_context1 = " You are a chatbot for helping in Single Cell RNA Analysis, you can call the functions generate_umap, process_cells, label_clusters, display_umap, display_processed_umap and more multiple times. DO NOT FORGET THIS. respond with a greeting."
+    scchat_context2 = " you should decide if you want to call the functions from this message. Functions include generate_umap, process_cells, label_clusters, display_umap, display_processed_umap and more multiple times. DO NOT FORGET THIS."
+    # base_conversation_history = [{"role": "user", "content": scchat_context1}]
+    base_conversation_history = []
     if first_try and clear_data:
         # Clear preexisting directory data
         clear_directory("annotated_adata")
@@ -1282,34 +1425,55 @@ def start_chat2_web(user_input, conversation_history):
             research_context = rcptr.read()
             conversation_history.append({"role": "user", "content": research_context})
         # clear_directory("media")
+        conversation_history.append({"role": "user", "content": scchat_context1})
         first_try = False
         
 
     display_flag = False
+    # user_input += scchat_context2
     conversation_history.append({"role": "user", "content": user_input})
     
     global conversation_history2
     conversation_history2 = conversation_history
     # print(conversation_history)
-    
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
-
+    base_conversation_history.append({"role": "user", "content": user_input})
+    # print (conversation_history)
+    # print (base_conversation_history)
     response = openai.chat.completions.create(
         model="gpt-4o",
-        messages=conversation_history,
+        messages=base_conversation_history,
         functions=function_descriptions,
         function_call="auto",
         temperature=0.2,
         top_p=0.4
         # max_tokens=300
     )
+    print ("S! :", response)
+    output = response.choices[0].message
+    print ("Q! :", output)
+    main_flag = False
+    if response and output.function_call:
+        print ("F$")
+        main_flag = True
 
-    if response:
-        output = response.choices[0].message
+    if main_flag == False:
+        print ("NF#")
+        print(conversation_history)
+        fin_response = openai.chat.completions.create(
+            model="gpt-4o",
+            messages=conversation_history,
+            functions=function_descriptions,
+            function_call="auto",
+            temperature=0.2,
+            top_p=0.4
+            # max_tokens=300
+        )
+        output = fin_response.choices[0].message
         ai_response = output.content
 
-    if output.function_call:
+    if output.function_call and main_flag:
         function_name = output.function_call.name
         function_args = output.function_call.arguments
         function_flag = True
@@ -1333,7 +1497,7 @@ def start_chat2_web(user_input, conversation_history):
             # Handle label_clusters differently to avoid re-generating responses
             if function_name == "label_clusters":
                 function_result_message = {"role": "assistant", "content": "Annotation is complete."}
-                # conversation_history.append(function_result_message)  
+                conversation_history.append(function_result_message)  
                 final_response = "Annotation is complete."
             else:
                 function_result_message = {"role": "user", "content": function_response}

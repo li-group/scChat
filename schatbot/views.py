@@ -18,7 +18,7 @@ from .new_function_calling import start_chat2_web
 from .new_function_calling import display_dotplot
 from .new_function_calling import display_cell_type_composition
 from .new_function_calling import convert_into_labels
-from .new_function_calling import display_annotated_umap
+from .new_function_calling import display_processed_umap
 from .new_function_calling import sample_differential_expression_genes_comparison
 from .new_function_calling import generate_umap
 from .new_function_calling import display_gsea_dotplot
@@ -167,7 +167,7 @@ function_descriptions = [
         },
     },
     {
-        "name": "display_annotated_umap",
+        "name": "display_processed_umap",
         "description": "displays umap that IS annotated. This function should be called whenever the user asks for a umap that IS annotated. In the case that the user does not specify cell type, use overall cells. This function can be called multiple times. This function should not be called when asked to GENERATE umap.",
         "parameters": {
             "type": "object",
