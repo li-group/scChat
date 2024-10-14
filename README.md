@@ -29,7 +29,7 @@ If you found this work useful, please cite this [preprint](https://arxiv.org/abs
 # Overview
 <a name="overview"></a>
 ## Motivation
-Data-driven methods such as unsupervised and supervised learning are essential tools in single-cell RNA sequencing (scRNA-seq) analysis. However, these methods often lack the ability to incorporate research context, which can lead to missed insights. scChat addresses this by integrating contextualized conversation with data analysis to provide a deeper understanding of experimental results. It supports the exploration of research hypotheses and generates actionable insights for future experiments.
+Data-driven methods such as unsupervised and supervised learning are essential tools in single-cell RNA sequencing (scRNA-seq) analysis. However, these methods often lack the ability to incorporate research context, which can lead to overlooked insights. scChat addresses this by integrating contextualized conversation with data analysis to provide a deeper understanding of experimental results. It supports the exploration of research hypotheses and generates actionable insights for future experiments.
 
 Please read our [scChat paper](https://www.biorxiv.org/content/10.1101/2024.10.01.616063v1) for more motivation and details about how the scChat works.
 
@@ -52,21 +52,35 @@ Follow these steps to utilize the application effectively:
 - run python3 manage.py runserver
 
 ### Step 2: Access the Application
-- Go to http://127.0.0.1:8000/schatbot on a web browser.
+- Open your web browser and navigate to:
+  `http://127.0.0.1:8000/schatbot`
+  
+- **Recommended:** Use Google Chrome for the best experience.
 
+### Additional Tip: Clear Cache to Avoid Previous Chat Data
+- Periodically clearing the cache is recommended to ensure a smooth experience:
+  1. Right-click on the page and select **Inspect**.
+  2. Go to the **Application** tab.
+  3. Under **Cookies**, remove `sessionid`.
+  
+  This will prevent previous chat sessions from being reprocessed.
 
 
 # Tutorial
 <a name="tutorial"></a>
-1. Upload adata file
+1. Upload scRNA-seq adata file (.h5ad)
 2. Upload sample mapping (.json file) (if required).
-3. request to generate UMAP for RNA Analysis.
-4. (3) Will return a python dictionary, type in that you want to label/annotate clusters for overall cells. 
-5. Now you can ask to display annotated umap for overall cells or view the non-annotated umap for overall cells.
-6. You can ask for rationale or research questions specific to your dataset.
-7. If you want you can filter and process a specific cell type.
-8. (7) would return a python dictionary, type in that you want to label/annotate clusters for the processed cell type
-9. You can ask for reasoning, possible hypothesis and so on.
+3. Upload research context (.txt file) (if required).
+4. Request to generate UMAP for overall cells in the scRNA-seq Analysis. ("Generate UMAP")
+5. (4) Will return a Python dictionary. You can then request to label/annotate clusters for overall cells. ("Label clusters for overall cells")
+6. You can now ask to display the annotated UMAP for overall cells or view the unannotated UMAP for overall cells.
+7. You can ask for rationale or research questions specific to your dataset.
+8. If needed, you can filter and process a specific cell type for detailed subtype clustering and annotation.  ("Process <cell_type> cells")
+9. (8) would return a Python dictionary. You can then label/annotate clusters for the processed cell. ("Label clusters for <cell_type> cells")
+10. You can calculate cell population changes for overall cells or specific cell types. ("Calculate cell population change for <cell_type> cells")
+11. You can display the cell population change for previously calculated cell types. ("Display cell population change for <cell_type> cells")
+12. You can ask for reasoning, possible hypotheses, experimental designs, and additional insights.
+13. You can compare differential gene expression between two samples for a specific cell type. ("Calculate sample differential expression genes comparison for <cell_type> <sample_1> <sample_2>")
 
 ## Chat Example
 <a name="chat-example"></a>
