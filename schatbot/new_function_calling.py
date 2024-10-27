@@ -67,11 +67,9 @@ import os
 import shutil
 
 def clear_directory(directory_path):
-    # Check if the directory exists
     if not os.path.exists(directory_path):
         return
     
-    # Clear all files and subdirectories in the directory
     for filename in os.listdir(directory_path):
         file_path = os.path.join(directory_path, filename)
         try:
@@ -86,13 +84,11 @@ def clear_directory(directory_path):
 def find_and_load_sample_mapping(directory):
     global sample_mapping
 
-    # Walk through the directory
     for root, dirs, files in os.walk(directory):
         for file in files:
             if file == 'sample_mapping.json':
                 file_path = os.path.join(root, file)
                 
-                # Read the JSON file
                 with open(file_path, 'r') as f:
                     sample_mapping = json.load(f)
                 
@@ -424,47 +420,28 @@ def convert_into_labels(conversation_history):
         pickle.dump(annotated_adata, file)
 
     
-def select_markers(category):
-    markers_overall = get_overall_markers()
-    myeloid_markers = get_myeloid_markers()
-    t_cells_markers = get_t_markers()
-    if category == 'overall':
-        return markers_overall
-    elif category == 'Myeloid cells':
-        return myeloid_markers
-    elif category == 'T cells':
-        return t_cells_markers
-    else:
-        raise ValueError("Invalid category")
     
 def extract_top_genes_stats(adata, groupby='leiden', n_genes=25):
-    # Extract gene ranking and statistical data
     result = adata.uns['rank_genes_groups']
     gene_names = result['names']
     pvals = result['pvals']
     pvals_adj = result['pvals_adj']
     logfoldchanges = result['logfoldchanges']
     
-    # Initialize a dictionary to store the top n_genes for each group with their statistics
     top_genes_stats = {group: {} for group in gene_names.dtype.names}
     
-    # Process each group
     for group in gene_names.dtype.names:
         top_genes_stats[group]['gene'] = gene_names[group][:n_genes]
         top_genes_stats[group]['pval'] = pvals[group][:n_genes]
         top_genes_stats[group]['pval_adj'] = pvals_adj[group][:n_genes]
         top_genes_stats[group]['logfoldchange'] = logfoldchanges[group][:n_genes]
     
-    # Convert the dictionary to DataFrame for easier viewing and exporting
     top_genes_stats_df = pd.concat({group: pd.DataFrame(top_genes_stats[group])
                                     for group in top_genes_stats}, axis=0)
 
-    # Reset index to make 'group' a column, not an index
     top_genes_stats_df = top_genes_stats_df.reset_index()
     
-    # Rename columns for clarity
     top_genes_stats_df = top_genes_stats_df.rename(columns={'level_0': 'cluster', 'level_1': 'index'})
-    print ("top genes stats df", top_genes_stats_df)
     return top_genes_stats_df
 
 # Define the statistical extraction and API interaction functions
@@ -483,18 +460,11 @@ def calculate_cluster_statistics(adata, category, n_genes=25):
     markers = filter_existing_genes(adata, markers)
     print ("MARKERS FINAL2 ", markers)
     markers = list(set(markers))
-    #done
-    # markers = select_markers(category)
-    # markers = [gene for gene in markers if gene in adata.var_names]
-    # Ranking genes per cluster
+
     sc.tl.rank_genes_groups(adata, 'leiden', method='wilcoxon', n_genes=n_genes)
     top_genes_df = extract_top_genes_stats(adata, groupby='leiden', n_genes=25)
     second_dataset = True
-    # Extract marker gene expression within clusters
-    # if second_dataset:
-    #     sc.tl.dendrogram(adata, groupby='leiden')
-    # else:
-    #     sc.tl.dendrogram(adata, groupby='leiden', use_rep='X_scVI')
+
     if sample_mapping:
         sc.tl.dendrogram(adata, groupby='leiden', use_rep='X_scVI')
         # sc.tl.dendrogram(adata, groupby='leiden')
@@ -541,61 +511,7 @@ def retreive_stats():
     return summary
 
 
-def get_overall_markers():
-    file_path = "RAG/R_MARK_overall_marker_genes_annotation.json"
-    with open(file_path, 'r') as file:
-        data = json.load(file)
 
-    gene_dict = {}
-    for cell in data:
-        cell_type = cell["cellType"].replace(" ", "_") + "_markers"
-        genes = [marker["gene"] for marker in cell["markers"]]
-        gene_dict[cell_type] = genes
-
-    T_cells_markers = []
-    myeloid_cells_markers = []
-    B_cells_markers = []
-    general_immune_cells = []
-    overall_dict = {}
-    for cell_type, genes in gene_dict.items():
-        if cell_type == "T_Cells_markers":
-            T_cells_markers = genes
-            overall_dict["T Cells markers"] = genes
-        elif cell_type == "Myeloid_Cells_markers":
-            myeloid_cells_markers.append(genes)
-            myeloid_cells_markers = genes
-            overall_dict["Myeloid Cells Markers"] = genes
-
-        elif cell_type == "B_Cells_markers":
-            B_cells_markers.append(genes)
-            B_cells_markers = genes
-            overall_dict["B Cells Markers"] = genes
-
-        else:
-            general_immune_cells.append(genes)
-            general_immune_cells = genes
-            overall_dict["General Cells Markers"] = genes
-
-    overall_markers = T_cells_markers + myeloid_cells_markers + B_cells_markers + general_immune_cells
-    return overall_markers
-
-def get_markers(cell_type): 
-    cell_complex_markers = []
-    file_path = f'schatbot/markers/{cell_type}.json'
-    # file_path = "schatbot/R_T_specific_cells_annotation.json"
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-
-    gene_dict = {}
-    for cell in data:
-        cell_type = cell["cellType"].replace(" ", "_") + "_markers"
-        genes = [marker["gene"] for marker in cell["markers"]]
-        gene_dict[cell_type] = genes
-
-    for cell_type, genes in gene_dict.items():
-        cell_complex_markers += genes
-        
-    return cell_complex_markers 
 
 #tag True for RAG, False for marker genes list
 def get_rag_and_markers(tag):
@@ -658,43 +574,6 @@ def get_rag_and_markers(tag):
     fptr.write(json.dumps(combined_data, indent=4))
     # print("Combined data:", json.dumps(combined_data, indent=4))
     return combined_data
-
-    
-
-
-
-
-def get_t_markers():
-    t_cell_complex_markers = []
-    file_path = "RAG/R_T_specific_cells_annotation.json"
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-
-    gene_dict = {}
-    for cell in data:
-        cell_type = cell["cellType"].replace(" ", "_") + "_markers"
-        genes = [marker["gene"] for marker in cell["markers"]]
-        gene_dict[cell_type] = genes
-
-    for cell_type, genes in gene_dict.items():
-        t_cell_complex_markers += genes
-        
-    return t_cell_complex_markers
-
-def get_myeloid_markers():
-    myeloid_cell_complex_markers = []
-    file_path = "RAG/R_RAG_Myeloid_specific_cells_annotation.json"
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-    gene_dict = {}
-    for cell in data:
-        cell_type = cell["cellType"].replace(" ", "_") + "_markers"
-        genes = [marker["gene"] for marker in cell["markers"]]
-        gene_dict[cell_type] = genes
-    for cell_type, genes in gene_dict.items():
-        myeloid_cell_complex_markers += genes
-    
-    return myeloid_cell_complex_markers        
 
 def filter_existing_genes(adata, gene_list):
     existing_genes = [gene for gene in gene_list if gene in adata.raw.var_names]
@@ -780,30 +659,22 @@ def generate_umap():
         print (cell_data)
         markers += cell_data['genes']
     
-    print ("MARKERS BEFORE FILTER ", markers)
+    # print ("MARKERS BEFORE FILTER ", markers)
     markers = filter_existing_genes(adata, markers)
-    print ("MARKERS FINAL ", markers)
+    # print ("MARKERS FINAL ", markers)
     markers = list(set(markers))
     # Calculate statistics to feed into GPT
     statistic_data = sc.get.obs_df(adata, keys=['leiden'] + markers, use_raw=True)
-    print ("HERE1")
     statistic_data.set_index('leiden', inplace=True)
-    print ("HERE2")
     mean_expression = statistic_data.groupby('leiden').mean()
-    print ("HERE3")
     pd_mean_expression = pd.DataFrame(mean_expression)
-    print ("HERE4")
     pd_mean_expression.to_csv("basic_data/mean_expression.csv")
-    print ("HERE4.5")
     pd_mean_expression.to_json("basic_data/mean_expression.json")
-    print ("HERE4.6")
 
     expression_proportion = statistic_data.gt(0).groupby('leiden').mean()
-    print ("HERE5")
     pd_expression_proportion = pd.DataFrame(expression_proportion)
     pd_expression_proportion.to_csv("basic_data/expression_proportion.csv")
     pd_expression_proportion.to_json("basic_data/expression_proportion.json")
-    print ("HERE6")
     # Dot plot
     if sample_mapping == None:
         sc.tl.dendrogram(adata, groupby='leiden')
@@ -819,7 +690,6 @@ def generate_umap():
     adata.obs['cell_type'] = 'Unknown'
     adata.obs[['UMAP_1', 'UMAP_2', 'leiden', 'patient_name']].to_csv("basic_data/Overall cells_umap_data.csv", index=False)
     adata.obs[['UMAP_1', 'UMAP_2', 'leiden', 'patient_name']].to_csv("process_cell_data/Overall cells_umap_data.csv", index=False)
-    print ("HERE")
 
     # Save dot plot data for Plotly
     dot_plot_data = statistic_data.reset_index().melt(id_vars='leiden', var_name='gene', value_name='expression')
@@ -1450,17 +1320,13 @@ def start_chat2_web(user_input, conversation_history):
         top_p=0.4
         # max_tokens=300
     )
-    print ("S! :", response)
     output = response.choices[0].message
-    print ("Q! :", output)
     main_flag = False
     if response and output.function_call:
-        print ("F$")
         main_flag = True
 
     if main_flag == False:
-        print ("NF#")
-        print(conversation_history)
+        # print(conversation_history)
         fin_response = openai.chat.completions.create(
             model="gpt-4o",
             messages=conversation_history,
@@ -1488,7 +1354,6 @@ def start_chat2_web(user_input, conversation_history):
                 print(f"Parsed function arguments: {function_args}")
 
                 function_response = globals()[function_name](**function_args)
-                print("Q6.5")
             
             # Check if display_flag is set to True, return immediately if it is
             if display_flag:
@@ -1513,7 +1378,6 @@ def start_chat2_web(user_input, conversation_history):
                 )
                 final_response = new_response.choices[0].message.content if new_response.choices[0] else "Interesting"
                 conversation_history.append({"role": "assistant", "content": final_response})
-            print (conversation_history)
 
             function_flag = False
             return final_response, conversation_history, display_flag
