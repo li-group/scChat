@@ -48,10 +48,14 @@ To set up the project environment and run the server, follow these steps:
    pip3 install -r requirements.txt
 
 Follow these steps to utilize the application effectively:
-### Step 1: Initialize the Application
+### Step 1: Set the OPENAI Key Environment Variable 
+- type and enter export OPENAI_API_KEY='your_openai_api_key' in your terminal
+
+  
+### Step 2: Initialize the Application
 - run python3 manage.py runserver
 
-### Step 2: Access the Application
+### Step 3: Access the Application
 - Open your web browser and navigate to:
   `http://127.0.0.1:8000/schatbot`
   
