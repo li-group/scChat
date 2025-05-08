@@ -1,0 +1,209 @@
+:root {
+  --clr-light: #ffffff; /* White */
+  --clr-dark: #000000; /* Black */
+  --clr-primary: #f9f9f9; /* Very light grey */
+  --clr-secondary: #e0e0e0; /* Light grey */
+  --clr-accent: #0073e6; /* Professional blue accent */
+  
+  --user-message-bg: var(--clr-primary);
+  --system-message-bg: var(--clr-secondary);
+  --button-bg: var(--clr-accent);
+  --button-hover-bg: #005bb5; /* Darker blue for hover */
+
+  --foreground: var(--clr-dark);
+  --background: var(--clr-light);
+
+  --ff-title: "Garamond", serif;
+  --ff-body: "Arial", sans-serif;
+}
+
+body, html {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--clr-light);
+  color: var(--foreground);
+  font-family: var(--ff-body);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+header {
+  background-color: var(--background);
+  text-align: center;
+  margin-bottom: 20px;
+  position: relative; /* To position buttons inside header */
+}
+
+header h1 {
+  font-size: 2.2em;
+  color: var(--foreground);
+  font-weight: bold;
+  font-family: var(--ff-title);
+}
+
+/* Styling export buttons */
+.export-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 24px; /* Adjust icon size */
+    color: var(--clr-accent); /* Accent color for icons */
+}
+
+/* Hover effect for export buttons */
+.export-button:hover i {
+    color: var(--button-hover-bg); /* Change color on hover */
+}
+
+/* Positioning export buttons in top-right corner */
+.export-button {
+    position: absolute;
+    top: 10px; /* Distance from the top */
+}
+
+#export-chat {
+    right: 60px; /* Place the text export button 50px to the left of PDF button */
+}
+
+#export-pdf {
+    right: 10px; /* Place PDF export button at the far right */
+}
+
+#chat-container {
+  width: 100vw; /* Full viewport width */
+  height: 100vh; /* Full viewport height */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background-color: var(--background); /* White background */
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  box-sizing: border-box; /* Ensure padding doesn't affect overall size */
+  overflow: hidden;
+}
+
+#messages-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  background-color: var(--background); /* White background for messages container */
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+#messages {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  word-wrap: break-word; /* Break long words */
+}
+
+.system-message, .user-message {
+  word-wrap: break-word;
+  overflow-wrap: break-word; /* Prevent overflow */
+  white-space: normal; /* Ensure text wraps normally */
+  max-width: 75%; /* Ensure bubbles don't exceed 75% width */
+  padding: 12px 18px;
+  border-radius: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  line-height: 1.0; /* Ensure consistent line height */
+}
+
+.user-message {
+  font-family: 'Arial', sans-serif;
+  background-color: var(--user-message-bg);
+  color: var(--clr-dark);
+  align-self: flex-end;
+  border-radius: 15px 15px 0 15px;
+}
+
+.system-message {
+  background-color: var(--system-message-bg);
+  color: var(--clr-dark);
+  align-self: flex-start;
+  border-radius: 15px 15px 15px 0;
+}
+
+/* User symbol */
+.user-message::before {
+  content: "👤"; /* User icon */
+  margin-right: 10px;
+  font-size: 1.2em;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Chatbot symbol */
+.system-message::before {
+  content: "🤖"; /* Chatbot icon */
+  margin-right: 10px;
+  font-size: 1.2em;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Button styling */
+#send-message {
+  padding: 14px 24px;
+  border-radius: 20px;
+  border: none;
+  background-color: var(--button-bg);
+  color: var(--clr-light);
+  font-family: var(--ff-body);
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#send-message:hover {
+  background-color: var(--button-hover-bg);
+}
+
+/* Input field styling */
+#message-input {
+  flex-grow: 1;
+  padding: 14px;
+  border-radius: 20px;
+  border: 1px solid var(--clr-secondary);
+  font-size: 16px;
+  background-color: var(--background);
+}
+
+/* Footer layout */
+.footer-flex-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-flex-container label {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.footer-flex-container label img {
+  height: 24px;
+  width: auto;
+}
+
+@media (min-width: 1200px) {
+  #chat-container {
+    width: 100vw;
+  }
+}
+
+@media (max-width: 768px) {
+  #chat-container {
+    width: 100vw;
+  }
+}
+
+@media (max-width: 480px) {
+  #chat-container {
+    height: 100vh;
+  }
+}

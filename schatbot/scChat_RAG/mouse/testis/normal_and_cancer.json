@@ -1,0 +1,71 @@
+{
+    "Immature sertoli cell": {
+        "markers": [
+            {
+                "gene": "Amh",
+                "explanation": "This gene encodes a secreted ligand of the TGF-beta (transforming growth factor-beta) superfamily of proteins. Ligands of this family bind various TGF-beta receptors leading to recruitment and activation of SMAD family transcription factors that regulate gene expression. The encoded preproprotein is proteolytically processed to generate N- and C-terminal cleavage products that homodimerize and associate to form a biologically active noncovalent complex. This complex binds to the anti-Mullerian hormone receptor type 2 and causes the regression of Mullerian ducts in the male embryo that would otherwise differentiate into the uterus and fallopian tubes. This protein also plays a role in Leydig cell differentiation and function and follicular development in adult females. Mutations in this gene result in persistent Mullerian duct syndrome. [provided by RefSeq, Jul 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/11705"
+            }
+        ]
+    },
+    "Mature sertoli cell": {
+        "markers": [
+            {
+                "gene": "Ifi27",
+                "explanation": "Enables RNA polymerase II-specific DNA-binding transcription factor binding activity; identical protein binding activity; and lamin binding activity. Involved in several processes, including cellular protein metabolic process; defense response to other organism; and extrinsic apoptotic signaling pathway. Acts upstream of or within negative regulation of transcription by RNA polymerase II and regulation of protein export from nucleus. Located in mitochondrial membrane and nuclear inner membrane. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/52668"
+            }
+        ]
+    },
+    "Sertoli cell": {
+        "markers": [
+            {
+                "gene": "Sox9",
+                "explanation": "The protein encoded by this gene recognizes the sequence CCTTGAG along with other members of the HMG-box class DNA-binding proteins. It acts during chondrocyte differentiation and, with steroidogenic factor 1, regulates transcription of the anti-Muellerian hormone (AMH) gene. Deficiencies lead to the skeletal malformation syndrome campomelic dysplasia, frequently with sex reversal. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/20682"
+            },
+            {
+                "gene": "Ar",
+                "explanation": "The androgen receptor gene is more than 90 kb long and codes for a protein that has 3 major functional domains: the N-terminal domain, DNA-binding domain, and androgen-binding domain. The protein functions as a steroid-hormone activated transcription factor. Upon binding the hormone ligand, the receptor dissociates from accessory proteins, translocates into the nucleus, dimerizes, and then stimulates transcription of androgen responsive genes. This gene contains 2 polymorphic trinucleotide repeat segments that encode polyglutamine and polyglycine tracts in the N-terminal transactivation domain of its protein. Expansion of the polyglutamine tract from the normal 9-34 repeats to the pathogenic 38-62 repeats causes spinal bulbar muscular atrophy (SBMA, also known as Kennedy's disease). Mutations in this gene are also associated with complete androgen insensitivity (CAIS). Alternative splicing results in multiple transcript variants encoding different isoforms. [provided by RefSeq, Jan 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/11835"
+            },
+            {
+                "gene": "Amh",
+                "explanation": "This gene encodes a secreted ligand of the TGF-beta (transforming growth factor-beta) superfamily of proteins. Ligands of this family bind various TGF-beta receptors leading to recruitment and activation of SMAD family transcription factors that regulate gene expression. The encoded preproprotein is proteolytically processed to generate N- and C-terminal cleavage products that homodimerize and associate to form a biologically active noncovalent complex. This complex binds to the anti-Mullerian hormone receptor type 2 and causes the regression of Mullerian ducts in the male embryo that would otherwise differentiate into the uterus and fallopian tubes. This protein also plays a role in Leydig cell differentiation and function and follicular development in adult females. Mutations in this gene result in persistent Mullerian duct syndrome. [provided by RefSeq, Jul 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/11705"
+            },
+            {
+                "gene": "Cdkn1b",
+                "explanation": "This gene encodes a cyclin-dependent kinase inhibitor, which shares a limited similarity with CDK inhibitor CDKN1A/p21. The encoded protein binds to and prevents the activation of cyclin E-CDK2 or cyclin D-CDK4 complexes, and thus controls the cell cycle progression at G1. The degradation of this protein, which is triggered by its CDK dependent phosphorylation and subsequent ubiquitination by SCF complexes, is required for the cellular transition from quiescence to the proliferative state. Mutations in this gene are associated with multiple endocrine neoplasia type IV (MEN4). [provided by RefSeq, Apr 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12576"
+            }
+        ]
+    },
+    "Stem leydig cell": {
+        "markers": [
+            {
+                "gene": "Itgav",
+                "explanation": "The product of this gene belongs to the integrin alpha chain family. Integrins are heterodimeric integral membrane proteins composed of an alpha subunit and a beta subunit that function in cell surface adhesion and signaling. The encoded preproprotein is proteolytically processed to generate light and heavy chains that comprise the alpha V subunit. This subunit associates with beta 1, beta 3, beta 5, beta 6 and beta 8 subunits. The heterodimer consisting of alpha V and beta 3 subunits is also known as the vitronectin receptor. This integrin may regulate angiogenesis and cancer progression. Alternative splicing results in multiple transcript variants. Note that the integrin alpha 5 and integrin alpha V subunits are encoded by distinct genes. [provided by RefSeq, Oct 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/16410"
+            }
+        ]
+    },
+    "Testicular stem cell": {
+        "markers": [
+            {
+                "gene": "Abcg2",
+                "explanation": "The membrane-associated protein encoded by this gene is included in the superfamily of ATP-binding cassette (ABC) transporters. ABC proteins transport various molecules across extra- and intra-cellular membranes. ABC genes are divided into seven distinct subfamilies (ABC1, MDR/TAP, MRP, ALD, OABP, GCN20, White). This protein is a member of the White subfamily. Alternatively referred to as a breast cancer resistance protein, this protein functions as a xenobiotic transporter which may play a major role in multi-drug resistance. It likely serves as a cellular defense mechanism in response to mitoxantrone and anthracycline exposure. Significant expression of this protein has been observed in the placenta, which may suggest a potential role for this molecule in placenta tissue. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Apr 2012]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/26357"
+            }
+        ]
+    },
+    "Undifferentiated type A spermatogonium": {
+        "markers": [
+            {
+                "gene": "Cdh1",
+                "explanation": "This gene encodes a classical cadherin of the cadherin superfamily. Alternative splicing results in multiple transcript variants, at least one of which encodes a preproprotein that is proteolytically processed to generate the mature glycoprotein. This calcium-dependent cell-cell adhesion protein is comprised of five extracellular cadherin repeats, a transmembrane region and a highly conserved cytoplasmic tail. Mutations in this gene are correlated with gastric, breast, colorectal, thyroid and ovarian cancer. Loss of function of this gene is thought to contribute to cancer progression by increasing proliferation, invasion, and/or metastasis. The ectodomain of this protein mediates bacterial adhesion to mammalian cells and the cytoplasmic domain is required for internalization. This gene is present in a gene cluster with other members of the cadherin family on chromosome 16. [provided by RefSeq, Nov 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/12550"
+            }
+        ]
+    }
+}

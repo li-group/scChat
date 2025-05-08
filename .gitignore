@@ -1,0 +1,13 @@
+# Ignore the virtual environment folder
+scchat/
+
+# (Other ignores…)
+__pycache__/
+*.py[cod]
+.venv/
+env/
+.env/
+*.h5ad
+*.pkl
+/data/
+/models/

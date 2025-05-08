@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Chat Interface</title>
+    <link rel="stylesheet" href="{% static 'schatbot/style.css' %}" />
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <script>
+      const chatUrl = "{% url 'chat_with_ai' %}";
+      const csrfToken = "{{ csrf_token }}";
+    </script>
+    <!-- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
+    <script src="https://cdn.plot.ly/plotly-2.34.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.0/marked.min.js"></script>
+    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script> <!-- Added html2pdf.js -->
+  </head>
+  <body>
+    <div id="chat-container">
+      <header style="position: relative;">
+        <h1>scChat</h1>
+        
+        <!-- Export to Text Button with Font Awesome Icon -->
+        <button id="export-chat" class="btn btn-primary export-button" title="Export Text">
+          <i class="fas fa-file-alt"></i> <!-- Text file icon -->
+        </button>
+        
+        <!-- Export to PDF Button with Font Awesome Icon -->
+        <button id="export-pdf" class="btn btn-primary export-button" title="Export PDF">
+          <i class="fas fa-file-pdf"></i> <!-- PDF file icon -->
+        </button>
+      </header>
+      
+      <div id="messages-container">
+        <div id="messages"></div>
+      </div>
+      
+      <footer>
+        <form id="chat-form" method="post" enctype="multipart/form-data">
+          <div class="footer-flex-container">
+            <label for="file-upload" title="Attach file">
+              <img
+                src="{% static 'schatbot/assets/PurdueP.png' %}"
+                alt="Attach"
+              />
+            </label>
+            <input type="file" id="file-upload" name="file" hidden />
+            <input
+              type="text"
+              id="message-input"
+              name="message"
+              placeholder="Type a message…"
+              autocomplete="off"
+            />
+            <button type="submit" id="send-message">Send</button>
+          </div>
+        </form>
+      </footer>
+    </div>
+    
+    <script src="{% static 'schatbot/script.js' %}"></script>
+  </body>
+</html>

@@ -1,0 +1,620 @@
+{
+    "Acinar cell": {
+        "markers": [
+            {
+                "gene": "BMI1",
+                "explanation": "This gene encodes a ring finger protein that is major component of the polycomb group complex 1 (PRC1). This complex functions through chromatin remodeling as an essential epigenetic repressor of multiple regulatory genes involved in embryonic development and self-renewal in somatic stem cells. This protein also plays a central role in DNA damage repair. This gene is an oncogene and aberrant expression is associated with numerous cancers and is associated with resistance to certain chemotherapies. A pseudogene of this gene is found on chromosome X. Read-through transcription also exists between this gene and the upstream COMM domain containing 3 (COMMD3) gene. [provided by RefSeq, Sep 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/648"
+            },
+            {
+                "gene": "PRSS1",
+                "explanation": "This gene encodes a trypsinogen, which is a member of the trypsin family of serine proteases. This enzyme is secreted by the pancreas and cleaved to its active form in the small intestine. It is active on peptide linkages involving the carboxyl group of lysine or arginine. Mutations in this gene are associated with hereditary pancreatitis. This gene and several other trypsinogen genes are localized to the T cell receptor beta locus on chromosome 7. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5644"
+            }
+        ]
+    },
+    "Alpha cell": {
+        "markers": [
+            {
+                "gene": "UBA2",
+                "explanation": "Posttranslational modification of proteins by the addition of the small protein SUMO (see SUMO1; MIM 601912), or sumoylation, regulates protein structure and intracellular localization. SAE1 (MIM 613294) and UBA2 form a heterodimer that functions as a SUMO-activating enzyme for the sumoylation of proteins (Okuma et al., 1999 [PubMed 9920803]).[supplied by OMIM, Mar 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10054"
+            },
+            {
+                "gene": "LDB2",
+                "explanation": "The protein encoded by this gene belongs to the LIM-domain binding family. Members of this family are characterized by a conserved nuclear localization sequence, an amino-terminal homodimerization domain and a carboxy-terminal LIM interaction domain. These proteins function as adapter molecules to allow assembly of transcriptional regulatory complexes. Genetic association studies suggest functions for this gene in rhegmatogenous retinal detachment and coronary artery disease. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Jan 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9079"
+            },
+            {
+                "gene": "CRYBA2",
+                "explanation": "Crystallins are separated into two classes: taxon-specific, or enzyme, and ubiquitous. The latter class constitutes the major proteins of the vertebrate eye, which function to maintain the transparency and refractive index of the lens. Since lens central fiber cells lose their nuclei during development, these crystallins are made and then retained throughout life, making them extremely stable proteins. Mammalian lens crystallins are divided into alpha, beta, and gamma families; beta and gamma crystallins are also defined as a superfamily. Alpha and beta families are further divided into acidic and basic groups. Seven protein regions exist in crystallins: four homologous motifs, a connecting peptide, and N- and C-terminal extensions. Beta-crystallins, the most heterogeneous, differ by the presence of the C-terminal extension (present in the basic group but absent in the acidic group). Beta-crystallins form aggregates of different sizes and are able to form homodimers through self-association or heterodimers with other beta-crystallins. This gene is a beta acidic group member. Three alternatively spliced transcript variants encoding identical proteins have been reported. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1412"
+            },
+            {
+                "gene": "FEV",
+                "explanation": "This gene belongs to the ETS transcription factor family. ETS family members have a highly conserved 85-amino acid ETS domain that binds purine-rich DNA sequences. The alanine-rich C-terminus of this gene indicates that it may act as a transcription repressor. This gene is exclusively expressed in neurons of the central serotonin (5-HT) system, a system implicated in the pathogeny of such psychiatric diseases as depression, anxiety, and eating disorders. In some types of Ewing tumors, this gene is fused to the Ewing sarcoma (EWS) gene following chromosome translocations. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/54738"
+            },
+            {
+                "gene": "GBA",
+                "explanation": "This gene encodes a lysosomal membrane protein that cleaves the beta-glucosidic linkage of glycosylceramide, an intermediate in glycolipid metabolism. Mutations in this gene cause Gaucher disease, a lysosomal storage disease characterized by an accumulation of glucocerebrosides. A related pseudogene is approximately 12 kb downstream of this gene on chromosome 1. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Jan 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2629"
+            },
+            {
+                "gene": "HMGB3",
+                "explanation": "This gene encodes a member of a family of proteins containing one or more high mobility group DNA-binding motifs. The encoded protein plays an important role in maintaining stem cell populations, and may be aberrantly expressed in tumor cells. A mutation in this gene was associated with microphthalmia, syndromic 13. There are numerous pseudogenes of this gene on multiple chromosomes. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Jul 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3149"
+            },
+            {
+                "gene": "TM4SF4",
+                "explanation": "Error fetching data for TM4SF4: HTTP Error 400: Bad Request",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7104"
+            },
+            {
+                "gene": "IRX2",
+                "explanation": "IRX2 is a member of the Iroquois homeobox gene family. Members of this family appear to play multiple roles during pattern formation of vertebrate embryos.[supplied by OMIM, Apr 2004]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/153572"
+            },
+            {
+                "gene": "KLHL41",
+                "explanation": "This gene is a member of the kelch-like family. The encoded protein contains a BACK domain, a BTB/POZ domain, and 5 Kelch repeats. This protein is thought to function in skeletal muscle development and maintenance. Mutations in this gene have been associated with nemaline myopathy (NM), a rare congenital muscle disorder. [provided by RefSeq, Mar 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10324"
+            },
+            {
+                "gene": "LOXL4",
+                "explanation": "This gene encodes a member of the lysyl oxidase gene family. The prototypic member of the family is essential to the biogenesis of connective tissue, encoding an extracellular copper-dependent amine oxidase that catalyses the first step in the formation of crosslinks in collagens and elastin. A highly conserved amino acid sequence at the C-terminus end appears to be sufficient for amine oxidase activity, suggesting that each family member may retain this function. The N-terminus is poorly conserved and may impart additional roles in developmental regulation, senescence, tumor suppression, cell growth control, and chemotaxis to each member of the family. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/84171"
+            },
+            {
+                "gene": "MAFB",
+                "explanation": "The protein encoded by this gene is a basic leucine zipper (bZIP) transcription factor that plays an important role in the regulation of lineage-specific hematopoiesis. The encoded nuclear protein represses ETS1-mediated transcription of erythroid-specific genes in myeloid cells. This gene contains no introns. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9935"
+            },
+            {
+                "gene": "PTGER3",
+                "explanation": "The protein encoded by this gene is a member of the G-protein coupled receptor family. This protein is one of four receptors identified for prostaglandin E2 (PGE2). This receptor may have many biological functions, which involve digestion, nervous system, kidney reabsorption, and uterine contraction activities. Studies of the mouse counterpart suggest that this receptor may also mediate adrenocorticotropic hormone response as well as fever generation in response to exogenous and endogenous stimuli. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Aug 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5733"
+            },
+            {
+                "gene": "PGR",
+                "explanation": "This gene encodes a member of the steroid receptor superfamily. The encoded protein mediates the physiological effects of progesterone, which plays a central role in reproductive events associated with the establishment and maintenance of pregnancy. This gene uses two distinct promotors and translation start sites in the first exon to produce several transcript variants, both protein coding and non-protein coding. Two of the isoforms (A and B) are identical except for an additional 165 amino acids found in the N-terminus of isoform B and mediate their own response genes and physiologic effects with little overlap. [provided by RefSeq, Sep 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5241"
+            },
+            {
+                "gene": "PLCE1",
+                "explanation": "This gene encodes a phospholipase enzyme that catalyzes the hydrolysis of phosphatidylinositol-4,5-bisphosphate to generate two second messengers: inositol 1,4,5-triphosphate (IP3) and diacylglycerol (DAG). These second messengers subsequently regulate various processes affecting cell growth, differentiation, and gene expression. This enzyme is regulated by small monomeric GTPases of the Ras and Rho families and by heterotrimeric G proteins. In addition to its phospholipase C catalytic activity, this enzyme has an N-terminal domain with guanine nucleotide exchange (GEF) activity. Mutations in this gene cause early-onset nephrotic syndrome; characterized by proteinuria, edema, and diffuse mesangial sclerosis or focal and segmental glomerulosclerosis. Alternative splicing results in multiple transcript variants encoding distinct isoforms.[provided by RefSeq, Sep 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/51196"
+            },
+            {
+                "gene": "RFX6",
+                "explanation": "The nuclear protein encoded by this gene is a member of the regulatory factor X (RFX) family of transcription factors. Studies in mice suggest that this gene is specifically required for the differentiation of islet cells for the production of insulin, but not for the differentiation of pancreatic polypeptide-producing cells. It regulates the transcription factors involved in beta-cell maturation and function, thus, restricting the expression of the beta-cell differentiation and specification genes. Mutations in this gene are associated with Mitchell-Riley syndrome, which is characterized by neonatal diabetes with pancreatic hypoplasia, duodenal and jejunal atresia, and gall bladder agenesis.[provided by RefSeq, Sep 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/222546"
+            },
+            {
+                "gene": "RGPD4",
+                "explanation": "Predicted to contribute to GTPase activator activity. Predicted to be involved in NLS-bearing protein import into nucleus. Predicted to be part of nuclear pore. Predicted to be active in cytoplasm. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/285190"
+            },
+            {
+                "gene": "SMARCA1",
+                "explanation": "This gene encodes a member of the SWI/SNF family of proteins. The encoded protein is an ATPase which is expressed in diverse tissues and contributes to the chromatin remodeling complex that is involved in transcription. The protein may also play a role in DNA damage, growth inhibition and apoptosis of cancer cells. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Sep 2013]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6594"
+            },
+            {
+                "gene": "GCG",
+                "explanation": "The protein encoded by this gene is actually a preproprotein that is cleaved into four distinct mature peptides. One of these, glucagon, is a pancreatic hormone that counteracts the glucose-lowering action of insulin by stimulating glycogenolysis and gluconeogenesis. Glucagon is a ligand for a specific G-protein linked receptor whose signalling pathway controls cell proliferation. Two of the other peptides are secreted from gut endocrine cells and promote nutrient absorption through distinct mechanisms. Finally, the fourth peptide is similar to glicentin, an active enteroglucagon. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2641"
+            }
+        ]
+    },
+    "Beta cell": {
+        "markers": [
+            {
+                "gene": "HEPACAM2",
+                "explanation": "This gene encodes a protein related to the immunoglobulin superfamily that plays a role in mitosis. Knockdown of this gene results in prometaphase arrest, abnormal nuclear morphology and apoptosis. Poly(ADP-ribosylation) of the encoded protein promotes its translocation to centrosomes, which may stimulate centrosome maturation. A chromosomal deletion including this gene may be associated with myeloid leukemia and myelodysplastic syndrome in human patients. [provided by RefSeq, Oct 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/253012"
+            },
+            {
+                "gene": "FXYD2",
+                "explanation": "This gene encodes a member of the FXYD family of transmembrane proteins. This particular protein encodes the sodium/potassium-transporting ATPase subunit gamma. Mutations in this gene have been associated with Renal Hypomagnesemia-2. Alternatively spliced transcript variants have been described. Read-through transcripts have been observed between this locus and the upstream FXYD domain-containing ion transport regulator 6 (FXYD6, GeneID 53826) locus.[provided by RefSeq, Feb 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/486"
+            },
+            {
+                "gene": "CD99",
+                "explanation": "The protein encoded by this gene is a cell surface glycoprotein involved in leukocyte migration, T-cell adhesion, ganglioside GM1 and transmembrane protein transport, and T-cell death by a caspase-independent pathway. In addition, the encoded protein may have the ability to rearrange the actin cytoskeleton and may also act as an oncosuppressor in osteosarcoma. This gene is found in the pseudoautosomal region of chromosomes X and Y and escapes X-chromosome inactivation. There is a related pseudogene located immediately adjacent to this locus. [provided by RefSeq, Mar 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4267"
+            },
+            {
+                "gene": "PTGDR2",
+                "explanation": "This gene encodes a G-protein-coupled receptor that is preferentially expressed in CD4+ effector T helper 2 (Th2) cells. This protein is a prostaglandin D2 receptor that mediates the pro-inflammatory chemotaxis of eosinophils, basophils, and Th2 lymphocytes generated during allergic inflammation. Single nucleotide polymorphisms in the 3' UTR of this gene have been associated with asthma susceptibility.[provided by RefSeq, Mar 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/11251"
+            },
+            {
+                "gene": "TSPAN7",
+                "explanation": "The protein encoded by this gene is a member of the transmembrane 4 superfamily, also known as the tetraspanin family. Most of these members are cell-surface proteins that are characterized by the presence of four hydrophobic domains. The proteins mediate signal transduction events that play a role in the regulation of cell development, activation, growth and motility. This encoded protein is a cell surface glycoprotein and may have a role in the control of neurite outgrowth. It is known to complex with integrins. This gene is associated with X-linked cognitive disability and neuropsychiatric diseases such as Huntington's chorea, fragile X syndrome and myotonic dystrophy. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7102"
+            },
+            {
+                "gene": "SLC2A2",
+                "explanation": "This gene encodes an integral plasma membrane glycoprotein of the liver, islet beta cells, intestine, and kidney epithelium. The encoded protein mediates facilitated bidirectional glucose transport. Because of its low affinity for glucose, it has been suggested as a glucose sensor. Mutations in this gene are associated with susceptibility to diseases, including Fanconi-Bickel syndrome and noninsulin-dependent diabetes mellitus (NIDDM). Alternative splicing results in multiple transcript variants of this gene. [provided by RefSeq, Jul 2013]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6514"
+            },
+            {
+                "gene": "IAPP",
+                "explanation": "This gene encodes a member of the calcitonin family of peptide hormones. This hormone is released from pancreatic beta cells following food intake to regulate blood glucose levels and act as a satiation signal. Human patients with type 1 and advanced type 2 diabetes exhibit reduced levels of the encoded hormone in blood and pancreas. This protein also exhibits a bactericidal, antimicrobial activity. [provided by RefSeq, Jul 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3375"
+            },
+            {
+                "gene": "NKX6-1",
+                "explanation": "In the pancreas, NKX6.1 is required for the development of beta cells and is a potent bifunctional transcription regulator that binds to AT-rich sequences within the promoter region of target genes Iype et al. (2004) [PubMed 15056733].[supplied by OMIM, Mar 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4825"
+            },
+            {
+                "gene": "PDX1",
+                "explanation": "The protein encoded by this gene is a transcriptional activator of several genes, including insulin, somatostatin, glucokinase, islet amyloid polypeptide, and glucose transporter type 2. The encoded nuclear protein is involved in the early development of the pancreas and plays a major role in glucose-dependent regulation of insulin gene expression. Defects in this gene are a cause of pancreatic agenesis, which can lead to early-onset insulin-dependent diabetes mellitus (IDDM), as well as maturity onset diabetes of the young type 4 (MODY4). [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3651"
+            },
+            {
+                "gene": "BMP5",
+                "explanation": "This gene encodes a secreted ligand of the TGF-beta (transforming growth factor-beta) superfamily of proteins. Ligands of this family bind various TGF-beta receptors leading to recruitment and activation of SMAD family transcription factors that regulate gene expression. The encoded preproprotein is proteolytically processed to generate each subunit of the disulfide-linked homodimer, which plays a role in bone and cartilage development. Polymorphisms in this gene may be associated with osteoarthritis in human patients. This gene is differentially regulated in multiple human cancers. This gene encodes distinct protein isoforms that may be similarly proteolytically processed. [provided by RefSeq, Jul 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/653"
+            },
+            {
+                "gene": "CDKN1C",
+                "explanation": "This gene is imprinted, with preferential expression of the maternal allele. The encoded protein is a tight-binding, strong inhibitor of several G1 cyclin/Cdk complexes and a negative regulator of cell proliferation. Mutations in this gene are implicated in sporadic cancers and Beckwith-Wiedemann syndorome, suggesting that this gene is a tumor suppressor candidate. Three transcript variants encoding two different isoforms have been found for this gene. [provided by RefSeq, Oct 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1028"
+            },
+            {
+                "gene": "TFCP2L1",
+                "explanation": "Enables RNA polymerase II cis-regulatory region sequence-specific DNA binding activity. Involved in regulation of transcription by RNA polymerase II. Predicted to be located in cytoplasm and membrane. Predicted to be part of chromatin. Predicted to be active in nucleus. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/29842"
+            },
+            {
+                "gene": "DLK1",
+                "explanation": "This gene encodes a transmembrane protein that contains multiple epidermal growth factor repeats that functions as a regulator of cell growth. The encoded protein is involved in the differentiation of several cell types including adipocytes. This gene is located in a region of chromosome 14 frequently showing unparental disomy, and is imprinted and expressed from the paternal allele. A single nucleotide variant in this gene is associated with child and adolescent obesity and shows polar overdominance, where heterozygotes carrying an active paternal allele express the phenotype, while mutant homozygotes are normal. [provided by RefSeq, Nov 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8788"
+            },
+            {
+                "gene": "NPTX2",
+                "explanation": "This gene encodes a member of the family of neuronal petraxins, synaptic proteins that are related to C-reactive protein. This protein is involved in excitatory synapse formation. It also plays a role in clustering of alpha-amino-3-hydroxy-5-methyl-4-isoxazolepropionic acid (AMPA)-type glutamate receptors at established synapses, resulting in non-apoptotic cell death of dopaminergic nerve cells. Up-regulation of this gene in Parkinson disease (PD) tissues suggests that the protein may be involved in the pathology of PD. [provided by RefSeq, Feb 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4885"
+            },
+            {
+                "gene": "MZB1",
+                "explanation": "Involved in positive regulation of cell population proliferation. Located in cytoplasm and extracellular region. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/51237"
+            },
+            {
+                "gene": "PFKFB2",
+                "explanation": "The protein encoded by this gene is involved in both the synthesis and degradation of fructose-2,6-bisphosphate, a regulatory molecule that controls glycolysis in eukaryotes. The encoded protein has a 6-phosphofructo-2-kinase activity that catalyzes the synthesis of fructose-2,6-bisphosphate, and a fructose-2,6-biphosphatase activity that catalyzes the degradation of fructose-2,6-bisphosphate. This protein regulates fructose-2,6-bisphosphate levels in the heart, while a related enzyme encoded by a different gene regulates fructose-2,6-bisphosphate levels in the liver and muscle. This enzyme functions as a homodimer. Two transcript variants encoding two different isoforms have been found for this gene. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5208"
+            },
+            {
+                "gene": "PIR",
+                "explanation": "This gene encodes a member of the cupin superfamily. The encoded protein is an Fe(II)-containing nuclear protein expressed in all tissues of the body and concentrated within dot-like subnuclear structures. Interactions with nuclear factor I/CCAAT box transcription factor as well as B cell lymphoma 3-encoded oncoprotein suggest the encoded protein may act as a transcriptional cofactor and be involved in the regulation of DNA transcription and replication. Alternatively spliced transcript variants have been described. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8544"
+            },
+            {
+                "gene": "SIX2",
+                "explanation": "This gene is a member of the vertebrate gene family which encode proteins homologous to the Drosophila 'sine oculis' homeobox protein. The encoded protein is a transcription factor which, like other members of this gene family, may be involved in limb or eye development. [provided by RefSeq, Dec 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10736"
+            },
+            {
+                "gene": "SIX3",
+                "explanation": "This gene encodes a member of the sine oculis homeobox transcription factor family. The encoded protein plays a role in eye development. Mutations in this gene have been associated with holoprosencephaly type 2. [provided by RefSeq, Oct 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6496"
+            },
+            {
+                "gene": "SMAD9",
+                "explanation": "The protein encoded by this gene is a member of the SMAD family, which transduces signals from TGF-beta family members. The encoded protein is activated by bone morphogenetic proteins and interacts with SMAD4. Two transcript variants encoding different isoforms have been found for this gene.[provided by RefSeq, Jan 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4093"
+            },
+            {
+                "gene": "SYT13",
+                "explanation": "This gene encodes a member of the large synaptotagmin protein family. Family members have an extracellular N-terminal transmembrane domain and a cytoplasmic C terminus with two tandem C2 domains (C2A and C2B). Synaptotogmin family members can form homo- and heteromeric complexes with each other. They also have different biochemical properties and developmental profiles, and patterns of tissue distribution. Synaptotagmins function as membrane traffickers in multicellular organisms. Two alternatively spliced transcript variants that encode different protein isoforms have been described for this gene. [provided by RefSeq, Oct 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/57586"
+            },
+            {
+                "gene": "TGFBR3",
+                "explanation": "This locus encodes the transforming growth factor (TGF)-beta type III receptor. The encoded receptor is a membrane proteoglycan that often functions as a co-receptor with other TGF-beta receptor superfamily members. Ectodomain shedding produces soluble TGFBR3, which may inhibit TGFB signaling. Decreased expression of this receptor has been observed in various cancers. Alternatively spliced transcript variants encoding different isoforms have been identified for this gene.[provided by RefSeq, Sep 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7049"
+            },
+            {
+                "gene": "INS",
+                "explanation": "This gene encodes insulin, a peptide hormone that plays a vital role in the regulation of carbohydrate and lipid metabolism. After removal of the precursor signal peptide, proinsulin is post-translationally cleaved into three peptides: the B chain and A chain peptides, which are covalently linked via two disulfide bonds to form insulin, and C-peptide. Binding of insulin to the insulin receptor (INSR) stimulates glucose uptake. A multitude of mutant alleles with phenotypic effects have been identified, including insulin-dependent diabetes mellitus, permanent neonatal diabetes diabetes mellitus, maturity-onset diabetes of the young type 10 and hyperproinsulinemia. There is a read-through gene, INS-IGF2, which overlaps with this gene at the 5' region and with the IGF2 gene at the 3' region. [provided by RefSeq, May 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3630"
+            }
+        ]
+    },
+    "Cancer stem cell": {
+        "markers": [
+            {
+                "gene": "THY1",
+                "explanation": "This gene encodes a cell surface glycoprotein and member of the immunoglobulin superfamily of proteins. The encoded protein is involved in cell adhesion and cell communication in numerous cell types, but particularly in cells of the immune and nervous systems. The encoded protein is widely used as a marker for hematopoietic stem cells. This gene may function as a tumor suppressor in nasopharyngeal carcinoma. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Jul 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7070"
+            },
+            {
+                "gene": "LGR5",
+                "explanation": "The protein encoded by this gene is a leucine-rich repeat-containing receptor (LGR) and member of the G protein-coupled, 7-transmembrane receptor (GPCR) superfamily. The encoded protein is a receptor for R-spondins and is involved in the canonical Wnt signaling pathway. This protein plays a role in the formation and maintenance of adult intestinal stem cells during postembryonic development. Several transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Sep 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8549"
+            },
+            {
+                "gene": "NANOG",
+                "explanation": "The protein encoded by this gene is a DNA binding homeobox transcription factor involved in embryonic stem (ES) cell proliferation, renewal, and pluripotency. The encoded protein can block ES cell differentiation and can also autorepress its own expression in differentiating cells. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Sep 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/79923"
+            },
+            {
+                "gene": "CD24",
+                "explanation": "This gene encodes a sialoglycoprotein that is expressed on mature granulocytes and B cells and modulates growth and differentiation signals to these cells. The precursor protein is cleaved to a short 32 amino acid mature peptide which is anchored via a glycosyl phosphatidylinositol (GPI) link to the cell surface. This gene was missing from previous genome assemblies, but is properly located on chromosome 6. Non-transcribed pseudogenes have been designated on chromosomes 1, 15, 20, and Y. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Apr 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/100133941"
+            },
+            {
+                "gene": "CD44",
+                "explanation": "The protein encoded by this gene is a cell-surface glycoprotein involved in cell-cell interactions, cell adhesion and migration. It is a receptor for hyaluronic acid (HA) and can also interact with other ligands, such as osteopontin, collagens, and matrix metalloproteinases (MMPs). This protein participates in a wide variety of cellular functions including lymphocyte activation, recirculation and homing, hematopoiesis, and tumor metastasis. Transcripts for this gene undergo complex alternative splicing that results in many functionally distinct isoforms, however, the full length nature of some of these variants has not been determined. Alternative splicing is the basis for the structural and functional diversity of this protein, and may be related to tumor metastasis. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/960"
+            },
+            {
+                "gene": "FLOT2",
+                "explanation": "Caveolae are small domains on the inner cell membrane involved in vesicular trafficking and signal transduction. This gene encodes a caveolae-associated, integral membrane protein, which is thought to function in neuronal signaling. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2319"
+            },
+            {
+                "gene": "PROM1",
+                "explanation": "This gene encodes a pentaspan transmembrane glycoprotein. The protein localizes to membrane protrusions and is often expressed on adult stem cells, where it is thought to function in maintaining stem cell properties by suppressing differentiation. Mutations in this gene have been shown to result in retinitis pigmentosa and Stargardt disease. Expression of this gene is also associated with several types of cancer. This gene is expressed from at least five alternative promoters that are expressed in a tissue-dependent manner. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Mar 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8842"
+            },
+            {
+                "gene": "MET",
+                "explanation": "This gene encodes a member of the receptor tyrosine kinase family of proteins and the product of the proto-oncogene MET. The encoded preproprotein is proteolytically processed to generate alpha and beta subunits that are linked via disulfide bonds to form the mature receptor. Further processing of the beta subunit results in the formation of the M10 peptide, which has been shown to reduce lung fibrosis. Binding of its ligand, hepatocyte growth factor, induces dimerization and activation of the receptor, which plays a role in cellular survival, embryogenesis, and cellular migration and invasion. Mutations in this gene are associated with papillary renal cell carcinoma, hepatocellular carcinoma, and various head and neck cancers. Amplification and overexpression of this gene are also associated with multiple human cancers. [provided by RefSeq, May 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4233"
+            },
+            {
+                "gene": "DCLK1",
+                "explanation": "This gene encodes a member of the protein kinase superfamily and the doublecortin family. The protein encoded by this gene contains two N-terminal doublecortin domains, which bind microtubules and regulate microtubule polymerization, a C-terminal serine/threonine protein kinase domain, which shows substantial homology to Ca2+/calmodulin-dependent protein kinase, and a serine/proline-rich domain in between the doublecortin and the protein kinase domains, which mediates multiple protein-protein interactions. The microtubule-polymerizing activity of the encoded protein is independent of its protein kinase activity. The encoded protein is involved in several different cellular processes, including neuronal migration, retrograde transport, neuronal apoptosis and neurogenesis. This gene is up-regulated by brain-derived neurotrophic factor and associated with memory and general cognitive abilities. Multiple transcript variants generated by two alternative promoter usage and alternative splicing have been reported, but the full-length nature and biological validity of some variants have not been defined. These variants encode different isoforms, which are differentially expressed and have different kinase activities.[provided by RefSeq, Sep 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9201"
+            }
+        ]
+    },
+    "Delta cell": {
+        "markers": [
+            {
+                "gene": "SST",
+                "explanation": "The hormone somatostatin has active 14 aa and 28 aa forms that are produced by alternate cleavage of the single preproprotein encoded by this gene. Somatostatin is expressed throughout the body and inhibits the release of numerous secondary hormones by binding to high-affinity G-protein-coupled somatostatin receptors. This hormone is an important regulator of the endocrine system through its interactions with pituitary growth hormone, thyroid stimulating hormone, and most hormones of the gastrointestinal tract. Somatostatin also affects rates of neurotransmission in the central nervous system and proliferation of both normal and tumorigenic cells. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6750"
+            },
+            {
+                "gene": "AATF",
+                "explanation": "The protein encoded by this gene was identified on the basis of its interaction with MAP3K12/DLK, a protein kinase known to be involved in the induction of cell apoptosis. This gene product contains a leucine zipper, which is a characteristic motif of transcription factors, and was shown to exhibit strong transactivation activity when fused to Gal4 DNA binding domain. Overexpression of this gene interfered with MAP3K12 induced apoptosis. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/26574"
+            },
+            {
+                "gene": "EHF",
+                "explanation": "This gene encodes a protein that belongs to an ETS transcription factor subfamily characterized by epithelial-specific expression (ESEs). The encoded protein acts as a transcriptional repressor and may be involved in epithelial differentiation and carcinogenesis. Three transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Jun 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/26298"
+            },
+            {
+                "gene": "ETV1",
+                "explanation": "This gene encodes a member of the ETS (E twenty-six) family of transcription factors. The ETS proteins regulate many target genes that modulate biological processes like cell growth, angiogenesis, migration, proliferation and differentiation. All ETS proteins contain an ETS DNA-binding domain that binds to DNA sequences containing the consensus 5'-CGGA[AT]-3'. The protein encoded by this gene contains a conserved short acidic transactivation domain (TAD) in the N-terminal region, in addition to the ETS DNA-binding domain in the C-terminal region. This gene is involved in chromosomal translocations, which result in multiple fusion proteins including EWS-ETV1 in Ewing sarcoma and at least 10 ETV1 partners (see PMID: 19657377, Table 1) in prostate cancer. In addition to chromosomal rearrangement, this gene is overexpressed in prostate cancer, melanoma and gastrointestinal stromal tumor. Multiple alternatively spliced transcript variants encoding different isoforms have been identified. [provided by RefSeq, Jul 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2115"
+            },
+            {
+                "gene": "GABRG2",
+                "explanation": "This gene encodes a gamma-aminobutyric acid (GABA) receptor. GABA is the major inhibitory neurotransmitter in the mammlian brain, where it acts at GABA-A receptors, which are ligand-gated chloride channels. GABA-A receptors are pentameric, consisting of proteins from several subunit classes: alpha, beta, gamma, delta and rho. Mutations in this gene have been associated with epilepsy and febrile seizures. Multiple transcript variants encoding different isoforms have been identified for this gene. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2566"
+            },
+            {
+                "gene": "ERBB4",
+                "explanation": "This gene is a member of the Tyr protein kinase family and the epidermal growth factor receptor subfamily. It encodes a single-pass type I membrane protein with multiple cysteine rich domains, a transmembrane domain, a tyrosine kinase domain, a phosphotidylinositol-3 kinase binding site and a PDZ domain binding motif. The protein binds to and is activated by neuregulins and other factors and induces a variety of cellular responses including mitogenesis and differentiation. Multiple proteolytic events allow for the release of a cytoplasmic fragment and an extracellular fragment. Mutations in this gene have been associated with cancer. Alternatively spliced variants which encode different protein isoforms have been described; however, not all variants have been fully characterized. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2066"
+            },
+            {
+                "gene": "ISL1",
+                "explanation": "This gene encodes a member of the LIM/homeodomain family of transcription factors. The encoded protein binds to the enhancer region of the insulin gene, among others, and may play an important role in regulating insulin gene expression. The encoded protein is central to the development of pancreatic cell lineages and may also be required for motor neuron generation. Mutations in this gene have been associated with maturity-onset diabetes of the young. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3670"
+            },
+            {
+                "gene": "LCORL",
+                "explanation": "This gene encodes a transcription factor that appears to function in spermatogenesis. Polymorphisms in this gene are associated with measures of skeletal frame size and adult height. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Oct 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/254251"
+            },
+            {
+                "gene": "PSIP1",
+                "explanation": "Enables DNA-binding transcription factor binding activity; chromatin binding activity; and transcription coactivator activity. Involved in mRNA 5'-splice site recognition and positive regulation of transcription by RNA polymerase II. Located in heterochromatin; nuclear periphery; and nucleoplasm. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/11168"
+            },
+            {
+                "gene": "LEPROT",
+                "explanation": "LEPROT is associated with the Golgi complex and endosomes and has a role in cell surface expression of growth hormone receptor (GHR; MIM 600946) and leptin receptor (OBR, or LEPR; MIM 601007), thereby altering receptor-mediated cell signaling (Couturier et al., 2007 [PubMed 18042720]; Touvier et al., 2009 [PubMed 19907080]).[supplied by OMIM, Jul 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/54741"
+            },
+            {
+                "gene": "PCSK1",
+                "explanation": "This gene encodes a member of the subtilisin-like proprotein convertase family, which includes proteases that process protein and peptide precursors trafficking through regulated or constitutive branches of the secretory pathway. The encoded protein undergoes an initial autocatalytic processing event in the ER to generate a heterodimer which exits the ER and sorts to subcellular compartments where a second autocatalytic even takes place and the catalytic activity is acquired. The protease is packaged into and activated in dense core secretory granules and expressed in the neuroendocrine system and brain. This gene encodes one of the seven basic amino acid-specific members which cleave their substrates at single or paired basic residues. It functions in the proteolytic activation of polypeptide hormones and neuropeptides precursors. Mutations in this gene have been associated with susceptibility to obesity and proprotein convertase 1/3 deficiency. Alternatively spliced transcript variants encoding multiple isoforms have been observed for this gene [provided by RefSeq, Jan 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5122"
+            },
+            {
+                "gene": "PDLIM4",
+                "explanation": "Enables alpha-actinin binding activity; protein homodimerization activity; and protein phosphatase binding activity. Involved in actin cytoskeleton reorganization. Located in several cellular components, including lamellipodium; perinuclear region of cytoplasm; and stress fiber. Part of filamentous actin. Implicated in osteoporosis. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8572"
+            },
+            {
+                "gene": "POU3F1",
+                "explanation": "Enables sequence-specific double-stranded DNA binding activity. Predicted to be involved in negative regulation of transcription by RNA polymerase II; positive regulation of gene expression; and positive regulation of transcription, DNA-templated. Predicted to act upstream of or within keratinocyte differentiation; nervous system development; and positive regulation of transcription by RNA polymerase II. Located in nucleoplasm. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5453"
+            },
+            {
+                "gene": "RBP4",
+                "explanation": " This protein belongs to the lipocalin family and is the specific carrier for retinol (vitamin A alcohol) in the blood. It delivers retinol from the liver stores to the peripheral tissues. In plasma, the RBP-retinol complex interacts with transthyretin which prevents its loss by filtration through the kidney glomeruli. A deficiency of vitamin A blocks secretion of the binding protein posttranslationally and results in defective delivery and supply to the epidermal cells. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5950"
+            },
+            {
+                "gene": "PRG4",
+                "explanation": "The protein encoded by this gene is a large proteoglycan that is synthesized by chondrocytes located at the surface of articular cartilage and by some synovial lining cells. This protein contains both chondroitin sulfate and keratan sulfate glycosaminoglycans. It functions as a boundary lubricant at the cartilage surface and contributes to the elastic absorption and energy dissipation of synovial fluid. Mutations in this gene result in camptodactyly-arthropathy-coxa vara-pericarditis syndrome. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Dec 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10216"
+            },
+            {
+                "gene": "RGS2",
+                "explanation": "Regulator of G protein signaling (RGS) family members are regulatory molecules that act as GTPase activating proteins (GAPs) for G alpha subunits of heterotrimeric G proteins. RGS proteins are able to deactivate G protein subunits of the Gi alpha, Go alpha and Gq alpha subtypes. They drive G proteins into their inactive GDP-bound forms. Regulator of G protein signaling 2 belongs to this family. The protein acts as a mediator of myeloid differentiation and may play a role in leukemogenesis. [provided by RefSeq, Aug 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5997"
+            },
+            {
+                "gene": "FRZB",
+                "explanation": "The protein encoded by this gene is a secreted protein that is involved in the regulation of bone development. Defects in this gene are a cause of female-specific osteoarthritis (OA) susceptibility. [provided by RefSeq, Apr 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2487"
+            },
+            {
+                "gene": "BHLHE41",
+                "explanation": "This gene encodes a basic helix-loop-helix protein expressed in various tissues. The encoded protein can interact with ARNTL or compete for E-box binding sites in the promoter of PER1 and repress CLOCK/ARNTL's transactivation of PER1. This gene is believed to be involved in the control of circadian rhythm and cell differentiation. Defects in this gene are associated with the short sleep phenotype. [provided by RefSeq, Feb 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/79365"
+            }
+        ]
+    },
+    "Ductal cell": {
+        "markers": [
+            {
+                "gene": "PROM1",
+                "explanation": "This gene encodes a pentaspan transmembrane glycoprotein. The protein localizes to membrane protrusions and is often expressed on adult stem cells, where it is thought to function in maintaining stem cell properties by suppressing differentiation. Mutations in this gene have been shown to result in retinitis pigmentosa and Stargardt disease. Expression of this gene is also associated with several types of cancer. This gene is expressed from at least five alternative promoters that are expressed in a tissue-dependent manner. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Mar 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8842"
+            }
+        ]
+    },
+    "Endocrine progenitor cell": {
+        "markers": [
+            {
+                "gene": "DDR1",
+                "explanation": "Receptor tyrosine kinases play a key role in the communication of cells with their microenvironment. These kinases are involved in the regulation of cell growth, differentiation and metabolism. The protein encoded by this gene belongs to a subfamily of tyrosine kinase receptors with homology to Dictyostelium discoideum protein discoidin I in their extracellular domain, and that are activated by various types of collagen. Expression of this protein is restricted to epithelial cells, particularly in the kidney, lung, gastrointestinal tract, and brain. In addition, it has been shown to be significantly overexpressed in several human tumors. Alternatively spliced transcript variants encoding different isoforms have been described for this gene. [provided by RefSeq, Feb 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/780"
+            },
+            {
+                "gene": "DNER",
+                "explanation": "Predicted to enable Notch binding activity. Involved in central nervous system development. Located in dendrite; early endosome; and plasma membrane. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/92737"
+            }
+        ]
+    },
+    "Epithelial cell": {
+        "markers": [
+            {
+                "gene": "EPCAM",
+                "explanation": "This gene encodes a carcinoma-associated antigen and is a member of a family that includes at least two type I membrane proteins. This antigen is expressed on most normal epithelial cells and gastrointestinal carcinomas and functions as a homotypic calcium-independent cell adhesion molecule. The antigen is being used as a target for immunotherapy treatment of human carcinomas. Mutations in this gene result in congenital tufting enteropathy. [provided by RefSeq, Dec 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4072"
+            },
+            {
+                "gene": "KRT19",
+                "explanation": "The protein encoded by this gene is a member of the keratin family. The keratins are intermediate filament proteins responsible for the structural integrity of epithelial cells and are subdivided into cytokeratins and hair keratins. The type I cytokeratins consist of acidic proteins which are arranged in pairs of heterotypic keratin chains. Unlike its related family members, this smallest known acidic cytokeratin is not paired with a basic cytokeratin in epithelial cells. It is specifically expressed in the periderm, the transiently superficial layer that envelopes the developing epidermis. The type I cytokeratins are clustered in a region of chromosome 17q12-q21. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3880"
+            },
+            {
+                "gene": "CDH1",
+                "explanation": "This gene encodes a classical cadherin of the cadherin superfamily. Alternative splicing results in multiple transcript variants, at least one of which encodes a preproprotein that is proteolytically processed to generate the mature glycoprotein. This calcium-dependent cell-cell adhesion protein is comprised of five extracellular cadherin repeats, a transmembrane region and a highly conserved cytoplasmic tail. Mutations in this gene are correlated with gastric, breast, colorectal, thyroid and ovarian cancer. Loss of function of this gene is thought to contribute to cancer progression by increasing proliferation, invasion, and/or metastasis. The ectodomain of this protein mediates bacterial adhesion to mammalian cells and the cytoplasmic domain is required for internalization. This gene is present in a gene cluster with other members of the cadherin family on chromosome 16. [provided by RefSeq, Nov 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/999"
+            },
+            {
+                "gene": "GCG",
+                "explanation": "The protein encoded by this gene is actually a preproprotein that is cleaved into four distinct mature peptides. One of these, glucagon, is a pancreatic hormone that counteracts the glucose-lowering action of insulin by stimulating glycogenolysis and gluconeogenesis. Glucagon is a ligand for a specific G-protein linked receptor whose signalling pathway controls cell proliferation. Two of the other peptides are secreted from gut endocrine cells and promote nutrient absorption through distinct mechanisms. Finally, the fourth peptide is similar to glicentin, an active enteroglucagon. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2641"
+            },
+            {
+                "gene": "INS",
+                "explanation": "This gene encodes insulin, a peptide hormone that plays a vital role in the regulation of carbohydrate and lipid metabolism. After removal of the precursor signal peptide, proinsulin is post-translationally cleaved into three peptides: the B chain and A chain peptides, which are covalently linked via two disulfide bonds to form insulin, and C-peptide. Binding of insulin to the insulin receptor (INSR) stimulates glucose uptake. A multitude of mutant alleles with phenotypic effects have been identified, including insulin-dependent diabetes mellitus, permanent neonatal diabetes diabetes mellitus, maturity-onset diabetes of the young type 10 and hyperproinsulinemia. There is a read-through gene, INS-IGF2, which overlaps with this gene at the 5' region and with the IGF2 gene at the 3' region. [provided by RefSeq, May 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3630"
+            }
+        ]
+    },
+    "Fibroblast": {
+        "markers": [
+            {
+                "gene": "COL11A1",
+                "explanation": "This gene encodes one of the two alpha chains of type XI collagen, a minor fibrillar collagen. Type XI collagen is a heterotrimer but the third alpha chain is a post-translationally modified alpha 1 type II chain. Mutations in this gene are associated with type II Stickler syndrome and with Marshall syndrome. A single-nucleotide polymorphism in this gene is also associated with susceptibility to lumbar disc herniation. Multiple transcript variants have been identified for this gene. [provided by RefSeq, Nov 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1301"
+            }
+        ]
+    },
+    "Mesenchymal cell": {
+        "markers": [
+            {
+                "gene": "THY1",
+                "explanation": "This gene encodes a cell surface glycoprotein and member of the immunoglobulin superfamily of proteins. The encoded protein is involved in cell adhesion and cell communication in numerous cell types, but particularly in cells of the immune and nervous systems. The encoded protein is widely used as a marker for hematopoietic stem cells. This gene may function as a tumor suppressor in nasopharyngeal carcinoma. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Jul 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7070"
+            }
+        ]
+    },
+    "Neuroendocrine cell": {
+        "markers": [
+            {
+                "gene": "SV2A",
+                "explanation": "The protein encoded by this gene is one of three related synaptic vesicle proteins. The encoded protein may interact with synaptotagmin to enhance low frequency neurotransmission in quiescent neurons. [provided by RefSeq, Jun 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9900"
+            }
+        ]
+    },
+    "PP cell": {
+        "markers": [
+            {
+                "gene": "PPY",
+                "explanation": "This gene encodes a member of the neuropeptide Y (NPY) family of peptides. The encoded 95 aa preproprotein is synthesized in the pancreatic islets of Langerhans and proteolytically processed to generate two peptide products. These products include the active pancreatic hormone of 36 aa and an icosapeptide of unknown function. This hormone acts as a regulator of pancreatic and gastrointestinal functions and may be important in the regulation of food intake. Plasma level of this hormone has been shown to be reduced in conditions associated with increased food intake and elevated in anorexia nervosa. In addition, infusion of this hormone in obese rodents has shown to decrease weight gain. Alternative splicing results in multiple transcript variants, at least one of which encodes an isoform that is proteolytically processed. [provided by RefSeq, Jan 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5539"
+            }
+        ]
+    },
+    "Pancreatic ductal stem cell": {
+        "markers": [
+            {
+                "gene": "KRT19",
+                "explanation": "The protein encoded by this gene is a member of the keratin family. The keratins are intermediate filament proteins responsible for the structural integrity of epithelial cells and are subdivided into cytokeratins and hair keratins. The type I cytokeratins consist of acidic proteins which are arranged in pairs of heterotypic keratin chains. Unlike its related family members, this smallest known acidic cytokeratin is not paired with a basic cytokeratin in epithelial cells. It is specifically expressed in the periderm, the transiently superficial layer that envelopes the developing epidermis. The type I cytokeratins are clustered in a region of chromosome 17q12-q21. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3880"
+            },
+            {
+                "gene": "INS",
+                "explanation": "This gene encodes insulin, a peptide hormone that plays a vital role in the regulation of carbohydrate and lipid metabolism. After removal of the precursor signal peptide, proinsulin is post-translationally cleaved into three peptides: the B chain and A chain peptides, which are covalently linked via two disulfide bonds to form insulin, and C-peptide. Binding of insulin to the insulin receptor (INSR) stimulates glucose uptake. A multitude of mutant alleles with phenotypic effects have been identified, including insulin-dependent diabetes mellitus, permanent neonatal diabetes diabetes mellitus, maturity-onset diabetes of the young type 10 and hyperproinsulinemia. There is a read-through gene, INS-IGF2, which overlaps with this gene at the 5' region and with the IGF2 gene at the 3' region. [provided by RefSeq, May 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3630"
+            },
+            {
+                "gene": "GCG",
+                "explanation": "The protein encoded by this gene is actually a preproprotein that is cleaved into four distinct mature peptides. One of these, glucagon, is a pancreatic hormone that counteracts the glucose-lowering action of insulin by stimulating glycogenolysis and gluconeogenesis. Glucagon is a ligand for a specific G-protein linked receptor whose signalling pathway controls cell proliferation. Two of the other peptides are secreted from gut endocrine cells and promote nutrient absorption through distinct mechanisms. Finally, the fourth peptide is similar to glicentin, an active enteroglucagon. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2641"
+            }
+        ]
+    },
+    "Pancreatic polypeptide cell": {
+        "markers": [
+            {
+                "gene": "AQP3",
+                "explanation": "This gene encodes the water channel protein aquaporin 3. Aquaporins are a family of small integral membrane proteins related to the major intrinsic protein, also known as aquaporin 0. Aquaporin 3 is localized at the basal lateral membranes of collecting duct cells in the kidney. In addition to its water channel function, aquaporin 3 has been found to facilitate the transport of nonionic small solutes such as urea and glycerol, but to a smaller degree. It has been suggested that water channels can be functionally heterogeneous and possess water and solute permeation mechanisms. Alternative splicing of this gene results in multiple transcript variants encoding different isoforms. [provided by RefSeq, Dec 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/360"
+            },
+            {
+                "gene": "CHN2",
+                "explanation": "This gene is specifically expressed in Schwann cells of the peripheral nervous system and encodes a type I transmembrane glycoprotein that is a major structural protein of the peripheral myelin sheath. The encoded protein contains a large hydrophobic extracellular domain and a smaller basic intracellular domain, which are essential for the formation and stabilization of the multilamellar structure of the compact myelin. Mutations in this gene are associated with autosomal dominant form of Charcot-Marie-Tooth disease type 1 (CMT1B) and other polyneuropathies, such as Dejerine-Sottas syndrome (DSS) and congenital hypomyelinating neuropathy (CHN). A recent study showed that two isoforms are produced from the same mRNA by use of alternative in-frame translation termination codons via a stop codon readthrough mechanism. [provided by RefSeq, Oct 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1124"
+            },
+            {
+                "gene": "UBA2",
+                "explanation": "Posttranslational modification of proteins by the addition of the small protein SUMO (see SUMO1; MIM 601912), or sumoylation, regulates protein structure and intracellular localization. SAE1 (MIM 613294) and UBA2 form a heterodimer that functions as a SUMO-activating enzyme for the sumoylation of proteins (Okuma et al., 1999 [PubMed 9920803]).[supplied by OMIM, Mar 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10054"
+            },
+            {
+                "gene": "ID2",
+                "explanation": "The protein encoded by this gene belongs to the inhibitor of DNA binding family, members of which are transcriptional regulators that contain a helix-loop-helix (HLH) domain but not a basic domain. Members of the inhibitor of DNA binding family inhibit the functions of basic helix-loop-helix transcription factors in a dominant-negative manner by suppressing their heterodimerization partners through the HLH domains. This protein may play a role in negatively regulating cell differentiation. A pseudogene of this gene is located on chromosome 3. [provided by RefSeq, Aug 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3398"
+            },
+            {
+                "gene": "ID4",
+                "explanation": "This gene encodes a member of the inhibitor of DNA binding (ID) protein family. The encoded protein lacks DNA binding ability, and instead regulates gene expression through binding to and inhibiting basic helix-loop-helix transcription factors. This protein has been implicated in the regulation of diverse cellular processes that play a role in development and tumorigenesis. [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3400"
+            },
+            {
+                "gene": "CARTPT",
+                "explanation": "This gene encodes a preproprotein that is proteolytically processed to generate multiple biologically active peptides. These peptides play a role in appetite, energy balance, maintenance of body weight, reward and addiction, and the stress response. Expression of a similar gene transcript in rodents is upregulated following administration of cocaine and amphetamine. Mutations in this gene are associated with susceptibility to obesity in humans. [provided by RefSeq, Feb 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9607"
+            },
+            {
+                "gene": "EGR3",
+                "explanation": "This gene encodes a transcriptional regulator that belongs to the EGR family of C2H2-type zinc-finger proteins. It is an immediate-early growth response gene which is induced by mitogenic stimulation. The protein encoded by this gene participates in the transcriptional regulation of genes in controling biological rhythm. It may also play a role in a wide variety of processes including muscle development, lymphocyte development, endothelial cell growth and migration, and neuronal development. Alternative splicing results in multiple transcript variants encoding distinct isoforms.[provided by RefSeq, Dec 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1960"
+            },
+            {
+                "gene": "ENTPD2",
+                "explanation": "The protein encoded by this gene is the type 2 enzyme of the ecto-nucleoside triphosphate diphosphohydrolase family (E-NTPDase). E-NTPDases are a family of ecto-nucleosidases that hydrolyze 5'-triphosphates. This ecto-ATPase is an integral membrane protein. Alternative splicing of this gene results in multiple transcript variants. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/954"
+            },
+            {
+                "gene": "ETV1",
+                "explanation": "This gene encodes a member of the ETS (E twenty-six) family of transcription factors. The ETS proteins regulate many target genes that modulate biological processes like cell growth, angiogenesis, migration, proliferation and differentiation. All ETS proteins contain an ETS DNA-binding domain that binds to DNA sequences containing the consensus 5'-CGGA[AT]-3'. The protein encoded by this gene contains a conserved short acidic transactivation domain (TAD) in the N-terminal region, in addition to the ETS DNA-binding domain in the C-terminal region. This gene is involved in chromosomal translocations, which result in multiple fusion proteins including EWS-ETV1 in Ewing sarcoma and at least 10 ETV1 partners (see PMID: 19657377, Table 1) in prostate cancer. In addition to chromosomal rearrangement, this gene is overexpressed in prostate cancer, melanoma and gastrointestinal stromal tumor. Multiple alternatively spliced transcript variants encoding different isoforms have been identified. [provided by RefSeq, Jul 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2115"
+            },
+            {
+                "gene": "MEIS1",
+                "explanation": "Homeobox genes, of which the most well-characterized category is represented by the HOX genes, play a crucial role in normal development. In addition, several homeoproteins are involved in neoplasia. This gene encodes a homeobox protein belonging to the TALE ('three amino acid loop extension') family of homeodomain-containing proteins. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4211"
+            },
+            {
+                "gene": "MEIS2",
+                "explanation": "This gene encodes a homeobox protein belonging to the TALE ('three amino acid loop extension') family of homeodomain-containing proteins. TALE homeobox proteins are highly conserved transcription regulators, and several members have been shown to be essential contributors to developmental programs. Multiple transcript variants encoding distinct isoforms have been described for this gene. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4212"
+            },
+            {
+                "gene": "PAX6",
+                "explanation": "This gene encodes paired box protein Pax-6, one of many human homologs of the Drosophila melanogaster gene prd. In addition to a conserved paired box domain, a hallmark feature of this gene family, the encoded protein also contains a homeobox domain. Both domains are known to bind DNA and function as regulators of gene transcription. Activity of this protein is key in the development of neural tissues, particularly the eye. This gene is regulated by multiple enhancers located up to hundreds of kilobases distant from this locus. Mutations in this gene or in the enhancer regions can cause ocular disorders such as aniridia and Peter's anomaly. Use of alternate promoters and alternative splicing results in multiple transcript variants encoding different isoforms. Interestingly, inclusion of a particular alternate coding exon has been shown to increase the length of the paired box domain and alter its DNA binding specificity. Consequently, isoforms that carry the shorter paired box domain regulate a different set of genes compared to the isoforms carrying the longer paired box domain. [provided by RefSeq, Mar 2019]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5080"
+            },
+            {
+                "gene": "PTGFR",
+                "explanation": "The protein encoded by this gene is member of the G-protein coupled receptor family. This protein is a receptor for prostaglandin F2-alpha (PGF2-alpha), which is known to be a potent luteolytic agent, and may also be involved in modulating intraocular pressure and smooth muscle contraction in uterus. Knockout studies in mice suggest that the interaction of PGF2-alpha with this receptor may initiate parturition in ovarian luteal cells and thus induce luteolysis. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5737"
+            },
+            {
+                "gene": "LMO3",
+                "explanation": "The protein encoded by this gene belongs to the rhombotin family of cysteine-rich LIM domain oncogenes. This gene is predominantly expressed in the brain. Related family members, LMO1 and LMO2 on chromosome 11, have been reported to be involved in chromosomal translocations in T-cell leukemia. Many alternatively spliced transcript variants have been found for this gene. [provided by RefSeq, Aug 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/55885"
+            },
+            {
+                "gene": "SERTM1",
+                "explanation": "Located in intracellular membrane-bounded organelle. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/400120"
+            },
+            {
+                "gene": "SLITRK6",
+                "explanation": "This gene encodes a member of the SLITRK protein family. Members of this family are integral membrane proteins that are characterized by two N-terminal leucine-rich repeat (LRR) domains and a C-terminal region that shares homology with trk neurotrophin receptors. This protein functions as a regulator of neurite outgrowth required for normal hearing and vision. Mutations in this gene are a cause of myopia and deafness. [provided by RefSeq, Dec 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/84189"
+            },
+            {
+                "gene": "THSD7A",
+                "explanation": "The protein encoded by this gene is found almost exclusively in endothelial cells from placenta and umbilical cord. The encoded protein appears to interact with alpha(V)beta(3) integrin and paxillin to inhibit endothelial cell migration and tube formation. This protein may be involved in cytoskeletal organization. Variations in this gene may be associated with low bone mineral density in osteoporosis. [provided by RefSeq, Aug 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/221981"
+            },
+            {
+                "gene": "ZNF506",
+                "explanation": "Predicted to enable DNA-binding transcription factor activity, RNA polymerase II-specific and RNA polymerase II cis-regulatory region sequence-specific DNA binding activity. Predicted to be involved in regulation of transcription, DNA-templated. Located in nucleolus. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/440515"
+            }
+        ]
+    },
+    "Pancreatic progenitor cell": {
+        "markers": [
+            {
+                "gene": "PROM1",
+                "explanation": "This gene encodes a pentaspan transmembrane glycoprotein. The protein localizes to membrane protrusions and is often expressed on adult stem cells, where it is thought to function in maintaining stem cell properties by suppressing differentiation. Mutations in this gene have been shown to result in retinitis pigmentosa and Stargardt disease. Expression of this gene is also associated with several types of cancer. This gene is expressed from at least five alternative promoters that are expressed in a tissue-dependent manner. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Mar 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8842"
+            }
+        ]
+    },
+    "Pancreatic stem cell": {
+        "markers": [
+            {
+                "gene": "KIT",
+                "explanation": "This gene encodes a receptor tyrosine kinase. This gene was initially identified as a homolog of the feline sarcoma viral oncogene v-kit and is often referred to as proto-oncogene c-Kit. The canonical form of this glycosylated transmembrane protein has an N-terminal extracellular region with five immunoglobulin-like domains, a transmembrane region, and an intracellular tyrosine kinase domain at the C-terminus. Upon activation by its cytokine ligand, stem cell factor (SCF), this protein phosphorylates multiple intracellular proteins that play a role in in the proliferation, differentiation, migration and apoptosis of many cell types and thereby plays an important role in hematopoiesis, stem cell maintenance, gametogenesis, melanogenesis, and in mast cell development, migration and function. This protein can be a membrane-bound or soluble protein. Mutations in this gene are associated with gastrointestinal stromal tumors, mast cell disease, acute myelogenous leukemia, and piebaldism. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, May 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3815"
+            },
+            {
+                "gene": "PROM1",
+                "explanation": "This gene encodes a pentaspan transmembrane glycoprotein. The protein localizes to membrane protrusions and is often expressed on adult stem cells, where it is thought to function in maintaining stem cell properties by suppressing differentiation. Mutations in this gene have been shown to result in retinitis pigmentosa and Stargardt disease. Expression of this gene is also associated with several types of cancer. This gene is expressed from at least five alternative promoters that are expressed in a tissue-dependent manner. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Mar 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8842"
+            },
+            {
+                "gene": "LGR5",
+                "explanation": "The protein encoded by this gene is a leucine-rich repeat-containing receptor (LGR) and member of the G protein-coupled, 7-transmembrane receptor (GPCR) superfamily. The encoded protein is a receptor for R-spondins and is involved in the canonical Wnt signaling pathway. This protein plays a role in the formation and maintenance of adult intestinal stem cells during postembryonic development. Several transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Sep 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8549"
+            },
+            {
+                "gene": "NANOG",
+                "explanation": "The protein encoded by this gene is a DNA binding homeobox transcription factor involved in embryonic stem (ES) cell proliferation, renewal, and pluripotency. The encoded protein can block ES cell differentiation and can also autorepress its own expression in differentiating cells. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Sep 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/79923"
+            }
+        ]
+    },
+    "Stem cell": {
+        "markers": [
+            {
+                "gene": "LGR5",
+                "explanation": "The protein encoded by this gene is a leucine-rich repeat-containing receptor (LGR) and member of the G protein-coupled, 7-transmembrane receptor (GPCR) superfamily. The encoded protein is a receptor for R-spondins and is involved in the canonical Wnt signaling pathway. This protein plays a role in the formation and maintenance of adult intestinal stem cells during postembryonic development. Several transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Sep 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8549"
+            },
+            {
+                "gene": "NANOG",
+                "explanation": "The protein encoded by this gene is a DNA binding homeobox transcription factor involved in embryonic stem (ES) cell proliferation, renewal, and pluripotency. The encoded protein can block ES cell differentiation and can also autorepress its own expression in differentiating cells. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Sep 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/79923"
+            }
+        ]
+    }
+}

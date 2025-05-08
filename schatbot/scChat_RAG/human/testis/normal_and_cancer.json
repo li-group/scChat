@@ -1,0 +1,212 @@
+{
+    "Gonocyte": {
+        "markers": [
+            {
+                "gene": "THY1",
+                "explanation": "This gene encodes a cell surface glycoprotein and member of the immunoglobulin superfamily of proteins. The encoded protein is involved in cell adhesion and cell communication in numerous cell types, but particularly in cells of the immune and nervous systems. The encoded protein is widely used as a marker for hematopoietic stem cells. This gene may function as a tumor suppressor in nasopharyngeal carcinoma. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Jul 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7070"
+            },
+            {
+                "gene": "KIT",
+                "explanation": "This gene encodes a receptor tyrosine kinase. This gene was initially identified as a homolog of the feline sarcoma viral oncogene v-kit and is often referred to as proto-oncogene c-Kit. The canonical form of this glycosylated transmembrane protein has an N-terminal extracellular region with five immunoglobulin-like domains, a transmembrane region, and an intracellular tyrosine kinase domain at the C-terminus. Upon activation by its cytokine ligand, stem cell factor (SCF), this protein phosphorylates multiple intracellular proteins that play a role in in the proliferation, differentiation, migration and apoptosis of many cell types and thereby plays an important role in hematopoiesis, stem cell maintenance, gametogenesis, melanogenesis, and in mast cell development, migration and function. This protein can be a membrane-bound or soluble protein. Mutations in this gene are associated with gastrointestinal stromal tumors, mast cell disease, acute myelogenous leukemia, and piebaldism. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, May 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3815"
+            }
+        ]
+    },
+    "Leydig cell": {
+        "markers": [
+            {
+                "gene": "STAR",
+                "explanation": "The protein encoded by this gene plays a key role in the acute regulation of steroid hormone synthesis by enhancing the conversion of cholesterol into pregnenolone. This protein permits the cleavage of cholesterol into pregnenolone by mediating the transport of cholesterol from the outer mitochondrial membrane to the inner mitochondrial membrane. Mutations in this gene are a cause of congenital lipoid adrenal hyperplasia (CLAH), also called lipoid CAH. A pseudogene of this gene is located on chromosome 13. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6770"
+            },
+            {
+                "gene": "HSD3B",
+                "explanation": "The protein encoded by this gene is an enzyme that catalyzes the oxidative conversion of delta-5-3-beta-hydroxysteroid precursors into delta-4-ketosteroids, which leads to the production of all classes of steroid hormones. The encoded protein also catalyzes the interconversion of 3-beta-hydroxy- and 3-keto-5-alpha-androstane steroids. [provided by RefSeq, Jun 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3283"
+            }
+        ]
+    },
+    "Peritubular myoid cell": {
+        "markers": [
+            {
+                "gene": "ACTA2",
+                "explanation": "This gene encodes one of six different actin proteins. Actins are highly conserved proteins that are involved in cell motility, structure, integrity, and intercellular signaling. The encoded protein is a smooth muscle actin that is involved in vascular contractility and blood pressure homeostasis. Mutations in this gene cause a variety of vascular diseases, such as thoracic aortic disease, coronary artery disease, stroke, and Moyamoya disease, as well as multisystemic smooth muscle dysfunction syndrome. [provided by RefSeq, Sep 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/59"
+            }
+        ]
+    },
+    "Premeiotic germ cell": {
+        "markers": [
+            {
+                "gene": "MAGEA4",
+                "explanation": "This gene is a member of the MAGEA gene family. The members of this family encode proteins with 50 to 80% sequence identity to each other. The promoters and first exons of the MAGEA genes show considerable variability, suggesting that the existence of this gene family enables the same function to be expressed under different transcriptional controls. The MAGEA genes are clustered at chromosomal location Xq28. They have been implicated in some hereditary disorders, such as dyskeratosis congenita. Several variants encoding the same protein have been found for this gene. [provided by RefSeq, Aug 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4103"
+            }
+        ]
+    },
+    "Primordial germ cell": {
+        "markers": [
+            {
+                "gene": "MAGEA4",
+                "explanation": "This gene is a member of the MAGEA gene family. The members of this family encode proteins with 50 to 80% sequence identity to each other. The promoters and first exons of the MAGEA genes show considerable variability, suggesting that the existence of this gene family enables the same function to be expressed under different transcriptional controls. The MAGEA genes are clustered at chromosomal location Xq28. They have been implicated in some hereditary disorders, such as dyskeratosis congenita. Several variants encoding the same protein have been found for this gene. [provided by RefSeq, Aug 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4103"
+            }
+        ]
+    },
+    "Sertoli cell": {
+        "markers": [
+            {
+                "gene": "AMH",
+                "explanation": "This gene encodes a secreted ligand of the TGF-beta (transforming growth factor-beta) superfamily of proteins. Ligands of this family bind various TGF-beta receptors leading to recruitment and activation of SMAD family transcription factors that regulate gene expression. The encoded preproprotein is proteolytically processed to generate N- and C-terminal cleavage products that homodimerize and associate to form a biologically active noncovalent complex. This complex binds to the anti-Mullerian hormone receptor type 2 and causes the regression of Mullerian ducts in the male embryo that would otherwise differentiate into the uterus and fallopian tubes. This protein also plays a role in Leydig cell differentiation and function and follicular development in adult females. Mutations in this gene result in persistent Mullerian duct syndrome. [provided by RefSeq, Jul 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/268"
+            },
+            {
+                "gene": "KRT18",
+                "explanation": "KRT18 encodes the type I intermediate filament chain keratin 18. Keratin 18, together with its filament partner keratin 8, are perhaps the most commonly found members of the intermediate filament gene family. They are expressed in single layer epithelial tissues of the body. Mutations in this gene have been linked to cryptogenic cirrhosis. Two transcript variants encoding the same protein have been found for this gene. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3875"
+            },
+            {
+                "gene": "SOX9",
+                "explanation": "The protein encoded by this gene recognizes the sequence CCTTGAG along with other members of the HMG-box class DNA-binding proteins. It acts during chondrocyte differentiation and, with steroidogenic factor 1, regulates transcription of the anti-Muellerian hormone (AMH) gene. Deficiencies lead to the skeletal malformation syndrome campomelic dysplasia, frequently with sex reversal. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6662"
+            },
+            {
+                "gene": "CLU",
+                "explanation": "Error fetching data for CLU: HTTP Error 400: Bad Request",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1191"
+            },
+            {
+                "gene": "VIM",
+                "explanation": "This gene encodes a type III intermediate filament protein. Intermediate filaments, along with microtubules and actin microfilaments, make up the cytoskeleton. The encoded protein is responsible for maintaining cell shape and integrity of the cytoplasm, and stabilizing cytoskeletal interactions. This protein is involved in neuritogenesis and cholesterol transport and functions as an organizer of a number of other critical proteins involved in cell attachment, migration, and signaling. Bacterial and viral pathogens have been shown to attach to this protein on the host cell surface. Mutations in this gene are associated with congenital cataracts in human patients. [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7431"
+            }
+        ]
+    },
+    "Spermatogonial stem cell": {
+        "markers": [
+            {
+                "gene": "ADGRA3",
+                "explanation": "This gene encodes a member of the G protein-coupled receptor superfamily. This membrane protein may play a role in tumor angiogenesis through its interaction with the human homolog of the Drosophila disc large tumor suppressor gene. This gene is mapped to a candidate region of chromosome 4 which may be associated with bipolar disorder and schizophrenia. [provided by RefSeq, Oct 2012]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/166647"
+            },
+            {
+                "gene": "ID4",
+                "explanation": "This gene encodes a member of the inhibitor of DNA binding (ID) protein family. The encoded protein lacks DNA binding ability, and instead regulates gene expression through binding to and inhibiting basic helix-loop-helix transcription factors. This protein has been implicated in the regulation of diverse cellular processes that play a role in development and tumorigenesis. [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3400"
+            },
+            {
+                "gene": "UCHL1",
+                "explanation": "The protein encoded by this gene belongs to the peptidase C12 family. This enzyme is a thiol protease that hydrolyzes a peptide bond at the C-terminal glycine of ubiquitin. This gene is specifically expressed in the neurons and in cells of the diffuse neuroendocrine system. Mutations in this gene may be associated with Parkinson disease.[provided by RefSeq, Sep 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7345"
+            },
+            {
+                "gene": "DDX4",
+                "explanation": "DEAD box proteins, characterized by the conserved motif Asp-Glu-Ala-Asp (DEAD), are putative RNA helicases. They are implicated in a number of cellular processes involving alteration of RNA secondary structure such as translation initiation, nuclear and mitochondrial splicing, and ribosome and spliceosome assembly. Based on their distribution patterns, some members of this family are believed to be involved in embryogenesis, spermatogenesis, and cellular growth and division. This gene encodes a DEAD box protein, which is a homolog of VASA proteins in Drosophila and several other species. The gene is specifically expressed in the germ cell lineage in both sexes and functions in germ cell development. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Oct 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/54514"
+            },
+            {
+                "gene": "BCL6",
+                "explanation": "The protein encoded by this gene is a zinc finger transcription factor and contains an N-terminal POZ domain. This protein acts as a sequence-specific repressor of transcription, and has been shown to modulate the transcription of STAT-dependent IL-4 responses of B cells. This protein can interact with a variety of POZ-containing proteins that function as transcription corepressors. This gene is found to be frequently translocated and hypermutated in diffuse large-cell lymphoma (DLCL), and may be involved in the pathogenesis of DLCL. Alternatively spliced transcript variants encoding different protein isoforms have been found for this gene. [provided by RefSeq, Aug 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/604"
+            },
+            {
+                "gene": "ETV5",
+                "explanation": "Enables DNA-binding transcription activator activity, RNA polymerase II-specific and RNA polymerase II transcription regulatory region sequence-specific DNA binding activity. Involved in cellular response to oxidative stress; negative regulation of transcription by RNA polymerase II; and positive regulation of transcription by RNA polymerase II. Located in nucleoplasm. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2119"
+            },
+            {
+                "gene": "FGFR3",
+                "explanation": "This gene encodes a member of the fibroblast growth factor receptor (FGFR) family, with its amino acid sequence being highly conserved between members and among divergent species. FGFR family members differ from one another in their ligand affinities and tissue distribution. A full-length representative protein would consist of an extracellular region, composed of three immunoglobulin-like domains, a single hydrophobic membrane-spanning segment and a cytoplasmic tyrosine kinase domain. The extracellular portion of the protein interacts with fibroblast growth factors, setting in motion a cascade of downstream signals, ultimately influencing mitogenesis and differentiation. This particular family member binds acidic and basic fibroblast growth hormone and plays a role in bone development and maintenance. Mutations in this gene lead to craniosynostosis and multiple types of skeletal dysplasia. [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2261"
+            },
+            {
+                "gene": "GFRA1",
+                "explanation": "This gene encodes a member of the glial cell line-derived neurotrophic factor receptor (GDNFR) family of proteins. The encoded preproprotein is proteolytically processed to generate the mature receptor. Glial cell line-derived neurotrophic factor (GDNF) and neurturin (NTN) are two structurally related, potent neurotrophic factors that play key roles in the control of neuron survival and differentiation. This receptor is a glycosylphosphatidylinositol (GPI)-linked cell surface receptor for both GDNF and NTN, and mediates activation of the RET tyrosine kinase receptor. This gene is a candidate gene for Hirschsprung disease. Alternative splicing results in multiple transcript variants, at least one of which encodes a preproprotein that is proteolytically processed. [provided by RefSeq, Jan 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2674"
+            },
+            {
+                "gene": "SALL4",
+                "explanation": "This gene encodes a zinc finger transcription factor thought to play a role in the development of abducens motor neurons. Defects in this gene are a cause of Duane-radial ray syndrome (DRRS). Alternative splicing results in multiple transcript variants encoding different isoforms. [provided by RefSeq, Dec 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/57167"
+            }
+        ]
+    },
+    "Spermatogonium": {
+        "markers": [
+            {
+                "gene": "ITGB1",
+                "explanation": "Integrins are heterodimeric proteins made up of alpha and beta subunits. At least 18 alpha and 8 beta subunits have been described in mammals. Integrin family members are membrane receptors involved in cell adhesion and recognition in a variety of processes including embryogenesis, hemostasis, tissue repair, immune response and metastatic diffusion of tumor cells. This gene encodes a beta subunit. Multiple alternatively spliced transcript variants which encode different protein isoforms have been found for this gene. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3688"
+            },
+            {
+                "gene": "KIT",
+                "explanation": "This gene encodes a receptor tyrosine kinase. This gene was initially identified as a homolog of the feline sarcoma viral oncogene v-kit and is often referred to as proto-oncogene c-Kit. The canonical form of this glycosylated transmembrane protein has an N-terminal extracellular region with five immunoglobulin-like domains, a transmembrane region, and an intracellular tyrosine kinase domain at the C-terminus. Upon activation by its cytokine ligand, stem cell factor (SCF), this protein phosphorylates multiple intracellular proteins that play a role in in the proliferation, differentiation, migration and apoptosis of many cell types and thereby plays an important role in hematopoiesis, stem cell maintenance, gametogenesis, melanogenesis, and in mast cell development, migration and function. This protein can be a membrane-bound or soluble protein. Mutations in this gene are associated with gastrointestinal stromal tumors, mast cell disease, acute myelogenous leukemia, and piebaldism. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, May 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3815"
+            },
+            {
+                "gene": "NR6A1",
+                "explanation": "This gene encodes an orphan nuclear receptor which is a member of the nuclear hormone receptor family. Its expression pattern suggests that it may be involved in neurogenesis and germ cell development. The protein can homodimerize and bind DNA, but in vivo targets have not been identified. Alternate splicing results in multiple transcript variants.[provided by RefSeq, Jun 2013]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2649"
+            },
+            {
+                "gene": "SOHLH2",
+                "explanation": "This gene encodes one of testis-specific transcription factors which are essential for spermatogenesis, oogenesis and folliculogenesis. This gene is located on chromosome 13. The proteins encoded by this gene and another testis-specific transcription factor, SOHLH1, can form heterodimers, in addition to homodimers. There is a read-through locus (GeneID: 100526761) that shares sequence identity with this gene and the upstream CCDC169 (GeneID: 728591). Alternatively spliced transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Aug 2013]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/54937"
+            },
+            {
+                "gene": "SYCE3",
+                "explanation": "Predicted to be involved in reciprocal meiotic recombination; spermatogenesis; and synaptonemal complex assembly. Predicted to act upstream of or within positive regulation of apoptotic process. Predicted to be located in chromosome and nucleus. Predicted to be active in central element. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/644186"
+            },
+            {
+                "gene": "SSX3",
+                "explanation": "The product of this gene belongs to the family of highly homologous synovial sarcoma X (SSX) breakpoint proteins. These proteins may function as transcriptional repressors. They are also capable of eliciting spontaneous humoral and cellular immune responses in cancer patients, and are potentially useful targets in cancer vaccine-based immunotherapy. While some of the related SSX genes are involved in t(X;18)(p11.2;q11.2) translocations that are characteristically found in all synovial sarcomas, this gene does not appear to be involved in such translocations. [provided by RefSeq, Jul 2013]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10214"
+            },
+            {
+                "gene": "SYCP3",
+                "explanation": "This gene encodes an essential structural component of the synaptonemal complex. This complex is involved in synapsis, recombination and segregation of meiotic chromosomes. Mutations in this gene are associated with azoospermia in males and susceptibility to pregnancy loss in females. Alternate splicing results in multiple transcript variants that encode the same protein. [provided by RefSeq, May 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/50511"
+            }
+        ]
+    },
+    "Stem cell": {
+        "markers": [
+            {
+                "gene": "NANOG",
+                "explanation": "The protein encoded by this gene is a DNA binding homeobox transcription factor involved in embryonic stem (ES) cell proliferation, renewal, and pluripotency. The encoded protein can block ES cell differentiation and can also autorepress its own expression in differentiating cells. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Sep 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/79923"
+            },
+            {
+                "gene": "POU5F1",
+                "explanation": "This gene encodes a transcription factor containing a POU homeodomain that plays a key role in embryonic development and stem cell pluripotency. Aberrant expression of this gene in adult tissues is associated with tumorigenesis. This gene can participate in a translocation with the Ewing's sarcoma gene on chromosome 21, which also leads to tumor formation. Alternative splicing, as well as usage of alternative AUG and non-AUG translation initiation codons, results in multiple isoforms. One of the AUG start codons is polymorphic in human populations. Related pseudogenes have been identified on chromosomes 1, 3, 8, 10, and 12. [provided by RefSeq, Oct 2013]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5460"
+            },
+            {
+                "gene": "SOX2",
+                "explanation": "This intronless gene encodes a member of the SRY-related HMG-box (SOX) family of transcription factors involved in the regulation of embryonic development and in the determination of cell fate. The product of this gene is required for stem-cell maintenance in the central nervous system, and also regulates gene expression in the stomach. Mutations in this gene have been associated with optic nerve hypoplasia and with syndromic microphthalmia, a severe form of structural eye malformation. This gene lies within an intron of another gene called SOX2 overlapping transcript (SOX2OT). [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6657"
+            },
+            {
+                "gene": "SALL4",
+                "explanation": "This gene encodes a zinc finger transcription factor thought to play a role in the development of abducens motor neurons. Defects in this gene are a cause of Duane-radial ray syndrome (DRRS). Alternative splicing results in multiple transcript variants encoding different isoforms. [provided by RefSeq, Dec 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/57167"
+            },
+            {
+                "gene": "NES",
+                "explanation": "This gene encodes a member of the intermediate filament protein family and is expressed primarily in nerve cells. [provided by RefSeq, Sep 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10763"
+            }
+        ]
+    },
+    "Testis somatic cell": {
+        "markers": [
+            {
+                "gene": "THY1",
+                "explanation": "This gene encodes a cell surface glycoprotein and member of the immunoglobulin superfamily of proteins. The encoded protein is involved in cell adhesion and cell communication in numerous cell types, but particularly in cells of the immune and nervous systems. The encoded protein is widely used as a marker for hematopoietic stem cells. This gene may function as a tumor suppressor in nasopharyngeal carcinoma. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Jul 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7070"
+            }
+        ]
+    }
+}

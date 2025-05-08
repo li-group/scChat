@@ -1,0 +1,25 @@
+patient_name,cell_type,counts,percentage
+p1_pre,Dendritic cells,122,19.003115264797508
+p1_pre,Macrophages,48,7.476635514018691
+p1_pre,Monocytes,104,16.1993769470405
+p1_pre,Neutrophils,368,57.3208722741433
+p1_post,Dendritic cells,35,10.869565217391305
+p1_post,Macrophages,119,36.95652173913043
+p1_post,Monocytes,76,23.60248447204969
+p1_post,Neutrophils,92,28.57142857142857
+p6_pre,Dendritic cells,51,7.112970711297072
+p6_pre,Macrophages,259,36.122733612273365
+p6_pre,Monocytes,389,54.25383542538354
+p6_pre,Neutrophils,18,2.510460251046025
+p6_post,Dendritic cells,433,11.693221712125304
+p6_post,Macrophages,561,15.149878476910613
+p6_post,Monocytes,2684,72.48177153659195
+p6_post,Neutrophils,25,0.6751282743721306
+p7_pre,Dendritic cells,100,12.987012987012985
+p7_pre,Macrophages,327,42.467532467532465
+p7_pre,Monocytes,326,42.33766233766234
+p7_pre,Neutrophils,17,2.207792207792208
+p7_post,Dendritic cells,143,17.964824120603016
+p7_post,Macrophages,437,54.89949748743719
+p7_post,Monocytes,205,25.753768844221103
+p7_post,Neutrophils,11,1.3819095477386936

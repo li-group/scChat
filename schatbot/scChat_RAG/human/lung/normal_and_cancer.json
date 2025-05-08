@@ -1,0 +1,767 @@
+{
+    "Airway secretory cell": {
+        "markers": [
+            {
+                "gene": "AQP3",
+                "explanation": "This gene encodes the water channel protein aquaporin 3. Aquaporins are a family of small integral membrane proteins related to the major intrinsic protein, also known as aquaporin 0. Aquaporin 3 is localized at the basal lateral membranes of collecting duct cells in the kidney. In addition to its water channel function, aquaporin 3 has been found to facilitate the transport of nonionic small solutes such as urea and glycerol, but to a smaller degree. It has been suggested that water channels can be functionally heterogeneous and possess water and solute permeation mechanisms. Alternative splicing of this gene results in multiple transcript variants encoding different isoforms. [provided by RefSeq, Dec 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/360"
+            },
+            {
+                "gene": "MUC5AC",
+                "explanation": "Predicted to be an extracellular matrix structural constituent. Involved in phosphatidylinositol-mediated signaling. Located in cytoplasm; extracellular space; and mucus layer. Implicated in dry eye syndrome. Biomarker of several diseases, including Sjogren's syndrome; biliary tract disease (multiple); cystic fibrosis; eye disease (multiple); and pancreatic cancer (multiple). [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4586"
+            },
+            {
+                "gene": "MUC5B",
+                "explanation": "This gene encodes a member of the mucin family of proteins, which are highly glycosylated macromolecular components of mucus secretions. This family member is the major gel-forming mucin in mucus. It is a major contributor to the lubricating and viscoelastic properties of whole saliva, normal lung mucus and cervical mucus. This gene has been found to be up-regulated in some human diseases, including sinus mucosa of chronic rhinosinusitis (CRS), CRS with nasal polyposis, chronic obstructive pulmonary disease (COPD) and H. pylori-associated gastric disease, and it may be involved in the pathogenesis of these diseases. [provided by RefSeq, Jul 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/727897"
+            },
+            {
+                "gene": "PIGR",
+                "explanation": "This gene is a member of the immunoglobulin superfamily. The encoded poly-Ig receptor binds polymeric immunoglobulin molecules at the basolateral surface of epithelial cells; the complex is then transported across the cell to be secreted at the apical surface. A significant association was found between immunoglobulin A nephropathy and several SNPs in this gene.[provided by RefSeq, Sep 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5284"
+            },
+            {
+                "gene": "SCGB1A1",
+                "explanation": "This gene encodes a member of the secretoglobin family of small secreted proteins. The encoded protein has been implicated in numerous functions including anti-inflammation, inhibition of phospholipase A2 and the sequestering of hydrophobic ligands. Defects in this gene are associated with a susceptibility to asthma. [provided by RefSeq, May 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7356"
+            }
+        ]
+    },
+    "Alveolar epithelial progenitor cell": {
+        "markers": [
+            {
+                "gene": "TM4SF1",
+                "explanation": "The protein encoded by this gene is a member of the transmembrane 4 superfamily, also known as the tetraspanin family. Most of these members are cell-surface proteins that are characterized by the presence of four hydrophobic domains. The proteins mediate signal transduction events that play a role in the regulation of cell development, activation, growth and motility. This encoded protein is a cell surface antigen and is highly expressed in different carcinomas. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4071"
+            }
+        ]
+    },
+    "Anterior foregut endoderm cell": {
+        "markers": [
+            {
+                "gene": "CPM",
+                "explanation": "The protein encoded by this gene is a membrane-bound arginine/lysine carboxypeptidase. Its expression is associated with monocyte to macrophage differentiation. This encoded protein contains hydrophobic regions at the amino and carboxy termini and has 6 potential asparagine-linked glycosylation sites. The active site residues of carboxypeptidases A and B are conserved in this protein. Three alternatively spliced transcript variants encoding the same protein have been described for this gene. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1368"
+            }
+        ]
+    },
+    "Basophil": {
+        "markers": [
+            {
+                "gene": "SMAD1",
+                "explanation": "The protein encoded by this gene belongs to the SMAD, a family of proteins similar to the gene products of the Drosophila gene 'mothers against decapentaplegic' (Mad) and the C. elegans gene Sma. SMAD proteins are signal transducers and transcriptional modulators that mediate multiple signaling pathways. This protein mediates the signals of the bone morphogenetic proteins (BMPs), which are involved in a range of biological activities including cell growth, apoptosis, morphogenesis, development and immune responses. In response to BMP ligands, this protein can be phosphorylated and activated by the BMP receptor kinase. The phosphorylated form of this protein forms a complex with SMAD4, which is important for its function in the transcription regulation. This protein is a target for SMAD-specific E3 ubiquitin ligases, such as SMURF1 and SMURF2, and undergoes ubiquitination and proteasome-mediated degradation. Alternatively spliced transcript variants encoding the same protein have been observed. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4086"
+            },
+            {
+                "gene": "CCR5",
+                "explanation": "This gene encodes a member of the beta chemokine receptor family, which is predicted to be a seven transmembrane protein similar to G protein-coupled receptors. This protein is expressed by T cells and macrophages, and is known to be an important co-receptor for macrophage-tropic virus, including HIV, to enter host cells. Defective alleles of this gene have been associated with the HIV infection resistance. The ligands of this receptor include monocyte chemoattractant protein 2 (MCP-2), macrophage inflammatory protein 1 alpha (MIP-1 alpha), macrophage inflammatory protein 1 beta (MIP-1 beta) and regulated on activation normal T expressed and secreted protein (RANTES). Expression of this gene was also detected in a promyeloblastic cell line, suggesting that this protein may play a role in granulocyte lineage proliferation and differentiation. This gene is located at the chemokine receptor gene cluster region. An allelic polymorphism in this gene results in both functional and non-functional alleles; the reference genome represents the functional allele. Two transcript variants encoding the same protein have been found for this gene. [provided by RefSeq, Jul 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1234"
+            }
+        ]
+    },
+    "CD8+ T cell": {
+        "markers": [
+            {
+                "gene": "ITGAE",
+                "explanation": "Integrins are heterodimeric integral membrane proteins composed of an alpha chain and a beta chain. This gene encodes an I-domain-containing alpha integrin that undergoes post-translational cleavage in the extracellular domain, yielding disulfide-linked heavy and light chains. In combination with the beta 7 integrin, this protein forms the E-cadherin binding integrin known as the human mucosal lymphocyte-1 antigen. This protein is preferentially expressed in human intestinal intraepithelial lymphocytes (IEL), and in addition to a role in adhesion, it may serve as an accessory molecule for IEL activation. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3682"
+            }
+        ]
+    },
+    "Cancer cell": {
+        "markers": [
+            {
+                "gene": "KRT19",
+                "explanation": "The protein encoded by this gene is a member of the keratin family. The keratins are intermediate filament proteins responsible for the structural integrity of epithelial cells and are subdivided into cytokeratins and hair keratins. The type I cytokeratins consist of acidic proteins which are arranged in pairs of heterotypic keratin chains. Unlike its related family members, this smallest known acidic cytokeratin is not paired with a basic cytokeratin in epithelial cells. It is specifically expressed in the periderm, the transiently superficial layer that envelopes the developing epidermis. The type I cytokeratins are clustered in a region of chromosome 17q12-q21. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3880"
+            }
+        ]
+    },
+    "Cancer stem cell": {
+        "markers": [
+            {
+                "gene": "PROM1",
+                "explanation": "This gene encodes a pentaspan transmembrane glycoprotein. The protein localizes to membrane protrusions and is often expressed on adult stem cells, where it is thought to function in maintaining stem cell properties by suppressing differentiation. Mutations in this gene have been shown to result in retinitis pigmentosa and Stargardt disease. Expression of this gene is also associated with several types of cancer. This gene is expressed from at least five alternative promoters that are expressed in a tissue-dependent manner. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Mar 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8842"
+            },
+            {
+                "gene": "ALDH1A1",
+                "explanation": "The protein encoded by this gene belongs to the aldehyde dehydrogenase family. Aldehyde dehydrogenase is the next enzyme after alcohol dehydrogenase in the major pathway of alcohol metabolism. There are two major aldehyde dehydrogenase isozymes in the liver, cytosolic and mitochondrial, which are encoded by distinct genes, and can be distinguished by their electrophoretic mobility, kinetic properties, and subcellular localization. This gene encodes the cytosolic isozyme. Studies in mice show that through its role in retinol metabolism, this gene may also be involved in the regulation of the metabolic responses to high-fat diet. [provided by RefSeq, Mar 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/216"
+            },
+            {
+                "gene": "ALCAM",
+                "explanation": "This gene encodes activated leukocyte cell adhesion molecule (ALCAM), also known as CD166 (cluster of differentiation 166), which is a member of a subfamily of immunoglobulin receptors with five immunoglobulin-like domains (VVC2C2C2) in the extracellular domain. This protein binds to T-cell differentiation antigene CD6, and is implicated in the processes of cell adhesion and migration. Multiple alternatively spliced transcript variants encoding different isoforms have been found. [provided by RefSeq, Aug 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/214"
+            },
+            {
+                "gene": "CD44",
+                "explanation": "The protein encoded by this gene is a cell-surface glycoprotein involved in cell-cell interactions, cell adhesion and migration. It is a receptor for hyaluronic acid (HA) and can also interact with other ligands, such as osteopontin, collagens, and matrix metalloproteinases (MMPs). This protein participates in a wide variety of cellular functions including lymphocyte activation, recirculation and homing, hematopoiesis, and tumor metastasis. Transcripts for this gene undergo complex alternative splicing that results in many functionally distinct isoforms, however, the full length nature of some of these variants has not been determined. Alternative splicing is the basis for the structural and functional diversity of this protein, and may be related to tumor metastasis. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/960"
+            },
+            {
+                "gene": "THY1",
+                "explanation": "This gene encodes a cell surface glycoprotein and member of the immunoglobulin superfamily of proteins. The encoded protein is involved in cell adhesion and cell communication in numerous cell types, but particularly in cells of the immune and nervous systems. The encoded protein is widely used as a marker for hematopoietic stem cells. This gene may function as a tumor suppressor in nasopharyngeal carcinoma. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Jul 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7070"
+            },
+            {
+                "gene": "MET",
+                "explanation": "This gene encodes a member of the receptor tyrosine kinase family of proteins and the product of the proto-oncogene MET. The encoded preproprotein is proteolytically processed to generate alpha and beta subunits that are linked via disulfide bonds to form the mature receptor. Further processing of the beta subunit results in the formation of the M10 peptide, which has been shown to reduce lung fibrosis. Binding of its ligand, hepatocyte growth factor, induces dimerization and activation of the receptor, which plays a role in cellular survival, embryogenesis, and cellular migration and invasion. Mutations in this gene are associated with papillary renal cell carcinoma, hepatocellular carcinoma, and various head and neck cancers. Amplification and overexpression of this gene are also associated with multiple human cancers. [provided by RefSeq, May 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4233"
+            },
+            {
+                "gene": "EPCAM",
+                "explanation": "This gene encodes a carcinoma-associated antigen and is a member of a family that includes at least two type I membrane proteins. This antigen is expressed on most normal epithelial cells and gastrointestinal carcinomas and functions as a homotypic calcium-independent cell adhesion molecule. The antigen is being used as a target for immunotherapy treatment of human carcinomas. Mutations in this gene result in congenital tufting enteropathy. [provided by RefSeq, Dec 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4072"
+            },
+            {
+                "gene": "CD24",
+                "explanation": "This gene encodes a sialoglycoprotein that is expressed on mature granulocytes and B cells and modulates growth and differentiation signals to these cells. The precursor protein is cleaved to a short 32 amino acid mature peptide which is anchored via a glycosyl phosphatidylinositol (GPI) link to the cell surface. This gene was missing from previous genome assemblies, but is properly located on chromosome 6. Non-transcribed pseudogenes have been designated on chromosomes 1, 15, 20, and Y. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Apr 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/100133941"
+            },
+            {
+                "gene": "ABCG2",
+                "explanation": "The membrane-associated protein encoded by this gene is included in the superfamily of ATP-binding cassette (ABC) transporters. ABC proteins transport various molecules across extra- and intra-cellular membranes. ABC genes are divided into seven distinct subfamilies (ABC1, MDR/TAP, MRP, ALD, OABP, GCN20, White). This protein is a member of the White subfamily. Alternatively referred to as a breast cancer resistance protein, this protein functions as a xenobiotic transporter which may play a major role in multi-drug resistance. It likely serves as a cellular defense mechanism in response to mitoxantrone and anthracycline exposure. Significant expression of this protein has been observed in the placenta, which may suggest a potential role for this molecule in placenta tissue. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Apr 2012]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9429"
+            },
+            {
+                "gene": "ABCB1",
+                "explanation": "The membrane-associated protein encoded by this gene is a member of the superfamily of ATP-binding cassette (ABC) transporters. ABC proteins transport various molecules across extra- and intra-cellular membranes. ABC genes are divided into seven distinct subfamilies (ABC1, MDR/TAP, MRP, ALD, OABP, GCN20, White). This protein is a member of the MDR/TAP subfamily. Members of the MDR/TAP subfamily are involved in multidrug resistance. The protein encoded by this gene is an ATP-dependent drug efflux pump for xenobiotic compounds with broad substrate specificity. It is responsible for decreased drug accumulation in multidrug-resistant cells and often mediates the development of resistance to anticancer drugs. This protein also functions as a transporter in the blood-brain barrier. Mutations in this gene are associated with colchicine resistance and Inflammatory bowel disease 13. Alternative splicing and the use of alternative promoters results in multiple transcript variants. [provided by RefSeq, Feb 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5243"
+            },
+            {
+                "gene": "GLI1",
+                "explanation": "This gene encodes a member of the Kruppel family of zinc finger proteins. The encoded transcription factor is activated by the sonic hedgehog signal transduction cascade and regulates stem cell proliferation. The activity and nuclear localization of this protein is negatively regulated by p53 in an inhibitory loop. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, May 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2735"
+            },
+            {
+                "gene": "NES",
+                "explanation": "This gene encodes a member of the intermediate filament protein family and is expressed primarily in nerve cells. [provided by RefSeq, Sep 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10763"
+            },
+            {
+                "gene": "PDPN",
+                "explanation": "This gene encodes a type-I integral membrane glycoprotein with diverse distribution in human tissues. The physiological function of this protein may be related to its mucin-type character. The homologous protein in other species has been described as a differentiation antigen and influenza-virus receptor. The specific function of this protein has not been determined but it has been proposed as a marker of lung injury. Alternatively spliced transcript variants encoding different isoforms have been identified. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10630"
+            },
+            {
+                "gene": "NANOG",
+                "explanation": "The protein encoded by this gene is a DNA binding homeobox transcription factor involved in embryonic stem (ES) cell proliferation, renewal, and pluripotency. The encoded protein can block ES cell differentiation and can also autorepress its own expression in differentiating cells. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Sep 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/79923"
+            },
+            {
+                "gene": "POU5F1",
+                "explanation": "This gene encodes a transcription factor containing a POU homeodomain that plays a key role in embryonic development and stem cell pluripotency. Aberrant expression of this gene in adult tissues is associated with tumorigenesis. This gene can participate in a translocation with the Ewing's sarcoma gene on chromosome 21, which also leads to tumor formation. Alternative splicing, as well as usage of alternative AUG and non-AUG translation initiation codons, results in multiple isoforms. One of the AUG start codons is polymorphic in human populations. Related pseudogenes have been identified on chromosomes 1, 3, 8, 10, and 12. [provided by RefSeq, Oct 2013]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5460"
+            },
+            {
+                "gene": "SOX2",
+                "explanation": "This intronless gene encodes a member of the SRY-related HMG-box (SOX) family of transcription factors involved in the regulation of embryonic development and in the determination of cell fate. The product of this gene is required for stem-cell maintenance in the central nervous system, and also regulates gene expression in the stomach. Mutations in this gene have been associated with optic nerve hypoplasia and with syndromic microphthalmia, a severe form of structural eye malformation. This gene lies within an intron of another gene called SOX2 overlapping transcript (SOX2OT). [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6657"
+            },
+            {
+                "gene": "KIT",
+                "explanation": "This gene encodes a receptor tyrosine kinase. This gene was initially identified as a homolog of the feline sarcoma viral oncogene v-kit and is often referred to as proto-oncogene c-Kit. The canonical form of this glycosylated transmembrane protein has an N-terminal extracellular region with five immunoglobulin-like domains, a transmembrane region, and an intracellular tyrosine kinase domain at the C-terminus. Upon activation by its cytokine ligand, stem cell factor (SCF), this protein phosphorylates multiple intracellular proteins that play a role in in the proliferation, differentiation, migration and apoptosis of many cell types and thereby plays an important role in hematopoiesis, stem cell maintenance, gametogenesis, melanogenesis, and in mast cell development, migration and function. This protein can be a membrane-bound or soluble protein. Mutations in this gene are associated with gastrointestinal stromal tumors, mast cell disease, acute myelogenous leukemia, and piebaldism. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, May 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3815"
+            },
+            {
+                "gene": "MYC",
+                "explanation": "This gene is a proto-oncogene and encodes a nuclear phosphoprotein that plays a role in cell cycle progression, apoptosis and cellular transformation. The encoded protein forms a heterodimer with the related transcription factor MAX. This complex binds to the E box DNA consensus sequence and regulates the transcription of specific target genes. Amplification of this gene is frequently observed in numerous human cancers. Translocations involving this gene are associated with Burkitt lymphoma and multiple myeloma in human patients. There is evidence to show that translation initiates both from an upstream, in-frame non-AUG (CUG) and a downstream AUG start site, resulting in the production of two isoforms with distinct N-termini. [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4609"
+            },
+            {
+                "gene": "KLF4",
+                "explanation": "This gene encodes a protein that belongs to the Kruppel family of transcription factors. The encoded zinc finger protein is required for normal development of the barrier function of skin. The encoded protein is thought to control the G1-to-S transition of the cell cycle following DNA damage by mediating the tumor suppressor gene p53. Mice lacking this gene have a normal appearance but lose weight rapidly, and die shortly after birth due to fluid evaporation resulting from compromised epidermal barrier function. Alternative splicing results in multiple transcript variants encoding different isoforms. [provided by RefSeq, Sep 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9314"
+            },
+            {
+                "gene": "MSI1",
+                "explanation": "This gene encodes a protein containing two conserved tandem RNA recognition motifs. Similar proteins in other species function as RNA-binding proteins and play central roles in posttranscriptional gene regulation. Expression of this gene has been correlated with the grade of the malignancy and proliferative activity in gliomas and melanomas. A pseudogene for this gene is located on chromosome 11q13. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4440"
+            },
+            {
+                "gene": "ABCG5",
+                "explanation": "The protein encoded by this gene is a member of the superfamily of ATP-binding cassette (ABC) transporters. ABC proteins transport various molecules across extra- and intra-cellular membranes. ABC genes are divided into seven distinct subfamilies (ABC1, MDR/TAP, MRP, ALD, OABP, GCN20, White). This protein is a member of the White subfamily. The protein encoded by this gene functions as a half-transporter to limit intestinal absorption and promote biliary excretion of sterols. It is expressed in a tissue-specific manner in the liver, colon, and intestine. This gene is tandemly arrayed on chromosome 2, in a head-to-head orientation with family member ABCG8. Mutations in this gene may contribute to sterol accumulation and atheroschlerosis, and have been observed in patients with sitosterolemia. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/64240"
+            },
+            {
+                "gene": "FLOT2",
+                "explanation": "Caveolae are small domains on the inner cell membrane involved in vesicular trafficking and signal transduction. This gene encodes a caveolae-associated, integral membrane protein, which is thought to function in neuronal signaling. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2319"
+            },
+            {
+                "gene": "BMI1",
+                "explanation": "This gene encodes a ring finger protein that is major component of the polycomb group complex 1 (PRC1). This complex functions through chromatin remodeling as an essential epigenetic repressor of multiple regulatory genes involved in embryonic development and self-renewal in somatic stem cells. This protein also plays a central role in DNA damage repair. This gene is an oncogene and aberrant expression is associated with numerous cancers and is associated with resistance to certain chemotherapies. A pseudogene of this gene is found on chromosome X. Read-through transcription also exists between this gene and the upstream COMM domain containing 3 (COMMD3) gene. [provided by RefSeq, Sep 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/648"
+            },
+            {
+                "gene": "CTNNB1",
+                "explanation": "The protein encoded by this gene is part of a complex of proteins that constitute adherens junctions (AJs). AJs are necessary for the creation and maintenance of epithelial cell layers by regulating cell growth and adhesion between cells. The encoded protein also anchors the actin cytoskeleton and may be responsible for transmitting the contact inhibition signal that causes cells to stop dividing once the epithelial sheet is complete. Finally, this protein binds to the product of the APC gene, which is mutated in adenomatous polyposis of the colon. Mutations in this gene are a cause of colorectal cancer (CRC), pilomatrixoma (PTR), medulloblastoma (MDB), and ovarian cancer. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Aug 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1499"
+            },
+            {
+                "gene": "TP63",
+                "explanation": "This gene encodes a member of the p53 family of transcription factors. The functional domains of p53 family proteins include an N-terminal transactivation domain, a central DNA-binding domain and an oligomerization domain. Alternative splicing of this gene and the use of alternative promoters results in multiple transcript variants encoding different isoforms that vary in their functional properties. These isoforms function during skin development and maintenance, adult stem/progenitor cell regulation, heart development and premature aging. Some isoforms have been found to protect the germline by eliminating oocytes or testicular germ cells that have suffered DNA damage. Mutations in this gene are associated with ectodermal dysplasia, and cleft lip/palate syndrome 3 (EEC3); split-hand/foot malformation 4 (SHFM4); ankyloblepharon-ectodermal defects-cleft lip/palate; ADULT syndrome (acro-dermato-ungual-lacrimal-tooth); limb-mammary syndrome; Rap-Hodgkin syndrome (RHS); and orofacial cleft 8. [provided by RefSeq, Aug 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8626"
+            }
+        ]
+    },
+    "Clara cell": {
+        "markers": [
+            {
+                "gene": "SCGB1A1",
+                "explanation": "This gene encodes a member of the secretoglobin family of small secreted proteins. The encoded protein has been implicated in numerous functions including anti-inflammation, inhibition of phospholipase A2 and the sequestering of hydrophobic ligands. Defects in this gene are associated with a susceptibility to asthma. [provided by RefSeq, May 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7356"
+            }
+        ]
+    },
+    "Dendritic cell": {
+        "markers": [
+            {
+                "gene": "THBD",
+                "explanation": "Error fetching data for THBD: HTTP Error 400: Bad Request",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7056"
+            },
+            {
+                "gene": "CD1C",
+                "explanation": "This gene encodes a member of the CD1 family of transmembrane glycoproteins, which are structurally related to the major histocompatibility complex (MHC) proteins and form heterodimers with beta-2-microglobulin. The CD1 proteins mediate the presentation of primarily lipid and glycolipid antigens of self or microbial origin to T cells. The human genome contains five CD1 family genes organized in a cluster on chromosome 1. The CD1 family members are thought to differ in their cellular localization and specificity for particular lipid ligands. The protein encoded by this gene is broadly distributed throughout the endocytic system via a tyrosine-based motif in the cytoplasmic tail. Alternatively spliced transcript variants of this gene have been observed, but their full-length nature is not known. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/911"
+            },
+            {
+                "gene": "CLEC4C",
+                "explanation": "This gene encodes a member of the C-type lectin/C-type lectin-like domain (CTL/CTLD) superfamily. Members of this family share a common protein fold and have diverse functions, such as cell adhesion, cell-cell signalling, glycoprotein turnover, and roles in inflammation and immune response. The encoded type 2 transmembrane protein may play a role in dendritic cell function. Two transcript variants encoding distinct isoforms have been identified for this gene. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/170482"
+            },
+            {
+                "gene": "ITGAX",
+                "explanation": "This gene encodes the integrin alpha X chain protein. Integrins are heterodimeric integral membrane proteins composed of an alpha chain and a beta chain. This protein combines with the beta 2 chain (ITGB2) to form a leukocyte-specific integrin referred to as inactivated-C3b (iC3b) receptor 4 (CR4). The alpha X beta 2 complex seems to overlap the properties of the alpha M beta 2 integrin in the adherence of neutrophils and monocytes to stimulated endothelium cells, and in the phagocytosis of complement coated particles. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Nov 2013]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3687"
+            },
+            {
+                "gene": "CD209",
+                "explanation": "This gene encodes a C-type lectin that functions in cell adhesion and pathogen recognition. This receptor recognizes a wide range of evolutionarily divergent pathogens with a large impact on public health, including leprosy and tuberculosis mycobacteria, the Ebola, hepatitis C, HIV-1 and Dengue viruses, and the SARS-CoV acute respiratory syndrome coronavirus. The protein is organized into four distinct domains: a C-terminal carbohydrate recognition domain, a flexible tandem-repeat neck domain, a transmembrane region and an N-terminal cytoplasmic domain involved in internalization. This gene is closely related in terms of both sequence and function to a neighboring gene, CLEC4M (Gene ID: 10332), also known as L-SIGN. The two genes differ in viral recognition and expression patterns, with this gene showing high expression on the surface of dendritic cells. Polymorphisms in the neck region are associated with protection from HIV-1 infection, while single nucleotide polymorphisms in the promoter of this gene are associated with differing resistance and susceptibility to and severity of infectious disease, including rs4804803, which is associated with SARS severity. [provided by RefSeq, May 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/30835"
+            },
+            {
+                "gene": "CD83",
+                "explanation": "The protein encoded by this gene is a single-pass type I membrane protein and member of the immunoglobulin superfamily of receptors. The encoded protein may be involved in the regulation of antigen presentation. A soluble form of this protein can bind to dendritic cells and inhibit their maturation. Three transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Oct 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9308"
+            },
+            {
+                "gene": "CD1A",
+                "explanation": "This gene encodes a divergent member of the CD1 family of transmembrane glycoproteins, which are structurally related to the major histocompatibility complex (MHC) proteins and form heterodimers with beta-2-microglobulin. The CD1 proteins mediate the presentation of primarily lipid and glycolipid antigens of self or microbial origin to T cells. The human genome contains five CD1 family genes organized in a cluster on chromosome 1. The CD1 family members are thought to differ in their cellular localization and specificity for particular lipid ligands. The protein encoded by this gene localizes to late endosomes and lysosomes via a tyrosine-based motif in the cytoplasmic tail. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Jan 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/909"
+            }
+        ]
+    },
+    "Endothelial cell": {
+        "markers": [
+            {
+                "gene": "PECAM1",
+                "explanation": "The protein encoded by this gene is found on the surface of platelets, monocytes, neutrophils, and some types of T-cells, and makes up a large portion of endothelial cell intercellular junctions. The encoded protein is a member of the immunoglobulin superfamily and is likely involved in leukocyte migration, angiogenesis, and integrin activation. [provided by RefSeq, May 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5175"
+            },
+            {
+                "gene": "CDH5",
+                "explanation": "This gene encodes a classical cadherin of the cadherin superfamily. The encoded preproprotein is proteolytically processed to generate the mature glycoprotein. This calcium-dependent cell-cell adhesion molecule is comprised of five extracellular cadherin repeats, a transmembrane region and a highly conserved cytoplasmic tail. Functioning as a classical cadherin by imparting to cells the ability to adhere in a homophilic manner, this protein plays a role in endothelial adherens junction assembly and maintenance. This gene is located in a gene cluster in a region on the long arm of chromosome 16 that is involved in loss of heterozygosity events in breast and prostate cancer. [provided by RefSeq, Nov 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1003"
+            },
+            {
+                "gene": "MCAM",
+                "explanation": "Involved in glomerular filtration and vascular wound healing. Acts upstream of or within angiogenesis. Located in external side of plasma membrane. Biomarker of chronic obstructive pulmonary disease and uveal melanoma. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4162"
+            },
+            {
+                "gene": "VWF",
+                "explanation": "This gene encodes a glycoprotein involved in hemostasis. The encoded preproprotein is proteolytically processed following assembly into large multimeric complexes. These complexes function in the adhesion of platelets to sites of vascular injury and the transport of various proteins in the blood. Mutations in this gene result in von Willebrand disease, an inherited bleeding disorder. An unprocessed pseudogene has been found on chromosome 22. [provided by RefSeq, Oct 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7450"
+            },
+            {
+                "gene": "LYVE1",
+                "explanation": "This gene encodes a type I integral membrane glycoprotein. The encoded protein acts as a receptor and binds to both soluble and immobilized hyaluronan. This protein may function in lymphatic hyaluronan transport and have a role in tumor metastasis. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10894"
+            },
+            {
+                "gene": "CD34",
+                "explanation": "The protein encoded by this gene may play a role in the attachment of stem cells to the bone marrow extracellular matrix or to stromal cells. This single-pass membrane protein is highly glycosylated and phosphorylated by protein kinase C. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Aug 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/947"
+            },
+            {
+                "gene": "ESM1",
+                "explanation": "This gene encodes a secreted protein which is mainly expressed in the endothelial cells in human lung and kidney tissues. The expression of this gene is regulated by cytokines, suggesting that it may play a role in endothelium-dependent pathological disorders. The transcript contains multiple polyadenylation and mRNA instability signals. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Oct 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/11082"
+            },
+            {
+                "gene": "FLT1",
+                "explanation": "This gene encodes a member of the vascular endothelial growth factor receptor (VEGFR) family. VEGFR family members are receptor tyrosine kinases (RTKs) which contain an extracellular ligand-binding region with seven immunoglobulin (Ig)-like domains, a transmembrane segment, and a tyrosine kinase (TK) domain within the cytoplasmic domain. This protein binds to VEGFR-A, VEGFR-B and placental growth factor and plays an important role in angiogenesis and vasculogenesis. Expression of this receptor is found in vascular endothelial cells, placental trophoblast cells and peripheral blood monocytes. Multiple transcript variants encoding different isoforms have been found for this gene. Isoforms include a full-length transmembrane receptor isoform and shortened, soluble isoforms. The soluble isoforms are associated with the onset of pre-eclampsia.[provided by RefSeq, May 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2321"
+            },
+            {
+                "gene": "KDR",
+                "explanation": "Vascular endothelial growth factor (VEGF) is a major growth factor for endothelial cells. This gene encodes one of the two receptors of the VEGF. This receptor, known as kinase insert domain receptor, is a type III receptor tyrosine kinase. It functions as the main mediator of VEGF-induced endothelial proliferation, survival, migration, tubular morphogenesis and sprouting. The signalling and trafficking of this receptor are regulated by multiple factors, including Rab GTPase, P2Y purine nucleotide receptor, integrin alphaVbeta3, T-cell protein tyrosine phosphatase, etc.. Mutations of this gene are implicated in infantile capillary hemangiomas. [provided by RefSeq, May 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3791"
+            },
+            {
+                "gene": "EMCN",
+                "explanation": "EMCN is a mucin-like sialoglycoprotein that interferes with the assembly of focal adhesion complexes and inhibits interaction between cells and the extracellular matrix (Kinoshita et al., 2001 [PubMed 11418125]).[supplied by OMIM, Mar 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/51705"
+            }
+        ]
+    },
+    "Eosinophil": {
+        "markers": [
+            {
+                "gene": "RNASE3",
+                "explanation": "Error fetching data for RNASE3: HTTP Error 400: Bad Request",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6037"
+            }
+        ]
+    },
+    "Epithelial cell": {
+        "markers": [
+            {
+                "gene": "ITGAE",
+                "explanation": "Integrins are heterodimeric integral membrane proteins composed of an alpha chain and a beta chain. This gene encodes an I-domain-containing alpha integrin that undergoes post-translational cleavage in the extracellular domain, yielding disulfide-linked heavy and light chains. In combination with the beta 7 integrin, this protein forms the E-cadherin binding integrin known as the human mucosal lymphocyte-1 antigen. This protein is preferentially expressed in human intestinal intraepithelial lymphocytes (IEL), and in addition to a role in adhesion, it may serve as an accessory molecule for IEL activation. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3682"
+            },
+            {
+                "gene": "VCAM1",
+                "explanation": "This gene is a member of the Ig superfamily and encodes a cell surface sialoglycoprotein expressed by cytokine-activated endothelium. This type I membrane protein mediates leukocyte-endothelial cell adhesion and signal transduction, and may play a role in the development of artherosclerosis and rheumatoid arthritis. Three alternatively spliced transcripts encoding different isoforms have been described for this gene. [provided by RefSeq, Dec 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7412"
+            },
+            {
+                "gene": "IL6R",
+                "explanation": "This gene encodes a subunit of the interleukin 6 (IL6) receptor complex. Interleukin 6 is a potent pleiotropic cytokine that regulates cell growth and differentiation and plays an important role in the immune response. The IL6 receptor is a protein complex consisting of this protein and interleukin 6 signal transducer (IL6ST/GP130/IL6-beta), a receptor subunit also shared by many other cytokines. Dysregulated production of IL6 and this receptor are implicated in the pathogenesis of many diseases, such as multiple myeloma, autoimmune diseases and prostate cancer. Alternatively spliced transcript variants encoding distinct isoforms have been identified in this gene. A pseudogene of this gene is found on chromosome 9. [provided by RefSeq, Aug 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3570"
+            },
+            {
+                "gene": "ANPEP",
+                "explanation": "Aminopeptidase N is located in the small-intestinal and renal microvillar membrane, and also in other plasma membranes. In the small intestine aminopeptidase N plays a role in the final digestion of peptides generated from hydrolysis of proteins by gastric and pancreatic proteases. Its function in proximal tubular epithelial cells and other cell types is less clear. The large extracellular carboxyterminal domain contains a pentapeptide consensus sequence characteristic of members of the zinc-binding metalloproteinase superfamily. Sequence comparisons with known enzymes of this class showed that CD13 and aminopeptidase N are identical. The latter enzyme was thought to be involved in the metabolism of regulatory peptides by diverse cell types, including small intestinal and renal tubular epithelial cells, macrophages, granulocytes, and synaptic membranes from the CNS. This membrane-bound zinc metalloprotease is known to serve as a receptor for the HCoV-229E alphacoronavirus as well as other non-human coronaviruses. This gene has also been shown to promote angiogenesis, tumor growth, and metastasis and defects in this gene are associated with various types of leukemia and lymphoma. [provided by RefSeq, Apr 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/290"
+            },
+            {
+                "gene": "IL6ST",
+                "explanation": "The protein encoded by this gene is a signal transducer shared by many cytokines, including interleukin 6 (IL6), ciliary neurotrophic factor (CNTF), leukemia inhibitory factor (LIF), and oncostatin M (OSM). This protein functions as a part of the cytokine receptor complex. The activation of this protein is dependent upon the binding of cytokines to their receptors. vIL6, a protein related to IL6 and encoded by the Kaposi sarcoma-associated herpesvirus, can bypass the interleukin 6 receptor (IL6R) and directly activate this protein. Knockout studies in mice suggest that this gene plays a critical role in regulating myocyte apoptosis. Alternatively spliced transcript variants have been described. A related pseudogene has been identified on chromosome 17. [provided by RefSeq, May 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3572"
+            },
+            {
+                "gene": "THBD",
+                "explanation": "Error fetching data for THBD: HTTP Error 400: Bad Request",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7056"
+            },
+            {
+                "gene": "CD1D",
+                "explanation": "This gene encodes a divergent member of the CD1 family of transmembrane glycoproteins, which are structurally related to the major histocompatibility complex (MHC) proteins and form heterodimers with beta-2-microglobulin. The CD1 proteins mediate the presentation of primarily lipid and glycolipid antigens of self or microbial origin to T cells. The human genome contains five CD1 family genes organized in a cluster on chromosome 1. The CD1 family members are thought to differ in their cellular localization and specificity for particular lipid ligands. The protein encoded by this gene localizes to late endosomes and lysosomes via a tyrosine-based motif in the cytoplasmic tail. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Jan 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/912"
+            },
+            {
+                "gene": "CD24",
+                "explanation": "This gene encodes a sialoglycoprotein that is expressed on mature granulocytes and B cells and modulates growth and differentiation signals to these cells. The precursor protein is cleaved to a short 32 amino acid mature peptide which is anchored via a glycosyl phosphatidylinositol (GPI) link to the cell surface. This gene was missing from previous genome assemblies, but is properly located on chromosome 6. Non-transcribed pseudogenes have been designated on chromosomes 1, 15, 20, and Y. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Apr 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/100133941"
+            },
+            {
+                "gene": "CDH1",
+                "explanation": "This gene encodes a classical cadherin of the cadherin superfamily. Alternative splicing results in multiple transcript variants, at least one of which encodes a preproprotein that is proteolytically processed to generate the mature glycoprotein. This calcium-dependent cell-cell adhesion protein is comprised of five extracellular cadherin repeats, a transmembrane region and a highly conserved cytoplasmic tail. Mutations in this gene are correlated with gastric, breast, colorectal, thyroid and ovarian cancer. Loss of function of this gene is thought to contribute to cancer progression by increasing proliferation, invasion, and/or metastasis. The ectodomain of this protein mediates bacterial adhesion to mammalian cells and the cytoplasmic domain is required for internalization. This gene is present in a gene cluster with other members of the cadherin family on chromosome 16. [provided by RefSeq, Nov 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/999"
+            },
+            {
+                "gene": "NOS2",
+                "explanation": "Nitric oxide is a reactive free radical which acts as a biologic mediator in several processes, including neurotransmission and antimicrobial and antitumoral activities. This gene encodes a nitric oxide synthase which is expressed in liver and is inducible by a combination of lipopolysaccharide and certain cytokines. Three related pseudogenes are located within the Smith-Magenis syndrome region on chromosome 17. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4843"
+            }
+        ]
+    },
+    "Epithelial progenitor cell": {
+        "markers": [
+            {
+                "gene": "CEACAM6",
+                "explanation": "Error fetching data for CEACAM6: HTTP Error 400: Bad Request",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4680"
+            }
+        ]
+    },
+    "Fibroblast": {
+        "markers": [
+            {
+                "gene": "ACTA2",
+                "explanation": "This gene encodes one of six different actin proteins. Actins are highly conserved proteins that are involved in cell motility, structure, integrity, and intercellular signaling. The encoded protein is a smooth muscle actin that is involved in vascular contractility and blood pressure homeostasis. Mutations in this gene cause a variety of vascular diseases, such as thoracic aortic disease, coronary artery disease, stroke, and Moyamoya disease, as well as multisystemic smooth muscle dysfunction syndrome. [provided by RefSeq, Sep 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/59"
+            },
+            {
+                "gene": "CD36",
+                "explanation": "The protein encoded by this gene is the fourth major glycoprotein of the platelet surface and serves as a receptor for thrombospondin in platelets and various cell lines. Since thrombospondins are widely distributed proteins involved in a variety of adhesive processes, this protein may have important functions as a cell adhesion molecule. It binds to collagen, thrombospondin, anionic phospholipids and oxidized LDL. It directly mediates cytoadherence of Plasmodium falciparum parasitized erythrocytes and it binds long chain fatty acids and may function in the transport and/or as a regulator of fatty acid transport. Mutations in this gene cause platelet glycoprotein deficiency. Multiple alternatively spliced transcript variants have been found for this gene. [provided by RefSeq, Feb 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/948"
+            },
+            {
+                "gene": "ADGRE5",
+                "explanation": "This gene encodes a member of the EGF-TM7 subfamily of adhesion G protein-coupled receptors, which mediate cell-cell interactions. These proteins are cleaved by self-catalytic proteolysis into a large extracellular subunit and seven-span transmembrane subunit, which associate at the cell surface as a receptor complex. The encoded protein may play a role in cell adhesion as well as leukocyte recruitment, activation and migration, and contains multiple extracellular EGF-like repeats which mediate binding to chondroitin sulfate and the cell surface complement regulatory protein CD55. Expression of this gene may play a role in the progression of several types of cancer. Alternatively spliced transcript variants encoding multiple isoforms with 3 to 5 EGF-like repeats have been observed for this gene. This gene is found in a cluster with other EGF-TM7 genes on the short arm of chromosome 19. [provided by RefSeq, Jun 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/976"
+            },
+            {
+                "gene": "DES",
+                "explanation": "This gene encodes a muscle-specific class III intermediate filament. Homopolymers of this protein form a stable intracytoplasmic filamentous network connecting myofibrils to each other and to the plasma membrane. Mutations in this gene are associated with desmin-related myopathy, a familial cardiac and skeletal myopathy (CSM), and with distal myopathies. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1674"
+            },
+            {
+                "gene": "PTPN13",
+                "explanation": "The protein encoded by this gene is a member of the protein tyrosine phosphatase (PTP) family. PTPs are signaling molecules that regulate a variety of cellular processes including cell growth, differentiation, mitotic cycle, and oncogenic transformation. This PTP is a large intracellular protein. It has a catalytic PTP domain at its C-terminus and two major structural domains: a region with five PDZ domains and a FERM domain that binds to plasma membrane and cytoskeletal elements. This PTP was found to interact with, and dephosphorylate, Fas receptor and IkappaBalpha through the PDZ domains. This suggests it has a role in Fas mediated programmed cell death. This PTP was also shown to interact with GTPase-activating protein, and thus may function as a regulator of Rho signaling pathways. Four alternatively spliced transcript variants, which encode distinct proteins, have been reported. [provided by RefSeq, Oct 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5783"
+            },
+            {
+                "gene": "PDGFRA",
+                "explanation": "This gene encodes a cell surface tyrosine kinase receptor for members of the platelet-derived growth factor family. These growth factors are mitogens for cells of mesenchymal origin. The identity of the growth factor bound to a receptor monomer determines whether the functional receptor is a homodimer or a heterodimer, composed of both platelet-derived growth factor receptor alpha and beta polypeptides. Studies suggest that this gene plays a role in organ development, wound healing, and tumor progression. Mutations in this gene have been associated with idiopathic hypereosinophilic syndrome, somatic and familial gastrointestinal stromal tumors, and a variety of other cancers. [provided by RefSeq, Mar 2012]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5156"
+            },
+            {
+                "gene": "PDGFRB",
+                "explanation": "The protein encoded by this gene is a cell surface tyrosine kinase receptor for members of the platelet-derived growth factor family. These growth factors are mitogens for cells of mesenchymal origin. The identity of the growth factor bound to a receptor monomer determines whether the functional receptor is a homodimer (PDGFB or PDGFD) or a heterodimer (PDGFA and PDGFB). This gene is essential for normal development of the cardiovascular system and aids in rearrangement of the actin cytoskeleton. This gene is flanked on chromosome 5 by the genes for granulocyte-macrophage colony-stimulating factor and macrophage-colony stimulating factor receptor; all three genes may be implicated in the 5-q syndrome. A translocation between chromosomes 5 and 12, that fuses this gene to that of the ETV6 gene, results in chronic myeloproliferative disorder with eosinophilia. [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5159"
+            },
+            {
+                "gene": "VIM",
+                "explanation": "This gene encodes a type III intermediate filament protein. Intermediate filaments, along with microtubules and actin microfilaments, make up the cytoskeleton. The encoded protein is responsible for maintaining cell shape and integrity of the cytoplasm, and stabilizing cytoskeletal interactions. This protein is involved in neuritogenesis and cholesterol transport and functions as an organizer of a number of other critical proteins involved in cell attachment, migration, and signaling. Bacterial and viral pathogens have been shown to attach to this protein on the host cell surface. Mutations in this gene are associated with congenital cataracts in human patients. [provided by RefSeq, Aug 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7431"
+            },
+            {
+                "gene": "THY1",
+                "explanation": "This gene encodes a cell surface glycoprotein and member of the immunoglobulin superfamily of proteins. The encoded protein is involved in cell adhesion and cell communication in numerous cell types, but particularly in cells of the immune and nervous systems. The encoded protein is widely used as a marker for hematopoietic stem cells. This gene may function as a tumor suppressor in nasopharyngeal carcinoma. Alternative splicing results in multiple transcript variants. [provided by RefSeq, Jul 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7070"
+            }
+        ]
+    },
+    "Idiopathic pulmonary fibrosis cell": {
+        "markers": [
+            {
+                "gene": "AKT2",
+                "explanation": "This gene is a putative oncogene encoding a protein belonging to a subfamily of serine/threonine kinases containing SH2-like (Src homology 2-like) domains, which is involved in signaling pathways. The gene serves as an oncogene in the tumorigenesis of cancer cells For example, its overexpression contributes to the malignant phenotype of a subset of human ductal pancreatic cancers. The encoded protein is a general protein kinase capable of phophorylating several known proteins, and has also been implicated in insulin signaling. [provided by RefSeq, Nov 2019]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/208"
+            },
+            {
+                "gene": "COL1A1",
+                "explanation": "This gene encodes the pro-alpha1 chains of type I collagen whose triple helix comprises two alpha1 chains and one alpha2 chain. Type I is a fibril-forming collagen found in most connective tissues and is abundant in bone, cornea, dermis and tendon. Mutations in this gene are associated with osteogenesis imperfecta types I-IV, Ehlers-Danlos syndrome type VIIA, Ehlers-Danlos syndrome Classical type, Caffey Disease and idiopathic osteoporosis. Reciprocal translocations between chromosomes 17 and 22, where this gene and the gene for platelet-derived growth factor beta are located, are associated with a particular type of skin tumor called dermatofibrosarcoma protuberans, resulting from unregulated expression of the growth factor. Two transcripts, resulting from the use of alternate polyadenylation signals, have been identified for this gene. [provided by R. Dalgleish, Feb 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1277"
+            },
+            {
+                "gene": "IL10",
+                "explanation": "The protein encoded by this gene is a cytokine produced primarily by monocytes and to a lesser extent by lymphocytes. This cytokine has pleiotropic effects in immunoregulation and inflammation. It down-regulates the expression of Th1 cytokines, MHC class II Ags, and costimulatory molecules on macrophages. It also enhances B cell survival, proliferation, and antibody production. This cytokine can block NF-kappa B activity, and is involved in the regulation of the JAK-STAT signaling pathway. Knockout studies in mice suggested the function of this cytokine as an essential immunoregulator in the intestinal tract. Mutations in this gene are associated with an increased susceptibility to HIV-1 infection and rheumatoid arthritis. [provided by RefSeq, May 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3586"
+            },
+            {
+                "gene": "KRT14",
+                "explanation": "This gene encodes a member of the keratin family, the most diverse group of intermediate filaments. This gene product, a type I keratin, is usually found as a heterotetramer with two keratin 5 molecules, a type II keratin. Together they form the cytoskeleton of epithelial cells. Mutations in the genes for these keratins are associated with epidermolysis bullosa simplex. At least one pseudogene has been identified at 17p12-p11. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3861"
+            },
+            {
+                "gene": "KRT5",
+                "explanation": "The protein encoded by this gene is a member of the keratin gene family. The type II cytokeratins consist of basic or neutral proteins which are arranged in pairs of heterotypic keratin chains coexpressed during differentiation of simple and stratified epithelial tissues. This type II cytokeratin is specifically expressed in the basal layer of the epidermis with family member KRT14. Mutations in these genes have been associated with a complex of diseases termed epidermolysis bullosa simplex. The type II cytokeratins are clustered in a region of chromosome 12q12-q13. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3852"
+            },
+            {
+                "gene": "LTBP4",
+                "explanation": "The protein encoded by this gene binds transforming growth factor beta (TGFB) as it is secreted and targeted to the extracellular matrix. TGFB is biologically latent after secretion and insertion into the extracellular matrix, and sheds TGFB and other proteins upon activation. Defects in this gene may be a cause of cutis laxa and severe pulmonary, gastrointestinal, and urinary abnormalities. Three transcript variants encoding different isoforms have been found for this gene.[provided by RefSeq, May 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8425"
+            },
+            {
+                "gene": "MUC5AC",
+                "explanation": "Predicted to be an extracellular matrix structural constituent. Involved in phosphatidylinositol-mediated signaling. Located in cytoplasm; extracellular space; and mucus layer. Implicated in dry eye syndrome. Biomarker of several diseases, including Sjogren's syndrome; biliary tract disease (multiple); cystic fibrosis; eye disease (multiple); and pancreatic cancer (multiple). [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4586"
+            },
+            {
+                "gene": "MUC5B",
+                "explanation": "This gene encodes a member of the mucin family of proteins, which are highly glycosylated macromolecular components of mucus secretions. This family member is the major gel-forming mucin in mucus. It is a major contributor to the lubricating and viscoelastic properties of whole saliva, normal lung mucus and cervical mucus. This gene has been found to be up-regulated in some human diseases, including sinus mucosa of chronic rhinosinusitis (CRS), CRS with nasal polyposis, chronic obstructive pulmonary disease (COPD) and H. pylori-associated gastric disease, and it may be involved in the pathogenesis of these diseases. [provided by RefSeq, Jul 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/727897"
+            },
+            {
+                "gene": "NGFR",
+                "explanation": "Nerve growth factor receptor contains an extracellular domain containing four 40-amino acid repeats with 6 cysteine residues at conserved positions followed by a serine/threonine-rich region, a single transmembrane domain, and a 155-amino acid cytoplasmic domain. The cysteine-rich region contains the nerve growth factor binding domain. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4804"
+            },
+            {
+                "gene": "PDPN",
+                "explanation": "This gene encodes a type-I integral membrane glycoprotein with diverse distribution in human tissues. The physiological function of this protein may be related to its mucin-type character. The homologous protein in other species has been described as a differentiation antigen and influenza-virus receptor. The specific function of this protein has not been determined but it has been proposed as a marker of lung injury. Alternatively spliced transcript variants encoding different isoforms have been identified. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10630"
+            },
+            {
+                "gene": "PLA2G4C",
+                "explanation": "This gene encodes a protein which is a member of the phospholipase A2 enzyme family which hydrolyzes glycerophospholipids to produce free fatty acids and lysophospholipids, both of which serve as precursors in the production of signaling molecules. The encoded protein has been shown to be a calcium-independent and membrane bound enzyme. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Apr 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8605"
+            },
+            {
+                "gene": "SCGB1A1",
+                "explanation": "This gene encodes a member of the secretoglobin family of small secreted proteins. The encoded protein has been implicated in numerous functions including anti-inflammation, inhibition of phospholipase A2 and the sequestering of hydrophobic ligands. Defects in this gene are associated with a susceptibility to asthma. [provided by RefSeq, May 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7356"
+            },
+            {
+                "gene": "SLC26A8",
+                "explanation": "This gene encodes a member of the SLC26 gene family of anion transporters. Family members are well conserved in gene structure and protein length yet have markedly different tissue expression patterns. The expression of this gene appears to be restricted to spermatocytes. Alternatively spliced transcript variants that encode different isoforms have been described. [provided by RefSeq, Jul 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/116369"
+            },
+            {
+                "gene": "SPDEF",
+                "explanation": "The protein encoded by this gene belongs to the ETS family of transcription factors. It is highly expressed in the prostate epithelial cells, and functions as an androgen-independent transactivator of prostate-specific antigen (PSA) promoter. Higher expression of this protein has also been reported in brain, breast, lung and ovarian tumors, compared to the corresponding normal tissues, and it shows better tumor-association than other cancer-associated molecules, making it a more suitable target for developing specific cancer therapies. Alternatively spliced transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Nov 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/25803"
+            },
+            {
+                "gene": "TP63",
+                "explanation": "This gene encodes a member of the p53 family of transcription factors. The functional domains of p53 family proteins include an N-terminal transactivation domain, a central DNA-binding domain and an oligomerization domain. Alternative splicing of this gene and the use of alternative promoters results in multiple transcript variants encoding different isoforms that vary in their functional properties. These isoforms function during skin development and maintenance, adult stem/progenitor cell regulation, heart development and premature aging. Some isoforms have been found to protect the germline by eliminating oocytes or testicular germ cells that have suffered DNA damage. Mutations in this gene are associated with ectodermal dysplasia, and cleft lip/palate syndrome 3 (EEC3); split-hand/foot malformation 4 (SHFM4); ankyloblepharon-ectodermal defects-cleft lip/palate; ADULT syndrome (acro-dermato-ungual-lacrimal-tooth); limb-mammary syndrome; Rap-Hodgkin syndrome (RHS); and orofacial cleft 8. [provided by RefSeq, Aug 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8626"
+            }
+        ]
+    },
+    "Lung epithelial cell": {
+        "markers": [
+            {
+                "gene": "MUC1",
+                "explanation": "This gene encodes a membrane-bound protein that is a member of the mucin family. Mucins are O-glycosylated proteins that play an essential role in forming protective mucous barriers on epithelial surfaces. These proteins also play a role in intracellular signaling. This protein is expressed on the apical surface of epithelial cells that line the mucosal surfaces of many different tissues including lung, breast stomach and pancreas. This protein is proteolytically cleaved into alpha and beta subunits that form a heterodimeric complex. The N-terminal alpha subunit functions in cell-adhesion and the C-terminal beta subunit is involved in cell signaling. Overexpression, aberrant intracellular localization, and changes in glycosylation of this protein have been associated with carcinomas. This gene is known to contain a highly polymorphic variable number tandem repeats (VNTR) domain. Alternate splicing results in multiple transcript variants.[provided by RefSeq, Feb 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4582"
+            },
+            {
+                "gene": "ABCA3",
+                "explanation": "The membrane-associated protein encoded by this gene is a member of the superfamily of ATP-binding cassette (ABC) transporters.  ABC proteins transport various molecules across extra- and intracellular membranes.  ABC genes are divided into seven distinct subfamilies (ABC1, MDR/TAP, MRP, ALD, OABP, GCN20, White).  This protein is a member of the ABC1 subfamily.  Members of the ABC1 subfamily comprise the only major ABC subfamily found exclusively in multicellular eukaryotes.  The full transporter encoded by this gene may be involved in development of resistance to xenobiotics and engulfment during programmed cell death. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/21"
+            },
+            {
+                "gene": "LPCAT1",
+                "explanation": "This gene encodes a member of the 1-acyl-sn-glycerol-3-phosphate acyltransferase family of proteins. The encoded enzyme plays a role in phospholipid metabolism, specifically in the conversion of lysophosphatidylcholine to phosphatidylcholine in the presence of acyl-CoA. This process is important in the synthesis of lung surfactant and platelet-activating factor (PAF). Elevated expression of this gene may contribute to the progression of oral squamous cell, prostate, breast, and other human cancers. [provided by RefSeq, Sep 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/79888"
+            },
+            {
+                "gene": "NAPSA",
+                "explanation": "This gene encodes a member of the peptidase A1 family of aspartic proteases. The encoded preproprotein is proteolytically processed to generate an activation peptide and the mature protease. The activation peptides of aspartic proteinases function as inhibitors of the protease active site. These peptide segments, or pro-parts, are deemed important for correct folding, targeting, and control of the activation of aspartic proteinase zymogens. The encoded protease may play a role in the proteolytic processing of pulmonary surfactant protein B in the lung and may function in protein catabolism in the renal proximal tubules. This gene has been described as a marker for lung adenocarcinoma and renal cell carcinoma. [provided by RefSeq, Feb 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9476"
+            },
+            {
+                "gene": "SFTPB",
+                "explanation": "This gene encodes the pulmonary-associated surfactant protein B (SPB), an amphipathic surfactant protein essential for lung function and homeostasis after birth. Pulmonary surfactant is a surface-active lipoprotein complex composed of 90% lipids and 10% proteins which include plasma proteins and apolipoproteins SPA, SPB, SPC and SPD. The surfactant is secreted by the alveolar cells of the lung and maintains the stability of pulmonary tissue by reducing the surface tension of fluids that coat the lung. The SPB enhances the rate of spreading and increases the stability of surfactant monolayers in vitro. Multiple mutations in this gene have been identified, which cause pulmonary surfactant metabolism dysfunction type 1, also called pulmonary alveolar proteinosis due to surfactant protein B deficiency, and are associated with fatal respiratory distress in the neonatal period. Alternatively spliced transcript variants encoding the same protein have been identified.[provided by RefSeq, Feb 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6439"
+            },
+            {
+                "gene": "SFTPC",
+                "explanation": "This gene encodes the pulmonary-associated surfactant protein C (SPC), an extremely hydrophobic surfactant protein essential for lung function and homeostasis after birth. Pulmonary surfactant is a surface-active lipoprotein complex composed of 90% lipids and 10% proteins which include plasma proteins and apolipoproteins SPA, SPB, SPC and SPD. The surfactant is secreted by the alveolar cells of the lung and maintains the stability of pulmonary tissue by reducing the surface tension of fluids that coat the lung. Multiple mutations in this gene have been identified, which cause pulmonary surfactant metabolism dysfunction type 2, also called pulmonary alveolar proteinosis due to surfactant protein C deficiency, and are associated with interstitial lung disease in older infants, children, and adults. Alternatively spliced transcript variants encoding different protein isoforms have been identified.[provided by RefSeq, Feb 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6440"
+            },
+            {
+                "gene": "SLC34A2",
+                "explanation": "The protein encoded by this gene is a pH-sensitive sodium-dependent phosphate transporter. Phosphate uptake is increased at lower pH. Defects in this gene are a cause of pulmonary alveolar microlithiasis. Three transcript variants encoding two different isoforms have been found for this gene. [provided by RefSeq, May 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10568"
+            }
+        ]
+    },
+    "M1 macrophage": {
+        "markers": [
+            {
+                "gene": "CXCL10",
+                "explanation": "This antimicrobial gene encodes a chemokine of the CXC subfamily and ligand for the receptor CXCR3. Binding of this protein to CXCR3 results in pleiotropic effects, including stimulation of monocytes, natural killer and T-cell migration, and modulation of adhesion molecule expression. This gene may also be a key regulator of the 'cytokine storm' immune response to SARS-CoV-2 infection. [provided by RefSeq, Sep 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3627"
+            }
+        ]
+    },
+    "M2 macrophage": {
+        "markers": [
+            {
+                "gene": "CCL18",
+                "explanation": "This antimicrobial gene is one of several Cys-Cys (CC) cytokine genes clustered on the q arm of chromosome 17. Cytokines are a family of secreted proteins involved in immunoregulatory and inflammatory processes. The CC cytokines are proteins characterized by two adjacent cysteines. The cytokine encoded by this gene displays chemotactic activity for naive T cells, CD4+ and CD8+ T cells and nonactivated lymphocytes, but not for monocytes or granulocytes. This chemokine attracts naive T lymphocytes toward dendritic cells and activated macrophages in lymph nodes. It may play a role in both humoral and cell-mediated immunity responses. [provided by RefSeq, Sep 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6362"
+            },
+            {
+                "gene": "CD163",
+                "explanation": "The protein encoded by this gene is a member of the scavenger receptor cysteine-rich (SRCR) superfamily, and is exclusively expressed in monocytes and macrophages. It functions as an acute phase-regulated receptor involved in the clearance and endocytosis of hemoglobin/haptoglobin complexes by macrophages, and may thereby protect tissues from free hemoglobin-mediated oxidative damage. This protein may also function as an innate immune sensor for bacteria and inducer of local inflammation. Alternatively spliced transcript variants encoding different isoforms have been described for this gene. [provided by RefSeq, Aug 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9332"
+            },
+            {
+                "gene": "CD68",
+                "explanation": "This gene encodes a 110-kD transmembrane glycoprotein that is highly expressed by human monocytes and tissue macrophages. It is a member of the lysosomal/endosomal-associated membrane glycoprotein (LAMP) family. The protein primarily localizes to lysosomes and endosomes with a smaller fraction circulating to the cell surface. It is a type I integral membrane protein with a heavily glycosylated extracellular domain and binds to tissue- and organ-specific lectins or selectins. The protein is also a member of the scavenger receptor family. Scavenger receptors typically function to clear cellular debris, promote phagocytosis, and mediate the recruitment and activation of macrophages. Alternative splicing results in multiple transcripts encoding different isoforms. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/968"
+            }
+        ]
+    },
+    "Macrophage": {
+        "markers": [
+            {
+                "gene": "CD163",
+                "explanation": "The protein encoded by this gene is a member of the scavenger receptor cysteine-rich (SRCR) superfamily, and is exclusively expressed in monocytes and macrophages. It functions as an acute phase-regulated receptor involved in the clearance and endocytosis of hemoglobin/haptoglobin complexes by macrophages, and may thereby protect tissues from free hemoglobin-mediated oxidative damage. This protein may also function as an innate immune sensor for bacteria and inducer of local inflammation. Alternatively spliced transcript variants encoding different isoforms have been described for this gene. [provided by RefSeq, Aug 2011]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9332"
+            },
+            {
+                "gene": "CCL18",
+                "explanation": "This antimicrobial gene is one of several Cys-Cys (CC) cytokine genes clustered on the q arm of chromosome 17. Cytokines are a family of secreted proteins involved in immunoregulatory and inflammatory processes. The CC cytokines are proteins characterized by two adjacent cysteines. The cytokine encoded by this gene displays chemotactic activity for naive T cells, CD4+ and CD8+ T cells and nonactivated lymphocytes, but not for monocytes or granulocytes. This chemokine attracts naive T lymphocytes toward dendritic cells and activated macrophages in lymph nodes. It may play a role in both humoral and cell-mediated immunity responses. [provided by RefSeq, Sep 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6362"
+            },
+            {
+                "gene": "CCL2",
+                "explanation": "This gene is one of several cytokine genes clustered on the q-arm of chromosome 17. Chemokines are a superfamily of secreted proteins involved in immunoregulatory and inflammatory processes. The superfamily is divided into four subfamilies based on the arrangement of N-terminal cysteine residues of the mature peptide. This chemokine is a member of the CC subfamily which is characterized by two adjacent cysteine residues. This cytokine displays chemotactic activity for monocytes and basophils but not for neutrophils or eosinophils. It has been implicated in the pathogenesis of diseases characterized by monocytic infiltrates, like psoriasis, rheumatoid arthritis and atherosclerosis. It binds to chemokine receptors CCR2 and CCR4. Elevated expression of the encoded protein is associated with severe acute respiratory syndrome coronavirus 2 (SARS&#8208;CoV&#8208;2) infection. [provided by RefSeq, Aug 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/6347"
+            },
+            {
+                "gene": "IL1RN",
+                "explanation": "The protein encoded by this gene is a member of the interleukin 1 cytokine family. This protein inhibits the activities of interleukin 1, alpha (IL1A) and interleukin 1, beta (IL1B), and modulates a variety of interleukin 1 related immune and inflammatory responses, particularly in the acute phase of infection and inflammation. This gene and five other closely related cytokine genes form a gene cluster spanning approximately 400 kb on chromosome 2. A polymorphism of this gene is reported to be associated with increased risk of osteoporotic fractures and gastric cancer. Several alternatively spliced transcript variants encoding distinct isoforms have been reported. [provided by RefSeq, Aug 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3557"
+            },
+            {
+                "gene": "CD68",
+                "explanation": "This gene encodes a 110-kD transmembrane glycoprotein that is highly expressed by human monocytes and tissue macrophages. It is a member of the lysosomal/endosomal-associated membrane glycoprotein (LAMP) family. The protein primarily localizes to lysosomes and endosomes with a smaller fraction circulating to the cell surface. It is a type I integral membrane protein with a heavily glycosylated extracellular domain and binds to tissue- and organ-specific lectins or selectins. The protein is also a member of the scavenger receptor family. Scavenger receptors typically function to clear cellular debris, promote phagocytosis, and mediate the recruitment and activation of macrophages. Alternative splicing results in multiple transcripts encoding different isoforms. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/968"
+            },
+            {
+                "gene": "CD14",
+                "explanation": "The protein encoded by this gene is a surface antigen that is preferentially expressed on monocytes/macrophages. It cooperates with other proteins to mediate the innate immune response to bacterial lipopolysaccharide, and to viruses. This gene has been identified as a target candidate in the treatment of SARS-CoV-2-infected patients to potentially lessen or inhibit a severe inflammatory response. Alternative splicing results in multiple transcript variants encoding the same protein. [provided by RefSeq, Aug 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/929"
+            }
+        ]
+    },
+    "Malignant mesothelioma cell": {
+        "markers": [
+            {
+                "gene": "MUC16",
+                "explanation": "This gene encodes a protein that is a member of the mucin family. Mucins are high molecular weight, O-glycosylated proteins that play an important role in forming a protective mucous barrier, and are found on the apical surfaces of the epithelia. The encoded protein is a membrane-tethered mucin that contains an extracellular domain at its amino terminus, a large tandem repeat domain, and a transmembrane domain with a short cytoplasmic domain. The amino terminus is highly glycosylated, while the repeat region contains 156 amino acid repeats unit that are rich in serines, threonines, and prolines. Interspersed within the repeats are Sea urchin sperm protein Enterokinase and Agrin (SEA) modules, leucine-rich repeats and ankyrin (ANK) repeats. These regions together form the ectodomain, and there is a potential cleavage site found near an SEA module close to the transmembrane domain. This protein is thought to play a role in forming a barrier, protecting epithelial cells from pathogens. Products of this gene have been used as a marker for different cancers, with higher expression levels associated with poorer outcomes. [provided by RefSeq, May 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/94025"
+            }
+        ]
+    },
+    "Mesothelial cell": {
+        "markers": [
+            {
+                "gene": "CDH2",
+                "explanation": "This gene encodes a classical cadherin and member of the cadherin superfamily. Alternative splicing results in multiple transcript variants, at least one of which encodes a preproprotein is proteolytically processed to generate a calcium-dependent cell adhesion molecule and glycoprotein. This protein plays a role in the establishment of left-right asymmetry, development of the nervous system and the formation of cartilage and bone. [provided by RefSeq, Nov 2015]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1000"
+            }
+        ]
+    },
+    "Migrating cancer stem cell": {
+        "markers": [
+            {
+                "gene": "MPL",
+                "explanation": "In 1990 an oncogene, v-mpl, was identified from the murine myeloproliferative leukemia virus that was capable of immortalizing bone marrow hematopoietic cells from different lineages. In 1992 the human homologue, named, c-mpl, was cloned. Sequence data revealed that c-mpl encoded a protein that was homologous with members of the hematopoietic receptor superfamily. Presence of anti-sense oligodeoxynucleotides of c-mpl inhibited megakaryocyte colony formation. The ligand for c-mpl, thrombopoietin, was cloned in 1994. Thrombopoietin was shown to be the major regulator of megakaryocytopoiesis and platelet formation. The protein encoded by the c-mpl gene, CD110, is a 635 amino acid transmembrane domain, with two extracellular cytokine receptor domains and two intracellular cytokine receptor box motifs . TPO-R deficient mice were severely thrombocytopenic, emphasizing the important role of CD110 and thrombopoietin in megakaryocyte and platelet formation. Upon binding of thrombopoietin CD110 is dimerized and the JAK family of non-receptor tyrosine kinases, as well as the STAT family, the MAPK family, the adaptor protein Shc and the receptors themselves become tyrosine phosphorylated. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/4352"
+            },
+            {
+                "gene": "CDCP1",
+                "explanation": "This gene encodes a transmembrane protein which contains three extracellular CUB domains and acts as a substrate for Src family kinases. The protein plays a role in the tyrosine phosphorylation-dependent regulation of cellular events that are involved in tumor invasion and metastasis. Alternative splicing results in multiple transcript variants of this gene. [provided by RefSeq, May 2013]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/64866"
+            }
+        ]
+    },
+    "Monocyte": {
+        "markers": [
+            {
+                "gene": "CD14",
+                "explanation": "The protein encoded by this gene is a surface antigen that is preferentially expressed on monocytes/macrophages. It cooperates with other proteins to mediate the innate immune response to bacterial lipopolysaccharide, and to viruses. This gene has been identified as a target candidate in the treatment of SARS-CoV-2-infected patients to potentially lessen or inhibit a severe inflammatory response. Alternative splicing results in multiple transcript variants encoding the same protein. [provided by RefSeq, Aug 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/929"
+            },
+            {
+                "gene": "CD36",
+                "explanation": "The protein encoded by this gene is the fourth major glycoprotein of the platelet surface and serves as a receptor for thrombospondin in platelets and various cell lines. Since thrombospondins are widely distributed proteins involved in a variety of adhesive processes, this protein may have important functions as a cell adhesion molecule. It binds to collagen, thrombospondin, anionic phospholipids and oxidized LDL. It directly mediates cytoadherence of Plasmodium falciparum parasitized erythrocytes and it binds long chain fatty acids and may function in the transport and/or as a regulator of fatty acid transport. Mutations in this gene cause platelet glycoprotein deficiency. Multiple alternatively spliced transcript variants have been found for this gene. [provided by RefSeq, Feb 2014]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/948"
+            },
+            {
+                "gene": "CD68",
+                "explanation": "This gene encodes a 110-kD transmembrane glycoprotein that is highly expressed by human monocytes and tissue macrophages. It is a member of the lysosomal/endosomal-associated membrane glycoprotein (LAMP) family. The protein primarily localizes to lysosomes and endosomes with a smaller fraction circulating to the cell surface. It is a type I integral membrane protein with a heavily glycosylated extracellular domain and binds to tissue- and organ-specific lectins or selectins. The protein is also a member of the scavenger receptor family. Scavenger receptors typically function to clear cellular debris, promote phagocytosis, and mediate the recruitment and activation of macrophages. Alternative splicing results in multiple transcripts encoding different isoforms. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/968"
+            }
+        ]
+    },
+    "Myofibroblast": {
+        "markers": [
+            {
+                "gene": "ACTA2",
+                "explanation": "This gene encodes one of six different actin proteins. Actins are highly conserved proteins that are involved in cell motility, structure, integrity, and intercellular signaling. The encoded protein is a smooth muscle actin that is involved in vascular contractility and blood pressure homeostasis. Mutations in this gene cause a variety of vascular diseases, such as thoracic aortic disease, coronary artery disease, stroke, and Moyamoya disease, as well as multisystemic smooth muscle dysfunction syndrome. [provided by RefSeq, Sep 2017]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/59"
+            },
+            {
+                "gene": "FN1",
+                "explanation": "This gene encodes fibronectin, a glycoprotein present in a soluble dimeric form in plasma, and in a dimeric or multimeric form at the cell surface and in extracellular matrix. The encoded preproprotein is proteolytically processed to generate the mature protein. Fibronectin is involved in cell adhesion and migration processes including embryogenesis, wound healing, blood coagulation, host defense, and metastasis. The gene has three regions subject to alternative splicing, with the potential to produce 20 different transcript variants, at least one of which encodes an isoform that undergoes proteolytic processing. The full-length nature of some variants has not been determined. [provided by RefSeq, Jan 2016]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2335"
+            },
+            {
+                "gene": "DES",
+                "explanation": "This gene encodes a muscle-specific class III intermediate filament. Homopolymers of this protein form a stable intracytoplasmic filamentous network connecting myofibrils to each other and to the plasma membrane. Mutations in this gene are associated with desmin-related myopathy, a familial cardiac and skeletal myopathy (CSM), and with distal myopathies. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1674"
+            }
+        ]
+    },
+    "Natural killer cell": {
+        "markers": [
+            {
+                "gene": "NCR1",
+                "explanation": "Predicted to be involved in cellular defense response; regulation of natural killer cell mediated cytotoxicity; and signal transduction. Predicted to act upstream of or within defense response to virus and detection of virus. Predicted to be located in cell surface. Predicted to be part of SWI/SNF complex. Predicted to be active in plasma membrane. Biomarker of acquired immunodeficiency syndrome; anogenital venereal wart; hepatitis C; and lymphoproliferative syndrome. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/9437"
+            }
+        ]
+    },
+    "Neutrophil": {
+        "markers": [
+            {
+                "gene": "ITGAM",
+                "explanation": "This gene encodes the integrin alpha M chain. Integrins are heterodimeric integral membrane proteins composed of an alpha chain and a beta chain. This I-domain containing alpha integrin combines with the beta 2 chain (ITGB2) to form a leukocyte-specific integrin referred to as macrophage receptor 1 ('Mac-1'), or inactivated-C3b (iC3b) receptor 3 ('CR3'). The alpha M beta 2 integrin is important in the adherence of neutrophils and monocytes to stimulated endothelium, and also in the phagocytosis of complement coated particles. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Mar 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3684"
+            },
+            {
+                "gene": "CEACAM8",
+                "explanation": "Enables protein heterodimerization activity. Involved in heterophilic cell-cell adhesion via plasma membrane cell adhesion molecules. Located in cell surface and extracellular space. Biomarker of severe acute respiratory syndrome. [provided by Alliance of Genome Resources, Apr 2022]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/1088"
+            }
+        ]
+    },
+    "Plasmacytoid dendritic cell": {
+        "markers": [
+            {
+                "gene": "NRP1",
+                "explanation": "This gene encodes one of two neuropilins, which contain specific protein domains which allow them to participate in several different types of signaling pathways that control cell migration. Neuropilins contain a large N-terminal extracellular domain, made up of complement-binding, coagulation factor V/VIII, and meprin domains. These proteins also contains a short membrane-spanning domain and a small cytoplasmic domain. Neuropilins bind many ligands and various types of co-receptors; they affect cell survival, migration, and attraction. Some of the ligands and co-receptors bound by neuropilins are vascular endothelial growth factor (VEGF) and semaphorin family members. This protein has also been determined to act as a co-receptor for SARS-CoV-2 (which causes COVID-19) to infect host cells. [provided by RefSeq, Nov 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/8829"
+            },
+            {
+                "gene": "THBD",
+                "explanation": "Error fetching data for THBD: HTTP Error 400: Bad Request",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/7056"
+            }
+        ]
+    },
+    "T cell": {
+        "markers": [
+            {
+                "gene": "IL2RA",
+                "explanation": "The interleukin 2 (IL2) receptor alpha (IL2RA) and beta (IL2RB) chains, together with the common gamma chain (IL2RG), constitute the high-affinity IL2 receptor. Homodimeric alpha chains (IL2RA) result in low-affinity receptor, while homodimeric beta (IL2RB) chains produce a medium-affinity receptor. Normally an integral-membrane protein, soluble IL2RA has been isolated and determined to result from extracellular proteolyisis. Alternately-spliced IL2RA mRNAs have been isolated, but the significance of each is presently unknown. Mutations in this gene are associated with interleukin 2 receptor alpha deficiency. Patients with severe Coronavirus Disease 2019 (COVID-19), the disease caused by the novel severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2), have significantly elevated levels of IL2R in their plasma. Similarly, serum IL-2R levels are found to be elevated in patients with different types of carcinomas. Certain IL2RA and IL2RB gene polymorphisms have been associated with lung cancer risk. [provided by RefSeq, Jul 2020]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/3559"
+            },
+            {
+                "gene": "FOXP3",
+                "explanation": "The protein encoded by this gene is a member of the forkhead/winged-helix family of transcriptional regulators. Defects in this gene are the cause of immunodeficiency polyendocrinopathy, enteropathy, X-linked syndrome (IPEX), also known as X-linked autoimmunity-immunodeficiency syndrome. Alternatively spliced transcript variants encoding different isoforms have been identified. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/50943"
+            }
+        ]
+    },
+    "T helper cell": {
+        "markers": [
+            {
+                "gene": "GP1BA",
+                "explanation": "Glycoprotein Ib (GP Ib) is a platelet surface membrane glycoprotein composed of a heterodimer, an alpha chain and a beta chain, that is linked by disulfide bonds. The Gp Ib functions as a receptor for von Willebrand factor (VWF). The complete receptor complex includes noncovalent association of the alpha and beta subunits with platelet glycoprotein IX and platelet glycoprotein V. The binding of the GP Ib-IX-V complex to VWF facilitates initial platelet adhesion to vascular subendothelium after vascular injury, and also initiates signaling events within the platelet that lead to enhanced platelet activation, thrombosis, and hemostasis. This gene encodes the alpha subunit. Mutations in this gene result in Bernard-Soulier syndromes and platelet-type von Willebrand disease. The coding region of this gene is known to contain a polymophic variable number tandem repeat (VNTR) domain that is associated with susceptibility to nonarteritic anterior ischemic optic neuropathy. [provided by RefSeq, Oct 2013]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/2811"
+            }
+        ]
+    },
+    "Type II pneumocyte": {
+        "markers": [
+            {
+                "gene": "PGC",
+                "explanation": "This gene encodes an aspartic proteinase that belongs to the peptidase family A1. The encoded protein is a digestive enzyme that is produced in the stomach and constitutes a major component of the gastric mucosa. This protein is also secreted into the serum. This protein is synthesized as an inactive zymogen that includes a highly basic prosegment. This enzyme is converted into its active mature form at low pH by sequential cleavage of the prosegment that is carried out by the enzyme itself. Polymorphisms in this gene are associated with susceptibility to gastric cancers. Serum levels of this enzyme are used as a biomarker for certain gastric diseases including Helicobacter pylori related gastritis. Alternate splicing results in multiple transcript variants. A pseudogene of this gene is found on chromosome 1. [provided by RefSeq, Oct 2009]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/5225"
+            },
+            {
+                "gene": "CD44",
+                "explanation": "The protein encoded by this gene is a cell-surface glycoprotein involved in cell-cell interactions, cell adhesion and migration. It is a receptor for hyaluronic acid (HA) and can also interact with other ligands, such as osteopontin, collagens, and matrix metalloproteinases (MMPs). This protein participates in a wide variety of cellular functions including lymphocyte activation, recirculation and homing, hematopoiesis, and tumor metastasis. Transcripts for this gene undergo complex alternative splicing that results in many functionally distinct isoforms, however, the full length nature of some of these variants has not been determined. Alternative splicing is the basis for the structural and functional diversity of this protein, and may be related to tumor metastasis. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/960"
+            },
+            {
+                "gene": "ABCA3",
+                "explanation": "The membrane-associated protein encoded by this gene is a member of the superfamily of ATP-binding cassette (ABC) transporters.  ABC proteins transport various molecules across extra- and intracellular membranes.  ABC genes are divided into seven distinct subfamilies (ABC1, MDR/TAP, MRP, ALD, OABP, GCN20, White).  This protein is a member of the ABC1 subfamily.  Members of the ABC1 subfamily comprise the only major ABC subfamily found exclusively in multicellular eukaryotes.  The full transporter encoded by this gene may be involved in development of resistance to xenobiotics and engulfment during programmed cell death. [provided by RefSeq, Jul 2008]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/21"
+            },
+            {
+                "gene": "SLC34A2",
+                "explanation": "The protein encoded by this gene is a pH-sensitive sodium-dependent phosphate transporter. Phosphate uptake is increased at lower pH. Defects in this gene are a cause of pulmonary alveolar microlithiasis. Three transcript variants encoding two different isoforms have been found for this gene. [provided by RefSeq, May 2010]",
+                "source": "https://www.ncbi.nlm.nih.gov/gene/10568"
+            }
+        ]
+    }
+}
