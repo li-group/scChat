@@ -1528,7 +1528,7 @@ def get_rag():
     """Retrieve marker genes using Neo4j graph database."""
     # Initialize Neo4j connection
     uri = "bolt://localhost:7687"
-    driver = GraphDatabase.driver(uri, auth=("neo4j", "DBMSPassword"))
+    driver = GraphDatabase.driver(uri, auth=("neo4j", "37754262"))
     
     # Load specification from JSON
     specification = None
@@ -1761,6 +1761,8 @@ def preprocess_data(adata, sample_mapping=None):
     adata.var['mt'] = adata.var_names.str.startswith('MT-')
     sc.pp.calculate_qc_metrics(adata, qc_vars=['mt'], percent_top=None, log1p=False, inplace=True)
     adata = adata[adata.obs.pct_counts_mt < 20]
+    non_mt_mask = ~adata.var['mt']
+    adata = adata[:, non_mt_mask].copy()
     adata.layers['counts'] = adata.X.copy()  # used by scVI-tools
     
     # Normalization
@@ -2059,6 +2061,10 @@ def generate_umap(resolution=2):
     )
     results = model.invoke(messages)
     annotation_result = results.content
+    pth = "annotated_adata/Overall cells_annotated_adata.pkl"
+    os.makedirs(os.path.dirname(pth), exist_ok=True)
+    with open(pth, "wb") as file:
+        pickle.dump(adata, file)
     label_clusters(adata=adata, cell_type="Overall", annotation_result=annotation_result)
     print(annotation_result)
     #done adding
