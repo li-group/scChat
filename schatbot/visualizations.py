@@ -344,8 +344,10 @@ def display_processed_umap(cell_type: str) -> str:
     cell_type_formatted = cell_type.split()[0].capitalize() + " cells"
     import os
     if os.path.exists(f'umaps/annotated/{cell_type_formatted}_umap_data.csv'):
+        print (f'umaps/annotated/{cell_type_formatted}_umap_data.csv')
         umap_data = pd.read_csv(f'umaps/annotated/{cell_type_formatted}_umap_data.csv')
     else:
+        print (f'umaps/annotated/{cell_type_formatted}_umap_data.csv')
         umap_data = pd.read_csv(f'umaps/annotated/{cell_type_cell}_umap_data.csv')
     fig = px.scatter(
         umap_data,

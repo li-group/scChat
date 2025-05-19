@@ -203,8 +203,14 @@ class ChatBot:
                 "required": ["analysis","cell_type"]
             }
         }
-
         ]
+
+        def _wrap_process_cells(cell_type, resolution=None):
+            print ("Here now", cell_type)
+            # call your standalone function
+            annotation_str = process_cells(self.adata, cell_type, resolution)
+            print ("ANNOTATION STR", annotation_str)
+            return annotation_str
         
         # Map function names to actual functions
         self.function_mapping = {
@@ -222,7 +228,15 @@ class ChatBot:
             # "display_reactome_barplot": display_reactome_barplot,
             "display_enrichment_barplot": display_enrichment_barplot,
             "display_enrichment_dotplot": display_enrichment_dotplot,
-            "process_cells":process_cells
+            # "process_cells":process_cells
+            # "process_cells": lambda cell_type, resolution=None: process_cells(
+            #     self.adata, cell_type, resolution
+            # ),
+            # "process_cells": lambda cell_type, resolution=None: (
+            #     process_cells(cell_type, resolution)
+            # ),
+            "process_cells": _wrap_process_cells
+
         }
 
     def send_message(self, message: str) -> str:
@@ -256,6 +270,7 @@ class ChatBot:
 
         # If a function call is produced with minimal context, process it.
         if output.function_call:
+            print ("OUTPUT ", output)
             function_name = output.function_call.name
             function_args = output.function_call.arguments
             if function_args:
@@ -308,7 +323,7 @@ class ChatBot:
                 if function_name in ["display_umap", "display_processed_umap", "display_dotplot", "display_cell_type_composition", "display_gsea_dotplot", "display_enrichment_barplot","display_enrichment_dotplot"]:
                     # Do NOT add the visualization result to conversation history.
                     return json.dumps({"response": "", "graph_html": result})
-                elif function_name != "generate_umap":
+                elif function_name != "generate_umap" and function_name != "process_cells":
                     self.conversation_history.append({"role": "user", "content": message})
                     self.conversation_history.append({"role": "assistant", "content": result})
                     new_response = openai.chat.completions.create(

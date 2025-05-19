@@ -1931,6 +1931,9 @@ def rank_ordering(adata_or_result, key=None, n_genes=25):
 def save_analysis_results(adata, prefix, leiden_key='leiden', save_umap=True, 
                          save_dendrogram=True, save_dotplot=False, markers=None):
     """Save analysis results to files with consistent naming."""
+    out_dir = os.path.dirname(prefix)
+    if out_dir and not os.path.exists(out_dir):
+        os.makedirs(out_dir, exist_ok=True)
     # Save UMAP data
     print ("X1")
     if save_umap:
@@ -2071,128 +2074,249 @@ def generate_umap(resolution=2):
     return gene_dict, marker_tree, adata #new
     # return str(annotation_result)
 
-def process_cells(adata, cell_type, resolution=None):
-    """Process specific cell type with consistent workflow."""
-    if resolution is None:
-        resolution = 1  # Default higher resolution for subtype clustering
+# def process_cells(adata, cell_type, resolution=None):
+#     """Process specific cell type with consistent workflow."""
+#     if resolution is None:
+#         resolution = 1  # Default higher resolution for subtype clustering
+#     print ("in process cells ", cell_type)
+#     # Get all possible variations of the cell type for matching
+#     possible_types = get_possible_cell_types(cell_type)
+#     standardized_name = unified_cell_type_handler(cell_type)
     
-    # Get all possible variations of the cell type for matching
-    possible_types = get_possible_cell_types(cell_type)
-    standardized_name = unified_cell_type_handler(cell_type)
+#     # Filter cells based on cell type with flexible matching
+#     mask = adata.obs['cell_type'].isin(possible_types)
+#     if mask.sum() == 0:
+#         print(f"WARNING: No cells found with cell type matching any of these variations: {possible_types}")
+#         return None, None, None
     
-    # Filter cells based on cell type with flexible matching
-    mask = adata.obs['cell_type'].isin(possible_types)
-    if mask.sum() == 0:
-        print(f"WARNING: No cells found with cell type matching any of these variations: {possible_types}")
-        return None, None, None
+#     filtered_cells = adata[mask].copy()
     
-    filtered_cells = adata[mask].copy()
+#     # Perform new clustering on filtered cells
+#     sc.tl.pca(filtered_cells, svd_solver='arpack')
+#     sc.pp.neighbors(filtered_cells)
+#     filtered_cells = perform_clustering(filtered_cells, resolution=resolution)
     
-    # Perform new clustering on filtered cells
-    sc.tl.pca(filtered_cells, svd_solver='arpack')
-    sc.pp.neighbors(filtered_cells)
-    filtered_cells = perform_clustering(filtered_cells, resolution=resolution)
+#     # Create ranking key based on cell type
+#     # Use standardized base form for key naming
+#     base_form = standardize_cell_type(cell_type).replace(' ', '_').lower()
+#     rank_key = f"rank_genes_{base_form}"
     
-    # Create ranking key based on cell type
-    # Use standardized base form for key naming
-    base_form = standardize_cell_type(cell_type).replace(' ', '_').lower()
-    rank_key = f"rank_genes_{base_form}"
+#     # Rank genes for the filtered cells
+#     filtered_cells = rank_genes(filtered_cells, key_added=rank_key)
     
-    # Rank genes for the filtered cells
-    filtered_cells = rank_genes(filtered_cells, key_added=rank_key)
+#     # Get markers and create marker-specific sub-AnnData if needed
+#     markers = get_subtypes(cell_type)
+#     markers_tree = markers.copy()
+#     markers_list = extract_genes(markers)
     
-    # Get markers and create marker-specific sub-AnnData if needed
-    markers = get_subtypes(cell_type)
-    markers_tree = markers.copy()
-    markers_list = extract_genes(markers)
-    
-    # Check if we have enough markers
-    if not markers_list:
-        print(f"WARNING: No marker genes found for {standardized_name}. Using general ranking.")
-        # Use general ranking instead
-        top_genes_df = rank_ordering(filtered_cells, key=rank_key, n_genes=25)
+#     # Check if we have enough markers
+#     if not markers_list:
+#         print(f"WARNING: No marker genes found for {standardized_name}. Using general ranking.")
+#         # Use general ranking instead
+#         top_genes_df = rank_ordering(filtered_cells, key=rank_key, n_genes=25)
         
-        # Create gene dictionary
-        gene_dict = {}
-        for cluster, group in top_genes_df.groupby("cluster"):
-            gene_dict[cluster] = list(group["gene"])
+#         # Create gene dictionary
+#         gene_dict = {}
+#         for cluster, group in top_genes_df.groupby("cluster"):
+#             gene_dict[cluster] = list(group["gene"])
         
-        # Create dendrogram
-        sc.tl.dendrogram(filtered_cells, groupby='leiden')
+#         # Create dendrogram
+#         sc.tl.dendrogram(filtered_cells, groupby='leiden')
         
-        # Save data
-        save_analysis_results(
-            filtered_cells,
-            prefix=f"process_cell_data/{standardized_name}",
-            save_dotplot=False
-        )
+#         # Save data
+#         save_analysis_results(
+#             filtered_cells,
+#             prefix=f"process_cell_data/{standardized_name}",
+#             save_dotplot=False
+#         )
         
-        # Save processed data
-        umap_df = filtered_cells.obs[['UMAP_1', 'UMAP_2', 'leiden', 'cell_type']]
-        if 'patient_name' in filtered_cells.obs.columns:
-            umap_df['patient_name'] = filtered_cells.obs['patient_name']
+#         # Save processed data
+#         umap_df = filtered_cells.obs[['UMAP_1', 'UMAP_2', 'leiden', 'cell_type']]
+#         if 'patient_name' in filtered_cells.obs.columns:
+#             umap_df['patient_name'] = filtered_cells.obs['patient_name']
             
-        fname = f'{standardized_name}_adata_processed.pkl'
-        with open(fname, 'wb') as file:
-            pickle.dump(umap_df, file)
+#         fname = f'{standardized_name}_adata_processed.pkl'
+#         with open(fname, 'wb') as file:
+#             pickle.dump(umap_df, file)
         
 
-        return gene_dict, filtered_cells, markers_tree
+#         return gene_dict, filtered_cells, markers_tree
     
-    # Rest of the function remains the same, but using standardized_name instead of 
-    # the previous f"{cell_type_cap} cells" format for file paths and variable names
+#     # Rest of the function remains the same, but using standardized_name instead of 
+#     # the previous f"{cell_type_cap} cells" format for file paths and variable names
     
-    # Create marker-specific AnnData
-    filtered_markers, marker_list = create_marker_anndata(filtered_cells, markers_list)
+#     # Create marker-specific AnnData
+#     filtered_markers, marker_list = create_marker_anndata(filtered_cells, markers_list)
     
-    # Skip marker-specific ranking if fewer than 5 markers were found
-    if len(marker_list) < 5:
-        print(f"WARNING: Only {len(marker_list)} marker genes found. Using general gene ranking.")
-        # Use general ranking instead
-        top_genes_df = rank_ordering(filtered_cells, key=rank_key, n_genes=25)
-    else:
-        try:
-            # Rank marker genes
-            marker_key = f"rank_markers_{base_form}"
-            filtered_markers = rank_genes(filtered_markers, key_added=marker_key)
+#     # Skip marker-specific ranking if fewer than 5 markers were found
+#     if len(marker_list) < 5:
+#         print(f"WARNING: Only {len(marker_list)} marker genes found. Using general gene ranking.")
+#         # Use general ranking instead
+#         top_genes_df = rank_ordering(filtered_cells, key=rank_key, n_genes=25)
+#     else:
+#         try:
+#             # Rank marker genes
+#             marker_key = f"rank_markers_{base_form}"
+#             filtered_markers = rank_genes(filtered_markers, key_added=marker_key)
             
-            # Copy marker ranking to filtered dataset
-            filtered_cells.uns[marker_key] = filtered_markers.uns[marker_key]
+#             # Copy marker ranking to filtered dataset
+#             filtered_cells.uns[marker_key] = filtered_markers.uns[marker_key]
             
-            # Extract top genes with preference for marker-specific ranking
-            top_genes_df = rank_ordering(filtered_markers, key=marker_key, n_genes=25)
-        except Exception as e:
-            print(f"ERROR in marker-specific ranking: {e}")
-            print("Falling back to general ranking")
-            # Use general ranking in case of any error
-            top_genes_df = rank_ordering(filtered_cells, key=rank_key, n_genes=25)
+#             # Extract top genes with preference for marker-specific ranking
+#             top_genes_df = rank_ordering(filtered_markers, key=marker_key, n_genes=25)
+#         except Exception as e:
+#             print(f"ERROR in marker-specific ranking: {e}")
+#             print("Falling back to general ranking")
+#             # Use general ranking in case of any error
+#             top_genes_df = rank_ordering(filtered_cells, key=rank_key, n_genes=25)
     
-    # Create gene dictionary
-    gene_dict = {}
-    for cluster, group in top_genes_df.groupby("cluster"):
-        gene_dict[cluster] = list(group["gene"])
+#     # Create gene dictionary
+#     gene_dict = {}
+#     for cluster, group in top_genes_df.groupby("cluster"):
+#         gene_dict[cluster] = list(group["gene"])
     
-    # Create dendrogram
-    sc.tl.dendrogram(filtered_cells, groupby='leiden')
+#     # Create dendrogram
+#     sc.tl.dendrogram(filtered_cells, groupby='leiden')
     
-    # Save data
-    save_analysis_results(
-        filtered_cells,
-        prefix=f"process_cell_data/{standardized_name}",
-        save_dotplot=len(marker_list) >= 5,
-        markers=marker_list
-    )
+#     # Save data
+#     save_analysis_results(
+#         filtered_cells,
+#         prefix=f"process_cell_data/{standardized_name}",
+#         save_dotplot=len(marker_list) >= 5,
+#         markers=marker_list
+#     )
     
-    # Save processed data
-    umap_df = filtered_cells.obs[['UMAP_1', 'UMAP_2', 'leiden', 'cell_type']]
-    if 'patient_name' in filtered_cells.obs.columns:
-        umap_df['patient_name'] = filtered_cells.obs['patient_name']
+#     # Save processed data
+#     umap_df = filtered_cells.obs[['UMAP_1', 'UMAP_2', 'leiden', 'cell_type']]
+#     if 'patient_name' in filtered_cells.obs.columns:
+#         umap_df['patient_name'] = filtered_cells.obs['patient_name']
         
-    fname = f'{standardized_name}_adata_processed.pkl'
-    with open(fname, 'wb') as file:
-        pickle.dump(umap_df, file)
+#     fname = f'{standardized_name}_adata_processed.pkl'
+#     with open(fname, 'wb') as file:
+#         pickle.dump(umap_df, file)
     
-    return gene_dict, filtered_cells, markers_tree
+#     return gene_dict, filtered_cells, markers_tree
+
+
+def process_cells(adata, cell_type, resolution=None):
+    """
+    Process specific cell type with full workflow:
+      1) Subset and recluster
+      2) Rank genes (general + marker-based)
+      3) GPT‐driven annotation → label_clusters
+      4) Save UMAP/dendrogram/dot-plot CSVs + pickles
+      5) Return (gene_dict, filtered_cells, markers_tree)
+    """
+    if resolution is None:
+        resolution = 1
+
+    print("in process cells", cell_type)
+    # ── 1) Subset ──
+    possible_types = get_possible_cell_types(cell_type)
+    standardized_name = unified_cell_type_handler(cell_type)
+    mask = adata.obs["cell_type"].isin(possible_types)
+    if mask.sum() == 0:
+        print(f"WARNING: No cells found matching {possible_types}")
+        return {}, None, None
+
+    filtered = adata[mask].copy()
+
+    # ── 2) Reclustering ──
+    sc.tl.pca(filtered, svd_solver='arpack')
+    sc.pp.neighbors(filtered)
+    filtered = perform_clustering(filtered, resolution=resolution)
+    sc.tl.dendrogram(filtered, groupby='leiden')
+
+    # ── 3) Rank genes ──
+    base = standardize_cell_type(cell_type).replace(' ', '_').lower()
+    rank_key = f"rank_genes_{base}"
+    filtered = rank_genes(filtered, key_added=rank_key)
+
+    # ── 4) Marker-based reranking ──
+    markers_tree = get_subtypes(cell_type)
+    markers_list = extract_genes(markers_tree)
+    if markers_list and len(markers_list) >= 5:
+        madata, _ = create_marker_anndata(filtered, markers_list)
+        try:
+            mk = f"rank_markers_{base}"
+            madata = rank_genes(madata, key_added=mk)
+            filtered.uns[mk] = madata.uns[mk]
+            top_df = rank_ordering(madata, key=mk, n_genes=25)
+        except Exception as e:
+            print(f"Marker ranking failed: {e}")
+            top_df = rank_ordering(filtered, key=rank_key, n_genes=25)
+    else:
+        top_df = rank_ordering(filtered, key=rank_key, n_genes=25)
+
+    # ── 5) Build gene_dict ──
+    gene_dict = {grp: list(gr["gene"]) for grp, gr in top_df.groupby("cluster")}
+
+    # ── 6) Save subset analysis ──
+    # save_analysis_results(
+    #     filtered,
+    #     prefix=f"process_cell_data/{standardized_name}",
+    #     save_dotplot=bool(markers_list and len(markers_list) >= 5),
+    #     markers=markers_list
+    # )
+    with open(f"{standardized_name}_adata_processed.pkl", "wb") as f:
+        pickle.dump(filtered, f)
+
+    # ── 7) GPT annotation ──
+    prompt = (f"Top genes details: {gene_dict}. "
+              f"Markers: {markers_tree}.")
+    messages = [
+        SystemMessage(content="""
+            You are a bioinformatics researcher that can do cell annotation.
+            You will receive:
+            1. A gene list of top 25 marker genes per cluster.
+            2. A marker tree to guide annotation.
+            Identify the most specific cell type for each cluster and return
+            strictly a Python dict mapping cluster IDs to cell types,
+            e.g. {'0':'T cells','1':'B cells',...}.
+        """),
+        HumanMessage(content=prompt)
+    ]
+    model = ChatOpenAI(model="gpt-4o", temperature=0)
+    results = model.invoke(messages)
+    annotation_result = results.content
+
+    # ── 8) Save & apply annotation to the subset ──
+    pth = f"annotated_adata/{standardized_name}_annotated_adata.pkl"
+    os.makedirs(os.path.dirname(pth), exist_ok=True)
+    with open(pth, "wb") as f:
+        pickle.dump(filtered, f)
+
+    label_clusters(annotation_result=annotation_result,
+                   cell_type=cell_type,
+                   adata=filtered)
+
+    # ── 9) Merge annotations back into original adata ──
+    adata.obs.loc[mask, 'cell_type'] = filtered.obs['cell_type']
+    print ("FINISHED 9", annotation_result)
+    # ── 10) Re‐save the overall UMAP in umaps/ so display_processed_umap picks it up ──
+    # save_analysis_results(
+    #     adata,
+    #     prefix="umaps/Overall cells",
+    #     save_umap=True,
+    #     save_dendrogram=False,
+    #     save_dotplot=False
+    # )
+        # Ensure the annotated UMAP directory exists
+    out_dir = "umaps/annotated"
+    os.makedirs(out_dir, exist_ok=True)
+
+    # Build the dataframe to save
+    overall_df = adata.obs[['UMAP_1', 'UMAP_2', 'cell_type']].copy()
+    if 'patient_name' in adata.obs.columns:
+        overall_df['patient_name'] = adata.obs['patient_name']
+
+    # 3) Save to "Overall cells_umap_data.csv"
+    overall_df.to_csv(os.path.join(out_dir, "Overall cells_umap_data.csv"), index=False)
+    # ── 9) Return ──
+    return_val = str(annotation_result) 
+    # return gene_dict, filtered, markers_tree
+    return return_val
+
 
 def label_clusters(annotation_result, cell_type, adata):
     """Label clusters with consistent cell type handling."""
