@@ -139,7 +139,6 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
             f"results_raw_{cell_type}.csv"
             )
             reactome_enrichment_results.to_csv(raw_output_filename, index=False)
-            print(f"Saved raw Reactome results to {raw_output_filename}")
 
         
         # Post-processing
@@ -207,7 +206,6 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
                     f"results_summary_{cell_type}.csv"
                 )
                 reactome_output_df.to_csv(summary_output_filename, index=False)
-                print(f"Saved summary Reactome results to {summary_output_filename}")
             
             # Visualization
             if save_plots:
@@ -220,7 +218,6 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
                         min_non_zero_p = significant_df[significant_df['p_value'] > 0]['p_value'].min()
                         replacement_p = min_non_zero_p / 1000 if pd.notna(min_non_zero_p) and min_non_zero_p > 0 else 1e-300
                         significant_df['p_value'] = significant_df['p_value'].replace(0, replacement_p)
-                        print(f"Replaced 0 p-values with {replacement_p} for plotting.")
                     
                     # Calculate -log10(p-value)
                     significant_df['-log10(p_value)'] = -np.log10(significant_df['p_value'])
@@ -254,7 +251,6 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
                         )
                         plt.savefig(barplot_filename, dpi=300, bbox_inches='tight')
                         plt.close()
-                        print(f"Saved Reactome bar plot to {barplot_filename}")
                         
                         # --- Dot plot ---
                         # Sort by average log2FC for dot plot ordering
@@ -303,7 +299,6 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
                         )
                         plt.savefig(dotplot_filename, dpi=300, bbox_inches='tight')
                         plt.close()
-                        print(f"Saved Reactome dot plot to {dotplot_filename}")
                     else:
                         print(f"No significant terms found for plotting after filtering (p < {p_value_threshold}) for {cell_type}.")
                 else:
@@ -394,7 +389,6 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                     f"results_raw_{cell_type}.csv"
                 )
                 go_enrichment_results.to_csv(raw_output_filename, index=False)
-                print(f"Saved raw GO {domain} results to {raw_output_filename}")
             
             # Post-processing
             go_enrichment_dict = {}
@@ -461,7 +455,6 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                         f"results_summary_{cell_type}.csv"
                     )
                     go_output_df.to_csv(summary_output_filename, index=False)
-                    print(f"Saved summary GO {domain} results to {summary_output_filename}")
                 
                 # Visualization
                 if save_plots:
@@ -474,7 +467,6 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                             min_non_zero_p = significant_df[significant_df['p_value'] > 0]['p_value'].min()
                             replacement_p = min_non_zero_p / 1000 if pd.notna(min_non_zero_p) and min_non_zero_p > 0 else 1e-300
                             significant_df['p_value'] = significant_df['p_value'].replace(0, replacement_p)
-                            print(f"Replaced 0 p-values with {replacement_p} for plotting.")
                         
                         # Calculate -log10(p-value)
                         significant_df['-log10(p_value)'] = -np.log10(significant_df['p_value'])
@@ -504,7 +496,6 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                             barplot_filename = f'{domain_prefix}_barplot_{cell_type}.png'
                             plt.savefig(barplot_filename, dpi=300, bbox_inches='tight')
                             plt.close()
-                            print(f"Saved GO {domain} bar plot to {barplot_filename}")
                             
                             # --- Dot plot ---
                             # Sort by average log2FC for dot plot ordering
@@ -549,7 +540,6 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                             dotplot_filename = f'{domain_prefix}_dotplot_{cell_type}.png'
                             plt.savefig(dotplot_filename, dpi=300, bbox_inches='tight')
                             plt.close()
-                            print(f"Saved GO {domain} dot plot to {dotplot_filename}")
                         else:
                             print(f"No significant terms found for plotting after filtering (p < {p_value_threshold}) for {cell_type}, {domain}.")
                     else:
@@ -623,7 +613,6 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
             f"results_raw_{cell_type}.csv"
             )
             kegg_enrichment_results.to_csv(raw_output_filename, index=False)
-            print(f"Saved raw KEGG results to {raw_output_filename}")
         
         # Post-processing
         kegg_enrichment_dict = {}
@@ -690,7 +679,6 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
                     f"results_summary_{cell_type}.csv"
                 )
                 kegg_output_df.to_csv(summary_output_filename, index=False)
-                print(f"Saved summary KEGG results to {summary_output_filename}")
             
             # Visualization
             if save_plots:
@@ -703,7 +691,6 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
                         min_non_zero_p = significant_df[significant_df['p_value'] > 0]['p_value'].min()
                         replacement_p = min_non_zero_p / 1000 if pd.notna(min_non_zero_p) and min_non_zero_p > 0 else 1e-300
                         significant_df['p_value'] = significant_df['p_value'].replace(0, replacement_p)
-                        print(f"Replaced 0 p-values with {replacement_p} for plotting.")
                     
                     # Calculate -log10(p-value)
                     significant_df['-log10(p_value)'] = -np.log10(significant_df['p_value'])
@@ -737,7 +724,6 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
                         )
                         plt.savefig(barplot_filename, dpi=300, bbox_inches='tight')
                         plt.close()
-                        print(f"Saved KEGG bar plot to {barplot_filename}")
                         
                         # --- Dot plot ---
                         # Sort by average log2FC for dot plot ordering
@@ -786,7 +772,6 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
                         )
                         plt.savefig(dotplot_filename, dpi=300, bbox_inches='tight')
                         plt.close()
-                        print(f"Saved KEGG dot plot to {dotplot_filename}")
                     else:
                         print(f"No significant terms found for plotting after filtering (p < {p_value_threshold}) for {cell_type}.")
                 else:
@@ -851,7 +836,6 @@ def gsea_enrichment_analysis(
     if save_raw:
         path = os.path.join(output_prefix, f"results_raw_{cell_type}.csv")
         df_raw.to_csv(path, index=False)
-        print(f"Saved raw GSEA results to {path}")
 
     # 4) Post-process into list of dicts
     processed = []
@@ -889,7 +873,6 @@ def gsea_enrichment_analysis(
     if save_summary:
         path = os.path.join(output_prefix, f"results_summary_{cell_type}.csv")
         df_sum.to_csv(path, index=False)
-        print(f"Saved summary GSEA results to {path}")
 
     # 6) Plotting
     if save_plots and not df_sum.empty:
@@ -914,7 +897,6 @@ def gsea_enrichment_analysis(
         plt.tight_layout()
         barfile = os.path.join(output_prefix, f"barplot_{cell_type}.png")
         plt.savefig(barfile, dpi=300, bbox_inches='tight'); plt.close()
-        print(f"Saved barplot to {barfile}")
 
         # Dotplot
         xcol = 'gene_ratio' if plot_x_axis=='gene_ratio' else 'avg_log2fc'
@@ -937,7 +919,6 @@ def gsea_enrichment_analysis(
         plt.tight_layout()
         dotfile = os.path.join(output_prefix, f"dotplot_{cell_type}.png")
         plt.savefig(dotfile, dpi=300, bbox_inches='tight'); plt.close()
-        print(f"Saved dotplot to {dotfile}")
 
     return results
 
@@ -1468,25 +1449,18 @@ def get_possible_cell_types(cell_type):
     """
     # Get standardized base form
     base_form = standardize_cell_type(cell_type)
-    # print ("TEST 1")
     # Generate variations with proper capitalization
     result = unified_cell_type_handler(cell_type)
-    # print ("TEST 2")
     # Create variations based on the correct standardized form
     words = base_form.split()
     possible_types = [base_form]  # Add the base form
-    # print ("TEST 3")
     # Add the properly standardized result and its variants
     possible_types.append(result)
-    # print ("TEST 4")
     # Add variations with and without "cell" or "cells"
     if not result.lower().endswith("cells"):
         possible_types.append(f"{result} cells")
-        # print ("TEST 4.5")
-    # print ("TEST 5")
     if len(words) == 1:
         # For single words, add with/without "s" variations
-        # print ("TEST 5.5")
         if words[0].endswith('s'):
             possible_types.append(words[0][:-1])  # Without 's'
         else:
@@ -1694,9 +1668,7 @@ def save_analysis_results(adata, prefix, leiden_key='leiden', save_umap=True,
     if out_dir and not os.path.exists(out_dir):
         os.makedirs(out_dir, exist_ok=True)
     # Save UMAP data
-    print ("X1")
     if save_umap:
-        print ("X2")
         umap_cols = ['UMAP_1', 'UMAP_2', leiden_key]
         if 'patient_name' in adata.obs.columns:
             umap_cols.append('patient_name')
@@ -1704,20 +1676,16 @@ def save_analysis_results(adata, prefix, leiden_key='leiden', save_umap=True,
             umap_cols.append('cell_type')
             
         adata.obs[umap_cols].to_csv(f"{prefix}_umap_data.csv", index=False)
-    print ("X3")
     # Save dendrogram data
     if save_dendrogram and f'dendrogram_{leiden_key}' in adata.uns:
-        print ("X4")
         dendrogram_data = adata.uns[f'dendrogram_{leiden_key}']
         pd_dendrogram_linkage = pd.DataFrame(
             dendrogram_data['linkage'],
             columns=['source', 'target', 'distance', 'count']
         )
         pd_dendrogram_linkage.to_csv(f"{prefix}_dendrogram_data.csv", index=False)
-    print ("X5")
     # Save dot plot data
     if save_dotplot and markers:
-        print ("X6")
         statistic_data = sc.get.obs_df(adata, keys=[leiden_key] + markers, use_raw=True)
         statistic_data.set_index(leiden_key, inplace=True)
         dot_plot_data = statistic_data.reset_index().melt(
@@ -1744,7 +1712,6 @@ def generate_umap(resolution=2):
         adata.obs['patient_name'] = adata.obs['Sample'].map(sample_mapping)
     # Preprocess data
     adata = preprocess_data(adata, sample_mapping)
-    # sc.tl.pca(adata, svd_solver='arpack')
     # Perform clustering
     adata = perform_clustering(adata, resolution=resolution)
     # Rank all genes
@@ -1765,13 +1732,6 @@ def generate_umap(resolution=2):
     else:
         sc.tl.dendrogram(adata, groupby='leiden')
     
-    # Create dot plot
-    # with plt.rc_context({'figure.figsize': (10, 10)}):
-    #     print ("TEST 14")
-    #     sc.pl.dotplot(adata, filtered_markers, groupby='leiden', swap_axes=True, use_raw=True,
-    #                 standard_scale='var', dendrogram=True, color_map="Blues", save="dotplot.png")
-    #     plt.close()
-    # Initialize cell type as unknown
     adata.obs['cell_type'] = 'Unknown'
     # Save data
     # prefix = "schatbot/runtime_data/basic_data/Overall cells"
@@ -1781,11 +1741,6 @@ def generate_umap(resolution=2):
         save_dotplot=True, 
         markers=filtered_markers
     )
-    # save_analysis_results(
-    #     adata, 
-    #     prefix="process_cell_data/Overall cells", 
-    #     save_dotplot=False
-    # )
     # Extract top genes from marker-specific ranking
     top_genes_df = rank_ordering(adata, key='rank_genes_markers', n_genes=25)
     # Create gene dictionary
@@ -1825,258 +1780,7 @@ def generate_umap(resolution=2):
     annotation_result = results.content
 
     label_clusters(adata=adata, cell_type="Overall", annotation_result=annotation_result)
-    print(annotation_result)
-    # pth = "annotated_adata/Overall cells_annotated_adata.pkl"
-    # os.makedirs(os.path.dirname(pth), exist_ok=True)
-    # with open(pth, "wb") as file:
-    #     pickle.dump(adata, file)
-    #done adding
     return gene_dict, marker_tree, adata #new
-    # return str(annotation_result)
-
-# def process_cells(adata, cell_type, resolution=None):
-#     """Process specific cell type with consistent workflow."""
-#     if resolution is None:
-#         resolution = 1  # Default higher resolution for subtype clustering
-#     print ("in process cells ", cell_type)
-#     # Get all possible variations of the cell type for matching
-#     possible_types = get_possible_cell_types(cell_type)
-#     standardized_name = unified_cell_type_handler(cell_type)
-    
-#     # Filter cells based on cell type with flexible matching
-#     mask = adata.obs['cell_type'].isin(possible_types)
-#     if mask.sum() == 0:
-#         print(f"WARNING: No cells found with cell type matching any of these variations: {possible_types}")
-#         return None, None, None
-    
-#     filtered_cells = adata[mask].copy()
-    
-#     # Perform new clustering on filtered cells
-#     sc.tl.pca(filtered_cells, svd_solver='arpack')
-#     sc.pp.neighbors(filtered_cells)
-#     filtered_cells = perform_clustering(filtered_cells, resolution=resolution)
-    
-#     # Create ranking key based on cell type
-#     # Use standardized base form for key naming
-#     base_form = standardize_cell_type(cell_type).replace(' ', '_').lower()
-#     rank_key = f"rank_genes_{base_form}"
-    
-#     # Rank genes for the filtered cells
-#     filtered_cells = rank_genes(filtered_cells, key_added=rank_key)
-    
-#     # Get markers and create marker-specific sub-AnnData if needed
-#     markers = get_subtypes(cell_type)
-#     markers_tree = markers.copy()
-#     markers_list = extract_genes(markers)
-    
-#     # Check if we have enough markers
-#     if not markers_list:
-#         print(f"WARNING: No marker genes found for {standardized_name}. Using general ranking.")
-#         # Use general ranking instead
-#         top_genes_df = rank_ordering(filtered_cells, key=rank_key, n_genes=25)
-        
-#         # Create gene dictionary
-#         gene_dict = {}
-#         for cluster, group in top_genes_df.groupby("cluster"):
-#             gene_dict[cluster] = list(group["gene"])
-        
-#         # Create dendrogram
-#         sc.tl.dendrogram(filtered_cells, groupby='leiden')
-        
-#         # Save data
-#         save_analysis_results(
-#             filtered_cells,
-#             prefix=f"process_cell_data/{standardized_name}",
-#             save_dotplot=False
-#         )
-        
-#         # Save processed data
-#         umap_df = filtered_cells.obs[['UMAP_1', 'UMAP_2', 'leiden', 'cell_type']]
-#         if 'patient_name' in filtered_cells.obs.columns:
-#             umap_df['patient_name'] = filtered_cells.obs['patient_name']
-            
-#         fname = f'{standardized_name}_adata_processed.pkl'
-#         with open(fname, 'wb') as file:
-#             pickle.dump(umap_df, file)
-        
-
-#         return gene_dict, filtered_cells, markers_tree
-    
-#     # Rest of the function remains the same, but using standardized_name instead of 
-#     # the previous f"{cell_type_cap} cells" format for file paths and variable names
-    
-#     # Create marker-specific AnnData
-#     filtered_markers, marker_list = create_marker_anndata(filtered_cells, markers_list)
-    
-#     # Skip marker-specific ranking if fewer than 5 markers were found
-#     if len(marker_list) < 5:
-#         print(f"WARNING: Only {len(marker_list)} marker genes found. Using general gene ranking.")
-#         # Use general ranking instead
-#         top_genes_df = rank_ordering(filtered_cells, key=rank_key, n_genes=25)
-#     else:
-#         try:
-#             # Rank marker genes
-#             marker_key = f"rank_markers_{base_form}"
-#             filtered_markers = rank_genes(filtered_markers, key_added=marker_key)
-            
-#             # Copy marker ranking to filtered dataset
-#             filtered_cells.uns[marker_key] = filtered_markers.uns[marker_key]
-            
-#             # Extract top genes with preference for marker-specific ranking
-#             top_genes_df = rank_ordering(filtered_markers, key=marker_key, n_genes=25)
-#         except Exception as e:
-#             print(f"ERROR in marker-specific ranking: {e}")
-#             print("Falling back to general ranking")
-#             # Use general ranking in case of any error
-#             top_genes_df = rank_ordering(filtered_cells, key=rank_key, n_genes=25)
-    
-#     # Create gene dictionary
-#     gene_dict = {}
-#     for cluster, group in top_genes_df.groupby("cluster"):
-#         gene_dict[cluster] = list(group["gene"])
-    
-#     # Create dendrogram
-#     sc.tl.dendrogram(filtered_cells, groupby='leiden')
-    
-#     # Save data
-#     save_analysis_results(
-#         filtered_cells,
-#         prefix=f"process_cell_data/{standardized_name}",
-#         save_dotplot=len(marker_list) >= 5,
-#         markers=marker_list
-#     )
-    
-#     # Save processed data
-#     umap_df = filtered_cells.obs[['UMAP_1', 'UMAP_2', 'leiden', 'cell_type']]
-#     if 'patient_name' in filtered_cells.obs.columns:
-#         umap_df['patient_name'] = filtered_cells.obs['patient_name']
-        
-#     fname = f'{standardized_name}_adata_processed.pkl'
-#     with open(fname, 'wb') as file:
-#         pickle.dump(umap_df, file)
-    
-#     return gene_dict, filtered_cells, markers_tree
-
-
-# def process_cells(adata, cell_type, resolution=None):
-#     """
-#     Process specific cell type with full workflow:
-#       1) Subset and recluster
-#       2) Rank genes (general + marker-based)
-#       3) GPT‐driven annotation → label_clusters
-#       4) Save UMAP/dendrogram/dot-plot CSVs + pickles
-#       5) Return (gene_dict, filtered_cells, markers_tree)
-#     """
-#     if resolution is None:
-#         resolution = 1
-
-#     print("in process cells", cell_type)
-#     # ── 1) Subset ──
-#     possible_types = get_possible_cell_types(cell_type)
-#     standardized_name = unified_cell_type_handler(cell_type)
-#     mask = adata.obs["cell_type"].isin(possible_types)
-#     if mask.sum() == 0:
-#         print(f"WARNING: No cells found matching {possible_types}")
-#         return {}, None, None
-
-#     filtered = adata[mask].copy()
-
-#     # ── 2) Reclustering ──
-#     sc.tl.pca(filtered, svd_solver='arpack')
-#     sc.pp.neighbors(filtered)
-#     filtered = perform_clustering(filtered, resolution=resolution)
-#     sc.tl.dendrogram(filtered, groupby='leiden')
-
-#     # ── 3) Rank genes ──
-#     base = standardize_cell_type(cell_type).replace(' ', '_').lower()
-#     rank_key = f"rank_genes_{base}"
-#     filtered = rank_genes(filtered, key_added=rank_key)
-
-#     # ── 4) Marker-based reranking ──
-#     markers_tree = get_subtypes(cell_type)
-#     markers_list = extract_genes(markers_tree)
-#     if markers_list and len(markers_list) >= 5:
-#         madata, _ = create_marker_anndata(filtered, markers_list)
-#         try:
-#             mk = f"rank_markers_{base}"
-#             madata = rank_genes(madata, key_added=mk)
-#             filtered.uns[mk] = madata.uns[mk]
-#             top_df = rank_ordering(madata, key=mk, n_genes=25)
-#         except Exception as e:
-#             print(f"Marker ranking failed: {e}")
-#             top_df = rank_ordering(filtered, key=rank_key, n_genes=25)
-#     else:
-#         top_df = rank_ordering(filtered, key=rank_key, n_genes=25)
-
-#     # ── 5) Build gene_dict ──
-#     gene_dict = {grp: list(gr["gene"]) for grp, gr in top_df.groupby("cluster")}
-
-#     # ── 6) Save subset analysis ──
-#     save_analysis_results(
-#         filtered,
-#         prefix=f"process_cell_data/{standardized_name}",
-#         save_dotplot=bool(markers_list and len(markers_list) >= 5),
-#         markers=markers_list
-#     )
-#     # with open(f"{standardized_name}_adata_processed.pkl", "wb") as f:
-#     #     pickle.dump(filtered, f)
-
-#     # ── 7) GPT annotation ──
-#     prompt = (f"Top genes details: {gene_dict}. "
-#               f"Markers: {markers_tree}.")
-#     messages = [
-#         SystemMessage(content="""
-#             You are a bioinformatics researcher that can do cell annotation.
-#             You will receive:
-#             1. A gene list of top 25 marker genes per cluster.
-#             2. A marker tree to guide annotation.
-#             Identify the most specific cell type for each cluster and return
-#             strictly a Python dict mapping cluster IDs to cell types,
-#             e.g. {'0':'T cells','1':'B cells',...}.
-#         """),
-#         HumanMessage(content=prompt)
-#     ]
-#     model = ChatOpenAI(model="gpt-4o", temperature=0)
-#     results = model.invoke(messages)
-#     annotation_result = results.content
-
-#     # ── 8) Save & apply annotation to the subset ──
-#     pth = f"annotated_adata/{standardized_name}_annotated_adata.pkl"
-#     os.makedirs(os.path.dirname(pth), exist_ok=True)
-#     with open(pth, "wb") as f:
-#         pickle.dump(filtered, f)
-
-#     label_clusters(annotation_result=annotation_result,
-#                    cell_type=cell_type,
-#                    adata=filtered)
-
-#     # ── 9) Merge annotations back into original adata ──
-#     adata.obs.loc[mask, 'cell_type'] = filtered.obs['cell_type']
-#     print ("FINISHED 9", annotation_result)
-
-#     # ── 10) Re‐save the overall UMAP in umaps/ so display_processed_umap picks it up ──
-#     # save_analysis_results(
-#     #     adata,
-#     #     prefix="umaps/Overall cells",
-#     #     save_umap=True,
-#     #     save_dendrogram=False,
-#     #     save_dotplot=False
-#     # )
-#         # Ensure the annotated UMAP directory exists
-#     out_dir = "umaps/annotated/Overall cells_umap_data.csv"
-#     os.makedirs(out_dir, exist_ok=True)
-
-#     # Build the dataframe to save
-#     overall_df = adata.obs[['UMAP_1', 'UMAP_2', 'cell_type']].copy()
-#     if 'patient_name' in adata.obs.columns:
-#         overall_df['patient_name'] = adata.obs['patient_name']
-
-#     # 3) Save to "Overall cells_umap_data.csv"
-#     overall_df.to_csv(out_dir, index=False)
-#     # ── 9) Return ──
-#     return_val = str(annotation_result) 
-#     # return gene_dict, filtered, markers_tree
-#     return return_val
 
 
 def process_cells(adata, cell_type, resolution=None):
@@ -2091,25 +1795,18 @@ def process_cells(adata, cell_type, resolution=None):
     """
     # ── Init ──
     resolution = 1 if resolution is None else resolution
-    print("in process_cells:", cell_type)
 
     # ── 1) Subset ──
     possible_types = get_possible_cell_types(cell_type)
     standardized = unified_cell_type_handler(cell_type)
     mask = adata.obs["cell_type"].isin(possible_types)
-    print(f"  ▶ mask selects {mask.sum()} / {adata.n_obs} cells for {possible_types}")
     if mask.sum() == 0:
-        print(f"WARNING: No cells found matching {possible_types}")
         return {}, None, None
 
     filtered = adata[mask].copy()
     # Check subset integrity
     mask_idx = adata.obs.index[mask]
     filtered_idx = filtered.obs.index
-    print("  ▶ Subset match check:", 
-          "len(mask_idx)=", len(mask_idx), 
-          "len(filtered_idx)=", len(filtered_idx),
-          "mismatch?", not mask_idx.equals(filtered_idx))
 
     # ── 2) Reclustering ──
     sc.tl.pca(filtered, svd_solver="arpack")
@@ -2159,7 +1856,6 @@ def process_cells(adata, cell_type, resolution=None):
         save_dotplot=bool(len(markers_list) >= 5),
         markers=markers_list
     )
-    # pickle.dump(filtered, open(f"{standardized}_adata_processed.pkl", "wb"))
 
     # ── 7) GPT annotation ──
     prompt = f"Top genes details: {gene_dict}. Markers: {markers_tree}."
@@ -2181,9 +1877,6 @@ def process_cells(adata, cell_type, resolution=None):
     out_pkl = f"annotated_adata/{standardized}_annotated_adata.pkl"
     os.makedirs(os.path.dirname(out_pkl), exist_ok=True)
     pickle.dump(filtered, open(out_pkl, "wb"))
-    # label_clusters(annotation_result=annotation_result,
-    #                cell_type=cell_type,
-    #                adata=filtered)
     annotated_filtered = label_clusters(
         annotation_result=annotation_result,
         cell_type=cell_type,
@@ -2191,24 +1884,12 @@ def process_cells(adata, cell_type, resolution=None):
     ) 
 
     # ── 9) Merge annotations back into original adata ──
-    print("  ▶ filtered label counts BEFORE merge:")
-    # print(filtered.obs['cell_type'].value_counts())
-    print(annotated_filtered.obs['cell_type'].value_counts())
 
-    print("  ▶ original adata label counts BEFORE merge:")
-    print(adata.obs.loc[mask, 'cell_type'].value_counts())
-
-    # adata.obs.loc[mask, 'cell_type'] = filtered.obs['cell_type']
     adata.obs.loc[mask, 'cell_type'] = annotated_filtered.obs['cell_type']
-    print("  ▶ merged adata label counts AFTER merge:")
-    print(adata.obs.loc[mask, 'cell_type'].value_counts())
 
-    # spot‐check a few indices
-    # for idx in filtered_idx[:3]:
-    #     print(f"    • {idx}: filtered={filtered.obs.at[idx,'cell_type']} | adata={adata.obs.at[idx,'cell_type']}")
     for idx in filtered_idx[:3]:
         print(f"    • {idx}: filtered={annotated_filtered.obs.at[idx,'cell_type']} | adata={adata.obs.at[idx,'cell_type']}")
-        
+
     # ── 10) Resave overall UMAP so display picks it up ──
     umap_dir = "umaps/annotated"
     os.makedirs(umap_dir, exist_ok=True)
@@ -2220,7 +1901,6 @@ def process_cells(adata, cell_type, resolution=None):
 
     # verify the CSV
     df_check = pd.read_csv(csv_path)
-    print("  ▶ saved CSV shape/colors:", df_check.shape, df_check["cell_type"].value_counts().to_dict())
 
     return str(annotation_result)
 
@@ -2229,24 +1909,20 @@ def label_clusters(annotation_result, cell_type, adata):
     # Standardize cell type names
     standardized_name = unified_cell_type_handler(cell_type)
     base_form = standardize_cell_type(cell_type).lower()
-    print ("HERELC 1")
     try:
         adata = adata.copy()
-        print ("HERELC 2")
         # Parse annotation mapping
         start_idx = annotation_result.find("{")
         end_idx = annotation_result.rfind("}") + 1
         str_map = annotation_result[start_idx:end_idx]
         map2 = ast.literal_eval(str_map)
         map2 = {str(key): value for key, value in map2.items()}
-        print ("HERELC 3")
         # Apply annotations - different handling for overall cells vs specific cell types
         if base_form == "overall":
             # For overall cells, directly apply annotations to the main dataset
             adata.obs['cell_type'] = 'Unknown'
             for group, cell_type_value in map2.items():
                 adata.obs.loc[adata.obs['leiden'] == group, 'cell_type'] = cell_type_value
-            print ("HERELC 5")
             # Save annotated data
             save_analysis_results(
                 adata,
@@ -2254,7 +1930,6 @@ def label_clusters(annotation_result, cell_type, adata):
                 save_dendrogram=False,
                 save_dotplot=False
             )
-            print ("HERELC 6")
             # Save annotated adata
             fname = f'annotated_adata/{standardized_name}_annotated_adata.pkl'
             with open(fname, "wb") as file:
@@ -2269,7 +1944,6 @@ def label_clusters(annotation_result, cell_type, adata):
             specific_cells.obs['cell_type'] = 'Unknown'
             for group, cell_type_value in map2.items():
                 specific_cells.obs.loc[specific_cells.obs['leiden'] == group, 'cell_type'] = cell_type_value
-            print ("HERELC 7")
             # Save annotated data
             save_analysis_results(
                 specific_cells,
@@ -2277,12 +1951,10 @@ def label_clusters(annotation_result, cell_type, adata):
                 save_dendrogram=False,
                 save_dotplot=False
             )
-            print ("HERELC 8")
             # Save annotated adata
             fname = f'annotated_adata/{standardized_name}_annotated_adata.pkl'
             with open(fname, "wb") as file:
                 pickle.dump(specific_cells, file)
-            print ("HERELC 9")
             return specific_cells
             
     except (SyntaxError, ValueError) as e:

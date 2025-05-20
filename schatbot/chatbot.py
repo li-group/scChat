@@ -20,7 +20,6 @@ class ChatBot:
         openai.api_key = self.api_key
         self.adata = None 
         gene_dict, marker_tree, adata = generate_umap()
-        # self.adata = adata
         pth = "annotated_adata/Overall cells_annotated_adata.pkl"
         if os.path.exists(pth):
             with open(pth, "rb") as f:
@@ -206,10 +205,7 @@ class ChatBot:
         ]
 
         def _wrap_process_cells(cell_type, resolution=None):
-            print ("Here now", cell_type)
-            # call your standalone function
             annotation_str = process_cells(self.adata, cell_type, resolution)
-            print ("ANNOTATION STR", annotation_str)
             return annotation_str
         
         # Map function names to actual functions
@@ -228,13 +224,6 @@ class ChatBot:
             # "display_reactome_barplot": display_reactome_barplot,
             "display_enrichment_barplot": display_enrichment_barplot,
             "display_enrichment_dotplot": display_enrichment_dotplot,
-            # "process_cells":process_cells
-            # "process_cells": lambda cell_type, resolution=None: process_cells(
-            #     self.adata, cell_type, resolution
-            # ),
-            # "process_cells": lambda cell_type, resolution=None: (
-            #     process_cells(cell_type, resolution)
-            # ),
             "process_cells": _wrap_process_cells
 
         }
@@ -270,7 +259,6 @@ class ChatBot:
 
         # If a function call is produced with minimal context, process it.
         if output.function_call:
-            print ("OUTPUT ", output)
             function_name = output.function_call.name
             function_args = output.function_call.arguments
             if function_args:
@@ -280,9 +268,6 @@ class ChatBot:
                     function_args = {}
             else:
                 function_args = {}
-            # if function_name in self.function_mapping:
-            #     result = self.function_mapping[function_name](**function_args)
-            #     print("Made a function call to", function_name)
             if function_name in self.function_mapping:
                 # SPECIAL‐CASE the enrichment call so we can inject self.adata
                 if function_name == "perform_enrichment_analyses":
@@ -318,7 +303,6 @@ class ChatBot:
                     # your existing generic dispatch
                     result = self.function_mapping[function_name](**function_args)
 
-                print("Made a function call to", function_name)
                 # … then the rest of your if/elif tree handling display vs text‐based results …
                 if function_name in ["display_umap", "display_processed_umap", "display_dotplot", "display_cell_type_composition", "display_gsea_dotplot", "display_enrichment_barplot","display_enrichment_dotplot"]:
                     # Do NOT add the visualization result to conversation history.
@@ -336,10 +320,6 @@ class ChatBot:
                     self.conversation_history.append({"role": "assistant", "content": final_response})
                     return final_response
                 else:
-                    # final_response = "Annotation is complete."
-                    # self.conversation_history.append({"role": "assistant", "content": result})
-                    # self.conversation_history.append({"role": "assistant", "content": final_response})
-                    # return final_response
                     cell = function_args.get("cell_type")
                     umap_html = display_processed_umap(cell_type=cell)
                     # we treat it like any other graph return:

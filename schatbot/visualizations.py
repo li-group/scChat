@@ -339,31 +339,78 @@ def display_umap(cell_type: str) -> str:
 #     fig.update_layout(width=1200, height=800, autosize=True, showlegend=True)
 #     return fig.to_json()
 
+# def display_processed_umap(cell_type: str) -> str:
+#     cell_type_cell = cell_type.split()[0].capitalize() + " cell"
+#     cell_type_formatted = cell_type.split()[0].capitalize() + " cells"
+#     import os
+#     if os.path.exists(f'umaps/annotated/{cell_type_formatted}_umap_data.csv'):
+#         print (f'umaps/annotated/{cell_type_formatted}_umap_data.csv')
+#         umap_data = pd.read_csv(f'umaps/annotated/{cell_type_formatted}_umap_data.csv')
+#     else:
+#         print (f'umaps/annotated/{cell_type_formatted}_umap_data.csv')
+#         umap_data = pd.read_csv(f'umaps/annotated/{cell_type_cell}_umap_data.csv')
+#     fig = px.scatter(
+#         umap_data,
+#         x="UMAP_1",
+#         y="UMAP_2",
+#         color="cell_type",
+#         # symbol="patient_name",
+#         title=f'{cell_type_formatted} UMAP Plot',
+#         labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
+#     )
+#     fig.update_traces(marker=dict(size=5, opacity=0.8))
+#     fig.update_layout(width=1200, height=800, autosize=True, showlegend=True)
+#     # Return an HTML snippet of the Plotly figure
+#     plot_html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
+#     return plot_html
+from .sc_analysis import unified_cell_type_handler
 def display_processed_umap(cell_type: str) -> str:
-    cell_type_cell = cell_type.split()[0].capitalize() + " cell"
-    cell_type_formatted = cell_type.split()[0].capitalize() + " cells"
     import os
-    if os.path.exists(f'umaps/annotated/{cell_type_formatted}_umap_data.csv'):
-        print (f'umaps/annotated/{cell_type_formatted}_umap_data.csv')
-        umap_data = pd.read_csv(f'umaps/annotated/{cell_type_formatted}_umap_data.csv')
-    else:
-        print (f'umaps/annotated/{cell_type_formatted}_umap_data.csv')
-        umap_data = pd.read_csv(f'umaps/annotated/{cell_type_cell}_umap_data.csv')
+    import pandas as pd
+    import plotly.express as px
+    import plotly.io as pio
+
+    # standardize your cell type into the form used by process_cells
+    std = unified_cell_type_handler(cell_type)  # e.g. "Monocytes"
+
+    # possible filenames in order
+    candidates = [
+        f'umaps/annotated/{std}_umap_data.csv',         # new pattern
+        f'umaps/annotated/{std} cells_umap_data.csv',   # old plural
+        f'umaps/annotated/{std} cell_umap_data.csv'     # old singular
+    ]
+
+    # pick the first one that exists
+    umap_path = next((p for p in candidates if os.path.exists(p)), None)
+
+    # if none found, scan the directory for any "{std}*_umap_data.csv"
+    if umap_path is None:
+        directory = 'umaps/annotated'
+        if os.path.isdir(directory):
+            for fn in os.listdir(directory):
+                if fn.startswith(std) and fn.endswith('_umap_data.csv'):
+                    umap_path = os.path.join(directory, fn)
+                    break
+
+    if umap_path is None:
+        print(f"Warning: could not find an annotated UMAP file for '{cell_type}'")
+        return ""
+
+    # load and plot
+    umap_data = pd.read_csv(umap_path)
     fig = px.scatter(
         umap_data,
         x="UMAP_1",
         y="UMAP_2",
         color="cell_type",
-        # symbol="patient_name",
-        title=f'{cell_type_formatted} UMAP Plot',
+        title=f"{std} (annotated) UMAP Plot",
         labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
     )
     fig.update_traces(marker=dict(size=5, opacity=0.8))
     fig.update_layout(width=1200, height=800, autosize=True, showlegend=True)
-    # Return an HTML snippet of the Plotly figure
-    plot_html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
-    return plot_html
 
+    # return html snippet
+    return pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
 
 def display_gsea_dotplot() -> str:
     """
