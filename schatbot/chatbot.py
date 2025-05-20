@@ -336,10 +336,14 @@ class ChatBot:
                     self.conversation_history.append({"role": "assistant", "content": final_response})
                     return final_response
                 else:
-                    final_response = "Annotation is complete."
-                    self.conversation_history.append({"role": "assistant", "content": result})
-                    self.conversation_history.append({"role": "assistant", "content": final_response})
-                    return final_response
+                    # final_response = "Annotation is complete."
+                    # self.conversation_history.append({"role": "assistant", "content": result})
+                    # self.conversation_history.append({"role": "assistant", "content": final_response})
+                    # return final_response
+                    cell = function_args.get("cell_type")
+                    umap_html = display_processed_umap(cell_type=cell)
+                    # we treat it like any other graph return:
+                    return json.dumps({"response": "", "graph_html": umap_html})
             else:
                 return f"Function {function_name} not found."
         else:

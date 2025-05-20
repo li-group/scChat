@@ -90,7 +90,7 @@ def sample_differential_expression_genes_comparison(cell_type: str, sample_1: st
     cell_type2 = cell_type.split()[0].capitalize() + " cell"
     cell_type_formatted = cell_type.split()[0].capitalize() + " cells"
     
-    with open(f'annotated_adata/Overall cells_annotated_adata.pkl', 'rb') as file:
+    with open(f'annotated_adata/{cell_type_formatted}_annotated_adata.pkl', 'rb') as file:
         adata2 = pd.read_pickle(file)
     
     filtered_cells = adata2[adata2.obs['cell_type'].isin([cell_type_formatted])].copy()

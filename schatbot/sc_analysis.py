@@ -34,6 +34,7 @@ from pandas.errors import PerformanceWarning
 from gprofiler import GProfiler
 import seaborn as sns
 import gseapy as gp
+load_dotenv()             # 🔑 actually read .env into os.environ
 
 
 warnings.filterwarnings("ignore", category=PerformanceWarning)
@@ -793,248 +794,6 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
     
     return results
 
-# def gsea_enrichment_analysis(cell_type, significant_genes, gene_to_logfc,
-#                             gene_set_library="MSigDB_Hallmark_2020", organism='Human',
-#                             p_value_threshold=0.05, top_n_terms=10,
-#                             save_raw=True, save_summary=True, save_plots=True,
-#                             output_prefix="enrichment"):
-#     """
-#     Performs gene set enrichment analysis using gseapy on significant genes
-#     for a specific cell type.
-
-#     Parameters:
-#     -----------
-#     cell_type : str
-#         Identifier for the cell type being analyzed (used for filenames).
-#     significant_genes : list
-#         A list of significant gene symbols (strings).
-#     gene_to_logfc : dict
-#         A dictionary mapping gene symbols (str) to their log2 fold change values (float).
-#     gene_set_library : str, default="MSigDB_Hallmark_2020"
-#         The gene set library to use for enrichment analysis.
-#     organism : str, default='Human'
-#         Organism to use for enrichment analysis.
-#     p_value_threshold : float, default=0.05
-#         P-value threshold for significant enrichment terms (used for plotting).
-#     top_n_terms : int, default=10
-#         Number of top terms to display in plots.
-#     save_raw : bool, default=True
-#         Whether to save raw gseapy enrichment results.
-#     save_summary : bool, default=True
-#         Whether to save summary enrichment results (with calculated avg log2FC).
-#     save_plots : bool, default=True
-#         Whether to save enrichment plots (barplot and dotplot).
-#     output_prefix : str, default="enrichment"
-#         Prefix to use for output filenames.
-
-#     Returns:
-#     --------
-#     dict
-#         Dictionary containing DataFrames of raw and processed enrichment results:
-#         {'raw_results': DataFrame, 'summary_results': DataFrame}
-#     """
-#     results = {
-#         'raw_results': None,
-#         'summary_results': None
-#     }
-
-#     if not significant_genes:
-#         print(f"No significant genes provided for {cell_type}. Skipping enrichment.")
-#         return results
-
-#     try:
-#         # Run enrichr analysis using gseapy
-#         enr = gp.enrichr(gene_list=significant_genes,
-#                         gene_sets=gene_set_library,
-#                         organism=organism,  # Can be specified based on dataset
-#                         outdir=None,  # Prevent gseapy from saving files automatically
-#                         cutoff=1.0  # Get all results and filter later based on p_value_threshold for plotting
-#                         )
-
-#         if enr is None or enr.results.empty:
-#             print(f"No enrichment results found for {cell_type} using {gene_set_library}.")
-#             return results
-
-#         # The results DataFrame is typically stored in enr.results
-#         enrichment_results_df = enr.results.copy()  # Make a copy to avoid modifying original
-#         results['raw_results'] = enrichment_results_df
-
-#         # Save raw gseapy results
-#         if save_raw:
-#             # raw_output_filename = f"{output_prefix}_results_raw_{cell_type}.csv"
-#             raw_output_filename = os.path.join(
-#             output_prefix,
-#             f"results_raw_{cell_type}.csv"
-#             )
-#             enrichment_results_df.to_csv(raw_output_filename, index=False)
-#             print(f"Saved raw {gene_set_library} results to {raw_output_filename}")
-
-#         # Post-processing to add average log2FC and format
-#         processed_results_list = []
-#         for index, row in enrichment_results_df.iterrows():
-#             term_name = row['Term']
-#             p_value = row['P-value']
-#             adj_p_value = row['Adjusted P-value']  # Keep adjusted p-value as well
-#             # Genes are semicolon-separated in gseapy enrichr results
-#             intersecting_genes_str = row['Genes']
-#             intersecting_genes = intersecting_genes_str.split(';') if isinstance(intersecting_genes_str, str) else []
-#             # Extract intersection size from 'Overlap' column (e.g., "15/50")
-#             overlap_str = row['Overlap']
-#             intersection_size = 0
-#             if isinstance(overlap_str, str):
-#                 match = re.match(r'(\d+)/\d+', overlap_str)
-#                 if match:
-#                     intersection_size = int(match.group(1))
-
-#             # Calculate average log2FC for intersecting genes found in gene_to_logfc
-#             sum_log2fc = 0
-#             gene_count_in_term = 0
-#             valid_intersecting_genes = []
-#             if intersecting_genes:
-#                 for gene in intersecting_genes:
-#                     if gene in gene_to_logfc:
-#                         sum_log2fc += gene_to_logfc[gene]
-#                         gene_count_in_term += 1
-#                         valid_intersecting_genes.append(gene)  # Store genes actually used
-
-#             avg_log2fc = sum_log2fc / gene_count_in_term if gene_count_in_term > 0 else 0
-
-#             processed_results_list.append({
-#                 'Term': term_name,
-#                 'p_value': p_value,
-#                 'adj_p_value': adj_p_value,
-#                 'intersection_size': intersection_size,  # Actual count based on overlap string
-#                 'calculated_intersection_count': gene_count_in_term,  # Count of genes with logFC found
-#                 'avg_log2fc': avg_log2fc,
-#                 'intersecting_genes': ';'.join(valid_intersecting_genes)  # Save genes with logFC
-#             })
-
-#         if processed_results_list:
-#             # Create summary output dataframe
-#             summary_output_df = pd.DataFrame(processed_results_list)
-
-#             # Sort by p-value
-#             summary_output_df = summary_output_df.sort_values('p_value', ascending=True)
-#             results['summary_results'] = summary_output_df
-
-#             # Save summarized results
-#             if save_summary:
-#                 # summary_output_filename = f'{output_prefix}_results_summary_{cell_type}.csv'
-#                 summary_output_filename = os.path.join(
-#                     output_prefix,
-#                     f"results_summary_{cell_type}.csv"
-#                 )
-#                 summary_output_df.to_csv(summary_output_filename, index=False)
-#                 print(f"Saved summary {gene_set_library} results to {summary_output_filename}")
-
-#             # Visualization
-#             if save_plots:
-#                 # Filter for significant terms based on the specified p_value_threshold
-#                 significant_df = summary_output_df[summary_output_df['p_value'] < p_value_threshold].copy()
-
-#                 if not significant_df.empty:
-#                     # Handle potential zero p-values for plotting
-#                     if (significant_df['p_value'] == 0).any():
-#                         min_non_zero_p = significant_df[significant_df['p_value'] > 0]['p_value'].min()
-#                         # Use a small epsilon or a fraction of the minimum non-zero p-value
-#                         replacement_p = min_non_zero_p / 1000 if pd.notna(min_non_zero_p) and min_non_zero_p > 0 else 1e-300  # Fallback if all are zero
-#                         significant_df['p_value'] = significant_df['p_value'].replace(0, replacement_p)
-#                         print(f"Replaced 0 p-values with {replacement_p} for plotting.")
-
-#                     # Calculate -log10(p-value)
-#                     significant_df['-log10(p_value)'] = -np.log10(significant_df['p_value'])
-
-#                     # Select top N terms (already sorted by p-value)
-#                     top_n_actual = min(top_n_terms, len(significant_df))
-
-#                     if top_n_actual > 0:
-#                         plot_df = significant_df.head(top_n_actual)
-
-#                         # --- Bar chart ---
-#                         # Sort by -log10(p_value) for bar plot ordering
-#                         plot_df_bar = plot_df.sort_values('-log10(p_value)', ascending=True)
-#                         plt.figure(figsize=(10, max(6, top_n_actual * 0.5)))  # Adjust height based on N
-#                         sns.barplot(
-#                             x='-log10(p_value)',
-#                             y='Term',
-#                             data=plot_df_bar,
-#                             palette='viridis',  # Changed palette for variety
-#                             orient='h'
-#                         )
-#                         plt.title(f'Top {top_n_actual} Enriched Terms from {gene_set_library} ({cell_type}) by P-value')
-#                         plt.xlabel('-log10(P-value)')
-#                         plt.ylabel('Term')
-#                         plt.tight_layout()
-#                         # barplot_filename = f'{output_prefix}_barplot_{cell_type}.png'
-#                         barplot_filename = os.path.join(
-#                             output_prefix,
-#                             f"barplot_{cell_type}.png"
-#                         )
-#                         plt.savefig(barplot_filename, dpi=300, bbox_inches='tight')
-#                         plt.close()
-#                         print(f"Saved {gene_set_library} bar plot to {barplot_filename}")
-
-#                         # --- Dot plot ---
-#                         # Sort by average log2FC for dot plot ordering, or keep p-value sort
-#                         plot_df_dot = plot_df.sort_values('avg_log2fc', ascending=False)
-#                         plt.figure(figsize=(12, max(6, top_n_actual * 0.5)))  # Adjust height
-#                         scatter = sns.scatterplot(
-#                             data=plot_df_dot,
-#                             y='Term',
-#                             x='avg_log2fc',
-#                             size='intersection_size',  # Use intersection size from gseapy
-#                             hue='-log10(p_value)',  # Color by significance
-#                             palette='plasma_r',  # Keep palette consistent with original example
-#                             sizes=(40, 400),  # Control dot size range
-#                             edgecolor='grey',
-#                             linewidth=0.5,
-#                             alpha=0.8
-#                         )
-#                         plt.title(f'Top {top_n_actual} Enriched Terms from {gene_set_library} ({cell_type})')
-#                         plt.ylabel('Term')
-#                         plt.xlabel('Average log2 Fold Change')
-#                         plt.axvline(0, color='grey', linestyle='--', lw=1)  # Line at logFC=0
-#                         # Improve legend positioning
-#                         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., title='Legend')
-#                         # Customize legend titles if necessary (might need manual creation for clarity)
-#                         handles, labels = scatter.get_legend_handles_labels()
-#                         # Find legend sections and add titles (this can be complex, basic version shown)
-#                         legend_title_map = {'size': 'Intersection Size', 'hue': '-log10(P-value)'}
-#                         new_handles = []
-#                         new_labels = []
-#                         # Simple re-titling - may need refinement depending on seaborn version
-#                         for i, label in enumerate(labels):
-#                             if label in legend_title_map:  # Identify title rows generated by seaborn
-#                                 new_labels.append(legend_title_map[label])  # Replace with custom title
-#                                 new_handles.append(handles[i])
-#                             elif handles[i] is not None:  # Keep actual data points
-#                                 new_labels.append(label)
-#                                 new_handles.append(handles[i])
-
-#                         scatter.legend(new_handles, new_labels, bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
-
-#                         plt.grid(True, axis='y', linestyle='--', alpha=0.6)
-#                         plt.tight_layout(rect=[0, 0, 0.85, 1])  # Adjust layout to make space for legend
-#                         # dotplot_filename = f'{output_prefix}_dotplot_{cell_type}.png'
-#                         dotplot_filename = os.path.join(
-#                             output_prefix,
-#                             f"dotplot_{cell_type}.png"
-#                         )
-#                         plt.savefig(dotplot_filename, dpi=300, bbox_inches='tight')
-#                         plt.close()
-#                         print(f"Saved {gene_set_library} dot plot to {dotplot_filename}")
-#                     else:
-#                         print(f"No significant terms found for plotting after filtering (p < {p_value_threshold}) for {cell_type}.")
-#                 else:
-#                     print(f"No significant terms found passing p-value threshold {p_value_threshold} for {cell_type}.")
-#         else:
-#             print(f"No enrichment results processed for {cell_type}.")
-
-#     except Exception as e:
-#         print(f"An error occurred during gseapy enrichment analysis for {cell_type}: {e}")
-
-#     return results
-
 def gsea_enrichment_analysis(
     cell_type,
     significant_genes,
@@ -1528,7 +1287,7 @@ def get_rag():
     """Retrieve marker genes using Neo4j graph database."""
     # Initialize Neo4j connection
     uri = "bolt://localhost:7687"
-    driver = GraphDatabase.driver(uri, auth=("neo4j", "37754262"))
+    driver = GraphDatabase.driver(uri, auth=("neo4j", "DBMSPassword"))
     
     # Load specification from JSON
     specification = None
@@ -2064,12 +1823,13 @@ def generate_umap(resolution=2):
     )
     results = model.invoke(messages)
     annotation_result = results.content
-    pth = "annotated_adata/Overall cells_annotated_adata.pkl"
-    os.makedirs(os.path.dirname(pth), exist_ok=True)
-    with open(pth, "wb") as file:
-        pickle.dump(adata, file)
+
     label_clusters(adata=adata, cell_type="Overall", annotation_result=annotation_result)
     print(annotation_result)
+    # pth = "annotated_adata/Overall cells_annotated_adata.pkl"
+    # os.makedirs(os.path.dirname(pth), exist_ok=True)
+    # with open(pth, "wb") as file:
+    #     pickle.dump(adata, file)
     #done adding
     return gene_dict, marker_tree, adata #new
     # return str(annotation_result)
@@ -2198,6 +1958,127 @@ def generate_umap(resolution=2):
 #     return gene_dict, filtered_cells, markers_tree
 
 
+# def process_cells(adata, cell_type, resolution=None):
+#     """
+#     Process specific cell type with full workflow:
+#       1) Subset and recluster
+#       2) Rank genes (general + marker-based)
+#       3) GPT‐driven annotation → label_clusters
+#       4) Save UMAP/dendrogram/dot-plot CSVs + pickles
+#       5) Return (gene_dict, filtered_cells, markers_tree)
+#     """
+#     if resolution is None:
+#         resolution = 1
+
+#     print("in process cells", cell_type)
+#     # ── 1) Subset ──
+#     possible_types = get_possible_cell_types(cell_type)
+#     standardized_name = unified_cell_type_handler(cell_type)
+#     mask = adata.obs["cell_type"].isin(possible_types)
+#     if mask.sum() == 0:
+#         print(f"WARNING: No cells found matching {possible_types}")
+#         return {}, None, None
+
+#     filtered = adata[mask].copy()
+
+#     # ── 2) Reclustering ──
+#     sc.tl.pca(filtered, svd_solver='arpack')
+#     sc.pp.neighbors(filtered)
+#     filtered = perform_clustering(filtered, resolution=resolution)
+#     sc.tl.dendrogram(filtered, groupby='leiden')
+
+#     # ── 3) Rank genes ──
+#     base = standardize_cell_type(cell_type).replace(' ', '_').lower()
+#     rank_key = f"rank_genes_{base}"
+#     filtered = rank_genes(filtered, key_added=rank_key)
+
+#     # ── 4) Marker-based reranking ──
+#     markers_tree = get_subtypes(cell_type)
+#     markers_list = extract_genes(markers_tree)
+#     if markers_list and len(markers_list) >= 5:
+#         madata, _ = create_marker_anndata(filtered, markers_list)
+#         try:
+#             mk = f"rank_markers_{base}"
+#             madata = rank_genes(madata, key_added=mk)
+#             filtered.uns[mk] = madata.uns[mk]
+#             top_df = rank_ordering(madata, key=mk, n_genes=25)
+#         except Exception as e:
+#             print(f"Marker ranking failed: {e}")
+#             top_df = rank_ordering(filtered, key=rank_key, n_genes=25)
+#     else:
+#         top_df = rank_ordering(filtered, key=rank_key, n_genes=25)
+
+#     # ── 5) Build gene_dict ──
+#     gene_dict = {grp: list(gr["gene"]) for grp, gr in top_df.groupby("cluster")}
+
+#     # ── 6) Save subset analysis ──
+#     save_analysis_results(
+#         filtered,
+#         prefix=f"process_cell_data/{standardized_name}",
+#         save_dotplot=bool(markers_list and len(markers_list) >= 5),
+#         markers=markers_list
+#     )
+#     # with open(f"{standardized_name}_adata_processed.pkl", "wb") as f:
+#     #     pickle.dump(filtered, f)
+
+#     # ── 7) GPT annotation ──
+#     prompt = (f"Top genes details: {gene_dict}. "
+#               f"Markers: {markers_tree}.")
+#     messages = [
+#         SystemMessage(content="""
+#             You are a bioinformatics researcher that can do cell annotation.
+#             You will receive:
+#             1. A gene list of top 25 marker genes per cluster.
+#             2. A marker tree to guide annotation.
+#             Identify the most specific cell type for each cluster and return
+#             strictly a Python dict mapping cluster IDs to cell types,
+#             e.g. {'0':'T cells','1':'B cells',...}.
+#         """),
+#         HumanMessage(content=prompt)
+#     ]
+#     model = ChatOpenAI(model="gpt-4o", temperature=0)
+#     results = model.invoke(messages)
+#     annotation_result = results.content
+
+#     # ── 8) Save & apply annotation to the subset ──
+#     pth = f"annotated_adata/{standardized_name}_annotated_adata.pkl"
+#     os.makedirs(os.path.dirname(pth), exist_ok=True)
+#     with open(pth, "wb") as f:
+#         pickle.dump(filtered, f)
+
+#     label_clusters(annotation_result=annotation_result,
+#                    cell_type=cell_type,
+#                    adata=filtered)
+
+#     # ── 9) Merge annotations back into original adata ──
+#     adata.obs.loc[mask, 'cell_type'] = filtered.obs['cell_type']
+#     print ("FINISHED 9", annotation_result)
+
+#     # ── 10) Re‐save the overall UMAP in umaps/ so display_processed_umap picks it up ──
+#     # save_analysis_results(
+#     #     adata,
+#     #     prefix="umaps/Overall cells",
+#     #     save_umap=True,
+#     #     save_dendrogram=False,
+#     #     save_dotplot=False
+#     # )
+#         # Ensure the annotated UMAP directory exists
+#     out_dir = "umaps/annotated/Overall cells_umap_data.csv"
+#     os.makedirs(out_dir, exist_ok=True)
+
+#     # Build the dataframe to save
+#     overall_df = adata.obs[['UMAP_1', 'UMAP_2', 'cell_type']].copy()
+#     if 'patient_name' in adata.obs.columns:
+#         overall_df['patient_name'] = adata.obs['patient_name']
+
+#     # 3) Save to "Overall cells_umap_data.csv"
+#     overall_df.to_csv(out_dir, index=False)
+#     # ── 9) Return ──
+#     return_val = str(annotation_result) 
+#     # return gene_dict, filtered, markers_tree
+#     return return_val
+
+
 def process_cells(adata, cell_type, resolution=None):
     """
     Process specific cell type with full workflow:
@@ -2205,37 +2086,57 @@ def process_cells(adata, cell_type, resolution=None):
       2) Rank genes (general + marker-based)
       3) GPT‐driven annotation → label_clusters
       4) Save UMAP/dendrogram/dot-plot CSVs + pickles
-      5) Return (gene_dict, filtered_cells, markers_tree)
+      5) Merge back into full adata + resave overall UMAP
+      6) Return annotation dict as string
     """
-    if resolution is None:
-        resolution = 1
+    # ── Init ──
+    resolution = 1 if resolution is None else resolution
+    print("in process_cells:", cell_type)
 
-    print("in process cells", cell_type)
     # ── 1) Subset ──
     possible_types = get_possible_cell_types(cell_type)
-    standardized_name = unified_cell_type_handler(cell_type)
+    standardized = unified_cell_type_handler(cell_type)
     mask = adata.obs["cell_type"].isin(possible_types)
+    print(f"  ▶ mask selects {mask.sum()} / {adata.n_obs} cells for {possible_types}")
     if mask.sum() == 0:
         print(f"WARNING: No cells found matching {possible_types}")
         return {}, None, None
 
     filtered = adata[mask].copy()
+    # Check subset integrity
+    mask_idx = adata.obs.index[mask]
+    filtered_idx = filtered.obs.index
+    print("  ▶ Subset match check:", 
+          "len(mask_idx)=", len(mask_idx), 
+          "len(filtered_idx)=", len(filtered_idx),
+          "mismatch?", not mask_idx.equals(filtered_idx))
 
     # ── 2) Reclustering ──
-    sc.tl.pca(filtered, svd_solver='arpack')
+    sc.tl.pca(filtered, svd_solver="arpack")
     sc.pp.neighbors(filtered)
     filtered = perform_clustering(filtered, resolution=resolution)
-    sc.tl.dendrogram(filtered, groupby='leiden')
+    sc.tl.dendrogram(filtered, groupby="leiden")
 
     # ── 3) Rank genes ──
-    base = standardize_cell_type(cell_type).replace(' ', '_').lower()
+    base = standardize_cell_type(cell_type).replace(" ", "_").lower()
     rank_key = f"rank_genes_{base}"
     filtered = rank_genes(filtered, key_added=rank_key)
 
-    # ── 4) Marker-based reranking ──
+    # ── 4) Marker‐based reranking ──
     markers_tree = get_subtypes(cell_type)
     markers_list = extract_genes(markers_tree)
-    if markers_list and len(markers_list) >= 5:
+
+    # only keep genes that are actually in adata
+    existing_markers = [
+        g for g in markers_list
+        if g in adata.raw.var_names or g in adata.obs.columns
+    ]
+    missing = set(markers_list) - set(existing_markers)
+    if missing:
+        print(f"⚠️ dropping {len(missing)} missing markers:", missing)
+    markers_list = existing_markers
+
+    if len(markers_list) >= 5:
         madata, _ = create_marker_anndata(filtered, markers_list)
         try:
             mk = f"rank_markers_{base}"
@@ -2243,7 +2144,7 @@ def process_cells(adata, cell_type, resolution=None):
             filtered.uns[mk] = madata.uns[mk]
             top_df = rank_ordering(madata, key=mk, n_genes=25)
         except Exception as e:
-            print(f"Marker ranking failed: {e}")
+            print(f"  ▶ Marker ranking failed: {e}")
             top_df = rank_ordering(filtered, key=rank_key, n_genes=25)
     else:
         top_df = rank_ordering(filtered, key=rank_key, n_genes=25)
@@ -2252,18 +2153,16 @@ def process_cells(adata, cell_type, resolution=None):
     gene_dict = {grp: list(gr["gene"]) for grp, gr in top_df.groupby("cluster")}
 
     # ── 6) Save subset analysis ──
-    # save_analysis_results(
-    #     filtered,
-    #     prefix=f"process_cell_data/{standardized_name}",
-    #     save_dotplot=bool(markers_list and len(markers_list) >= 5),
-    #     markers=markers_list
-    # )
-    with open(f"{standardized_name}_adata_processed.pkl", "wb") as f:
-        pickle.dump(filtered, f)
+    save_analysis_results(
+        filtered,
+        prefix=f"process_cell_data/{standardized}",
+        save_dotplot=bool(len(markers_list) >= 5),
+        markers=markers_list
+    )
+    # pickle.dump(filtered, open(f"{standardized}_adata_processed.pkl", "wb"))
 
     # ── 7) GPT annotation ──
-    prompt = (f"Top genes details: {gene_dict}. "
-              f"Markers: {markers_tree}.")
+    prompt = f"Top genes details: {gene_dict}. Markers: {markers_tree}."
     messages = [
         SystemMessage(content="""
             You are a bioinformatics researcher that can do cell annotation.
@@ -2271,52 +2170,59 @@ def process_cells(adata, cell_type, resolution=None):
             1. A gene list of top 25 marker genes per cluster.
             2. A marker tree to guide annotation.
             Identify the most specific cell type for each cluster and return
-            strictly a Python dict mapping cluster IDs to cell types,
-            e.g. {'0':'T cells','1':'B cells',...}.
+            strictly a Python dict mapping cluster IDs to cell types.
         """),
-        HumanMessage(content=prompt)
+        HumanMessage(content=prompt),
     ]
-    model = ChatOpenAI(model="gpt-4o", temperature=0)
-    results = model.invoke(messages)
+    results = ChatOpenAI(model="gpt-4o", temperature=0).invoke(messages)
     annotation_result = results.content
 
     # ── 8) Save & apply annotation to the subset ──
-    pth = f"annotated_adata/{standardized_name}_annotated_adata.pkl"
-    os.makedirs(os.path.dirname(pth), exist_ok=True)
-    with open(pth, "wb") as f:
-        pickle.dump(filtered, f)
-
-    label_clusters(annotation_result=annotation_result,
-                   cell_type=cell_type,
-                   adata=filtered)
+    out_pkl = f"annotated_adata/{standardized}_annotated_adata.pkl"
+    os.makedirs(os.path.dirname(out_pkl), exist_ok=True)
+    pickle.dump(filtered, open(out_pkl, "wb"))
+    # label_clusters(annotation_result=annotation_result,
+    #                cell_type=cell_type,
+    #                adata=filtered)
+    annotated_filtered = label_clusters(
+        annotation_result=annotation_result,
+        cell_type=cell_type,
+        adata=filtered
+    ) 
 
     # ── 9) Merge annotations back into original adata ──
-    adata.obs.loc[mask, 'cell_type'] = filtered.obs['cell_type']
-    print ("FINISHED 9", annotation_result)
-    # ── 10) Re‐save the overall UMAP in umaps/ so display_processed_umap picks it up ──
-    # save_analysis_results(
-    #     adata,
-    #     prefix="umaps/Overall cells",
-    #     save_umap=True,
-    #     save_dendrogram=False,
-    #     save_dotplot=False
-    # )
-        # Ensure the annotated UMAP directory exists
-    out_dir = "umaps/annotated"
-    os.makedirs(out_dir, exist_ok=True)
+    print("  ▶ filtered label counts BEFORE merge:")
+    # print(filtered.obs['cell_type'].value_counts())
+    print(annotated_filtered.obs['cell_type'].value_counts())
 
-    # Build the dataframe to save
-    overall_df = adata.obs[['UMAP_1', 'UMAP_2', 'cell_type']].copy()
-    if 'patient_name' in adata.obs.columns:
-        overall_df['patient_name'] = adata.obs['patient_name']
+    print("  ▶ original adata label counts BEFORE merge:")
+    print(adata.obs.loc[mask, 'cell_type'].value_counts())
 
-    # 3) Save to "Overall cells_umap_data.csv"
-    overall_df.to_csv(os.path.join(out_dir, "Overall cells_umap_data.csv"), index=False)
-    # ── 9) Return ──
-    return_val = str(annotation_result) 
-    # return gene_dict, filtered, markers_tree
-    return return_val
+    # adata.obs.loc[mask, 'cell_type'] = filtered.obs['cell_type']
+    adata.obs.loc[mask, 'cell_type'] = annotated_filtered.obs['cell_type']
+    print("  ▶ merged adata label counts AFTER merge:")
+    print(adata.obs.loc[mask, 'cell_type'].value_counts())
 
+    # spot‐check a few indices
+    # for idx in filtered_idx[:3]:
+    #     print(f"    • {idx}: filtered={filtered.obs.at[idx,'cell_type']} | adata={adata.obs.at[idx,'cell_type']}")
+    for idx in filtered_idx[:3]:
+        print(f"    • {idx}: filtered={annotated_filtered.obs.at[idx,'cell_type']} | adata={adata.obs.at[idx,'cell_type']}")
+        
+    # ── 10) Resave overall UMAP so display picks it up ──
+    umap_dir = "umaps/annotated"
+    os.makedirs(umap_dir, exist_ok=True)
+    overall_df = adata.obs[["UMAP_1", "UMAP_2", "cell_type"]].copy()
+    if "patient_name" in adata.obs.columns:
+        overall_df["patient_name"] = adata.obs["patient_name"]
+    csv_path = os.path.join(umap_dir, "Overall cells_umap_data.csv")
+    overall_df.to_csv(csv_path, index=False)
+
+    # verify the CSV
+    df_check = pd.read_csv(csv_path)
+    print("  ▶ saved CSV shape/colors:", df_check.shape, df_check["cell_type"].value_counts().to_dict())
+
+    return str(annotation_result)
 
 def label_clusters(annotation_result, cell_type, adata):
     """Label clusters with consistent cell type handling."""
