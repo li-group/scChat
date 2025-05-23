@@ -6,7 +6,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from nltk.tokenize import word_tokenize
 from .chatbot import ChatBot
-from .gemini import browse_web  # Ensure this module/function exists
 from .forms import MyForm, UploadFileForm
 
 # Create a global ChatBot instance
@@ -82,6 +81,7 @@ def upload_file(request):
 #             return JsonResponse({"error": "Invalid JSON"}, status=400)
 #         except Exception as e:
 #             return JsonResponse({"error": str(e)}, status=500)
+#
 
 
 @csrf_exempt
@@ -102,7 +102,7 @@ def chat_with_ai(request):
             print("chat_with_ai: User message:", user_message)
             
             if classify_intent(user_message) == 'web_search':
-                response_text = browse_web(user_message)
+                # response_text = browse_web(user_message)
                 print("chat_with_ai: Web search response (first 300 chars):", response_text[:300])
                 return JsonResponse({"response": response_text})
             

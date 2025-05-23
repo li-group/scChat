@@ -1,92 +1,113 @@
-import os
-import json
-import openai
-from .sc_analysis import generate_umap
+from .annotation import initial_cell_annotation, process_cells
 from .visualizations import (
     display_dotplot,
     display_cell_type_composition,
-    display_gsea_dotplot
+    display_gsea_dotplot,
+    display_umap,
+    display_processed_umap,
+    display_enrichment_barplot,
+    display_enrichment_dotplot
 )
-from .image_processing import read_image
-from .differential_expression import sample_differential_expression_genes_comparison
-from .cluster_labeling import label_clusters
-from .file_utils import clear_directory, find_file_with_extension
-from .sc_analysis import *
-from .visualizations import *
+from .enrichment import perform_enrichment_analyses
+from .utils import (
+    clear_directory,
+    dea_split_by_condition,
+    compare_cell_count,
+    repeat
+)
+import os
+import json
+import openai
+import pickle
+
 class ChatBot:
     def __init__(self):
+        # Clean all specified folders and files at initialization
+        clear_directory('annotated_adata')
+        clear_directory('figures')
+        clear_directory('process_cell_data')
+        clear_directory('schatbot/enrichment/go_bp')
+        clear_directory('schatbot/enrichment/go_cc')
+        clear_directory('schatbot/enrichment/go_mf')
+        clear_directory('schatbot/enrichment/gsea')
+        clear_directory('schatbot/enrichment/kegg')
+        clear_directory('schatbot/enrichment/reactome')
+        # Remove files directly inside schatbot/enrichment (not subfolders)
+        enrichment_dir = 'schatbot/enrichment'
+        for filename in os.listdir(enrichment_dir):
+            file_path = os.path.join(enrichment_dir, filename)
+            if os.path.isfile(file_path):
+                try:
+                    os.unlink(file_path)
+                except Exception:
+                    pass
+        # Clean runtime_data subfolders if they exist
+        for subdir in ['runtime_data/basic_data', 'runtime_data/figures', 'runtime_data/process_cell_data']:
+            if os.path.exists(subdir):
+                clear_directory(subdir)
+
         self.conversation_history = []
         self.api_key = os.getenv("OPENAI_API_KEY")
         openai.api_key = self.api_key
         self.adata = None 
-        gene_dict, marker_tree, adata = generate_umap()
+        gene_dict, marker_tree, adata = initial_cell_annotation()
         pth = "annotated_adata/Overall cells_annotated_adata.pkl"
         if os.path.exists(pth):
             with open(pth, "rb") as f:
                 self.adata = pickle.load(f)
         else:
             # fallback: regenerate & annotate in memory
-            _, _, adata = generate_umap()
+            _, _, adata = initial_cell_annotation()
             self.adata = adata
 
         self.function_descriptions = [
             {
-                "name": "generate_umap",
-                "description": "Generate UMAP for RNA analysis.",
+                "name": "initial_cell_annotation",
+                "description": """
+                                Do the initial cell type annotations. 
+                                Returns three values: (1) gene dictionary mapping clusters to their top genes, 
+                                                      (2) marker tree containing cell type markers, and 
+                                                      (3) annotated AnnData object with cell type labels.
+                                This function will be called only once.
+                """,
                 "parameters": {"type": "object", "properties": {}, "required": []},
             },
             {
                 "name": "display_dotplot",
-                "description": "Display dotplot for the sample.",
+                "description": """
+                                Display dotplot for the annotated results.
+                                This function will be called as the user asked to generate/visualize/display the dotplot.
+                """,
                 "parameters": {"type": "object", "properties": {}, "required": []},
             },
             {
                 "name": "display_cell_type_composition",
-                "description": "Display cell type composition graph.",
+                "description": """
+                                Display cell type composition graph.
+                                This function will be called as the user asked to generate/visualize/display the cell type composition graph.
+                """,
                 "parameters": {"type": "object", "properties": {}, "required": []},
             },
             {
                 "name": "display_gsea_dotplot",
-                "description": "Display GSEA dot plot.",
+                "description": """
+                                Display GSEA dot plot.
+                                This function will be called as the user asked to generate/visualize/display the GSEA dot plot.
+                """,
                 "parameters": {"type": "object", "properties": {}, "required": []},
             },
             {
-                "name": "read_image",
-                "description": "Process an image and return a description.",
+                "name": "repeat",
+                "description": "Repeat given sentence",
                 "parameters": {"type": "object", "properties": {}, "required": []},
-            },
-            {
-                "name": "repeater",
-                "description": "repeat given sentence",
-                "parameters": {"type": "object", "properties": {}, "required": []},
-            },
-            {
-                "name": "sample_differential_expression_genes_comparison",
-                "description": "Compare differential expression between two samples for a given cell type.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "cell_type": {"type": "string", "description": "Cell type"},
-                        "sample_1": {"type": "string", "description": "First patient"},
-                        "sample_2": {"type": "string", "description": "Second patient"},
-                    },
-                    "required": ["cell_type", "sample_1", "sample_2"],
-                },
-            },
-            {
-                "name": "label_clusters",
-                "description": "Annotate clusters for a given cell type.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "cell_type": {"type": "string", "description": "Cell type"}
-                    },
-                    "required": ["cell_type"],
-                },
             },
             {
                 "name": "display_umap",
-                "description": "Displays UMAP that is NOT annotated. Use overall cells if no cell type is specified.",
+                "description": """
+                                Displays UMAP that is NOT annotated with the cell types. 
+                                Use overall cells if no cell type is specified.
+                                This function will be called as the user asked to generate/visualize/display the UMAP.
+                """,
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -100,7 +121,11 @@ class ChatBot:
             },
             {
                 "name": "display_processed_umap",
-                "description": "Displays UMAP that IS annotated. Use overall cells if no cell type is specified.",
+                "description": """
+                                Displays UMAP that IS annotated with the cell types. 
+                                Use overall cells if no cell type is specified.
+                                This function will be called as the user asked to generate/visualize/display the UMAP.
+                """,
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -112,10 +137,12 @@ class ChatBot:
                     "required": ["cell_type"],
                 },
             },
-            
             {
                 "name": "perform_enrichment_analyses",
-                "description": "Run one or more enrichment analyses (reactome, go, kegg, gsea) on the DE genes for a given cell type.",
+                "description": """
+                                Run one or more enrichment analyses (reactome, go, kegg, gsea) on the DE genes for a given cell type.
+                                This function will be called as the user asked to generate/visualize/display the enrichment analyses.
+                """,
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -147,10 +174,16 @@ class ChatBot:
                     "required": ["cell_type"]
                 }
             },
-            
             {
                 "name": "process_cells",
-                "description": "Process a specific cell type: recluster, rank genes, save UMAP and dot-plot data, and return top marker genes.",
+                "description": """
+                                Recluster the cells based on the given cell type.
+                                Further annotate the cells based on the top marker genes.
+                                Returns three values: (1) gene dictionary mapping clusters to their top genes, 
+                                                      (2) marker tree containing cell type markers, and 
+                                                      (3) annotated AnnData object with cell type labels.
+                                This function will be called whenever the user asks to further annotate a specific cell type.
+                """,
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -159,73 +192,116 @@ class ChatBot:
                     "required": ["cell_type"]
                 }
             },
-
-        {
-            "name": "display_enrichment_barplot",
-            "description": "Show a barplot of top enriched terms from one of reactome/go/kegg/gsea for a given cell type.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "analysis": {
-                        "type": "string",
-                        "enum": ["reactome","go","kegg","gsea"]
+            {
+                "name": "display_enrichment_barplot",
+                "description": """
+                                Show a barplot of top enriched terms from one of reactome/go/kegg/gsea for a given cell type.
+                                This function will be called as the user asked to generate/visualize/display the enrichment barplot.
+                """,
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "analysis": {
+                            "type": "string",
+                            "enum": ["reactome","go","kegg","gsea"]
+                        },
+                        "cell_type": {"type": "string"},
+                        "top_n": {"type": "integer", "default": 10},
+                        "domain": {
+                            "type": "string",
+                            "enum": ["BP","MF","CC"],
+                            "description": "Only for GO"
+                        }
                     },
-                    "cell_type": {"type": "string"},
-                    "top_n": {"type": "integer", "default": 10},
-                    "domain": {
-                        "type": "string",
-                        "enum": ["BP","MF","CC"],
-                        "description": "Only for GO"
-                    }
-                },
-                "required": ["analysis","cell_type"]
-            }
-        },
-        {
-            "name": "display_enrichment_dotplot",
-            "description": "Show a dotplot (avg log2FC vs. term size) of top enriched terms.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "analysis": {
-                        "type": "string",
-                        "enum": ["reactome","go","kegg","gsea"]
+                    "required": ["analysis","cell_type"]
+                }
+            },
+            {
+                "name": "display_enrichment_dotplot",
+                "description": """
+                                Show a dotplot (gene ratio vs. term) of top enriched terms.
+                                This function will be called as the user asked to generate/visualize/display the enrichment dotplot.
+                """,
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "analysis": {
+                            "type": "string",
+                            "enum": ["reactome","go","kegg","gsea"]
+                        },
+                        "cell_type": {"type": "string"},
+                        "top_n": {"type": "integer", "default": 10},
+                        "domain": {
+                            "type": "string",
+                            "enum": ["BP","MF","CC"],
+                            "description": "Only for GO"
+                        }
                     },
-                    "cell_type": {"type": "string"},
-                    "top_n": {"type": "integer", "default": 10},
-                    "domain": {
-                        "type": "string",
-                        "enum": ["BP","MF","CC"],
-                        "description": "Only for GO"
-                    }
-                },
-                "required": ["analysis","cell_type"]
+                    "required": ["analysis","cell_type"]
+                }
+            },
+            {
+                "name": "dea_split_by_condition",
+                "description": """
+                                Perform differential expression analysis split by condition.
+                                Specifical when the dataset itself has the different conditions in the metadata ex. (p1_pre, p1_post, p2_pre, p2_post), and the user asks to do the differentail expression genes analysis.                              
+                                You will have to call this function.
+                """,
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "cell_type": {"type": "string"}
+                        },
+                    "required": ["cell_type"]
+                }
+            },
+            {
+                "name": "compare_cell_counts",
+                "description": """
+                                Compare cell counts between two conditions.
+                                You will have to specify the cell type and the two conditions ex. (p1_pre, p1_post) or (p2_pre, p1_pre).
+                                If user don't know how to specify the conditions, you can show them the example.
+                                This function will be called as the user asked to compare the cell counts between two conditions.
+                """,
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "cell_type": {"type": "string"},
+                        "sample1": {"type": "string"},
+                        "sample2": {"type": "string"}
+                    },
+                    "required": ["cell_type", "sample1", "sample2"]
+                }
             }
-        }
         ]
 
         def _wrap_process_cells(cell_type, resolution=None):
             annotation_str = process_cells(self.adata, cell_type, resolution)
             return annotation_str
         
+        def _wrap_dea_split_by_condition(cell_type):
+            results = dea_split_by_condition(self.adata, cell_type)
+            return results
+        
+        def _wrap_compare_cell_counts(cell_type, sample1, sample2):
+            results = compare_cell_count(self.adata, cell_type, sample1, sample2)
+            return results
+        
         # Map function names to actual functions
         self.function_mapping = {
-            "generate_umap": generate_umap,
+            "initial_cell_annotation": initial_cell_annotation,
             "display_dotplot": display_dotplot,
             "display_cell_type_composition": display_cell_type_composition,
             "display_gsea_dotplot": display_gsea_dotplot,
-            "read_image": read_image,
-            "sample_differential_expression_genes_comparison": sample_differential_expression_genes_comparison,
-            "label_clusters": label_clusters,
             "repeat": repeat,
             "display_umap": display_umap,
             "display_processed_umap": display_processed_umap,
             "perform_enrichment_analyses": perform_enrichment_analyses,
-            # "display_reactome_barplot": display_reactome_barplot,
             "display_enrichment_barplot": display_enrichment_barplot,
             "display_enrichment_dotplot": display_enrichment_dotplot,
-            "process_cells": _wrap_process_cells
-
+            "process_cells": _wrap_process_cells,
+            "dea_split_by_condition": _wrap_dea_split_by_condition,
+            "compare_cell_counts": _wrap_compare_cell_counts
         }
 
     def send_message(self, message: str) -> str:
@@ -239,8 +315,42 @@ class ChatBot:
         if not self.conversation_history:
             system_message = {
                 "role": "system",
-                "content": ("You are a chatbot specialized in Single Cell RNA Analysis. "
-                            "Provide clear, concise answers and call appropriate functions when needed.")
+                "content": """
+                    You are an expert assistant for single-cell RNA-seq analysis. 
+                    Your primary goal is to help users analyze, visualize, and interpret single-cell data by calling the appropriate functions from the available toolkit.
+
+                    Guidelines:
+                    1. Function Selection: Carefully read the user's request and select the function that most closely matches the user's intent, based on the function descriptions provided. 
+                       If the user asks for a plot or visualization (e.g., dotplot, UMAP, enrichment barplot/dotplot, cell type composition), call the corresponding display function. 
+                       If the user requests an analysis (e.g., enrichment, differential expression, cell count comparison), call the relevant analysis function. 
+                       If the user asks to annotate, further annotate, further process cells, use the annotation functions.
+
+                    2. Parameter Extraction: Extract all required parameters from the user's message. 
+                                             If a parameter is not specified but is required, use sensible defaults as described in the function's documentation. 
+                                             For optional parameters, use defaults unless the user specifies otherwise.
+
+                    3. Enrichment Analysis: When the user asks for enrichment (Reactome, GO, KEGG, GSEA), call perform_enrichment_analyses and specify the analyses as needed. 
+                                            For enrichment visualizations, use display_enrichment_barplot or display_enrichment_dotplot with the correct analysis type and cell type.
+
+                    4. Visualization: For UMAPs, dotplots, and cell type composition, use the corresponding display function. 
+                                      If the user asks for a plot for a specific cell type, ensure the cell_type parameter is set.
+
+                    5. Annotation: For further annotation, use process_cells as appropriate.
+
+                    6. Differential Expression and Cell Counts: For DE analysis split by condition, use dea_split_by_condition. 
+                                                                For comparing cell counts between conditions, especially when user asks to compare the cell counts between two conditions, use compare_cell_counts.
+
+                    8. Response Formatting: For visualization functions, return the graph HTML as specified. For analysis functions, return the results in a clear, concise format.
+
+                    Always:
+                    - Be precise in mapping user intent to function calls.
+                    - Use the function descriptions as your reference for what each function does and what parameters it needs.
+
+                    When a user asks a question, select and call the most appropriate function from the provided toolkit, using the function descriptions and required parameters. 
+                    Extract all necessary information from the user's message, use defaults where appropriate, and return results or visualizations as specified. 
+                    If the user's request is ambiguous, ask for clarification. Always provide clear, concise answers and call appropriate functions when needed.
+                """
+
             }
             self.conversation_history.append(system_message)
 
@@ -273,7 +383,7 @@ class ChatBot:
                 if function_name == "perform_enrichment_analyses":
                     # ensure we have an AnnData loaded
                     if self.adata is None:
-                        _, _, self.adata = generate_umap()
+                        _, _, self.adata = initial_cell_annotation()
                     result = perform_enrichment_analyses(
                     self.adata,
                     cell_type       = function_args.get("cell_type"),
@@ -307,7 +417,7 @@ class ChatBot:
                 if function_name in ["display_umap", "display_processed_umap", "display_dotplot", "display_cell_type_composition", "display_gsea_dotplot", "display_enrichment_barplot","display_enrichment_dotplot"]:
                     # Do NOT add the visualization result to conversation history.
                     return json.dumps({"response": "", "graph_html": result})
-                elif function_name != "generate_umap" and function_name != "process_cells":
+                elif function_name != "initial_cell_annotation" and function_name != "process_cells":
                     self.conversation_history.append({"role": "user", "content": message})
                     self.conversation_history.append({"role": "assistant", "content": result})
                     new_response = openai.chat.completions.create(

@@ -1,7 +1,7 @@
 import os
 import json
 import openai
-from .file_utils import clear_directory, find_file_with_extension
+from .utils import clear_directory, find_file_with_extension
 from .sc_analysis import generate_umap
 from .image_processing import *
 from .visualizations import *

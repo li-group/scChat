@@ -40,6 +40,103 @@ load_dotenv()             # 🔑 actually read .env into os.environ
 warnings.filterwarnings("ignore", category=PerformanceWarning)
 
 
+
+def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pval_threshold=0.05, save_csv=True):
+    try:
+        # Create a copy of the AnnData object
+        adata_modified = adata.copy()
+        
+        # First, split the data into pre and post conditions
+        pre_mask = adata_modified.obs["patient_name"].str.contains("_pre")
+        post_mask = ~pre_mask  # All non-pre cells are post
+        
+        # Create separate AnnData objects for pre and post
+        adata_pre = adata_modified[pre_mask].copy()
+        adata_post = adata_modified[post_mask].copy()
+        
+        # Check if both datasets have cells
+        if len(adata_pre) == 0 or len(adata_post) == 0:
+            print("Error: One of the conditions (pre or post) has no cells.")
+            return adata_pre, adata_post, [], []
+        
+        # For pre condition dataset: Create a new column for cell type comparison
+        adata_pre.obs["cell_type_group"] = "Other"
+        cell_type_mask_pre = adata_pre.obs["cell_type"] == str(cell_type)
+        adata_pre.obs.loc[cell_type_mask_pre, "cell_type_group"] = str(cell_type)
+        
+        # For post condition dataset: Create a new column for cell type comparison
+        adata_post.obs["cell_type_group"] = "Other"
+        cell_type_mask_post = adata_post.obs["cell_type"] == str(cell_type)
+        adata_post.obs.loc[cell_type_mask_post, "cell_type_group"] = str(cell_type)
+        
+        # Check if both datasets have the specified cell type
+        if sum(cell_type_mask_pre) == 0:
+            print(f"Error: No {cell_type} cells found in pre condition.")
+            return adata_pre, adata_post, [], []
+        
+        if sum(cell_type_mask_post) == 0:
+            print(f"Error: No {cell_type} cells found in post condition.")
+            return adata_pre, adata_post, [], []
+        
+        # Set up the key names for the results
+        pre_key_name = f"{cell_type}_markers_pre_only"
+        post_key_name = f"{cell_type}_markers_post_only"
+        
+        # Perform differential expression analysis for pre condition
+        sc.tl.rank_genes_groups(adata_pre, groupby="cell_type_group", 
+                            groups=[str(cell_type)], reference="Other",
+                            method="wilcoxon", n_genes=n_genes, 
+                            key_added=pre_key_name, use_raw_=False)
+        
+        # Perform differential expression analysis for post condition
+        sc.tl.rank_genes_groups(adata_post, groupby="cell_type_group", 
+                            groups=[str(cell_type)], reference="Other",
+                            method="wilcoxon", n_genes=n_genes, 
+                            key_added=post_key_name, use_raw_=False)
+        
+        # Get pre condition results
+        pre_data = sc.get.rank_genes_groups_df(adata_pre, group=str(cell_type), key=pre_key_name)
+        pre_significant_genes = list(pre_data.loc[(pre_data['pvals_adj'] < pval_threshold) & 
+                            (abs(pre_data['logfoldchanges']) > logfc_threshold), 'names'])
+        
+        # Get post condition results
+        post_data = sc.get.rank_genes_groups_df(adata_post, group=str(cell_type), key=post_key_name)
+        post_significant_genes = list(post_data.loc[(post_data['pvals_adj'] < pval_threshold) & 
+                                (abs(post_data['logfoldchanges']) > logfc_threshold), 'names'])
+        
+        # Save results to CSV if requested
+        if save_csv:
+            # Save pre condition results
+            pre_file_name = f"{cell_type}_markers_pre_only.csv"
+            pre_data.to_csv(pre_file_name, index=False)
+            print(f"Pre condition {cell_type} marker results saved to {pre_file_name}")
+            
+            # Save post condition results
+            post_file_name = f"{cell_type}_markers_post_only.csv"  
+            post_data.to_csv(post_file_name, index=False)
+            print(f"Post condition {cell_type} marker results saved to {post_file_name}")
+        
+        return adata_pre, adata_post, pre_significant_genes, post_significant_genes
+    
+    except Exception as e:
+        print(f"Error in analysis: {e}")
+        return None, None, [], []
+
+def compare_cell_count(adata, cell_type, sample1, sample2):
+    mask_sample1 = adata.obs["patient_name"] == sample1
+    mask_sample2 = adata.obs["patient_name"] == sample2
+    mask_cells = adata.obs["cell_type"] == cell_type
+    combined_mask1 = mask_sample1 & mask_cells
+    combined_mask2 = mask_sample2 & mask_cells
+    adata_sample1 = adata[combined_mask1]
+    adata_sample2 = adata[combined_mask2]
+    sample1_num = adata_sample1.shape[0]
+    sample2_num = adata_sample2.shape[0]
+
+    counts_comp = {f"{sample1}": sample1_num, f"{sample2}": sample2_num}
+    return counts_comp
+
+
 def dea(adata, cell_type):
     try:
         adata_modified = adata.copy()
@@ -69,8 +166,6 @@ def get_significant_gene(adata, cell_type, logfc_threshold=1, pval_threshold=0.0
     ].tolist()
     return sig, gene_to_logfc
 
-
-import os
 
 def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold=0.05, top_n_terms=10, 
                         save_raw=True, save_summary=True, save_plots=True, output_prefix="reactome"):
@@ -1268,7 +1363,7 @@ def get_rag():
     """Retrieve marker genes using Neo4j graph database."""
     # Initialize Neo4j connection
     uri = "bolt://localhost:7687"
-    driver = GraphDatabase.driver(uri, auth=("neo4j", "DBMSPassword"))
+    driver = GraphDatabase.driver(uri, auth=("neo4j", "37754262"))
     
     # Load specification from JSON
     specification = None
@@ -1318,7 +1413,7 @@ def get_rag():
 def get_subtypes(cell_type):
     """Get subtypes of a given cell type using Neo4j."""
     uri = "bolt://localhost:7687"
-    driver = GraphDatabase.driver(uri, auth=("neo4j", "DBMSPassword"))
+    driver = GraphDatabase.driver(uri, auth=("neo4j", "37754262"))
     
     # Load specification for database info
     specification = None
@@ -1694,7 +1789,7 @@ def save_analysis_results(adata, prefix, leiden_key='leiden', save_umap=True,
         dot_plot_data.to_csv(f"{prefix}_dot_plot_data.csv", index=False)
 
 # Main pipeline functions
-def generate_umap(resolution=2):
+def initial_cell_annotation(resolution=2):
     """Generate initial UMAP clustering on the full dataset."""
     global sample_mapping
     
@@ -1861,12 +1956,21 @@ def process_cells(adata, cell_type, resolution=None):
     prompt = f"Top genes details: {gene_dict}. Markers: {markers_tree}."
     messages = [
         SystemMessage(content="""
-            You are a bioinformatics researcher that can do cell annotation.
-            You will receive:
-            1. A gene list of top 25 marker genes per cluster.
-            2. A marker tree to guide annotation.
-            Identify the most specific cell type for each cluster and return
-            strictly a Python dict mapping cluster IDs to cell types.
+            You are a bioinformatics researcher that can do the cell annotation.
+            The following are the data and its decription that you will receive.
+            * 1. Gene list: top 25 cells arragned from the highest to lowest expression levels in each cluster.
+            * 2. Marker tree: marker genes that can help annotating cell type.           
+            
+            Identify the cell type for each cluster using the following markers in the marker tree.
+            This means you will have to use the markers to annotate the cell type in the gene list. 
+            Provide your result as the most specific cell type that is possible to be determined.
+            
+            Provide your output in the following example format:
+            Analysis: group_to_cell_type = {'0': 'Cell type','1': 'Cell type','2': 'Cell type','3': 'Cell type','4': 'Cell type', ...}.
+            
+            Strictly adhere to follwing rules:
+            * 1. Adhere to the dictionary format and do not include any additional words or explanations.
+            * 2. The cluster number in the result dictionary must be arranged with raising power.
         """),
         HumanMessage(content=prompt),
     ]
@@ -1968,7 +2072,7 @@ if __name__ == "__main__":
     clear_directory("umaps")
     clear_directory("process_cell_data")  
     clear_directory("figures") 
-    gene_dict, marker_tree, adata = generate_umap()  
+    gene_dict, marker_tree, adata = initial_cell_annotation()  
     input_msg =(f"Top genes details: {gene_dict}. "
                 f"Markers: {marker_tree}. ")
     

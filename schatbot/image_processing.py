@@ -2,7 +2,7 @@ import os
 import base64
 import json
 import requests
-from .file_utils import find_file_with_extension
+from .utils import find_file_with_extension
 
 def read_image() -> str:
     """

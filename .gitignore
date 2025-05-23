@@ -11,3 +11,4 @@ env/
 *.pkl
 /data/
 /models/
+*.csv

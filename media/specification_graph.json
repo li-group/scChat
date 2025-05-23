@@ -1,5 +1,5 @@
 {
-    "database": "neo4j",
-    "system": "Female Reproductive System",
-    "organ": "Breast"
+    "database": "human2",
+    "system": "Lymphatic System",
+    "organ": "Peripheral blood"
 }
