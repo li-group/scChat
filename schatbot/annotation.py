@@ -7,7 +7,7 @@ import os
 import ast
 from langchain.schema import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
-from .utils import get_rag, get_subtypes, save_analysis_results
+from .utils import get_rag, get_subtypes, save_analysis_results, explain_gene
 
 # Cell type naming/standardization
 
@@ -274,6 +274,10 @@ def initial_cell_annotation(resolution=2):
         gene_dict[cluster] = list(group["gene"])
     input_msg =(f"Top genes details: {gene_dict}. "
                 f"Markers: {marker_tree}. ")
+    # print ("MARKER TREE ", marker_tree)
+    #adding
+    # for 
+    #done adding
     messages = [
         SystemMessage(content="""
             You are a bioinformatics researcher that can do the cell annotation.
@@ -301,7 +305,13 @@ def initial_cell_annotation(resolution=2):
     results = model.invoke(messages)
     annotation_result = results.content
     label_clusters(adata=adata, cell_type="Overall", annotation_result=annotation_result)
-    return gene_dict, marker_tree, adata
+
+    #adding
+    explanation = explain_gene(gene_dict=gene_dict, marker_tree=marker_tree, annotation_result=annotation_result)
+    print ("EXPLANATION", explanation)
+    #done adding
+
+    return gene_dict, marker_tree, adata, explanation, annotation_result
 
 
 def process_cells(adata, cell_type, resolution=None):
@@ -314,6 +324,7 @@ def process_cells(adata, cell_type, resolution=None):
       5) Merge back into full adata + resave overall UMAP
       6) Return annotation dict as string
     """
+    print ("CELL TYPE INSIDE PROCESS CELLS ", cell_type)
     from .utils import extract_genes
     resolution = 1 if resolution is None else resolution
     possible_types = get_possible_cell_types(cell_type)
@@ -402,6 +413,16 @@ def process_cells(adata, cell_type, resolution=None):
     csv_path = os.path.join(umap_dir, "Overall cells_umap_data.csv")
     overall_df.to_csv(csv_path, index=False)
     df_check = pd.read_csv(csv_path)
+
+    #adding
+    explanation = explain_gene(gene_dict=gene_dict, marker_tree=markers_tree, annotation_result=annotation_result)
+    # final_result = (
+    #     f"Initial annotation complete.\n"
+    #     f"• Annotation Result: {annotation_result}\n"
+    #     f"• Top-genes per cluster: {gene_dict}\n"
+    #     f"• Marker-tree: {markers_tree}\n"
+    #     f"• Explanation: {explanation}"
+    # )    #done adding
     return str(annotation_result)
 
 

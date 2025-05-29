@@ -50,7 +50,19 @@ class ChatBot:
         self.api_key = os.getenv("OPENAI_API_KEY")
         openai.api_key = self.api_key
         self.adata = None 
-        gene_dict, marker_tree, adata = initial_cell_annotation()
+        gene_dict, marker_tree, adata, explanation, annotation_result = initial_cell_annotation()
+
+        self.conversation_history.append({
+           "role": "assistant",
+           "content": (
+               "Initial annotation complete.\n"
+               f"• Annotation Result: {annotation_result}\n"
+               f"• Top‐genes per cluster: {gene_dict}\n"
+               f"• Marker‐tree: {marker_tree}\n"
+               f"• Explanation: {explanation}"
+           )
+       })
+
         pth = "annotated_adata/Overall cells_annotated_adata.pkl"
         if os.path.exists(pth):
             with open(pth, "rb") as f:
@@ -304,6 +316,18 @@ class ChatBot:
             "compare_cell_counts": _wrap_compare_cell_counts
         }
 
+    def _chat_only(self, user_message: str) -> str:
+        """Ask gpt-4o directly, with no function schemas."""
+        resp = openai.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                self.conversation_history[0],
+                {"role": "user", "content": user_message}
+            ]
+        )
+        return resp.choices[0].message.content
+
+
     def send_message(self, message: str) -> str:
         """
         Uses minimal context (system message and current user message) to call ChatGPT.
@@ -430,6 +454,8 @@ class ChatBot:
                     self.conversation_history.append({"role": "assistant", "content": final_response})
                     return final_response
                 else:
+                    if function_name == "process_cells":
+                        self.conversation_history.append({"role": "assistant", "content": result})
                     cell = function_args.get("cell_type")
                     umap_html = display_processed_umap(cell_type=cell)
                     # we treat it like any other graph return:
@@ -451,3 +477,243 @@ class ChatBot:
             final_response = new_response.choices[0].message.content
             self.conversation_history.append({"role": "assistant", "content": final_response})
             return final_response
+
+
+    # def send_message(self, message: str) -> str:
+    #     """
+    #     1) o4-mini reasoning layer decides: direct-function / rewrite / pass-through
+    #     2) If direct-function: we call it immediately & return
+    #     3) Otherwise we rewrite (if requested) or use original message
+    #     4) Then your existing GPT-4O logic runs as before
+    #     """
+    #     import json
+
+    #     # ── Stage 1: reasoning layer ──
+    #     reasoning = openai.chat.completions.create(
+    #         model="o4-mini",
+    #         messages=[
+    #             {"role":"system","content":"""
+    #                 You are a router for single-cell RNA-seq requests.
+    #                 Given the raw user message, output a JSON object with exactly one of:
+    #                 1) { "function": "<function_name>", "args": { ... } }
+    #                    → to bypass GPT and call that function immediately
+    #                 2) { "rewrite": "<new user prompt>" }
+    #                    → to modify the prompt before GPT handles it
+    #                 3) { "pass": true }
+    #                    → to let the normal GPT-4O pipeline handle things
+    #                 Do NOT include anything else.
+    #             """},
+    #             {"role":"user","content": message}
+    #         ],
+    #         # temperature=0
+    #     )
+    #     print ("reasoning ", reasoning)
+    #     try:
+    #         decision = json.loads(reasoning.choices[0].message.content)
+    #     except Exception:
+    #         decision = {"pass": True}
+
+    #     # ── Stage 2: direct function override ──
+    #     if decision.get("function"):
+    #         fn_name = decision["function"]
+    #         fn_args = decision.get("args", {})
+    #         if fn_name in self.function_mapping:
+    #             result = self.function_mapping[fn_name](**fn_args)
+    #             # if it’s a viz, return graph_html
+    #             if fn_name in [
+    #                 "display_umap", "display_processed_umap",
+    #                 "display_dotplot", "display_cell_type_composition",
+    #                 "display_gsea_dotplot",
+    #                 "display_enrichment_barplot", "display_enrichment_dotplot"
+    #             ]:
+    #                 return json.dumps({"response":"", "graph_html": result})
+    #             return result
+    #         else:
+    #             return f"Function {fn_name} not found."
+
+    #     # ── Stage 3: rewrite or pass-through ──
+    #     user_prompt = decision.get("rewrite", message)
+
+    #     # ── Stage 4: your existing GPT-4O pipeline ──
+
+    #     # ensure system message
+    #     if not self.conversation_history:
+    #         self.conversation_history.append({
+    #             "role":"system","content":"""
+    #                 You are an expert assistant for single-cell RNA-seq analysis. 
+    #                 Your primary goal is to help users analyze, visualize, and interpret single-cell data by calling the appropriate functions from the available toolkit.
+
+    #                 Guidelines:
+    #                 1. Function Selection: Carefully read the user's request and select the function that most closely matches the user's intent...
+    #                 ... (rest of your system prompt here) ...
+    #             """
+    #         })
+
+    #     minimal_history = [
+    #         self.conversation_history[0],
+    #         {"role":"user","content": user_prompt}
+    #     ]
+
+    #     gpt4o_resp = openai.chat.completions.create(
+    #         model="gpt-4o",
+    #         messages=minimal_history,
+    #         functions=self.function_descriptions,
+    #         function_call="auto"
+    #     )
+    #     output = gpt4o_resp.choices[0].message
+
+    #     # ── If GPT-4O wants to call a function ──
+    #     if output.function_call:
+    #         fn_name = output.function_call.name
+    #         try:
+    #             fn_args = json.loads(output.function_call.arguments or "{}")
+    #         except:
+    #             fn_args = {}
+
+    #         # enrichment special‐case
+    #         if fn_name == "perform_enrichment_analyses":
+    #             if self.adata is None:
+    #                 _, _, self.adata = initial_cell_annotation()
+    #             result = perform_enrichment_analyses(
+    #                 self.adata,
+    #                 cell_type       = fn_args.get("cell_type"),
+    #                 analyses        = fn_args.get("analyses"),
+    #                 logfc_threshold = fn_args.get("logfc_threshold", 1.0),
+    #                 pval_threshold  = fn_args.get("pval_threshold", 0.05),
+    #                 top_n_terms     = fn_args.get("top_n_terms", 10),
+    #             )
+    #             self.conversation_history.append({
+    #                 "role":"function","name":fn_name,
+    #                 "content": json.dumps(result)
+    #             })
+    #             followup = openai.chat.completions.create(
+    #                 model="gpt-4o",
+    #                 messages=self.conversation_history,
+    #                 temperature=0.2,
+    #                 top_p=0.4
+    #             )
+    #             answer = followup.choices[0].message.content
+    #             self.conversation_history.append({"role":"assistant","content":answer})
+    #             return answer
+
+    #         # generic dispatch
+    #         result = self.function_mapping[fn_name](**fn_args)
+
+    #         # viz vs analysis branching
+    #         if fn_name in [
+    #             "display_umap","display_processed_umap",
+    #             "display_dotplot","display_cell_type_composition",
+    #             "display_gsea_dotplot",
+    #             "display_enrichment_barplot","display_enrichment_dotplot"
+    #         ]:
+    #             return json.dumps({"response":"", "graph_html": result})
+
+    #         elif fn_name not in ["initial_cell_annotation","process_cells"]:
+    #             self.conversation_history.append({"role":"user","content":message})
+    #             self.conversation_history.append({"role":"assistant","content":result})
+    #             follow = openai.chat.completions.create(
+    #                 model="gpt-4o",
+    #                 messages=self.conversation_history,
+    #                 temperature=0.2,
+    #                 top_p=0.4
+    #             )
+    #             final = follow.choices[0].message.content
+    #             self.conversation_history.append({"role":"assistant","content":final})
+    #             return final
+
+    #         else:
+    #             # process_cells → show annotated UMAP
+    #             cell = fn_args.get("cell_type")
+    #             umap_html = display_processed_umap(cell_type=cell)
+    #             return json.dumps({"response":"", "graph_html": umap_html})
+
+    #     # ── No function call: full‐history chat ──
+    #     else:
+    #         self.conversation_history.append({"role":"user","content":message})
+    #         self.conversation_history.append({"role":"assistant","content":output.content})
+
+    #         full = openai.chat.completions.create(
+    #             model="gpt-4o",
+    #             messages=self.conversation_history,
+    #             temperature=0.2,
+    #             top_p=0.4
+    #         )
+    #         reply = full.choices[0].message.content
+    #         self.conversation_history.append({"role":"assistant","content":reply})
+    #         return reply
+
+
+#     def send_message(self, message: str) -> str:
+#         """
+#         Uses a reasoning-capable model (o4-mini) to pick & call functions directly.
+#         If the model returns a function_call, we dispatch it immediately.
+#         Otherwise we just return its content.
+#         """
+#         import json
+
+#         # 1) Ensure we have your original system message
+#         if not self.conversation_history:
+#             self.conversation_history.append({
+#                 "role": "system",
+#                 "content": """
+# You are an expert assistant for single-cell RNA-seq analysis. 
+# Your primary goal is to help users analyze, visualize, and interpret single-cell data by calling the appropriate functions from the available toolkit.
+
+# When the user asks for a plot or analysis, pick and invoke the matching function with the right parameters. 
+# If the model does not emit a function_call, simply return its content as free text.
+# """
+#             })
+
+#         # 2) Build minimal context
+#         minimal = [
+#             self.conversation_history[0],
+#             {"role": "user", "content": message}
+#         ]
+
+#         # 3) Single reasoning / function-calling step:
+#         resp = openai.chat.completions.create(
+#             model="o4-mini",
+#             messages=minimal,
+#             functions=self.function_descriptions,
+#             function_call="auto"
+#         )
+#         out = resp.choices[0].message
+
+#         # 4) If it picked a function, dispatch:
+#         if out.function_call:
+#             name = out.function_call.name
+#             raw_args = out.function_call.arguments or "{}"
+#             try:
+#                 args = json.loads(raw_args)
+#             except:
+#                 args = {}
+
+#             # special‐case enrichment so we ensure self.adata
+#             if name == "perform_enrichment_analyses":
+#                 if self.adata is None:
+#                     _, _, self.adata = initial_cell_annotation()
+#                 result = perform_enrichment_analyses(
+#                     self.adata,
+#                     cell_type       = args.get("cell_type"),
+#                     analyses        = args.get("analyses"),
+#                     logfc_threshold = args.get("logfc_threshold", 1.0),
+#                     pval_threshold  = args.get("pval_threshold", 0.05),
+#                     top_n_terms     = args.get("top_n_terms", 10),
+#                 )
+#             else:
+#                 result = self.function_mapping[name](**args)
+
+#             # if it’s a viz, return graph_html
+#             if name in [
+#                 "display_umap", "display_processed_umap",
+#                 "display_dotplot", "display_cell_type_composition",
+#                 "display_gsea_dotplot",
+#                 "display_enrichment_barplot", "display_enrichment_dotplot"
+#             ]:
+#                 return json.dumps({"response": "", "graph_html": result})
+
+#             # otherwise return the raw result
+#             return result
+
+#         # 5) No function_call → just return content
+#         return out.content

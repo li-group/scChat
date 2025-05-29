@@ -953,5 +953,5 @@ def perform_enrichment_analyses(
 
     return {
         "Top terms": top_terms,
-        "Top terms stattistics": rec
+        "Top terms statistics": rec
     }
