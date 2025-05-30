@@ -8,59 +8,126 @@ import ast
 from langchain.schema import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 from .utils import get_rag, get_subtypes, save_analysis_results, explain_gene
+import re
 
 # Cell type naming/standardization
 
 def unified_cell_type_handler(cell_type):
     """
-    Standardizes cell type names with proper handling for special cases.
+    Standardizes cell type names to match the new database format:
+    - Singular form (ends with "cell" not "cells")
+    - CD markers use "-positive" format
+    - First word capitalized (except special abbreviations)
+    - Handles multi-word cell types with proper capitalization
     """
-    known_cell_types = {
-        "platelet": "Platelets",
-        "platelets": "Platelets",
-        "lymphocyte": "Lymphocytes",
-        "lymphocytes": "Lymphocytes",
-        "natural killer cell": "Natural killer cells",
-        "natural killer cells": "Natural killer cells",
-        "plasmacytoid dendritic cell": "Plasmacytoid dendritic cells",
-        "plasmacytoid dendritic cells": "Plasmacytoid dendritic cells"
-    }
-    clean_type = cell_type.lower().strip()
-    if clean_type.endswith(' cells'):
-        clean_type = clean_type[:-6].strip()
-    elif clean_type.endswith(' cell'):
-        clean_type = clean_type[:-5].strip()
-    if clean_type in known_cell_types:
-        return known_cell_types[clean_type]
-    words = clean_type.split()
-    if len(words) == 1:
-        if words[0].endswith('s') and not words[0].endswith('ss'):
-            return words[0].capitalize()
+    if not cell_type or not isinstance(cell_type, str):
+        return "Unknown cell"
+    # Clean and normalize input
+    clean_type = cell_type.strip()
+    # Handle CD markers: convert all formats to -positive/-negative
+    # Convert + to -positive
+    clean_type = re.sub(r'\bCD(\d+)\+', r'CD\1-positive', clean_type, flags=re.IGNORECASE)
+    # Convert - to -negative
+    clean_type = re.sub(r'\bCD(\d+)-(?!positive|negative)', r'CD\1-negative', clean_type, flags=re.IGNORECASE)
+    # Convert space-separated format
+    clean_type = re.sub(r'\bCD(\d+) positive\b', r'CD\1-positive', clean_type, flags=re.IGNORECASE)
+    clean_type = re.sub(r'\bCD(\d+) negative\b', r'CD\1-negative', clean_type, flags=re.IGNORECASE)
+    # Remove trailing "cell" or "cells" for processing
+    flag = 0
+    if clean_type.lower().endswith(' cells'):
+        base_type = clean_type[:-6].strip()
+        flag = 1
+    elif clean_type.lower().endswith(' cell'):
+        base_type = clean_type[:-5].strip()
+        flag = 2
+    else:
+        base_type = clean_type
+        flag = 3
+    # Split into words for processing
+    words = base_type.split()
+    if not words:
+        return "Unknown cell"
+    # Process each word
+    processed_words = []
+    for i, word in enumerate(words):
+        # Strip trailing punctuation for processing
+        punct = ''
+        m = re.match(r'^(.*?)([,.\.;:])$', word)
+        if m:
+            core_word, punct = m.groups()
         else:
-            return f"{words[0].capitalize()} cells"
-    elif len(words) == 2:
-        special_first_words = ['t', 'b', 'nk', 'cd4', 'cd8']
-        if words[0].lower() in special_first_words:
-            return f"{words[0].upper()} cells"
+            core_word = word
+        word_to_process = core_word
+        word_lower = word_to_process.lower()
+        # Special handling for CD markers: uppercase CD and number, lowercase suffix
+        cd_match = re.match(r'^(cd\d+)(?:[+\-]|(-positive|-negative))$', word_to_process, flags=re.IGNORECASE)
+        if cd_match:
+            cd_part = cd_match.group(1).upper()
+            suffix = ''
+            # handle explicit suffix (e.g., "-positive" or "-negative")
+            suff_match = re.search(r'(-positive|-negative)', word_to_process, flags=re.IGNORECASE)
+            if suff_match:
+                suffix = suff_match.group(1).lower()
+            processed_core = cd_part + suffix
+            processed_words.append(processed_core + punct)
+            continue
+        elif word_lower in ['t', 'b', 'nk', 'th1', 'th2', 'th17', 'treg', 'dc']:
+            processed_core = word_to_process.upper()
+            processed_words.append(processed_core + punct)
+        elif word_lower in ['alpha', 'beta', 'gamma', 'delta']:
+            processed_core = word_lower
+            processed_words.append(processed_core + punct)
+        elif word_lower in ['and', 'or', 'of', 'in']:
+            processed_core = word_lower
+            processed_words.append(processed_core + punct)
+        elif word_to_process in ['+', '-', '/', ',']:
+            processed_core = word_to_process
+            processed_words.append(processed_core + punct)
         else:
-            return f"{words[0].capitalize()} {words[1].capitalize()} cells"
-    elif len(words) >= 3:
-        return f"{words[0].capitalize()} {' '.join(words[1:])} cells"
-    return f"{cell_type} cells"
-
+            # Capitalize first letter of regular words
+            if i == 0 or words[i-1].lower() in ['and', 'or']:
+                processed_core = word_to_process.capitalize()
+            else:
+                processed_core = word_to_process.lower()
+            processed_words.append(processed_core + punct)
+    # Join words and add "cell" at the end (singular)
+    result = ' '.join(processed_words)
+    # Special cases: immunocyte names should always be singular
+    special = [
+        'platelet', 'platelets',
+        'erythrocyte', 'erythrocytes',
+        'lymphocyte', 'lymphocytes',
+        'monocyte', 'monocytes',
+        'neutrophil', 'neutrophils',
+        'eosinophil', 'eosinophils',
+        'basophil', 'basophils'
+    ]
+    if result.lower() in special:
+        # singularize by stripping trailing 's'
+        singular = result.lower().rstrip('s')
+        return singular.capitalize()
+    # Ensure it ends with "cell" (singular)
+    if flag == 1 or flag == 2:
+        result += ' cell'
+    return result
 
 def standardize_cell_type(cell_type):
     """
-    Standardize cell type strings for flexible matching.
-    Handles multi-word cell types, singular/plural forms, and capitalization.
+    Standardize cell type strings for flexible matching with the new database.
+    Converts to lowercase and handles CD markers consistently.
     """
     clean_type = cell_type.lower().strip()
+    # Normalize CD markers to -positive/-negative format
+    clean_type = re.sub(r'\bcd(\d+)\+', r'cd\1-positive', clean_type)
+    clean_type = re.sub(r'\bcd(\d+)-(?!positive|negative)', r'cd\1-negative', clean_type)
+    clean_type = re.sub(r'\bcd(\d+) positive\b', r'cd\1-positive', clean_type)
+    clean_type = re.sub(r'\bcd(\d+) negative\b', r'cd\1-negative', clean_type)
+    # Remove "cells" or "cell" suffix for base form
     if clean_type.endswith(' cells'):
         clean_type = clean_type[:-6].strip()
     elif clean_type.endswith(' cell'):
         clean_type = clean_type[:-5].strip()
     return clean_type
-
 
 def get_possible_cell_types(cell_type):
     """
@@ -122,7 +189,7 @@ def preprocess_data(adata, sample_mapping=None):
     return adata
 
 
-def perform_clustering(adata, resolution=2, random_state=42):
+def perform_clustering(adata, resolution=1, random_state=42):
     """
     Perform UMAP and Leiden clustering with consistent parameters.
     """
@@ -232,7 +299,7 @@ def rank_ordering(adata_or_result, key=None, n_genes=25):
 
 # Main annotation workflow
 
-def initial_cell_annotation(resolution=2):
+def initial_cell_annotation(resolution=1):
     """
     Generate initial UMAP clustering on the full dataset.
     """
@@ -300,11 +367,11 @@ def initial_cell_annotation(resolution=2):
     ]
     model = ChatOpenAI(
         model="gpt-4o",
-        temperature=0
+        temperature=0,
     )
     results = model.invoke(messages)
     annotation_result = results.content
-    label_clusters(adata=adata, cell_type="Overall", annotation_result=annotation_result)
+    adata = label_clusters(adata=adata, cell_type="Overall", annotation_result=annotation_result)
 
     #adding
     explanation = explain_gene(gene_dict=gene_dict, marker_tree=marker_tree, annotation_result=annotation_result)
@@ -327,9 +394,12 @@ def process_cells(adata, cell_type, resolution=None):
     print ("CELL TYPE INSIDE PROCESS CELLS ", cell_type)
     from .utils import extract_genes
     resolution = 1 if resolution is None else resolution
-    possible_types = get_possible_cell_types(cell_type)
+    # possible_types = get_possible_cell_types(cell_type)
+
     standardized = unified_cell_type_handler(cell_type)
-    mask = adata.obs["cell_type"].isin(possible_types)
+    standardized_list = [standardized]
+    
+    mask = adata.obs["cell_type"].isin(standardized_list)
     if mask.sum() == 0:
         return {}, None, None
     filtered = adata[mask].copy()
@@ -393,10 +463,11 @@ def process_cells(adata, cell_type, resolution=None):
         HumanMessage(content=prompt),
     ]
     results = ChatOpenAI(model="gpt-4o", temperature=0).invoke(messages)
+    print("RESULTS", results)
     annotation_result = results.content
-    out_pkl = f"annotated_adata/{standardized}_annotated_adata.pkl"
-    os.makedirs(os.path.dirname(out_pkl), exist_ok=True)
-    pickle.dump(filtered, open(out_pkl, "wb"))
+    # out_pkl = f"schatbot/annotated_adata/{standardized}_annotated_adata.pkl"
+    # os.makedirs(os.path.dirname(out_pkl), exist_ok=True)
+    # pickle.dump(filtered, open(out_pkl, "wb"))
     annotated_filtered = label_clusters(
         annotation_result=annotation_result,
         cell_type=cell_type,
@@ -449,7 +520,7 @@ def label_clusters(annotation_result, cell_type, adata):
                 save_dendrogram=False,
                 save_dotplot=False
             )
-            fname = f'annotated_adata/{standardized_name}_annotated_adata.pkl'
+            fname = f'schatbot/annotated_adata/{standardized_name}_annotated_adata.pkl'
             with open(fname, "wb") as file:
                 pickle.dump(adata, file)
         else:
@@ -463,7 +534,7 @@ def label_clusters(annotation_result, cell_type, adata):
                 save_dendrogram=False,
                 save_dotplot=False
             )
-            fname = f'annotated_adata/{standardized_name}_annotated_adata.pkl'
+            fname = f'schatbot/annotated_adata/{standardized_name}_annotated_adata.pkl'
             with open(fname, "wb") as file:
                 pickle.dump(specific_cells, file)
             return specific_cells

@@ -159,7 +159,7 @@ def get_rag():
     """Retrieve marker genes using Neo4j graph database."""
     from neo4j import GraphDatabase
     uri = "bolt://localhost:7687"
-    driver = GraphDatabase.driver(uri, auth=("neo4j", "DBMSPassword"))
+    driver = GraphDatabase.driver(uri, auth=("neo4j", "37754262"))
     specification = None
     file_path = "media/specification_graph.json"
     if os.path.exists(file_path):
@@ -197,7 +197,7 @@ def get_subtypes(cell_type):
     """Get subtypes of a given cell type using Neo4j."""
     from neo4j import GraphDatabase
     uri = "bolt://localhost:7687"
-    driver = GraphDatabase.driver(uri, auth=("neo4j", "DBMSPassword"))
+    driver = GraphDatabase.driver(uri, auth=("neo4j", "37754262"))
     specification = None
     file_path = "media/specification_graph.json"
     if os.path.exists(file_path):

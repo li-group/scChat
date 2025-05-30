@@ -363,7 +363,7 @@ def display_umap(cell_type: str) -> str:
 #     # Return an HTML snippet of the Plotly figure
 #     plot_html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
 #     return plot_html
-from .sc_analysis import unified_cell_type_handler
+from .annotation import unified_cell_type_handler
 def display_processed_umap(cell_type: str) -> str:
     import os
     import pandas as pd
@@ -372,7 +372,7 @@ def display_processed_umap(cell_type: str) -> str:
 
     # standardize your cell type into the form used by process_cells
     std = unified_cell_type_handler(cell_type)  # e.g. "Monocytes"
-
+    
     # possible filenames in order
     candidates = [
         f'umaps/annotated/{std}_umap_data.csv',         # new pattern
