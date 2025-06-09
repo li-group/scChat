@@ -5,54 +5,9 @@ import plotly.figure_factory as ff
 import json
 from plotly.utils import PlotlyJSONEncoder
 import numpy as np
-
-# def display_dotplot() -> str:
-#     """
-#     Creates a dotplot visualization from CSV data and returns its JSON representation.
-#     """
-#     dot_plot_data = pd.read_csv("/Users/ashleyjvarghese/Desktop/scChat-2/schatbot/runtime_data/basic_data/Overall cells_dot_plot_data.csv")
-#     fig = px.scatter(
-#         dot_plot_data,
-#         x='gene',
-#         y='leiden',
-#         size='expression',
-#         color='expression',
-#         title='Dot Plot',
-#         labels={'gene': 'Gene', 'leiden': 'Cluster', 'expression': 'Expression Level'},
-#         color_continuous_scale='Blues'
-#     )
-#     fig.update_traces(marker=dict(opacity=0.8))
-#     fig.update_layout(width=1200, height=800, autosize=True)
-#     return fig.to_json()
-
-import pandas as pd
-import plotly.express as px
+from .annotation import unified_cell_type_handler
 import plotly.io as pio
 import os
-
-# def display_reactome_barplot(cell_type: str, top_n: int = 10) -> str:
-#     """
-#     Reads reactome summary CSV, picks top_n by p-value, and returns
-#     a barplot HTML snippet (-log10 p-value).
-#     """
-#     folder = "schatbot/enrichment/reactome"
-#     csv_path = os.path.join(
-#         folder, f"results_summary_{cell_type}.csv"
-#     )
-#     df = pd.read_csv(csv_path)
-#     # add an -log10(p_value) column for plotting
-#     df["minus_log10_p"] = -np.log10(df["p_value"])
-#     top_df = df.nsmallest(top_n, "p_value")
-#     fig = px.bar(
-#         top_df,
-#         x="minus_log10_p",
-#         y="Term",
-#         orientation="h",
-#         title=f"Top {top_n} Reactome Pathways ({cell_type})",
-#         labels={"minus_log10_p":"-log10(p-value)", "Term":"Pathway"},
-#     )
-#     fig.update_layout(height=top_n*50 + 200, yaxis={"categoryorder":"total ascending"})
-#     return pio.to_html(fig, full_html=False, include_plotlyjs="cdn")
 
 def display_enrichment_barplot(
     analysis: str,
@@ -168,123 +123,8 @@ def display_dotplot() -> str:
     plot_html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
     return plot_html
 
-
-# def display_cell_population_change(cell_type: str) -> str:
-#     """
-#     Reads cell population change CSV data for the specified cell type
-#     and returns a Plotly bar chart JSON.
-#     """
-#     cell_type_formatted = cell_type.split()[0].capitalize() + " cells"
-#     filename = f'schatbot/cell_population_change/{cell_type_formatted}_cell_population_change.csv'
-#     cell_counts = pd.read_csv(filename)
-#     fig = px.bar(
-#         cell_counts,
-#         x="patient_name",
-#         y="percentage",
-#         color="cell_type",
-#         title="Cell Population Change",
-#         labels={"patient_name": "Patient Name", "percentage": "Percentage of Cell Type"}
-#     )
-#     fig.update_layout(width=1200, height=800, autosize=True, showlegend=True)
-#     return fig.to_json()
-
-def display_cell_population_change(cell_type: str) -> str:
-    """
-    Reads cell population change CSV data for the specified cell type
-    and returns an HTML snippet of a Plotly bar chart.
-    """
-    cell_type_formatted = cell_type.split()[0].capitalize() + " cells"
-    filename = f'schatbot/cell_population_change/{cell_type_formatted}_cell_population_change.csv'
-    cell_counts = pd.read_csv(filename)
-    fig = px.bar(
-        cell_counts,
-        x="patient_name",
-        y="percentage",
-        color="cell_type",
-        title="Cell Population Change",
-        labels={"patient_name": "Patient Name", "percentage": "Percentage of Cell Type"}
-    )
-    fig.update_layout(width=1200, height=800, autosize=True, showlegend=True)
-    # Return the HTML snippet for embedding the interactive figure
-    plot_html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
-    return plot_html
-
-# def display_umap(cell_type: str) -> str:
-#     """
-#     Reads UMAP data for the specified cell type from process_cell_data and returns a scatter plot JSON.
-#     """
-#     print ("T1")
-#     cell_type_formatted = cell_type.split()[0].capitalize() + " cells"
-#     print (cell_type_formatted)
-#     umap_data = pd.read_csv(f'schatbot/runtime_data/process_cell_data/{cell_type_formatted}_umap_data.csv')
-#     print ("T2")
-#     if cell_type_formatted != "Overall cells":
-#         print ("T3")
-#         umap_data['original_cell_type'] = umap_data['cell_type']
-#         umap_data['cell_type'] = 'Unknown'
-#         print ("T4")
-#     fig = px.scatter(
-#         umap_data,
-#         x="UMAP_1",
-#         y="UMAP_2",
-#         color="leiden",
-#         symbol="patient_name",
-#         title="T Cells UMAP Plot",
-#         labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
-#     )
-#     print ("T5")
-#     fig.update_traces(marker=dict(size=5, opacity=0.8))
-#     print ("T6")
-#     fig.update_layout(width=1200, height=800, autosize=True, showlegend=False)
-#     print ("T7")
-#     custom_legend = go.Scatter(
-#         x=[None], y=[None],
-#         mode='markers',
-#         marker=dict(size=10, color='rgba(0,0,0,0)'),
-#         legendgroup="Unknown",
-#         showlegend=True,
-#         name="Unknown"
-#     )
-#     print ("T8")
-#     fig.add_trace(custom_legend)
-#     print ("T9")
-#     return fig.to_json()
-import plotly.io as pio
-
-
-# def display_umap(cell_type: str) -> str:
-#     cell_type_formatted = cell_type.split()[0].capitalize() + " cells"
-#     umap_data = pd.read_csv(f'schatbot/runtime_data/process_cell_data/{cell_type_formatted}_umap_data.csv')
-#     if cell_type_formatted != "Overall cells":
-#         umap_data['original_cell_type'] = umap_data['cell_type']
-#         umap_data['cell_type'] = 'Unknown'
-#     fig = px.scatter(
-#         umap_data,
-#         x="UMAP_1",
-#         y="UMAP_2",
-#         color="leiden",
-#         symbol="patient_name",
-#         title="T Cells UMAP Plot",
-#         labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
-#     )
-#     fig.update_traces(marker=dict(size=5, opacity=0.8))
-#     fig.update_layout(width=1200, height=800, autosize=True, showlegend=False)
-#     custom_legend = go.Scatter(
-#         x=[None], y=[None],
-#         mode='markers',
-#         marker=dict(size=10, color='rgba(0,0,0,0)'),
-#         legendgroup="Unknown",
-#         showlegend=True,
-#         name="Unknown"
-#     )
-#     fig.add_trace(custom_legend)
-    
-#     # Use plotly.io.to_html instead of pyo.plot
-#     plot_html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
-#     return plot_html
-
 def display_umap(cell_type: str) -> str:
-    cell_type_formatted = cell_type.split()[0].capitalize() + " cells"
+    cell_type_formatted = unified_cell_type_handler(cell_type)
     umap_data = pd.read_csv(f'schatbot/runtime_data/process_cell_data/{cell_type_formatted}_umap_data.csv')
     if cell_type_formatted != "Overall cells":
         umap_data['original_cell_type'] = umap_data['cell_type']
@@ -314,56 +154,6 @@ def display_umap(cell_type: str) -> str:
     return plot_html
 
 
-
-# def display_processed_umap(cell_type: str) -> str:
-#     """
-#     Reads annotated UMAP data for the specified cell type from the umaps folder and returns a scatter plot JSON.
-#     """
-#     cell_type_cell = cell_type.split()[0].capitalize() + " cell"
-#     cell_type_formatted = cell_type.split()[0].capitalize() + " cells"
-#     import os
-#     if os.path.exists(f'umaps/{cell_type_formatted}_annotated_umap_data.csv'):
-#         umap_data = pd.read_csv(f'umaps/{cell_type_formatted}_annotated_umap_data.csv')
-#     else:
-#         umap_data = pd.read_csv(f'umaps/{cell_type_cell}_annotated_umap_data.csv')
-#     fig = px.scatter(
-#         umap_data,
-#         x="UMAP_1",
-#         y="UMAP_2",
-#         color="cell_type",
-#         symbol="patient_name",
-#         title=f'{cell_type_formatted} UMAP Plot',
-#         labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
-#     )
-#     fig.update_traces(marker=dict(size=5, opacity=0.8))
-#     fig.update_layout(width=1200, height=800, autosize=True, showlegend=True)
-#     return fig.to_json()
-
-# def display_processed_umap(cell_type: str) -> str:
-#     cell_type_cell = cell_type.split()[0].capitalize() + " cell"
-#     cell_type_formatted = cell_type.split()[0].capitalize() + " cells"
-#     import os
-#     if os.path.exists(f'umaps/annotated/{cell_type_formatted}_umap_data.csv'):
-#         print (f'umaps/annotated/{cell_type_formatted}_umap_data.csv')
-#         umap_data = pd.read_csv(f'umaps/annotated/{cell_type_formatted}_umap_data.csv')
-#     else:
-#         print (f'umaps/annotated/{cell_type_formatted}_umap_data.csv')
-#         umap_data = pd.read_csv(f'umaps/annotated/{cell_type_cell}_umap_data.csv')
-#     fig = px.scatter(
-#         umap_data,
-#         x="UMAP_1",
-#         y="UMAP_2",
-#         color="cell_type",
-#         # symbol="patient_name",
-#         title=f'{cell_type_formatted} UMAP Plot',
-#         labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
-#     )
-#     fig.update_traces(marker=dict(size=5, opacity=0.8))
-#     fig.update_layout(width=1200, height=800, autosize=True, showlegend=True)
-#     # Return an HTML snippet of the Plotly figure
-#     plot_html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
-#     return plot_html
-from .annotation import unified_cell_type_handler
 def display_processed_umap(cell_type: str) -> str:
     import os
     import pandas as pd
@@ -372,28 +162,9 @@ def display_processed_umap(cell_type: str) -> str:
 
     # standardize your cell type into the form used by process_cells
     std = unified_cell_type_handler(cell_type)  # e.g. "Monocytes"
-    
-    # possible filenames in order
-    candidates = [
-        f'umaps/annotated/{std}_umap_data.csv',         # new pattern
-        f'umaps/annotated/{std} cells_umap_data.csv',   # old plural
-        f'umaps/annotated/{std} cell_umap_data.csv'     # old singular
-    ]
-
-    # pick the first one that exists
-    umap_path = next((p for p in candidates if os.path.exists(p)), None)
-
-    # if none found, scan the directory for any "{std}*_umap_data.csv"
-    if umap_path is None:
-        directory = 'umaps/annotated'
-        if os.path.isdir(directory):
-            for fn in os.listdir(directory):
-                if fn.startswith(std) and fn.endswith('_umap_data.csv'):
-                    umap_path = os.path.join(directory, fn)
-                    break
-
-    if umap_path is None:
-        print(f"Warning: could not find an annotated UMAP file for '{cell_type}'")
+    umap_path = f'umaps/annotated/{std}_umap_data.csv'
+    if not os.path.exists(umap_path):
+        print(f"Warning: could not find an annotated UMAP file for '{cell_type}' at {umap_path}")
         return ""
 
     # load and plot

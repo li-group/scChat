@@ -12,3 +12,5 @@ env/
 /data/
 /models/
 *.csv
+/temp.py
+/testing.py

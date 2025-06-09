@@ -1,4 +1,4 @@
-from .annotation import initial_cell_annotation, process_cells
+from .annotation import initial_cell_annotation, process_cells, handle_process_cells_result
 from .visualizations import (
     display_dotplot,
     display_cell_type_composition,
@@ -19,21 +19,51 @@ import os
 import json
 import openai
 import pickle
+from typing import Dict, Any, Tuple, Optional
+import openai
+
+
 
 class ChatBot:
     def __init__(self):
-        # Clean all specified folders and files at initialization
-        clear_directory('annotated_adata')
-        clear_directory('figures')
-        clear_directory('process_cell_data')
-        clear_directory('schatbot/enrichment/go_bp')
-        clear_directory('schatbot/enrichment/go_cc')
-        clear_directory('schatbot/enrichment/go_mf')
-        clear_directory('schatbot/enrichment/gsea')
-        clear_directory('schatbot/enrichment/kegg')
-        clear_directory('schatbot/enrichment/reactome')
-        clear_directory('umaps/annotated')
-        # Remove files directly inside schatbot/enrichment (not subfolders)
+        # Initialization code remains the same...
+        self._initialize_directories()
+        self.conversation_history = []
+        self.api_key = os.getenv("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")
+        openai.api_key = self.api_key
+        self.adata = None
+        
+        # Load or create initial annotation
+        self._initialize_annotation()
+        
+        # Define function categories for consistent handling
+        self.visualization_functions = {
+            "display_dotplot", "display_cell_type_composition", "display_gsea_dotplot",
+            "display_umap", "display_processed_umap", "display_enrichment_barplot",
+            "display_enrichment_dotplot"
+        }
+        
+        self.analysis_functions = {
+            "perform_enrichment_analyses", "process_cells", "dea_split_by_condition",
+            "compare_cell_counts"
+        }
+        
+        self.setup_functions()
+
+    def _initialize_directories(self):
+        """Clean all directories at initialization"""
+        directories_to_clear = [
+            'annotated_adata', 'figures', 'process_cell_data',
+            'schatbot/enrichment/go_bp', 'schatbot/enrichment/go_cc',
+            'schatbot/enrichment/go_mf', 'schatbot/enrichment/gsea',
+            'schatbot/enrichment/kegg', 'schatbot/enrichment/reactome',
+            'umaps/annotated'
+        ]
+        
+        for directory in directories_to_clear:
+            clear_directory(directory)
+        
+        # Clean enrichment files
         enrichment_dir = 'schatbot/enrichment'
         for filename in os.listdir(enrichment_dir):
             file_path = os.path.join(enrichment_dir, filename)
@@ -42,40 +72,39 @@ class ChatBot:
                     os.unlink(file_path)
                 except Exception:
                     pass
-        # Clean runtime_data subfolders if they exist
-        for subdir in ['runtime_data/basic_data', 'runtime_data/figures', 'runtime_data/process_cell_data']:
-            if os.path.exists(subdir):
-                clear_directory(subdir)
 
-        self.conversation_history = []
-        self.api_key = os.getenv("OPENAI_API_KEY")
-        openai.api_key = self.api_key
-        self.adata = None 
-        
-        # Try to load from pickle first
+    def _initialize_annotation(self):
+        """Initialize or load annotation data"""
         pth = "annotated_adata/Overall cells_annotated_adata.pkl"
         if os.path.exists(pth):
             with open(pth, "rb") as f:
                 self.adata = pickle.load(f)
                 print("Loaded annotated adata from pickle file")
-            # Still need the other values for conversation history
             gene_dict, marker_tree, _, explanation, annotation_result = initial_cell_annotation()
         else:
-            # Only call once and get all values
             gene_dict, marker_tree, adata, explanation, annotation_result = initial_cell_annotation()
-            self.adata = adata  # Set self.adata here
+            self.adata = adata
             
-        self.conversation_history.append({
-        "role": "assistant",
-        "content": (
+        # Add initial annotation to conversation history
+        self._add_initial_annotation_to_history(gene_dict, marker_tree, explanation, annotation_result)
+
+    def _add_initial_annotation_to_history(self, gene_dict, marker_tree, explanation, annotation_result):
+        """Add initial annotation results to conversation history"""
+        initial_content = (
             "Initial annotation complete.\n"
             f"• Annotation Result: {annotation_result}\n"
             f"• Top‐genes per cluster: {gene_dict}\n"
             f"• Marker‐tree: {marker_tree}\n"
             f"• Explanation: {explanation}"
         )
+        self.conversation_history.append({
+            "role": "assistant",
+            "content": initial_content
         })
 
+    def setup_functions(self):
+        """Setup function descriptions and mappings"""
+        # Function descriptions remain the same...
         self.function_descriptions = [
             {
                 "name": "initial_cell_annotation",
@@ -92,7 +121,7 @@ class ChatBot:
                 "name": "display_dotplot",
                 "description": """
                                 Display dotplot for the annotated results.
-                                This function will be called as the user asked to generate/visualize/display the dotplot.
+                                This function will be called as the user asked to generate/visualize/display/show the dotplot.
                 """,
                 "parameters": {"type": "object", "properties": {}, "required": []},
             },
@@ -100,7 +129,7 @@ class ChatBot:
                 "name": "display_cell_type_composition",
                 "description": """
                                 Display cell type composition graph.
-                                This function will be called as the user asked to generate/visualize/display the cell type composition graph.
+                                This function will be called as the user asked to generate/visualize/display/show the cell type composition graph.
                 """,
                 "parameters": {"type": "object", "properties": {}, "required": []},
             },
@@ -108,7 +137,7 @@ class ChatBot:
                 "name": "display_gsea_dotplot",
                 "description": """
                                 Display GSEA dot plot.
-                                This function will be called as the user asked to generate/visualize/display the GSEA dot plot.
+                                This function will be called as the user asked to generate/visualize/display/show the GSEA dot plot.
                 """,
                 "parameters": {"type": "object", "properties": {}, "required": []},
             },
@@ -122,7 +151,7 @@ class ChatBot:
                 "description": """
                                 Displays UMAP that is NOT annotated with the cell types. 
                                 Use overall cells if no cell type is specified.
-                                This function will be called as the user asked to generate/visualize/display the UMAP.
+                                This function will be called as the user asked to generate/visualize/display/show the UMAP.
                 """,
                 "parameters": {
                     "type": "object",
@@ -140,7 +169,7 @@ class ChatBot:
                 "description": """
                                 Displays UMAP that IS annotated with the cell types. 
                                 Use overall cells if no cell type is specified.
-                                This function will be called as the user asked to generate/visualize/display the UMAP.
+                                This function will be called as the user asked to generate/visualize/display/show the UMAP.
                 """,
                 "parameters": {
                     "type": "object",
@@ -212,7 +241,7 @@ class ChatBot:
                 "name": "display_enrichment_barplot",
                 "description": """
                                 Show a barplot of top enriched terms from one of reactome/go/kegg/gsea for a given cell type.
-                                This function will be called as the user asked to generate/visualize/display the enrichment barplot.
+                                This function will be called as the user asked to generate/visualize/display/show the enrichment barplot.
                 """,
                 "parameters": {
                     "type": "object",
@@ -236,7 +265,7 @@ class ChatBot:
                 "name": "display_enrichment_dotplot",
                 "description": """
                                 Show a dotplot (gene ratio vs. term) of top enriched terms.
-                                This function will be called as the user asked to generate/visualize/display the enrichment dotplot.
+                                This function will be called as the user asked to generate/visualize/display/show the enrichment dotplot.
                 """,
                 "parameters": {
                     "type": "object",
@@ -290,35 +319,248 @@ class ChatBot:
                 }
             }
         ]
-
-        def _wrap_process_cells(cell_type, resolution=None):
-            annotation_str = process_cells(self.adata, cell_type, resolution)
-            return annotation_str
         
-        def _wrap_dea_split_by_condition(cell_type):
-            results = dea_split_by_condition(self.adata, cell_type)
-            return results
-        
-        def _wrap_compare_cell_counts(cell_type, sample1, sample2):
-            results = compare_cell_count(self.adata, cell_type, sample1, sample2)
-            return results
-        
-        # Map function names to actual functions
+        # Create function mappings with proper wrappers
         self.function_mapping = {
-            "initial_cell_annotation": initial_cell_annotation,
-            "display_dotplot": display_dotplot,
-            "display_cell_type_composition": display_cell_type_composition,
-            "display_gsea_dotplot": display_gsea_dotplot,
-            "repeat": repeat,
-            "display_umap": display_umap,
-            "display_processed_umap": display_processed_umap,
-            "perform_enrichment_analyses": perform_enrichment_analyses,
-            "display_enrichment_barplot": display_enrichment_barplot,
-            "display_enrichment_dotplot": display_enrichment_dotplot,
-            "process_cells": _wrap_process_cells,
-            "dea_split_by_condition": _wrap_dea_split_by_condition,
-            "compare_cell_counts": _wrap_compare_cell_counts
+            "initial_cell_annotation": self._wrap_initial_cell_annotation,
+            "display_dotplot": self._wrap_visualization(display_dotplot),
+            "display_cell_type_composition": self._wrap_visualization(display_cell_type_composition),
+            "display_gsea_dotplot": self._wrap_visualization(display_gsea_dotplot),
+            "display_umap": self._wrap_visualization(display_umap),
+            "display_processed_umap": self._wrap_visualization(display_processed_umap),
+            "display_enrichment_barplot": self._wrap_visualization(display_enrichment_barplot),
+            "display_enrichment_dotplot": self._wrap_visualization(display_enrichment_dotplot),
+            "perform_enrichment_analyses": self._wrap_enrichment_analysis,
+            "process_cells": self._wrap_process_cells,
+            "dea_split_by_condition": self._wrap_dea_analysis,
+            "compare_cell_counts": self._wrap_compare_cells,
+            "repeat": repeat
         }
+
+    def _wrap_initial_cell_annotation(self, **kwargs):
+        """Wrapper for initial cell annotation"""
+        return initial_cell_annotation()
+
+    def _wrap_visualization(self, func):
+        """Generic wrapper for visualization functions"""
+        def wrapper(**kwargs):
+            return func(**kwargs)
+        return wrapper
+
+    def _wrap_enrichment_analysis(self, **kwargs):
+        """Wrapper for enrichment analysis with proper parameter handling"""
+        if self.adata is None:
+            _, _, self.adata = initial_cell_annotation()
+        
+        return perform_enrichment_analyses(
+            self.adata,
+            cell_type=kwargs.get("cell_type"),
+            analyses=kwargs.get("analyses"),
+            logfc_threshold=kwargs.get("logfc_threshold", 1.0),
+            pval_threshold=kwargs.get("pval_threshold", 0.05),
+            top_n_terms=kwargs.get("top_n_terms", 10),
+        )
+
+    def _wrap_process_cells(self, **kwargs):
+        """Wrapper for process cells using the new handle_process_cells_result function"""
+        cell_type = kwargs.get("cell_type")
+        resolution = kwargs.get("resolution")
+        return handle_process_cells_result(self.adata, cell_type, resolution)
+
+    def _wrap_dea_analysis(self, **kwargs):
+        """Wrapper for differential expression analysis"""
+        cell_type = kwargs.get("cell_type")
+        adata_pre, adata_post, pre_significant_genes, post_significant_genes = dea_split_by_condition(self.adata, cell_type)
+        
+        return {
+            "summary": f"DEA split by condition for {cell_type} complete.",
+            "pre_significant_genes": pre_significant_genes,
+            "post_significant_genes": post_significant_genes,
+            "adata_pre": adata_pre,
+            "adata_post": adata_post
+        }
+
+    def _wrap_compare_cells(self, **kwargs):
+        """Wrapper for cell count comparison"""
+        return compare_cell_count(
+            self.adata,
+            kwargs.get("cell_type"),
+            kwargs.get("sample1"),
+            kwargs.get("sample2")
+        )
+
+    def _ensure_system_message(self):
+        """Ensure system message is in conversation history"""
+        if not self.conversation_history or self.conversation_history[0]["role"] != "system":
+            system_message = {
+                "role": "system",
+                "content": """
+                You are an expert assistant for single-cell RNA-seq analysis. 
+                Your primary goal is to help users analyze, visualize, and interpret single-cell data by calling the appropriate functions from the available toolkit.
+
+                Guidelines:
+                1. Function Selection: Carefully read the user's request and select the function that most closely matches the user's intent.
+                2. Parameter Extraction: Extract all required parameters from the user's message.
+                3. Always provide clear, concise answers and call appropriate functions when needed.
+                
+                Remember all previous analyses and their results to provide contextual responses.
+                """
+            }
+            self.conversation_history.insert(0, system_message)
+
+    def send_message(self, message: str) -> str:
+        """
+        Optimized message handling with consistent function calling and history management
+        """
+        self._ensure_system_message()
+        
+        # Step 1: Try to get a function call with current context
+        function_call_result = self._attempt_function_call(message)
+        
+        if function_call_result:
+            function_name, function_args, result = function_call_result
+            return self._handle_function_result(message, function_name, function_args, result)
+        else:
+            # Step 2: Handle as regular conversation
+            return self._handle_regular_conversation(message)
+
+    def _attempt_function_call(self, message: str) -> Optional[Tuple[str, Dict[str, Any], Any]]:
+        """Attempt to get a function call from the user message"""
+        try:
+            response = openai.chat.completions.create(
+                model="gpt-4o",
+                messages=self.conversation_history + [{"role": "user", "content": message}],
+                functions=self.function_descriptions,
+                function_call="auto",
+                temperature=0.1
+            )
+            
+            output = response.choices[0].message
+            
+            if output.function_call:
+                function_name = output.function_call.name
+                function_args = json.loads(output.function_call.arguments) if output.function_call.arguments else {}
+                
+                if function_name in self.function_mapping:
+                    result = self.function_mapping[function_name](**function_args)
+                    return function_name, function_args, result
+                    
+        except Exception as e:
+            print(f"Function call error: {e}")
+            
+        return None
+
+    def _handle_function_result(self, message: str, function_name: str, function_args: Dict[str, Any], result: Any) -> str:
+        """Handle function results consistently"""
+        # Add user message to history
+        self.conversation_history.append({"role": "user", "content": message})
+        
+        # Handle different function types
+        if function_name in self.visualization_functions:
+            return self._handle_visualization_result(function_name, function_args, result)
+        elif function_name in self.analysis_functions:
+            return self._handle_analysis_result(function_name, function_args, result)
+        else:
+            return self._handle_other_function_result(function_name, function_args, result)
+
+    def _handle_visualization_result(self, function_name: str, function_args: Dict[str, Any], result: Any) -> str:
+        """Handle visualization function results"""
+        # For visualizations, we don't add the HTML to conversation history
+        # but we do record that the visualization was created
+        viz_summary = f"Created {function_name} visualization"
+        if "cell_type" in function_args:
+            viz_summary += f" for {function_args['cell_type']}"
+        
+        self.conversation_history.append({"role": "assistant", "content": viz_summary})
+        
+        return json.dumps({"response": viz_summary, "graph_html": result})
+
+    def _handle_analysis_result(self, function_name: str, function_args: Dict[str, Any], result: Any) -> str:
+        """Handle analysis function results"""
+        # Format the result for conversation history
+        if function_name == "perform_enrichment_analyses":
+            formatted_result = result.get("formatted_summary", str(result))
+        elif function_name == "process_cells":
+            # Handle the new return format from handle_process_cells_result
+            if result is None:
+                # This means one of the early exit conditions was met (leaf node, no cells, insufficient markers)
+                formatted_result = f"Processing of {function_args.get('cell_type')} completed with special condition."
+            else:
+                formatted_result = result
+        elif function_name == "dea_split_by_condition":
+            formatted_result = f"DEA analysis completed for {function_args.get('cell_type')}\n"
+            formatted_result += f"Pre-condition genes: {result.get('pre_significant_genes', [])}\n"
+            formatted_result += f"Post-condition genes: {result.get('post_significant_genes', [])}"
+        else:
+            formatted_result = str(result)
+        
+        # Add result to conversation history
+        self.conversation_history.append({"role": "assistant", "content": formatted_result})
+        
+        # Get AI interpretation of the results
+        interpretation = self._get_ai_interpretation()
+        self.conversation_history.append({"role": "assistant", "content": interpretation})
+        
+        # Handle special cases that need visualization
+        if function_name == "process_cells" and result is not None:
+            # Only try to display UMAP if we have a successful result
+            cell_type = function_args.get("cell_type", "Overall cells")
+            umap_html = display_processed_umap(cell_type=cell_type)
+            return json.dumps({"response": interpretation, "graph_html": umap_html})
+        
+        return interpretation
+
+    def _handle_other_function_result(self, function_name: str, function_args: Dict[str, Any], result: Any) -> str:
+        """Handle other function results"""
+        formatted_result = str(result)
+        self.conversation_history.append({"role": "assistant", "content": formatted_result})
+        
+        interpretation = self._get_ai_interpretation()
+        self.conversation_history.append({"role": "assistant", "content": interpretation})
+        
+        return interpretation
+
+    def _get_ai_interpretation(self) -> str:
+        """Get AI interpretation of the current conversation state"""
+        try:
+            response = openai.chat.completions.create(
+                model="gpt-4o",
+                messages=self.conversation_history,
+                temperature=0.2,
+                top_p=0.4
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            return f"Analysis completed. Error in interpretation: {e}"
+
+    def _handle_regular_conversation(self, message: str) -> str:
+        """Handle regular conversation without function calls"""
+        self.conversation_history.append({"role": "user", "content": message})
+        
+        try:
+            response = openai.chat.completions.create(
+                model="gpt-4o",
+                messages=self.conversation_history,
+                temperature=0.2,
+                top_p=0.4
+            )
+            
+            ai_response = response.choices[0].message.content
+            self.conversation_history.append({"role": "assistant", "content": ai_response})
+            
+            return ai_response
+            
+        except Exception as e:
+            error_response = f"Sorry, I encountered an error: {e}"
+            self.conversation_history.append({"role": "assistant", "content": error_response})
+            return error_response
+
+    def get_conversation_summary(self) -> str:
+        """Get a summary of the conversation for debugging"""
+        summary = f"Conversation has {len(self.conversation_history)} messages:\n"
+        for i, msg in enumerate(self.conversation_history):
+            summary += f"{i}: {msg['role']} - {msg['content'][:100]}...\n"
+        return summary
 
     def _chat_only(self, user_message: str) -> str:
         """Ask gpt-4o directly, with no function schemas."""
@@ -329,158 +571,4 @@ class ChatBot:
                 {"role": "user", "content": user_message}
             ]
         )
-        return resp.choices[0].message.content
-
-
-    def send_message(self, message: str) -> str:
-        """
-        Uses minimal context (system message and current user message) to call ChatGPT.
-        If a function call is returned, process it immediately without adding it to
-        the conversation history. Otherwise, append the exchange to the conversation
-        history and reprompt using the full history for a final response.
-        """
-        # Ensure we have a system message in our full conversation history.
-        if not self.conversation_history:
-            system_message = {
-                "role": "system",
-                "content": """
-                    You are an expert assistant for single-cell RNA-seq analysis. 
-                    Your primary goal is to help users analyze, visualize, and interpret single-cell data by calling the appropriate functions from the available toolkit.
-
-                    Guidelines:
-                    1. Function Selection: Carefully read the user's request and select the function that most closely matches the user's intent, based on the function descriptions provided. 
-                       If the user asks for a plot or visualization (e.g., dotplot, UMAP, enrichment barplot/dotplot, cell type composition), call the corresponding display function. 
-                       If the user requests an analysis (e.g., enrichment, differential expression, cell count comparison), call the relevant analysis function. 
-                       If the user asks to annotate, further annotate, further process cells, use the annotation functions.
-
-                    2. Parameter Extraction: Extract all required parameters from the user's message. 
-                                             If a parameter is not specified but is required, use sensible defaults as described in the function's documentation. 
-                                             For optional parameters, use defaults unless the user specifies otherwise.
-
-                    3. Enrichment Analysis: When the user asks for enrichment (Reactome, GO, KEGG, GSEA), call perform_enrichment_analyses and specify the analyses as needed. 
-                                            For enrichment visualizations, use display_enrichment_barplot or display_enrichment_dotplot with the correct analysis type and cell type.
-
-                    4. Visualization: For UMAPs, dotplots, and cell type composition, use the corresponding display function. 
-                                      If the user asks for a plot for a specific cell type, ensure the cell_type parameter is set.
-
-                    5. Annotation: For further annotation, use process_cells as appropriate.
-
-                    6. Differential Expression and Cell Counts: For DE analysis split by condition, use dea_split_by_condition. 
-                                                                For comparing cell counts between conditions, especially when user asks to compare the cell counts between two conditions, use compare_cell_counts.
-
-                    8. Response Formatting: For visualization functions, return the graph HTML as specified. For analysis functions, return the results in a clear, concise format.
-
-                    Always:
-                    - Be precise in mapping user intent to function calls.
-                    - Use the function descriptions as your reference for what each function does and what parameters it needs.
-
-                    When a user asks a question, select and call the most appropriate function from the provided toolkit, using the function descriptions and required parameters. 
-                    Extract all necessary information from the user's message, use defaults where appropriate, and return results or visualizations as specified. 
-                    If the user's request is ambiguous, ask for clarification. Always provide clear, concise answers and call appropriate functions when needed.
-                """
-
-            }
-            self.conversation_history.append(system_message)
-
-        # Build a minimal conversation with just the system message and the current user message.
-        minimal_history = [self.conversation_history[0], {"role": "user", "content": message}]
-        
-        # Call ChatGPT with minimal history
-        response = openai.chat.completions.create(
-            model="gpt-4o",
-            messages=minimal_history,
-            functions=self.function_descriptions,
-            function_call="auto"
-        )
-        output = response.choices[0].message
-        ai_response = output.content
-
-        # If a function call is produced with minimal context, process it.
-        if output.function_call:
-            function_name = output.function_call.name
-            function_args = output.function_call.arguments
-            print("Name:", function_name)
-            print("Arg:", function_args)
-            if function_args:
-                try:
-                    function_args = json.loads(function_args)
-                except Exception:
-                    function_args = {}
-            else:
-                function_args = {}
-            if function_name in self.function_mapping:
-                # SPECIAL‐CASE the enrichment call so we can inject self.adata
-                if function_name == "perform_enrichment_analyses":
-                    # ensure we have an AnnData loaded
-                    if self.adata is None:
-                        _, _, self.adata = initial_cell_annotation()
-                    result = perform_enrichment_analyses(
-                    self.adata,
-                    cell_type       = function_args.get("cell_type"),
-                    analyses        = function_args.get("analyses"),
-                    logfc_threshold = function_args.get("logfc_threshold", 1.0),
-                    pval_threshold  = function_args.get("pval_threshold", 0.05),
-                    top_n_terms     = function_args.get("top_n_terms", 10),
-                )
-
-                    # 1) Push the function response into the convo history
-                    self.conversation_history.append({"role": "function",
-                                                    "name": function_name,
-                                                    "content": json.dumps(result)})
-
-                    # 2) Now ask ChatGPT to analyze that data:
-                    followup = openai.chat.completions.create(
-                        model="gpt-4o",
-                        messages=self.conversation_history,
-                        temperature=0.2,
-                        top_p=0.4
-                    )
-                    answer = followup.choices[0].message.content
-                    self.conversation_history.append({"role": "assistant",
-                                                    "content": answer})
-                    return answer
-                else:
-                    # your existing generic dispatch
-                    result = self.function_mapping[function_name](**function_args)
-
-                # … then the rest of your if/elif tree handling display vs text‐based results …
-                if function_name in ["display_umap", "display_processed_umap", "display_dotplot", "display_cell_type_composition", "display_gsea_dotplot", "display_enrichment_barplot","display_enrichment_dotplot"]:
-                    # Do NOT add the visualization result to conversation history.
-                    return json.dumps({"response": "", "graph_html": result})
-                elif function_name != "initial_cell_annotation" and function_name != "process_cells":
-                    self.conversation_history.append({"role": "user", "content": message})
-                    self.conversation_history.append({"role": "assistant", "content": result})
-                    new_response = openai.chat.completions.create(
-                        model="gpt-4o",
-                        messages=self.conversation_history,
-                        temperature=0.2,
-                        top_p=0.4
-                    )
-                    final_response = new_response.choices[0].message.content
-                    self.conversation_history.append({"role": "assistant", "content": final_response})
-                    return final_response
-                else:
-                    if function_name == "process_cells":
-                        self.conversation_history.append({"role": "assistant", "content": result})
-    
-                    cell = function_args.get("cell_type")
-                    umap_html = display_processed_umap(cell_type=cell)
-                    # we treat it like any other graph return:
-                    return json.dumps({"response": "", "graph_html": umap_html})
-            else:
-                return f"Function {function_name} not found."
-        else:
-            # No function call was returned from the minimal context.
-            # Append the minimal exchange (user + assistant text) to the full conversation history.
-            self.conversation_history.append({"role": "user", "content": message})
-            self.conversation_history.append({"role": "assistant", "content": ai_response})
-            # Now reprompt with full conversation history.
-            new_response = openai.chat.completions.create(
-                model="gpt-4o",
-                messages=self.conversation_history,
-                temperature=0.2,
-                top_p=0.4
-            )
-            final_response = new_response.choices[0].message.content
-            self.conversation_history.append({"role": "assistant", "content": final_response})
-            return final_response
+        return resp.choices[0].message.content 

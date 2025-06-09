@@ -951,7 +951,32 @@ def perform_enrichment_analyses(
             }
             top_terms.append(rec)
 
+    # Create a comprehensive human-readable summary
+    final_result = f"Enrichment analysis complete for {cell_type}.\n"
+    final_result += f"• Analysis parameters: logfc_threshold={logfc_threshold}, pval_threshold={pval_threshold}\n"
+    final_result += f"• Number of significant genes: {len(sig_genes)}\n"
+    final_result += f"• Analyses performed: {', '.join(analyses)}\n\n"
+    
+    for analysis in analyses:
+        analysis_key = analysis.lower()
+        if analysis_key in per_analysis and per_analysis[analysis_key]["summary_results"]:
+            final_result += f"• {analysis.upper()} Results:\n"
+            summary_results = per_analysis[analysis_key]["summary_results"][:5]  # Top 5 terms
+            for i, term in enumerate(summary_results, 1):
+                term_name = term.get("Term") or term.get("name", "Unknown")
+                p_val = term.get("p_value", "N/A")
+                intersections = term.get("intersecting_genes") or term.get("intersections", "")
+                if isinstance(intersections, str) and len(intersections) > 100:
+                    intersections = intersections[:100] + "..."
+                final_result += f"  {i}. {term_name} (p-value: {p_val})\n"
+                final_result += f"     Genes: {intersections}\n"
+            final_result += "\n"
+        else:
+            final_result += f"• {analysis.upper()} Results: No significant terms found\n\n"
+    
     return {
-        "Top terms": top_terms,
-        "Top terms statistics": rec
+        "formatted_summary": final_result,
+        "top_terms": top_terms,
+        "per_analysis": per_analysis,
+        "significant_genes": sig_genes
     }

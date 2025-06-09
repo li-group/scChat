@@ -158,6 +158,9 @@ def extract_genes(data):
 def get_rag():
     """Retrieve marker genes using Neo4j graph database."""
     from neo4j import GraphDatabase
+    import json
+    import os
+    
     uri = "bolt://localhost:7687"
     driver = GraphDatabase.driver(uri, auth=("neo4j", "37754262"))
     specification = None
@@ -167,25 +170,32 @@ def get_rag():
             specification = json.load(file)
     else:
         print("specification not found")
-        return "-"
+        return {}
+    
     database = specification['database']
     system = specification['system']
     organ = specification['organ']
+    
+    print(f"🔍 Querying Level 1 markers for organ: {organ}")
+    
     combined_data = {}
     try:
         with driver.session(database=database) as session:
             query = """
-            MATCH (s:System {name: $system})-[:HAS_ORGAN]->(o:Organ {name: $organ})-[:HAS_CELL]->(c:CellType)-[:HAS_MARKER]->(m:Marker)
-            RETURN c.name as cell_name, m.markers as marker_list
+            MATCH (s:System {name: $system})-[:HAS_ORGAN]->(o:Organ {name: $organ})-[:HAS_CELL]->(c:CellType)
+            WHERE c.level = 1 AND c.organ = $organ
+            RETURN c.name as cell_name, c.markers as marker_list
             """
             result = session.run(query, system=system, organ=organ)
+            
             for record in result:
-                cell_name = record["cell_name"]
-                marker_genes = record["marker_list"]
+                cell_name = record["cell_name"]  # ✅ Now matches query alias
+                marker_genes = record["marker_list"] or []  # ✅ Now matches query alias, handle null
+                
                 if cell_name not in combined_data:
                     combined_data[cell_name] = {"markers": []}
-                for marker in marker_genes:
-                    combined_data[cell_name]["markers"].append(marker)
+            
+                combined_data[cell_name]["markers"] = marker_genes   
     except Exception as e:
         print(f"Error accessing Neo4j: {e}")
         return {}
@@ -196,6 +206,9 @@ def get_rag():
 def get_subtypes(cell_type):
     """Get subtypes of a given cell type using Neo4j."""
     from neo4j import GraphDatabase
+    import json
+    import os
+    
     uri = "bolt://localhost:7687"
     driver = GraphDatabase.driver(uri, auth=("neo4j", "37754262"))
     specification = None
@@ -203,22 +216,34 @@ def get_subtypes(cell_type):
     if os.path.exists(file_path):
         with open(file_path, 'r') as file:
             specification = json.load(file)
+    else:
+        print("specification not found")
+        return {}
+    
     database = specification['database']
+    organ = specification['organ']  # ✅ ADDED: Extract organ from specification
+        
     subtypes_data = {}
     try:
         with driver.session(database=database) as session:
             query = """
-            MATCH (parent:CellType {name: $parent_cell})-[:DEVELOPS_TO]->(c:CellType)-[:HAS_MARKER]->(m:Marker)
-            RETURN c.name as cell_name, m.markers as marker_list
+            MATCH (parent:CellType {name: $parent_cell, organ: $organ})-[:DEVELOPS_TO {organ: $organ}]->(child:CellType)
+            WHERE child.organ = $organ
+            RETURN child.name as cell_name, child.markers as marker_list
             """
-            result = session.run(query, parent_cell=cell_type)
+            # ✅ FIXED: Added missing organ parameter
+            result = session.run(query, parent_cell=cell_type, organ=organ)
+            
             for record in result:
-                subtype_name = record["cell_name"]
-                marker_genes = record["marker_list"]
+                subtype_name = record["cell_name"]  # ✅ Now matches query alias
+                marker_genes = record["marker_list"] or []  # ✅ Now matches query alias, handle null
+                
                 if subtype_name not in subtypes_data:
                     subtypes_data[subtype_name] = {"markers": []}
-                for marker in marker_genes:
-                    subtypes_data[subtype_name]["markers"].append(marker)
+                
+                # ✅ FIXED: Markers are already a list, don't iterate through them
+                subtypes_data[subtype_name]["markers"] = marker_genes
+                
     except Exception as e:
         print(f"Error accessing Neo4j: {e}")
         return {}
@@ -264,6 +289,8 @@ def save_analysis_results(adata, prefix, leiden_key='leiden', save_umap=True,
         dot_plot_data.to_csv(f"{prefix}_dot_plot_data.csv", index=False)
 
 def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pval_threshold=0.05, save_csv=True):
+    from .annotation import unified_cell_type_handler
+    cell_type = unified_cell_type_handler(cell_type)
     try:
         adata_modified = adata.copy()
         pre_mask = adata_modified.obs["patient_name"].str.contains("_pre")
@@ -280,10 +307,10 @@ def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pva
         cell_type_mask_post = adata_post.obs["cell_type"] == str(cell_type)
         adata_post.obs.loc[cell_type_mask_post, "cell_type_group"] = str(cell_type)
         if sum(cell_type_mask_pre) == 0:
-            print(f"Error: No {cell_type} cells found in pre condition.")
+            print(f"Error: No {cell_type} found in pre condition.")
             return adata_pre, adata_post, [], []
         if sum(cell_type_mask_post) == 0:
-            print(f"Error: No {cell_type} cells found in post condition.")
+            print(f"Error: No {cell_type} found in post condition.")
             return adata_pre, adata_post, [], []
         pre_key_name = f"{cell_type}_markers_pre_only"
         post_key_name = f"{cell_type}_markers_post_only"
@@ -314,6 +341,8 @@ def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pva
         return None, None, [], []
 
 def compare_cell_count(adata, cell_type, sample1, sample2):
+    from .annotation import unified_cell_type_handler
+    cell_type = unified_cell_type_handler(cell_type)
     mask_sample1 = adata.obs["patient_name"] == sample1
     mask_sample2 = adata.obs["patient_name"] == sample2
     mask_cells = adata.obs["cell_type"] == cell_type
@@ -329,3 +358,7 @@ def compare_cell_count(adata, cell_type, sample1, sample2):
 def repeat():
     return "Hello"
 
+if __name__ == "__main__":
+    cell_type = "T cell"
+    marker_tree = get_subtypes(cell_type)
+    print(marker_tree)

@@ -341,10 +341,7 @@ def initial_cell_annotation(resolution=1):
         gene_dict[cluster] = list(group["gene"])
     input_msg =(f"Top genes details: {gene_dict}. "
                 f"Markers: {marker_tree}. ")
-    # print ("MARKER TREE ", marker_tree)
-    #adding
-    # for 
-    #done adding
+
     messages = [
         SystemMessage(content="""
             You are a bioinformatics researcher that can do the cell annotation.
@@ -383,41 +380,74 @@ def initial_cell_annotation(resolution=1):
 
 def process_cells(adata, cell_type, resolution=None):
     """
-    Process specific cell type with full workflow:
-      1) Subset and recluster
-      2) Rank genes (general + marker-based)
-      3) GPT‐driven annotation → label_clusters
-      4) Save UMAP/dendrogram/dot-plot CSVs + pickles
-      5) Merge back into full adata + resave overall UMAP
-      6) Return annotation dict as string
+    Process specific cell type with full workflow - FIXED VERSION
     """
-    print ("CELL TYPE INSIDE PROCESS CELLS ", cell_type)
+    print(f"🔍 Processing cell type: {cell_type}")
     from .utils import extract_genes
     resolution = 1 if resolution is None else resolution
-    # possible_types = get_possible_cell_types(cell_type)
-
+    
+    # Get subtypes from database
+    markers_tree = get_subtypes(cell_type)
+    print(f"🔍 Retrieved markers_tree: {markers_tree}")
+    
+    # 🚨 NEW: Check if cell type has no subtypes (leaf node)
+    if not markers_tree or len(markers_tree) == 0:
+        print(f"✅ '{cell_type}' is a leaf node with no subtypes.")
+        print(f"✅ No further refinement possible.")
+        return {
+            "status": "leaf_node",
+            "message": f"'{cell_type}' has no subtypes in the database. This is the most specific level available.",
+            "cell_type": cell_type,
+            "subtypes_available": False
+        }
+    
+    # Continue with original logic only if subtypes exist
     standardized = unified_cell_type_handler(cell_type)
     standardized_list = [standardized]
     
     mask = adata.obs["cell_type"].isin(standardized_list)
     if mask.sum() == 0:
-        return {}, None, None
+        print(f"❌ No cells found with type '{standardized}'")
+        return {
+            "status": "no_cells_found", 
+            "message": f"No cells found with type '{cell_type}' in the dataset.",
+            "cell_type": cell_type
+        }
+    
+    print(f"🔍 Found {mask.sum()} cells of type '{standardized}'")
+    
+    # Rest of the original function continues...
     filtered = adata[mask].copy()
     mask_idx = adata.obs.index[mask]
     filtered_idx = filtered.obs.index
+    
     sc.tl.pca(filtered, svd_solver="arpack")
     sc.pp.neighbors(filtered)
     filtered = perform_clustering(filtered, resolution=resolution)
     sc.tl.dendrogram(filtered, groupby="leiden")
+    
     base = standardize_cell_type(cell_type).replace(" ", "_").lower()
     rank_key = f"rank_genes_{base}"
     filtered = rank_genes(filtered, key_added=rank_key)
-    markers_tree = get_subtypes(cell_type)
+    
     markers_list = extract_genes(markers_tree)
     existing_markers = [
         g for g in markers_list
         if g in adata.raw.var_names or g in adata.obs.columns
     ]
+    
+    # 🚨 NEW: Additional check for sufficient markers
+    if len(existing_markers) < 3:
+        print(f"⚠️ Only {len(existing_markers)} markers available for '{cell_type}' subtypes.")
+        print(f"⚠️ Insufficient markers for reliable subtype annotation.")
+        return {
+            "status": "insufficient_markers",
+            "message": f"Only {len(existing_markers)} subtype markers found for '{cell_type}'. Need at least 3 for reliable annotation.",
+            "cell_type": cell_type,
+            "available_markers": existing_markers
+        }
+    
+    # Continue with rest of the original process_cells logic...
     missing = set(markers_list) - set(existing_markers)
     if missing:
         print(f"⚠️ dropping {len(missing)} missing markers:", missing)
@@ -463,11 +493,8 @@ def process_cells(adata, cell_type, resolution=None):
         HumanMessage(content=prompt),
     ]
     results = ChatOpenAI(model="gpt-4o", temperature=0).invoke(messages)
-    print("RESULTS", results)
+    print("RESULTS", results.content)
     annotation_result = results.content
-    # out_pkl = f"schatbot/annotated_adata/{standardized}_annotated_adata.pkl"
-    # os.makedirs(os.path.dirname(out_pkl), exist_ok=True)
-    # pickle.dump(filtered, open(out_pkl, "wb"))
     annotated_filtered = label_clusters(
         annotation_result=annotation_result,
         cell_type=cell_type,
@@ -487,14 +514,37 @@ def process_cells(adata, cell_type, resolution=None):
 
     #adding
     explanation = explain_gene(gene_dict=gene_dict, marker_tree=markers_tree, annotation_result=annotation_result)
-    # final_result = (
-    #     f"Initial annotation complete.\n"
-    #     f"• Annotation Result: {annotation_result}\n"
-    #     f"• Top-genes per cluster: {gene_dict}\n"
-    #     f"• Marker-tree: {markers_tree}\n"
-    #     f"• Explanation: {explanation}"
-    # )    #done adding
-    return str(annotation_result)
+    final_result = (
+        f"Annotation complete for {cell_type}.\n"
+        f"• Annotation Result: {annotation_result}\n"
+        f"• Top-genes per cluster: {gene_dict}\n"
+        f"• Marker-tree: {markers_tree}\n"
+        f"• Explanation: {explanation}"
+    )    #done adding
+    return final_result
+
+
+# 🚨 ALSO ADD: Modified calling logic to handle the new return format
+def handle_process_cells_result(adata, cell_type, resolution=None):
+    """
+    Wrapper function to handle the new process_cells return format
+    """
+    result = process_cells(adata, cell_type, resolution)
+    
+    # Handle special return cases
+    if isinstance(result, dict) and "status" in result:
+        if result["status"] == "leaf_node":
+            print(f"✅ {result['message']}")
+            return None  # or return some default response
+        elif result["status"] == "no_cells_found":
+            print(f"❌ {result['message']}")
+            return None
+        elif result["status"] == "insufficient_markers":
+            print(f"⚠️ {result['message']}")
+            return None
+    
+    # If we get here, it's the normal return with annotation results
+    return result
 
 
 def label_clusters(annotation_result, cell_type, adata):
