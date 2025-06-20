@@ -19,19 +19,17 @@ def classify_intent(user_message: str) -> str:
     words = set(word_tokenize(user_message.lower()))
     return 'web_search' if words & search_keywords else 'chat'
 
-def web_search(query: str) -> str:
+def browse_web(query: str) -> str:
     """
     Placeholder for web search functionality.
     """
     return "Web search results for: " + query
 
-def umap_leiden_view(request):
+def web_search(query: str) -> str:
     """
-    Calls the UMAP generation function and returns its summary.
+    Placeholder for web search functionality.
     """
-    from .sc_analysis import generate_umap
-    summary = generate_umap()
-    return HttpResponse(summary)
+    return "Web search results for: " + query
 
 def file_upload(request):
     """
@@ -101,10 +99,10 @@ def chat_with_ai(request):
             user_message = data.get('message', '')
             print("chat_with_ai: User message:", user_message)
             
-            if classify_intent(user_message) == 'web_search':
-                # response_text = browse_web(user_message)
-                print("chat_with_ai: Web search response (first 300 chars):", response_text[:300])
-                return JsonResponse({"response": response_text})
+            # if classify_intent(user_message) == 'web_search':
+            #     response_text = browse_web(user_message)
+            #     print("chat_with_ai: Web search response (first 300 chars):", response_text[:300])
+            #     return JsonResponse({"response": response_text})
             
             response_text = chatbot_instance.send_message(user_message)
             print("chat_with_ai: Chatbot response (first 300 chars):", response_text[:300])

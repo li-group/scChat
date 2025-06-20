@@ -8,6 +8,7 @@ from gprofiler import GProfiler
 from typing import List, Dict, Any
 import gseapy as gp
 import re
+from schatbot.utils import dea_split_by_condition
 
 def dea(adata, cell_type):
     try:
@@ -17,6 +18,7 @@ def dea(adata, cell_type):
         key_name = str(group_name) + "_markers"
         adata_modified.obs[str(group_name)] = "Other"
         adata_modified.obs.loc[mask, str(group_name)] = str(group_name)
+        adata_modified.obs = adata_modified.obs.copy()
         sc.tl.rank_genes_groups(adata_modified, groupby=str(group_name), method="wilcoxon", n_genes=100, key_added=key_name, use_raw_=False)
         
         return adata_modified
@@ -216,7 +218,7 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
                         plt.xlabel('Gene Ratio')
                         plt.ylabel('Reactome Pathway')
                         plt.tight_layout()
-                        barplot_filename = f'{output_prefix}_barplot_{cell_type}.png'
+                        barplot_filename = os.path.join(output_prefix, f'barplot_{cell_type}.png')
                         plt.savefig(barplot_filename, dpi=300, bbox_inches='tight')
                         plt.close()
                         print(f"Saved bar plot to {barplot_filename}")
@@ -255,7 +257,7 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
                         scatter.legend(new_handles, new_labels, bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
                         plt.grid(True, axis='y', linestyle='--', alpha=0.6)
                         plt.tight_layout(rect=[0, 0, 0.85, 1])
-                        dotplot_filename = f'{output_prefix}_dotplot_{cell_type}.png'
+                        dotplot_filename = os.path.join(output_prefix, f'dotplot_{cell_type}.png')
                         plt.savefig(dotplot_filename, dpi=300, bbox_inches='tight')
                         plt.close()
                         print(f"Saved dot plot to {dotplot_filename}")
@@ -459,7 +461,7 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                             plt.xlabel('Gene Ratio')
                             plt.ylabel(f'GO {domain} Term')
                             plt.tight_layout()
-                            barplot_filename = f'{domain_prefix}_barplot_{cell_type}.png'
+                            barplot_filename = os.path.join(domain_prefix, f'barplot_{cell_type}.png')
                             plt.savefig(barplot_filename, dpi=300, bbox_inches='tight')
                             plt.close()
                             print(f"Saved bar plot to {barplot_filename}")
@@ -498,7 +500,7 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                             scatter.legend(new_handles, new_labels, bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
                             plt.grid(True, axis='y', linestyle='--', alpha=0.6)
                             plt.tight_layout(rect=[0, 0, 0.85, 1])
-                            dotplot_filename = f'{domain_prefix}_dotplot_{cell_type}.png'
+                            dotplot_filename = os.path.join(domain_prefix, f'dotplot_{cell_type}.png')
                             plt.savefig(dotplot_filename, dpi=300, bbox_inches='tight')
                             plt.close()
                             print(f"Saved dot plot to {dotplot_filename}")
@@ -541,6 +543,7 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
     dict
         Dictionary containing DataFrames of raw and processed enrichment results.
     """   
+    os.makedirs(output_prefix, exist_ok=True)
     results = {
         'raw_results': None,
         'summary_results': None
@@ -685,7 +688,7 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
                         plt.xlabel('Gene Ratio')
                         plt.ylabel('KEGG Pathway')
                         plt.tight_layout()
-                        barplot_filename = f'{output_prefix}_barplot_{cell_type}.png'
+                        barplot_filename = os.path.join(output_prefix, f'barplot_{cell_type}.png')
                         plt.savefig(barplot_filename, dpi=300, bbox_inches='tight')
                         plt.close()
                         print(f"Saved bar plot to {barplot_filename}")
@@ -724,7 +727,7 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
                         scatter.legend(new_handles, new_labels, bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
                         plt.grid(True, axis='y', linestyle='--', alpha=0.6)
                         plt.tight_layout(rect=[0, 0, 0.85, 1])
-                        dotplot_filename = f'{output_prefix}_dotplot_{cell_type}.png'
+                        dotplot_filename = os.path.join(output_prefix, f'dotplot_{cell_type}.png')
                         plt.savefig(dotplot_filename, dpi=300, bbox_inches='tight')
                         plt.close()
                         print(f"Saved dot plot to {dotplot_filename}")
@@ -880,23 +883,52 @@ def perform_enrichment_analyses(
     analyses: List[str] = None,
     logfc_threshold: float = 1.0,
     pval_threshold: float = 0.05,
-    top_n_terms: int = 10
+    top_n_terms: int = 10,
+    include_condition_split: bool = True
 ) -> Dict[str, Any]:
     """
-    Runs reactome, go, kegg, gsea on DE genes, then returns:
-      - per_analysis: { analysis_name → { raw_results: [...], summary_results: [...] } }
-      - top_terms:     [ {analysis, Term_ID, Term, p_value, intersection_size, avg_log2fc, intersecting_genes} … ]
+    Runs reactome, go, kegg, gsea on DE genes for both full dataset and condition-specific datasets.
+    
+    Parameters:
+    -----------
+    adata : AnnData
+        The annotated data matrix.
+    cell_type : str
+        Cell type to analyze.
+    analyses : List[str], optional
+        List of enrichment analyses to perform. Default: ["reactome", "go", "kegg", "gsea"]
+    logfc_threshold : float, default=1.0
+        Log fold change threshold for significant genes.
+    pval_threshold : float, default=0.05
+        P-value threshold for significant genes.
+    top_n_terms : int, default=10
+        Number of top terms to display.
+    include_condition_split : bool, default=True
+        Whether to perform condition-specific enrichment analysis.
+    
+    Returns:
+    --------
+    Dict[str, Any]
+        Dictionary containing:
+        - formatted_summary: Human-readable summary
+        - full_dataset: Results from full dataset analysis
+        - condition_specific: Results from condition-specific analyses (if enabled)
+        - top_terms: Flattened list of top terms from all analyses
     """
     if analyses is None:
         analyses = ["reactome", "go", "kegg", "gsea"]
 
+    results = {}
+    
+    # 1. Perform enrichment analysis on the full dataset
+    print(f"🔬 Performing enrichment analysis on full dataset for {cell_type}...")
     sig_genes, gene_to_logfc = get_significant_gene(
         adata, cell_type,
         logfc_threshold=logfc_threshold,
         pval_threshold=pval_threshold
     )
 
-    per_analysis: Dict[str, Dict[str, List[Dict[str,Any]]]] = {}
+    per_analysis_full: Dict[str, Dict[str, List[Dict[str,Any]]]] = {}
 
     for name in analyses:
         key = name.lower()
@@ -934,49 +966,197 @@ def perform_enrichment_analyses(
         raw_list = raw_df.to_dict(orient="records")   if hasattr(raw_df, "to_dict")   else []
         sum_list = sum_df.to_dict(orient="records")   if hasattr(sum_df, "to_dict")   else []
 
-        per_analysis[key] = {
+        per_analysis_full[key] = {
             "raw_results":   raw_list,
             "summary_results": sum_list
         }
 
-    # now flatten the top_n_terms from each summary
+    results["full_dataset"] = {
+        "per_analysis": per_analysis_full,
+        "significant_genes": sig_genes
+    }
+
+    # 2. Perform condition-specific enrichment analysis if enabled
+    condition_results = {}
+    if include_condition_split:
+        print(f"🔬 Performing condition-specific DEA and enrichment analysis for {cell_type}...")
+        
+        # Run dea_split_by_condition to get DEGs for each condition
+        dea_condition_results = dea_split_by_condition(
+            adata, cell_type,
+            logfc_threshold=logfc_threshold,
+            pval_threshold=pval_threshold,
+            save_csv=True
+        )
+        
+        # For each condition, perform enrichment analysis
+        for condition_data in dea_condition_results:
+            category = condition_data["category"]
+            condition_sig_genes = condition_data["significant_genes"]
+            description = condition_data.get("description", "")
+            
+            print(f"  📊 Analyzing condition: {category} ({len(condition_sig_genes)} significant genes)")
+            
+            if not condition_sig_genes:
+                print(f"    ⚠️ No significant genes found for {category}, skipping enrichment...")
+                continue
+            
+            # Create gene_to_logfc mapping for condition-specific genes
+            # We'll need to read the saved CSV to get logfc values
+            csv_filename = f"schatbot/deg_res/{cell_type}_markers_{category}.csv"
+            condition_gene_to_logfc = {}
+            if os.path.exists(csv_filename):
+                df_condition = pd.read_csv(csv_filename)
+                condition_gene_to_logfc = dict(zip(df_condition['names'], df_condition['logfoldchanges']))
+            
+            per_analysis_condition: Dict[str, Dict[str, List[Dict[str,Any]]]] = {}
+            
+            for name in analyses:
+                key = name.lower()
+                output_prefix = f"schatbot/enrichment/{key}_{category}"
+                
+                if key == "reactome":
+                    out = reactome_enrichment(
+                        f"{cell_type}_{category}", condition_sig_genes, condition_gene_to_logfc,
+                        p_value_threshold=pval_threshold,
+                        top_n_terms=top_n_terms,
+                        output_prefix=output_prefix
+                    )
+                elif key == "go":
+                    out = go_enrichment(
+                        f"{cell_type}_{category}", condition_sig_genes, condition_gene_to_logfc,
+                        p_value_threshold=pval_threshold,
+                        top_n_terms=top_n_terms,
+                        output_prefix=output_prefix
+                    )
+                elif key == "kegg":
+                    out = kegg_enrichment(
+                        f"{cell_type}_{category}", condition_sig_genes, condition_gene_to_logfc,
+                        p_value_threshold=pval_threshold,
+                        top_n_terms=top_n_terms,
+                        output_prefix=output_prefix
+                    )
+                else:  # gsea
+                    out = gsea_enrichment_analysis(
+                        f"{cell_type}_{category}", condition_sig_genes, condition_gene_to_logfc,
+                        top_n_terms=top_n_terms,
+                        output_prefix=output_prefix
+                    )
+
+                # Convert any DataFrame → list of dicts
+                raw_df = out.get("raw_results")
+                sum_df = out.get("summary_results")
+                raw_list = raw_df.to_dict(orient="records")   if hasattr(raw_df, "to_dict")   else []
+                sum_list = sum_df.to_dict(orient="records")   if hasattr(sum_df, "to_dict")   else []
+
+                per_analysis_condition[key] = {
+                    "raw_results":   raw_list,
+                    "summary_results": sum_list
+                }
+            
+            condition_results[category] = {
+                "per_analysis": per_analysis_condition,
+                "significant_genes": condition_sig_genes,
+                "description": description
+            }
+    
+    results["condition_specific"] = condition_results
+
+    # 3. Create flattened top_terms from all analyses
     top_terms: List[Dict[str,Any]] = []
-    for analysis, tables in per_analysis.items():
+    
+    # Add terms from full dataset
+    for analysis, tables in per_analysis_full.items():
         for entry in tables["summary_results"][:top_n_terms]:
             rec = {
+                "dataset": "full",
+                "condition": "all",
                 "analysis": analysis,
                 "name": entry.get("Term") or entry.get("name"),
                 "description": entry.get("description") or entry.get("Term") or entry.get("name"),
-                "intersections": entry.get("intersecting_genes") or entry.get("intersections")
+                "intersections": entry.get("intersecting_genes") or entry.get("intersections"),
+                "p_value": entry.get("p_value", "N/A")
             }
             top_terms.append(rec)
+    
+    # Add terms from condition-specific analyses
+    for category, condition_data in condition_results.items():
+        for analysis, tables in condition_data["per_analysis"].items():
+            for entry in tables["summary_results"][:top_n_terms]:
+                rec = {
+                    "dataset": "condition_specific",
+                    "condition": category,
+                    "analysis": analysis,
+                    "name": entry.get("Term") or entry.get("name"),
+                    "description": entry.get("description") or entry.get("Term") or entry.get("name"),
+                    "intersections": entry.get("intersecting_genes") or entry.get("intersections"),
+                    "p_value": entry.get("p_value", "N/A")
+                }
+                top_terms.append(rec)
 
-    # Create a comprehensive human-readable summary
-    final_result = f"Enrichment analysis complete for {cell_type}.\n"
-    final_result += f"• Analysis parameters: logfc_threshold={logfc_threshold}, pval_threshold={pval_threshold}\n"
-    final_result += f"• Number of significant genes: {len(sig_genes)}\n"
-    final_result += f"• Analyses performed: {', '.join(analyses)}\n\n"
+    # 4. Create comprehensive human-readable summary
+    final_result = f"🔬 Enrichment Analysis Results for {cell_type}\n"
+    final_result += "=" * 60 + "\n\n"
+    final_result += f"📊 Analysis Parameters:\n"
+    final_result += f"  • Log FC threshold: {logfc_threshold}\n"
+    final_result += f"  • P-value threshold: {pval_threshold}\n"
+    final_result += f"  • Analyses performed: {', '.join(analyses)}\n"
+    final_result += f"  • Condition-specific analysis: {'Yes' if include_condition_split else 'No'}\n\n"
+    
+    # Full dataset summary
+    final_result += f"🌐 FULL DATASET ANALYSIS\n"
+    final_result += f"  • Number of significant genes: {len(sig_genes)}\n\n"
     
     for analysis in analyses:
         analysis_key = analysis.lower()
-        if analysis_key in per_analysis and per_analysis[analysis_key]["summary_results"]:
-            final_result += f"• {analysis.upper()} Results:\n"
-            summary_results = per_analysis[analysis_key]["summary_results"][:5]  # Top 5 terms
+        if analysis_key in per_analysis_full and per_analysis_full[analysis_key]["summary_results"]:
+            final_result += f"  • {analysis.upper()} Results:\n"
+            summary_results = per_analysis_full[analysis_key]["summary_results"][:5]  # Top 5 terms
             for i, term in enumerate(summary_results, 1):
                 term_name = term.get("Term") or term.get("name", "Unknown")
                 p_val = term.get("p_value", "N/A")
                 intersections = term.get("intersecting_genes") or term.get("intersections", "")
                 if isinstance(intersections, str) and len(intersections) > 100:
                     intersections = intersections[:100] + "..."
-                final_result += f"  {i}. {term_name} (p-value: {p_val})\n"
-                final_result += f"     Genes: {intersections}\n"
+                final_result += f"    {i}. {term_name} (p-value: {p_val})\n"
+                final_result += f"       Genes: {intersections}\n"
             final_result += "\n"
         else:
-            final_result += f"• {analysis.upper()} Results: No significant terms found\n\n"
+            final_result += f"  • {analysis.upper()} Results: No significant terms found\n\n"
+    
+    # Condition-specific summary
+    if condition_results:
+        final_result += f"🎯 CONDITION-SPECIFIC ANALYSIS\n"
+        for category, condition_data in condition_results.items():
+            description = condition_data.get("description", "")
+            desc_text = f" ({description})" if description else ""
+            final_result += f"\n  📁 Condition: {category}{desc_text}\n"
+            final_result += f"    • Number of significant genes: {len(condition_data['significant_genes'])}\n"
+            
+            for analysis in analyses:
+                analysis_key = analysis.lower()
+                if (analysis_key in condition_data["per_analysis"] and 
+                    condition_data["per_analysis"][analysis_key]["summary_results"]):
+                    final_result += f"    • {analysis.upper()} Results:\n"
+                    summary_results = condition_data["per_analysis"][analysis_key]["summary_results"][:3]  # Top 3 terms
+                    for i, term in enumerate(summary_results, 1):
+                        term_name = term.get("Term") or term.get("name", "Unknown")
+                        p_val = term.get("p_value", "N/A")
+                        final_result += f"      {i}. {term_name} (p-value: {p_val})\n"
+                    final_result += "\n"
+                else:
+                    final_result += f"    • {analysis.upper()}: No significant terms\n"
     
     return {
         "formatted_summary": final_result,
         "top_terms": top_terms,
-        "per_analysis": per_analysis,
-        "significant_genes": sig_genes
+        "significant_genes": {
+            "full_dataset": sig_genes,
+            "condition_specific": {cat: data["significant_genes"] for cat, data in condition_results.items()}
+        },
+        "conditions": {
+            "cell_type": cell_type,
+            "available_conditions": list(condition_results.keys()),
+            "condition_descriptions": {cat: data.get("description", "") for cat, data in condition_results.items()}
+        }
     }

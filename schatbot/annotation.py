@@ -7,8 +7,9 @@ import os
 import ast
 from langchain.schema import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
-from .utils import get_rag, get_subtypes, save_analysis_results, explain_gene
+from schatbot.utils import get_rag, get_subtypes, save_analysis_results, explain_gene, get_mapping, filter_existing_genes, extract_genes, get_h5ad
 import re
+import scvi
 
 # Cell type naming/standardization
 
@@ -173,10 +174,16 @@ def preprocess_data(adata, sample_mapping=None):
     if sample_mapping:
         from scvi.model import SCVI
         sc.pp.highly_variable_genes(adata, n_top_genes=3000, subset=True, layer='counts', 
-                                   flavor="seurat_v3", batch_key="Sample")
-        SCVI.setup_anndata(adata, layer="counts", categorical_covariate_keys=["Sample"],
+                                   flavor="seurat_v3", batch_key="Exp_sample_category")
+        SCVI.setup_anndata(adata, layer="counts", categorical_covariate_keys=["Exp_sample_category"],
                           continuous_covariate_keys=['pct_counts_mt', 'total_counts'])
-        model = SCVI.load(dir_path="schatbot/glioma_scvi_model", adata=adata)
+        if os.path.exists("schatbot/scvi_model") and any(os.scandir("schatbot/scvi_model")):
+            model = SCVI.load(dir_path="schatbot/scvi_model", adata=adata)
+        else:
+            model = scvi.model.SCVI(adata)
+            model.train()
+            model.save("schatbot/scvi_model", overwrite=True)
+
         latent = model.get_latent_representation()
         adata.obsm['X_scVI'] = latent
         adata.layers['scvi_normalized'] = model.get_normalized_expression(library_size=1e4)
@@ -215,18 +222,14 @@ def rank_genes(adata, groupby='leiden', method='wilcoxon', n_genes=25, key_added
         }
         return adata
     try:
+        adata.obs = adata.obs.copy()
         sc.tl.rank_genes_groups(adata, groupby, method=method, n_genes=n_genes, key_added=key_added, use_raw=False)
-    except Exception as e:
+    except ValueError as e:
         print(f"ERROR in rank_genes_groups: {e}")
-        print("Falling back to t-test method")
-        try:
-            sc.tl.rank_genes_groups(adata, groupby, method='t-test', n_genes=n_genes, key_added=key_added, use_raw=False)
-        except Exception as e2:
-            print(f"ERROR with fallback method: {e2}")
-            adata.uns[key_added] = {
-                'params': {'groupby': groupby},
-                'names': np.zeros((1,), dtype=[('0', 'U50')])
-            }
+        # Fallback to t-test if 'wilcoxon' fails due to small group size
+        adata.obs = adata.obs.copy()
+        sc.tl.rank_genes_groups(adata, groupby, method='t-test', n_genes=n_genes, key_added=key_added, use_raw=False)
+
     return adata
 
 
@@ -234,22 +237,38 @@ def create_marker_anndata(adata, markers, copy_uns=True, copy_obsm=True):
     """
     Create a copy of AnnData with only marker genes.
     """
-    from .utils import filter_existing_genes
     import scipy
-    markers = filter_existing_genes(adata, markers)
-    markers = list(set(markers))
-    if len(markers) == 0:
+    filtered_markers, updated_adata = filter_existing_genes(adata, markers)
+    
+    # Remove duplicates from markers
+    filtered_markers = list(set(filtered_markers))
+    
+    if len(filtered_markers) == 0:
         print("WARNING: No marker genes found in the dataset!")
         return anndata.AnnData(
-            X=scipy.sparse.csr_matrix((adata.n_obs, 0)),
-            obs=adata.obs.copy()
-        ), []
-    if hasattr(adata, 'raw') and adata.raw is not None:
-        raw_indices = [i for i, name in enumerate(adata.raw.var_names) if name in markers]
-        if hasattr(adata.raw, 'layers') and 'log1p' in adata.raw.layers:
-            X = adata.raw.layers['log1p'][:, raw_indices].copy()
+            X=scipy.sparse.csr_matrix((updated_adata.n_obs, 0)),
+            obs=updated_adata.obs.copy()
+        ), [], updated_adata
+    
+    # Determine which data source to use and get gene indices
+    if hasattr(updated_adata, 'raw') and updated_adata.raw is not None:
+        # Use raw data
+        raw_var_names = updated_adata.raw.var_names
+        raw_indices = [i for i, name in enumerate(raw_var_names) if name in filtered_markers]
+        
+        if len(raw_indices) == 0:
+            print("WARNING: No marker genes found in raw data!")
+            return anndata.AnnData(
+                X=scipy.sparse.csr_matrix((updated_adata.n_obs, 0)),
+                obs=updated_adata.obs.copy()
+            ), [], updated_adata
+        
+        # Extract expression data
+        if hasattr(updated_adata.raw, 'layers') and 'log1p' in updated_adata.raw.layers:
+            X = updated_adata.raw.layers['log1p'][:, raw_indices].copy()
         else:
-            X = adata.raw.X[:, raw_indices].copy()
+            X = updated_adata.raw.X[:, raw_indices].copy()
+            # Check if data needs log transformation
             if scipy.sparse.issparse(X):
                 max_val = X.max()
             else:
@@ -257,22 +276,43 @@ def create_marker_anndata(adata, markers, copy_uns=True, copy_obsm=True):
             if max_val > 100:
                 print("Log-transforming marker data...")
                 X = np.log1p(X)
+        
+        # Get variable metadata
+        var = updated_adata.raw.var.iloc[raw_indices].copy()
+        
     else:
-        main_indices = [i for i, name in enumerate(adata.var_names) if name in markers]
-        X = adata.X[:, main_indices].copy()
-    var = adata.var.iloc[main_indices].copy() if 'main_indices' in locals() else adata.raw.var.iloc[raw_indices].copy()
+        # Use main data
+        main_var_names = updated_adata.var_names
+        main_indices = [i for i, name in enumerate(main_var_names) if name in filtered_markers]
+        
+        if len(main_indices) == 0:
+            print("WARNING: No marker genes found in main data!")
+            return anndata.AnnData(
+                X=scipy.sparse.csr_matrix((updated_adata.n_obs, 0)),
+                obs=updated_adata.obs.copy()
+            ), [], updated_adata
+        
+        X = updated_adata.X[:, main_indices].copy()
+        var = updated_adata.var.iloc[main_indices].copy()
+    
+    
+    # Create the marker AnnData object
     marker_adata = anndata.AnnData(
         X=X,
-        obs=adata.obs.copy(),
+        obs=updated_adata.obs.copy(),
         var=var
-    )
+    )   
+    # Copy additional data if requested
     if copy_uns:
-        marker_adata.uns = adata.uns.copy()
+        marker_adata.uns = updated_adata.uns.copy()
+    
     if copy_obsm:
-        marker_adata.obsm = adata.obsm.copy()
-    if hasattr(adata, 'obsp'):
-        marker_adata.obsp = adata.obsp.copy()
-    return marker_adata, markers
+        marker_adata.obsm = updated_adata.obsm.copy()
+    
+    if hasattr(updated_adata, 'obsp'):
+        marker_adata.obsp = updated_adata.obsp.copy()
+    
+    return marker_adata, filtered_markers, updated_adata
 
 
 def rank_ordering(adata_or_result, key=None, n_genes=25):
@@ -304,7 +344,7 @@ def initial_cell_annotation(resolution=1):
     Generate initial UMAP clustering on the full dataset.
     """
     import matplotlib
-    from .utils import get_h5ad, get_mapping, extract_genes
+
     global sample_mapping
     matplotlib.use('Agg')
     path = get_h5ad("media", ".h5ad")
@@ -313,14 +353,20 @@ def initial_cell_annotation(resolution=1):
     adata = sc.read_h5ad(path)
     sample_mapping = get_mapping("media")
     if sample_mapping:
-        adata.obs['patient_name'] = adata.obs['Sample'].map(sample_mapping)
+        sample_column_name = sample_mapping.get("Sample name", "Sample")
+        if sample_column_name in adata.obs.columns:
+            adata.obs['Exp_sample_category'] = adata.obs[sample_column_name].map(sample_mapping["Sample categories"])
+        else:
+            print(f"Warning: '{sample_column_name}' column not found in adata.obs. Available columns:", list(adata.obs.columns))
+            print("Proceeding without sample mapping.")
+            sample_mapping = None
     adata = preprocess_data(adata, sample_mapping)
     adata = perform_clustering(adata, resolution=resolution)
     adata = rank_genes(adata, groupby='leiden', n_genes=25, key_added='rank_genes_all')
     markers = get_rag()
     marker_tree = markers.copy()
     markers = extract_genes(markers)
-    adata_markers, filtered_markers = create_marker_anndata(adata, markers)
+    adata_markers, filtered_markers, adata = create_marker_anndata(adata, markers)
     adata_markers = rank_genes(adata_markers, n_genes=25, key_added='rank_genes_markers')
     adata.uns['rank_genes_markers'] = adata_markers.uns['rank_genes_markers']
     use_rep = 'X_scVI' if sample_mapping else None
@@ -339,6 +385,7 @@ def initial_cell_annotation(resolution=1):
     gene_dict = {}
     for cluster, group in top_genes_df.groupby("cluster"):
         gene_dict[cluster] = list(group["gene"])
+    print("marker tree", marker_tree)
     input_msg =(f"Top genes details: {gene_dict}. "
                 f"Markers: {marker_tree}. ")
 
@@ -359,6 +406,7 @@ def initial_cell_annotation(resolution=1):
             Strictly adhere to follwing rules:
             * 1. Adhere to the dictionary format and do not include any additional words or explanations.
             * 2. The cluster number in the result dictionary must be arranged with raising power.
+            * 3. The annotated cell type must exist in the marker tree.
             """),
         HumanMessage(content=input_msg)
     ]
@@ -383,7 +431,6 @@ def process_cells(adata, cell_type, resolution=None):
     Process specific cell type with full workflow - FIXED VERSION
     """
     print(f"🔍 Processing cell type: {cell_type}")
-    from .utils import extract_genes
     resolution = 1 if resolution is None else resolution
     
     # Get subtypes from database
@@ -453,7 +500,7 @@ def process_cells(adata, cell_type, resolution=None):
         print(f"⚠️ dropping {len(missing)} missing markers:", missing)
     markers_list = existing_markers
     if len(markers_list) >= 5:
-        madata, _ = create_marker_anndata(filtered, markers_list)
+        madata, _, _ = create_marker_anndata(filtered, markers_list)
         try:
             mk = f"rank_markers_{base}"
             madata = rank_genes(madata, key_added=mk)
@@ -489,6 +536,7 @@ def process_cells(adata, cell_type, resolution=None):
             Strictly adhere to follwing rules:
             * 1. Adhere to the dictionary format and do not include any additional words or explanations.
             * 2. The cluster number in the result dictionary must be arranged with raising power.
+            * 3. The annotated cell type must exist in the marker tree.
         """),
         HumanMessage(content=prompt),
     ]
@@ -591,3 +639,9 @@ def label_clusters(annotation_result, cell_type, adata):
     except (SyntaxError, ValueError) as e:
         print(f"Error in parsing the map: {e}")
     return adata
+
+
+# if __name__ == "__main__":
+#     gene_dict, marker_tree, adata, explanation, annotation_result = initial_cell_annotation()
+    
+    

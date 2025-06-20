@@ -42,4 +42,3 @@ def ask(question, session_prompt="The following is a conversation with an AI ass
 # #         yield "I am unable to answer that question right now."
 
 
-

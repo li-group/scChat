@@ -9,6 +9,7 @@ import pandas as pd
 import scanpy as sc
 import anndata
 import scipy
+import mygene
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
@@ -252,13 +253,81 @@ def get_subtypes(cell_type):
     return subtypes_data
 
 def filter_existing_genes(adata, gene_list):
-    """Filter genes to only those present in the dataset, handling non-unique indices."""
+    """
+    Filter genes to only those present in the dataset, handling Ensembl ID conversion
+    without modifying the original AnnData object.
+    
+    Returns:
+        existing_genes (list): List of genes that exist in the dataset
+        adata (AnnData): The original adata object (unchanged)
+    """
+    # Determine which var_names to check (raw or main)
     if hasattr(adata, 'raw') and adata.raw is not None:
         var_names = adata.raw.var_names
+        use_raw = True
     else:
         var_names = adata.var_names
-    existing_genes = [gene for gene in gene_list if gene in var_names]
-    return existing_genes
+        use_raw = False
+    # Check if var_names are likely Ensembl IDs (e.g., start with 'ENSG')
+    needs_conversion = len(var_names) > 0 and var_names[0].startswith('ENSG')
+    
+    if needs_conversion:
+        print("Detected Ensembl IDs in .var_names. Converting to gene symbols for filtering (original data unchanged)...")
+        
+        try:
+            import mygene
+            mg = mygene.MyGeneInfo()
+            
+            # Clean Ensembl IDs by removing version numbers (e.g., .1)
+            ensembl_ids = var_names.to_series().str.split('.').str[0]          
+            # Query gene symbols
+            gene_info = mg.querymany(
+                ensembl_ids,
+                scopes='ensembl.gene',
+                fields='symbol',
+                species='human',
+                as_dataframe=True
+            )
+            
+            # Handle cases where mygene returns multiple hits for a single ID
+            if not gene_info.empty:
+                gene_info = gene_info[~gene_info.index.duplicated(keep='first')]
+                
+                # Map symbols, falling back to the original ID if no symbol is found
+                id_to_symbol_map = gene_info.get('symbol', pd.Series())
+                converted_var_names = ensembl_ids.map(id_to_symbol_map).fillna(ensembl_ids)
+            else:
+                # If no results from mygene, keep original names
+                converted_var_names = ensembl_ids
+            
+            # Create a mapping from original gene symbols to both original and converted names
+            # This allows matching against both Ensembl IDs and gene symbols
+            all_searchable_names = set(var_names.tolist() + converted_var_names.tolist())
+            
+            print("Conversion complete. Using converted names for filtering without modifying original data.")
+
+            
+        except Exception as e:
+            print(f"Error during Ensembl ID conversion: {e}")
+            print("Falling back to original var_names")
+            all_searchable_names = set(var_names.tolist())
+    else:
+        # If not Ensembl IDs, use them as they are
+        all_searchable_names = set(var_names.tolist())
+    
+    # Filter the input gene list against all searchable names
+    existing_genes = [gene for gene in gene_list if gene in all_searchable_names]
+    
+    # Log filtering statistics
+    original_count = len(gene_list)
+    found_count = len(existing_genes)
+    print(f"Gene filtering complete: {found_count}/{original_count} genes found in dataset")
+    if found_count < original_count:
+        missing_genes = [gene for gene in gene_list if gene not in all_searchable_names]
+        print(f"Missing genes: {missing_genes[:10]}{'...' if len(missing_genes) > 10 else ''}")
+    
+    # IMPORTANT: Always return the original adata object unchanged
+    return existing_genes, adata
 
 def save_analysis_results(adata, prefix, leiden_key='leiden', save_umap=True, 
                          save_dendrogram=True, save_dotplot=False, markers=None):
@@ -268,8 +337,8 @@ def save_analysis_results(adata, prefix, leiden_key='leiden', save_umap=True,
         os.makedirs(out_dir, exist_ok=True)
     if save_umap:
         umap_cols = ['UMAP_1', 'UMAP_2', leiden_key]
-        if 'patient_name' in adata.obs.columns:
-            umap_cols.append('patient_name')
+        if 'Exp_sample_category' in adata.obs.columns:
+            umap_cols.append('Exp_sample_category')
         if 'cell_type' in adata.obs.columns:
             umap_cols.append('cell_type')
         adata.obs[umap_cols].to_csv(f"{prefix}_umap_data.csv", index=False)
@@ -293,72 +362,86 @@ def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pva
     cell_type = unified_cell_type_handler(cell_type)
     try:
         adata_modified = adata.copy()
-        pre_mask = adata_modified.obs["patient_name"].str.contains("_pre")
-        post_mask = ~pre_mask
-        adata_pre = adata_modified[pre_mask].copy()
-        adata_post = adata_modified[post_mask].copy()
-        if len(adata_pre) == 0 or len(adata_post) == 0:
-            print("Error: One of the conditions (pre or post) has no cells.")
-            return adata_pre, adata_post, [], []
-        adata_pre.obs["cell_type_group"] = "Other"
-        cell_type_mask_pre = adata_pre.obs["cell_type"] == str(cell_type)
-        adata_pre.obs.loc[cell_type_mask_pre, "cell_type_group"] = str(cell_type)
-        adata_post.obs["cell_type_group"] = "Other"
-        cell_type_mask_post = adata_post.obs["cell_type"] == str(cell_type)
-        adata_post.obs.loc[cell_type_mask_post, "cell_type_group"] = str(cell_type)
-        if sum(cell_type_mask_pre) == 0:
-            print(f"Error: No {cell_type} found in pre condition.")
-            return adata_pre, adata_post, [], []
-        if sum(cell_type_mask_post) == 0:
-            print(f"Error: No {cell_type} found in post condition.")
-            return adata_pre, adata_post, [], []
-        pre_key_name = f"{cell_type}_markers_pre_only"
-        post_key_name = f"{cell_type}_markers_post_only"
-        sc.tl.rank_genes_groups(adata_pre, groupby="cell_type_group", 
-                            groups=[str(cell_type)], reference="Other",
-                            method="wilcoxon", n_genes=n_genes, 
-                            key_added=pre_key_name, use_raw_=False)
-        sc.tl.rank_genes_groups(adata_post, groupby="cell_type_group", 
-                            groups=[str(cell_type)], reference="Other",
-                            method="wilcoxon", n_genes=n_genes, 
-                            key_added=post_key_name, use_raw_=False)
-        pre_data = sc.get.rank_genes_groups_df(adata_pre, group=str(cell_type), key=pre_key_name)
-        pre_significant_genes = list(pre_data.loc[(pre_data['pvals_adj'] < pval_threshold) & 
-                            (abs(pre_data['logfoldchanges']) > logfc_threshold), 'names'])
-        post_data = sc.get.rank_genes_groups_df(adata_post, group=str(cell_type), key=post_key_name)
-        post_significant_genes = list(post_data.loc[(post_data['pvals_adj'] < pval_threshold) & 
-                                    (abs(post_data['logfoldchanges']) > logfc_threshold), 'names'])
-        if save_csv:
-            pre_file_name = f"{cell_type}_markers_pre_only.csv"
-            pre_data.to_csv(pre_file_name, index=False)
-            print(f"Pre condition {cell_type} marker results saved to {pre_file_name}")
-            post_file_name = f"{cell_type}_markers_post_only.csv"  
-            post_data.to_csv(post_file_name, index=False)
-            print(f"Post condition {cell_type} marker results saved to {post_file_name}")
-        return adata_pre, adata_post, pre_significant_genes, post_significant_genes
+        categories = adata_modified.obs["Exp_sample_category"].unique()
+        result_list = []
+        for cat in categories:
+            mask = adata_modified.obs["Exp_sample_category"] == cat
+            adata_cat = adata_modified[mask].copy()
+            if len(adata_cat) == 0:
+                print(f"Error: No cells for category {cat}.")
+                continue
+            adata_cat.obs["cell_type_group"] = "Other"
+            cell_type_mask = adata_cat.obs["cell_type"] == str(cell_type)
+            adata_cat.obs.loc[cell_type_mask, "cell_type_group"] = str(cell_type)
+            if sum(cell_type_mask) == 0:
+                print(f"Error: No {cell_type} found in {cat} condition.")
+                continue
+            key_name = f"{cell_type}_markers_{cat}"
+            sc.tl.rank_genes_groups(adata_cat, groupby="cell_type_group", 
+                                    groups=[str(cell_type)], reference="Other",
+                                    method="wilcoxon", n_genes=n_genes, 
+                                    key_added=key_name, use_raw_=False)
+            data = sc.get.rank_genes_groups_df(adata_cat, group=str(cell_type), key=key_name)
+            significant_genes = list(data.loc[(data['pvals_adj'] < pval_threshold) & 
+                                              (abs(data['logfoldchanges']) > logfc_threshold), 'names'])
+            if save_csv:
+                file_name = f"{cell_type}_markers_{cat}.csv"
+                os.makedirs('schatbot/deg_res', exist_ok=True)
+                data.to_csv(f'schatbot/deg_res/{file_name}', index=False)
+                print(f"{cat} condition {cell_type} marker results saved to {file_name}")
+            # Get description directly from JSON file
+            description = None
+            sample_mapping = get_mapping("media")
+            if sample_mapping:
+                description = sample_mapping.get('Sample description', {}).get(cat)
+            result_list.append({
+                "category": cat,
+                "significant_genes": significant_genes,
+                "description": description
+            })
+        return result_list
     except Exception as e:
         print(f"Error in analysis: {e}")
-        return None, None, [], []
+        return {}
 
-def compare_cell_count(adata, cell_type, sample1, sample2):
-    from .annotation import unified_cell_type_handler
+def compare_cell_count(adata, cell_type):
+    from annotation import unified_cell_type_handler
     cell_type = unified_cell_type_handler(cell_type)
-    mask_sample1 = adata.obs["patient_name"] == sample1
-    mask_sample2 = adata.obs["patient_name"] == sample2
-    mask_cells = adata.obs["cell_type"] == cell_type
-    combined_mask1 = mask_sample1 & mask_cells
-    combined_mask2 = mask_sample2 & mask_cells
-    adata_sample1 = adata[combined_mask1]
-    adata_sample2 = adata[combined_mask2]
-    sample1_num = adata_sample1.shape[0]
-    sample2_num = adata_sample2.shape[0]
-    counts_comp = {f"{sample1}": sample1_num, f"{sample2}": sample2_num}
-    return counts_comp
+    
+    # Get all unique sample categories
+    categories = adata.obs["Exp_sample_category"].unique()
+    result_list = []
+    
+    for cat in categories:
+        # Create masks for this category and cell type
+        mask_sample = adata.obs["Exp_sample_category"] == cat
+        mask_cells = adata.obs["cell_type"] == cell_type
+        combined_mask = mask_sample & mask_cells
+        
+        # Count cells
+        cell_count = combined_mask.sum()
+        
+        # Get description from JSON file
+        description = None
+        sample_mapping = get_mapping("media")
+        if sample_mapping:
+            description = sample_mapping.get('Sample description', {}).get(cat)
+        
+        result_list.append({
+            "category": cat,
+            "cell_count": cell_count,
+            "description": description
+        })
+    
+    return result_list
 
 def repeat():
     return "Hello"
 
 if __name__ == "__main__":
-    cell_type = "T cell"
-    marker_tree = get_subtypes(cell_type)
-    print(marker_tree)
+    import pickle
+    with open('schatbot/annotated_adata/Overall_annotated_adata.pkl', 'rb') as f:
+        adata = pickle.load(f)
+        
+    result = compare_cell_count(adata, "Immune cell")
+    print(result)

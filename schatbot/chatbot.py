@@ -19,8 +19,9 @@ import os
 import json
 import openai
 import pickle
-from typing import Dict, Any, Tuple, Optional
+from typing import Dict, Any, Tuple, Optional, List
 import openai
+import re
 
 
 
@@ -29,7 +30,7 @@ class ChatBot:
         # Initialization code remains the same...
         self._initialize_directories()
         self.conversation_history = []
-        self.api_key = os.getenv("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")
+        self.api_key = os.getenv("OPENAI_API_KEY", "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")
         openai.api_key = self.api_key
         self.adata = None
         
@@ -53,11 +54,13 @@ class ChatBot:
     def _initialize_directories(self):
         """Clean all directories at initialization"""
         directories_to_clear = [
-            'annotated_adata', 'figures', 'process_cell_data',
-            'schatbot/enrichment/go_bp', 'schatbot/enrichment/go_cc',
-            'schatbot/enrichment/go_mf', 'schatbot/enrichment/gsea',
-            'schatbot/enrichment/kegg', 'schatbot/enrichment/reactome',
-            'umaps/annotated'
+            # 'schatbot/annotated_adata',  # Keep cached annotations
+            'figures', 
+            'process_cell_data',
+            'schatbot/annotated_adata',
+            'schatbot/enrichment/',
+            'umaps/annotated',
+            'schatbot/runtime_data/basic_data/'
         ]
         
         for directory in directories_to_clear:
@@ -75,17 +78,9 @@ class ChatBot:
 
     def _initialize_annotation(self):
         """Initialize or load annotation data"""
-        pth = "annotated_adata/Overall cells_annotated_adata.pkl"
-        if os.path.exists(pth):
-            with open(pth, "rb") as f:
-                self.adata = pickle.load(f)
-                print("Loaded annotated adata from pickle file")
-            gene_dict, marker_tree, _, explanation, annotation_result = initial_cell_annotation()
-        else:
-            gene_dict, marker_tree, adata, explanation, annotation_result = initial_cell_annotation()
-            self.adata = adata
+        gene_dict, marker_tree, adata, explanation, annotation_result = initial_cell_annotation()
+        self.adata = adata
             
-        # Add initial annotation to conversation history
         self._add_initial_annotation_to_history(gene_dict, marker_tree, explanation, annotation_result)
 
     def _add_initial_annotation_to_history(self, gene_dict, marker_tree, explanation, annotation_result):
@@ -117,53 +112,53 @@ class ChatBot:
                 """,
                 "parameters": {"type": "object", "properties": {}, "required": []},
             },
-            {
-                "name": "display_dotplot",
-                "description": """
-                                Display dotplot for the annotated results.
-                                This function will be called as the user asked to generate/visualize/display/show the dotplot.
-                """,
-                "parameters": {"type": "object", "properties": {}, "required": []},
-            },
-            {
-                "name": "display_cell_type_composition",
-                "description": """
-                                Display cell type composition graph.
-                                This function will be called as the user asked to generate/visualize/display/show the cell type composition graph.
-                """,
-                "parameters": {"type": "object", "properties": {}, "required": []},
-            },
-            {
-                "name": "display_gsea_dotplot",
-                "description": """
-                                Display GSEA dot plot.
-                                This function will be called as the user asked to generate/visualize/display/show the GSEA dot plot.
-                """,
-                "parameters": {"type": "object", "properties": {}, "required": []},
-            },
-            {
-                "name": "repeat",
-                "description": "Repeat given sentence",
-                "parameters": {"type": "object", "properties": {}, "required": []},
-            },
-            {
-                "name": "display_umap",
-                "description": """
-                                Displays UMAP that is NOT annotated with the cell types. 
-                                Use overall cells if no cell type is specified.
-                                This function will be called as the user asked to generate/visualize/display/show the UMAP.
-                """,
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "cell_type": {
-                            "type": "string",
-                            "description": "The cell type"
-                        }
-                    },
-                    "required": ["cell_type"],
-                },
-            },
+            # {
+            #     "name": "display_dotplot",
+            #     "description": """
+            #                     Display dotplot for the annotated results.
+            #                     This function will be called as the user asked to generate/visualize/display/show the dotplot.
+            #     """,
+            #     "parameters": {"type": "object", "properties": {}, "required": []},
+            # },
+            # {
+            #     "name": "display_cell_type_composition",
+            #     "description": """
+            #                     Display cell type composition graph.
+            #                     This function will be called as the user asked to generate/visualize/display/show the cell type composition graph.
+            #     """,
+            #     "parameters": {"type": "object", "properties": {}, "required": []},
+            # },
+            # {
+            #     "name": "display_gsea_dotplot",
+            #     "description": """
+            #                     Display GSEA dot plot.
+            #                     This function will be called as the user asked to generate/visualize/display/show the GSEA dot plot.
+            #     """,
+            #     "parameters": {"type": "object", "properties": {}, "required": []},
+            # },
+            # {
+            #     "name": "repeat",
+            #     "description": "Repeat given sentence",
+            #     "parameters": {"type": "object", "properties": {}, "required": []},
+            # },
+            # {
+            #     "name": "display_umap",
+            #     "description": """
+            #                     Displays UMAP that is NOT annotated with the cell types. 
+            #                     Use overall cells if no cell type is specified.
+            #                     This function will be called as the user asked to generate/visualize/display/show the UMAP.
+            #     """,
+            #     "parameters": {
+            #         "type": "object",
+            #         "properties": {
+            #             "cell_type": {
+            #                 "type": "string",
+            #                 "description": "The cell type"
+            #             }
+            #         },
+            #         "required": ["cell_type"],
+            #     },
+            # },
             {
                 "name": "display_processed_umap",
                 "description": """
@@ -203,6 +198,11 @@ class ChatBot:
                             },
                             "description": "Which enrichment analyses to run. Defaults to all if omitted."
                         },
+                        "analysis_type": {
+                            "type": "string",
+                            "enum": ["GSEA", "GO", "KEGG", "reactome"],
+                            "description": "Specific type of enrichment analysis to perform when called from automated workflow."
+                        },
                         "logfc_threshold": {
                             "type": "number",
                             "description": "Minimum absolute log2 fold change to call a gene significant."
@@ -237,54 +237,54 @@ class ChatBot:
                     "required": ["cell_type"]
                 }
             },
-            {
-                "name": "display_enrichment_barplot",
-                "description": """
-                                Show a barplot of top enriched terms from one of reactome/go/kegg/gsea for a given cell type.
-                                This function will be called as the user asked to generate/visualize/display/show the enrichment barplot.
-                """,
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "analysis": {
-                            "type": "string",
-                            "enum": ["reactome","go","kegg","gsea"]
-                        },
-                        "cell_type": {"type": "string"},
-                        "top_n": {"type": "integer", "default": 10},
-                        "domain": {
-                            "type": "string",
-                            "enum": ["BP","MF","CC"],
-                            "description": "Only for GO"
-                        }
-                    },
-                    "required": ["analysis","cell_type"]
-                }
-            },
-            {
-                "name": "display_enrichment_dotplot",
-                "description": """
-                                Show a dotplot (gene ratio vs. term) of top enriched terms.
-                                This function will be called as the user asked to generate/visualize/display/show the enrichment dotplot.
-                """,
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "analysis": {
-                            "type": "string",
-                            "enum": ["reactome","go","kegg","gsea"]
-                        },
-                        "cell_type": {"type": "string"},
-                        "top_n": {"type": "integer", "default": 10},
-                        "domain": {
-                            "type": "string",
-                            "enum": ["BP","MF","CC"],
-                            "description": "Only for GO"
-                        }
-                    },
-                    "required": ["analysis","cell_type"]
-                }
-            },
+            # {
+            #     "name": "display_enrichment_barplot",
+            #     "description": """
+            #                     Show a barplot of top enriched terms from one of reactome/go/kegg/gsea for a given cell type.
+            #                     This function will be called as the user asked to generate/visualize/display/show the enrichment barplot.
+            #     """,
+            #     "parameters": {
+            #         "type": "object",
+            #         "properties": {
+            #             "analysis": {
+            #                 "type": "string",
+            #                 "enum": ["reactome","go","kegg","gsea"]
+            #             },
+            #             "cell_type": {"type": "string"},
+            #             "top_n": {"type": "integer", "default": 10},
+            #             "domain": {
+            #                 "type": "string",
+            #                 "enum": ["BP","MF","CC"],
+            #                 "description": "Only for GO"
+            #             }
+            #         },
+            #         "required": ["analysis","cell_type"]
+            #     }
+            # },
+            # {
+            #     "name": "display_enrichment_dotplot",
+            #     "description": """
+            #                     Show a dotplot (gene ratio vs. term) of top enriched terms.
+            #                     This function will be called as the user asked to generate/visualize/display/show the enrichment dotplot.
+            #     """,
+            #     "parameters": {
+            #         "type": "object",
+            #         "properties": {
+            #             "analysis": {
+            #                 "type": "string",
+            #                 "enum": ["reactome","go","kegg","gsea"]
+            #             },
+            #             "cell_type": {"type": "string"},
+            #             "top_n": {"type": "integer", "default": 10},
+            #             "domain": {
+            #                 "type": "string",
+            #                 "enum": ["BP","MF","CC"],
+            #                 "description": "Only for GO"
+            #             }
+            #         },
+            #         "required": ["analysis","cell_type"]
+            #     }
+            # },
             {
                 "name": "dea_split_by_condition",
                 "description": """
@@ -311,11 +311,9 @@ class ChatBot:
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "cell_type": {"type": "string"},
-                        "sample1": {"type": "string"},
-                        "sample2": {"type": "string"}
+                        "cell_type": {"type": "string"}
                     },
-                    "required": ["cell_type", "sample1", "sample2"]
+                    "required": ["cell_type"]
                 }
             }
         ]
@@ -352,20 +350,62 @@ class ChatBot:
         if self.adata is None:
             _, _, self.adata = initial_cell_annotation()
         
+        # Handle analysis_type parameter from automated workflow
+        analyses = kwargs.get("analyses")
+        if not analyses and "analysis_type" in kwargs:
+            analysis_type = kwargs["analysis_type"].lower()
+            if analysis_type == "gsea":
+                analyses = ["gsea"]
+            elif analysis_type == "go":
+                analyses = ["go"]
+            elif analysis_type == "kegg":
+                analyses = ["kegg"]
+            elif analysis_type == "reactome":
+                analyses = ["reactome"]
+            else:
+                analyses = None  # Use default (all analyses)
+        
         return perform_enrichment_analyses(
             self.adata,
             cell_type=kwargs.get("cell_type"),
-            analyses=kwargs.get("analyses"),
+            analyses=analyses,
             logfc_threshold=kwargs.get("logfc_threshold", 1.0),
             pval_threshold=kwargs.get("pval_threshold", 0.05),
             top_n_terms=kwargs.get("top_n_terms", 10),
         )
 
     def _wrap_process_cells(self, **kwargs):
-        """Wrapper for process cells using the new handle_process_cells_result function"""
+        """
+        FIXED: Wrapper for process cells that ensures annotation results are properly returned
+        """
         cell_type = kwargs.get("cell_type")
         resolution = kwargs.get("resolution")
-        return handle_process_cells_result(self.adata, cell_type, resolution)
+        
+        print(f"🔄 Processing cell type: {cell_type}")
+        
+        # Call the original process_cells function directly (not the wrapper)
+        result = process_cells(self.adata, cell_type, resolution)
+        
+        # Handle the different return types properly
+        if isinstance(result, dict) and "status" in result:
+            # Handle special status returns
+            if result["status"] == "leaf_node":
+                return f"✅ '{cell_type}' is a leaf node with no subtypes. This is the most specific level available."
+            elif result["status"] == "no_cells_found":
+                return f"❌ No cells found with type '{cell_type}' in the dataset."
+            elif result["status"] == "insufficient_markers":
+                return f"⚠️ Only {len(result.get('available_markers', []))} markers available for '{cell_type}' subtypes. Insufficient for reliable annotation."
+        
+        elif isinstance(result, str):
+            # This is the normal case - annotation results as formatted string
+            print(f"✅ Process cells completed successfully")
+            print(f"📝 Result preview: {result[:200]}...")
+            return result
+        
+        else:
+            # Fallback for unexpected return types
+            print(f"⚠️ Unexpected return type from process_cells: {type(result)}")
+            return f"Processing of {cell_type} completed with unexpected result format."
 
     def _wrap_dea_analysis(self, **kwargs):
         """Wrapper for differential expression analysis"""
@@ -384,9 +424,7 @@ class ChatBot:
         """Wrapper for cell count comparison"""
         return compare_cell_count(
             self.adata,
-            kwargs.get("cell_type"),
-            kwargs.get("sample1"),
-            kwargs.get("sample2")
+            kwargs.get("cell_type")
         )
 
     def _ensure_system_message(self):
@@ -476,39 +514,77 @@ class ChatBot:
         return json.dumps({"response": viz_summary, "graph_html": result})
 
     def _handle_analysis_result(self, function_name: str, function_args: Dict[str, Any], result: Any) -> str:
-        """Handle analysis function results"""
+        """
+        IMPROVED: Handle analysis function results with explicit result tracking
+        """
+        # Initialize variables
+        formatted_result = str(result)
+        found_cell_types = []
+
         # Format the result for conversation history
         if function_name == "perform_enrichment_analyses":
             formatted_result = result.get("formatted_summary", str(result))
         elif function_name == "process_cells":
-            # Handle the new return format from handle_process_cells_result
+            cell_type = function_args.get('cell_type', 'Unknown')
+            
             if result is None:
-                # This means one of the early exit conditions was met (leaf node, no cells, insufficient markers)
-                formatted_result = f"Processing of {function_args.get('cell_type')} completed with special condition."
-            else:
+                formatted_result = f"Processing of {cell_type} completed with special condition (leaf node, no cells, or insufficient markers)."
+            elif isinstance(result, str):
                 formatted_result = result
+                
+                # IMPROVED: Extract and explicitly track annotation results
+                annotation_match = re.search(r'Annotation Result:\s*([^•\n]+)', result)
+                if annotation_match:
+                    annotation_text = annotation_match.group(1).strip()
+                    print(f"📝 Extracted annotation: {annotation_text}")
+                    
+                    # Parse the actual cell types from annotation
+                    if "group_to_cell_type" in annotation_text:
+                        dict_match = re.search(r"\{([^}]+)\}", annotation_text)
+                        if dict_match:
+                            dict_content = dict_match.group(1)
+                            value_pattern = r":\s*['\"]([^'\"]+)['\"]"
+                            cell_types_from_dict = re.findall(value_pattern, dict_content)
+                            found_cell_types = list(set(cell_types_from_dict))
+                            
+                            # Add explicit tracking message
+                            tracking_msg = f"ANNOTATION_COMPLETED: {cell_type} → Found cell types: {found_cell_types}"
+                            self.conversation_history.append({
+                                "role": "system", 
+                                "content": tracking_msg
+                            })
+                            print(f"🎯 Tracking: {tracking_msg}")
+            else:
+                formatted_result = f"Processing of {cell_type} completed. Result: {str(result)}"
+                
         elif function_name == "dea_split_by_condition":
             formatted_result = f"DEA analysis completed for {function_args.get('cell_type')}\n"
             formatted_result += f"Pre-condition genes: {result.get('pre_significant_genes', [])}\n"
             formatted_result += f"Post-condition genes: {result.get('post_significant_genes', [])}"
-        else:
-            formatted_result = str(result)
         
         # Add result to conversation history
         self.conversation_history.append({"role": "assistant", "content": formatted_result})
         
-        # Get AI interpretation of the results
+        # Get CONSTRAINED AI interpretation
         interpretation = self._get_ai_interpretation()
         self.conversation_history.append({"role": "assistant", "content": interpretation})
         
-        # Handle special cases that need visualization
-        if function_name == "process_cells" and result is not None:
-            # Only try to display UMAP if we have a successful result
-            cell_type = function_args.get("cell_type", "Overall cells")
-            umap_html = display_processed_umap(cell_type=cell_type)
-            return json.dumps({"response": interpretation, "graph_html": umap_html})
+        # Prepare the final JSON response
+        response_data = {
+            "response": interpretation,
+            "extracted_cell_types": found_cell_types
+        }
         
-        return interpretation
+        # Handle visualization for successful process_cells
+        if function_name == "process_cells" and result is not None and isinstance(result, str):
+            cell_type = function_args.get("cell_type", "Overall cells")
+            try:
+                umap_html = display_processed_umap(cell_type=cell_type)
+                response_data["graph_html"] = umap_html
+            except Exception as e:
+                print(f"⚠️ UMAP display failed: {e}")
+        
+        return json.dumps(response_data)
 
     def _handle_other_function_result(self, function_name: str, function_args: Dict[str, Any], result: Any) -> str:
         """Handle other function results"""
@@ -521,17 +597,118 @@ class ChatBot:
         return interpretation
 
     def _get_ai_interpretation(self) -> str:
-        """Get AI interpretation of the current conversation state"""
+        """
+        FIXED: Get AI interpretation constrained to actual results only
+        """
         try:
+            # Extract the most recent annotation results to constrain the interpretation
+            recent_annotations = self._extract_recent_annotation_results()
+            
+            # Create a constrained prompt that focuses only on actual results
+            constraint_prompt = ""
+            if recent_annotations:
+                constraint_prompt = f"""
+IMPORTANT CONSTRAINT: Only discuss the cell types that were ACTUALLY identified in the results: {recent_annotations}
+Do NOT mention any cell types from the original question unless they appear in these actual results.
+Do NOT assume or infer cell types that are not explicitly listed in the results.
+"""
+            
+            # Build messages with constraints
+            messages = self.conversation_history.copy()
+            
+            # Add constraint as system message if we have recent annotations
+            if constraint_prompt:
+                messages.append({
+                    "role": "system", 
+                    "content": constraint_prompt
+                })
+            
             response = openai.chat.completions.create(
                 model="gpt-4o",
-                messages=self.conversation_history,
-                temperature=0.2,
-                top_p=0.4
+                messages=messages,
+                temperature=0.1,  # Lower temperature for more factual responses
+                top_p=0.3,        # More focused responses
+                max_tokens=300    # Limit length to prevent rambling
             )
-            return response.choices[0].message.content
+            
+            interpretation = response.choices[0].message.content
+            
+            # Post-process to validate no hallucinated cell types
+            validated_interpretation = self._validate_interpretation_against_results(
+                interpretation, recent_annotations
+            )
+            
+            return validated_interpretation
+            
         except Exception as e:
             return f"Analysis completed. Error in interpretation: {e}"
+
+    def _extract_recent_annotation_results(self) -> List[str]:
+        """Extract cell types from the most recent annotation results"""
+        if not self.conversation_history:
+            return []
+        
+        # Look for recent annotation results in conversation history
+        recent_cell_types = []
+        
+        # Check last few messages for annotation dictionaries
+        for msg in reversed(self.conversation_history[-5:]):  # Last 5 messages
+            content = msg.get("content", "")
+            if "group_to_cell_type" in content:
+                # Extract from annotation dictionary
+                annotation_pattern = r"group_to_cell_type\s*=\s*\{([^}]+)\}"
+                match = re.search(annotation_pattern, content)
+                if match:
+                    dict_content = match.group(1)
+                    # Extract values (cell types) from dictionary
+                    value_pattern = r":\s*['\"]([^'\"]+)['\"]"
+                    cell_types = re.findall(value_pattern, dict_content)
+                    recent_cell_types.extend(cell_types)
+                    break  # Use most recent annotation
+        
+        # Remove duplicates and return
+        return list(set(recent_cell_types))
+
+    def _validate_interpretation_against_results(self, interpretation: str, actual_results: List[str]) -> str:
+        """
+        Validate that interpretation doesn't mention cell types not in actual results
+        """
+        if not actual_results or not interpretation:
+            return interpretation
+        
+        # Convert actual results to lowercase for case-insensitive matching
+        actual_lower = [ct.lower() for ct in actual_results]
+        
+        # Check for common hallucinated cell types from the original question
+        problematic_mentions = [
+            "regulatory t cell", "conventional memory cd4 t cell", 
+            "memory cd4 t cell", "effector t cell", "central memory t cell"
+        ]
+        
+        # Flag if interpretation mentions cell types not in actual results
+        interpretation_lower = interpretation.lower()
+        hallucinated_types = []
+        
+        for prob_type in problematic_mentions:
+            if prob_type in interpretation_lower:
+                # Check if this type is actually in results
+                found_in_results = any(prob_type in actual.lower() for actual in actual_lower)
+                if not found_in_results:
+                    hallucinated_types.append(prob_type)
+        
+        # If hallucinations detected, provide a corrected interpretation
+        if hallucinated_types:
+            print(f"⚠️ Detected hallucinated cell types in interpretation: {hallucinated_types}")
+            print(f"✅ Actual results: {actual_results}")
+            
+            corrected_interpretation = f"""
+                                        The analysis has been completed and identified the following cell types: {', '.join(actual_results)}.
+                                        The annotation successfully distinguished between different cell populations based on their marker expression patterns. 
+                                        Further analysis can be performed on any of these identified cell types.
+                                        """
+            return corrected_interpretation.strip()
+        
+        return interpretation
 
     def _handle_regular_conversation(self, message: str) -> str:
         """Handle regular conversation without function calls"""

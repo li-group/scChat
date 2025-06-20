@@ -14,3 +14,15 @@ env/
 *.csv
 /temp.py
 /testing.py
+/schatbot/paper_analysis.json
+/schatbot/all_questions_covid19.json
+/schatbot/auto_test_langgraph.py
+/schatbot/auto_test.py
+/media/
+/data_store/
+/schatbot/scvi_model/
+/schatbot/enrichment/
+/qa_workflow_diagram.png
+/README_diagram_generation.md
+/simplified_workflow.mmd
+/testing_no_rag.py
