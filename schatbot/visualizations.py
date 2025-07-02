@@ -13,26 +13,64 @@ def display_enrichment_barplot(
     analysis: str,
     cell_type: str,
     top_n: int = 10,
-    domain: str = None
+    domain: str = None,
+    condition: str = None
 ) -> str:
     """
     Generic barplot of top_n enriched terms for a given analysis and cell type.
     analysis: "reactome", "kegg", "gsea", or "go"
     domain: required if analysis=="go" (one of "BP","MF","CC")
+    condition: optional specific condition folder (e.g., "kegg_p1_post")
     """
     base = analysis.lower()
-    if base == "go":
-        if domain is None:
-            raise ValueError("`domain` must be provided for GO.")
-        sub = domain.lower()
-        folder = f"schatbot/enrichment/go"
-        # fname = f"go_{sub}_results_summary_{cell_type}.csv"
+    
+    # If specific condition is provided, use that folder
+    if condition:
+        folder = f"schatbot/enrichment/{condition}"
         fname = f"results_summary_{cell_type}.csv"
     else:
-        folder = f"schatbot/enrichment/{base}"
-        # fname = f"{base}_results_summary_{cell_type}.csv"
-        fname = f"results_summary_{cell_type}.csv"
+        # Use default folder structure based on analysis type
+        if base == "go":
+            if domain is None:
+                raise ValueError("`domain` must be provided for GO.")
+            sub = domain.lower()
+            # Handle case where domain might already have "go_" prefix
+            if sub.startswith("go_"):
+                folder = f"schatbot/enrichment/{sub}"
+            else:
+                folder = f"schatbot/enrichment/go_{sub}"
+            fname = f"results_summary_{cell_type}.csv"
+        elif base.startswith("go_"):
+            # Handle cases where analysis is already "go_bp", "go_cc", "go_mf"
+            folder = f"schatbot/enrichment/{base}"
+            fname = f"results_summary_{cell_type}.csv"
+        elif base == "kegg":
+            folder = f"schatbot/enrichment/kegg"
+            fname = f"results_summary_{cell_type}.csv"
+        elif base == "gsea":
+            folder = f"schatbot/enrichment/gsea"
+            fname = f"results_summary_{cell_type}.csv"
+        elif base == "reactome":
+            folder = f"schatbot/enrichment/reactome"
+            fname = f"results_summary_{cell_type}.csv"
+        else:
+            # Fallback for other analyses
+            folder = f"schatbot/enrichment/{base}"
+            fname = f"results_summary_{cell_type}.csv"
+    
     path = os.path.join(folder, fname)
+    
+    # Check if file exists, if not try alternative naming
+    if not os.path.exists(path):
+        # Try with analysis prefix in filename
+        if base == "go" and not condition:
+            fname_alt = f"go_{domain.lower()}_results_summary_{cell_type}.csv"
+        else:
+            fname_alt = f"{base}_results_summary_{cell_type}.csv"
+        path_alt = os.path.join(folder, fname_alt)
+        if os.path.exists(path_alt):
+            path = path_alt
+    
     df = pd.read_csv(path)
     df["minus_log10_p"] = -np.log10(df["p_value"])
     top = df.nsmallest(top_n, "p_value")
@@ -56,24 +94,64 @@ def display_enrichment_dotplot(
     analysis: str,
     cell_type: str,
     top_n: int = 10,
-    domain: str = None
+    domain: str = None,
+    condition: str = None
 ) -> str:
     """
     Generic dotplot of avg_log2fc vs. top enriched terms for a given analysis.
     analysis: "reactome", "kegg", "gsea", or "go"
     domain: required if analysis=="go" (one of "BP","MF","CC")
+    condition: optional specific condition folder (e.g., "kegg_p1_post")
     """
     base = analysis.lower()
-    if base == "go":
-        if domain is None:
-            raise ValueError("`domain` must be provided for GO.")
-        folder = "schatbot/enrichment/go"
-        fname = f"go_{domain.lower()}_results_summary_{cell_type}.csv"
+    
+    # If specific condition is provided, use that folder
+    if condition:
+        folder = f"schatbot/enrichment/{condition}"
+        fname = f"results_summary_{cell_type}.csv"
     else:
-        folder = f"schatbot/enrichment/{base}"
-        # fname = f"{base}_results_summary_{cell_type}.csv"
-        fname  = f"results_summary_{cell_type}.csv"
+        # Use default folder structure based on analysis type
+        if base == "go":
+            if domain is None:
+                raise ValueError("`domain` must be provided for GO.")
+            sub = domain.lower()
+            # Handle case where domain might already have "go_" prefix
+            if sub.startswith("go_"):
+                folder = f"schatbot/enrichment/{sub}"
+            else:
+                folder = f"schatbot/enrichment/go_{sub}"
+            fname = f"results_summary_{cell_type}.csv"
+        elif base.startswith("go_"):
+            # Handle cases where analysis is already "go_bp", "go_cc", "go_mf"
+            folder = f"schatbot/enrichment/{base}"
+            fname = f"results_summary_{cell_type}.csv"
+        elif base == "kegg":
+            folder = f"schatbot/enrichment/kegg"
+            fname = f"results_summary_{cell_type}.csv"
+        elif base == "gsea":
+            folder = f"schatbot/enrichment/gsea"
+            fname = f"results_summary_{cell_type}.csv"
+        elif base == "reactome":
+            folder = f"schatbot/enrichment/reactome"
+            fname = f"results_summary_{cell_type}.csv"
+        else:
+            # Fallback for other analyses
+            folder = f"schatbot/enrichment/{base}"
+            fname = f"results_summary_{cell_type}.csv"
+    
     path = os.path.join(folder, fname)
+    
+    # Check if file exists, if not try alternative naming
+    if not os.path.exists(path):
+        # Try with analysis prefix in filename
+        if base == "go" and not condition:
+            fname_alt = f"go_{domain.lower()}_results_summary_{cell_type}.csv"
+        else:
+            fname_alt = f"{base}_results_summary_{cell_type}.csv"
+        path_alt = os.path.join(folder, fname_alt)
+        if os.path.exists(path_alt):
+            path = path_alt
+    
     df = pd.read_csv(path)
     df["minus_log10_p"] = -np.log10(df["p_value"])
     top = df.nsmallest(top_n, "p_value")

@@ -164,19 +164,21 @@ def preprocess_data(adata, sample_mapping=None):
     adata = adata[adata.obs.pct_counts_mt < 20]
     non_mt_mask = ~adata.var['mt']
     adata = adata[:, non_mt_mask].copy()
-    adata.layers['counts'] = adata.X.copy()
+    adata.layers["counts"] = adata.X.copy()
     sc.pp.normalize_total(adata, target_sum=1e4)
     sc.pp.log1p(adata)
     adata.raw = adata
     if hasattr(adata, 'raw') and adata.raw is not None and not adata.raw.var_names.is_unique:
         print("Warning: Raw gene names are not unique. Making them unique.")
         adata.raw.var_names_make_unique()
+    
     if sample_mapping:
         from scvi.model import SCVI
-        sc.pp.highly_variable_genes(adata, n_top_genes=3000, subset=True, layer='counts', 
+        sc.pp.highly_variable_genes(adata, n_top_genes=3000, subset=True,
                                    flavor="seurat_v3", batch_key="Exp_sample_category")
         SCVI.setup_anndata(adata, layer="counts", categorical_covariate_keys=["Exp_sample_category"],
                           continuous_covariate_keys=['pct_counts_mt', 'total_counts'])
+        
         if os.path.exists("schatbot/scvi_model") and any(os.scandir("schatbot/scvi_model")):
             model = SCVI.load(dir_path="schatbot/scvi_model", adata=adata)
         else:
@@ -385,7 +387,6 @@ def initial_cell_annotation(resolution=1):
     gene_dict = {}
     for cluster, group in top_genes_df.groupby("cluster"):
         gene_dict[cluster] = list(group["gene"])
-    print("marker tree", marker_tree)
     input_msg =(f"Top genes details: {gene_dict}. "
                 f"Markers: {marker_tree}. ")
 
@@ -643,5 +644,3 @@ def label_clusters(annotation_result, cell_type, adata):
 
 # if __name__ == "__main__":
 #     gene_dict, marker_tree, adata, explanation, annotation_result = initial_cell_annotation()
-    
-    

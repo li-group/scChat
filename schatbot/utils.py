@@ -7,8 +7,7 @@ import ast
 import numpy as np
 import pandas as pd
 import scanpy as sc
-import anndata
-import scipy
+from biomart import BiomartServer
 import mygene
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
@@ -252,82 +251,124 @@ def get_subtypes(cell_type):
         driver.close()
     return subtypes_data
 
+def map_ensembl_to_symbol_biomart(ensembl_ids):
+    """
+    Maps Ensembl IDs to gene symbols using Ensembl's BioMart service.
+    Handles potential HTTP errors and parsing.
+    """
+    if not ensembl_ids:
+        return pd.Series(dtype='object')
+
+    try:
+        server = BiomartServer("http://useast.ensembl.org/biomart")
+        # For human genes
+        mart = server.datasets['hsapiens_gene_ensembl']
+
+        response = mart.search({
+            'filters': {
+                'ensembl_gene_id': ensembl_ids
+            },
+            'attributes': [
+                'ensembl_gene_id',
+                'external_gene_name'
+            ]
+        })
+
+        content = response.content.decode('utf-8').strip()
+        if not content:
+            return pd.Series(dtype='object')
+
+        data = [line.split('\t') for line in content.split('\n')]
+        mapping_df = pd.DataFrame(data, columns=['Ensembl ID', 'Gene Symbol'])
+
+        # Handle cases where a gene symbol might be missing
+        mapping_df = mapping_df[mapping_df['Gene Symbol'].notna() & (mapping_df['Gene Symbol'] != '')]
+        mapping_df = mapping_df.drop_duplicates(subset=['Ensembl ID'])
+
+        return mapping_df.set_index('Ensembl ID')['Gene Symbol']
+
+    except Exception as e:
+        print(f"Warning: BioMart query failed. {e}")
+        return pd.Series(dtype='object')
+
 def filter_existing_genes(adata, gene_list):
-    """
-    Filter genes to only those present in the dataset, handling Ensembl ID conversion
-    without modifying the original AnnData object.
-    
-    Returns:
-        existing_genes (list): List of genes that exist in the dataset
-        adata (AnnData): The original adata object (unchanged)
-    """
-    # Determine which var_names to check (raw or main)
+    """Filter genes to only those present in the dataset, handling non-unique indices."""
     if hasattr(adata, 'raw') and adata.raw is not None:
+        # Use raw var_names if available
         var_names = adata.raw.var_names
-        use_raw = True
     else:
         var_names = adata.var_names
-        use_raw = False
-    # Check if var_names are likely Ensembl IDs (e.g., start with 'ENSG')
-    needs_conversion = len(var_names) > 0 and var_names[0].startswith('ENSG')
-    
-    if needs_conversion:
-        print("Detected Ensembl IDs in .var_names. Converting to gene symbols for filtering (original data unchanged)...")
         
-        try:
-            import mygene
-            mg = mygene.MyGeneInfo()
-            
-            # Clean Ensembl IDs by removing version numbers (e.g., .1)
-            ensembl_ids = var_names.to_series().str.split('.').str[0]          
-            # Query gene symbols
-            gene_info = mg.querymany(
-                ensembl_ids,
-                scopes='ensembl.gene',
-                fields='symbol',
-                species='human',
-                as_dataframe=True
-            )
-            
-            # Handle cases where mygene returns multiple hits for a single ID
-            if not gene_info.empty:
-                gene_info = gene_info[~gene_info.index.duplicated(keep='first')]
-                
-                # Map symbols, falling back to the original ID if no symbol is found
-                id_to_symbol_map = gene_info.get('symbol', pd.Series())
-                converted_var_names = ensembl_ids.map(id_to_symbol_map).fillna(ensembl_ids)
-            else:
-                # If no results from mygene, keep original names
-                converted_var_names = ensembl_ids
-            
-            # Create a mapping from original gene symbols to both original and converted names
-            # This allows matching against both Ensembl IDs and gene symbols
-            all_searchable_names = set(var_names.tolist() + converted_var_names.tolist())
-            
-            print("Conversion complete. Using converted names for filtering without modifying original data.")
-
-            
-        except Exception as e:
-            print(f"Error during Ensembl ID conversion: {e}")
-            print("Falling back to original var_names")
-            all_searchable_names = set(var_names.tolist())
-    else:
-        # If not Ensembl IDs, use them as they are
-        all_searchable_names = set(var_names.tolist())
-    
-    # Filter the input gene list against all searchable names
-    existing_genes = [gene for gene in gene_list if gene in all_searchable_names]
-    
-    # Log filtering statistics
-    original_count = len(gene_list)
-    found_count = len(existing_genes)
-    print(f"Gene filtering complete: {found_count}/{original_count} genes found in dataset")
-    if found_count < original_count:
-        missing_genes = [gene for gene in gene_list if gene not in all_searchable_names]
-        print(f"Missing genes: {missing_genes[:10]}{'...' if len(missing_genes) > 10 else ''}")
-    
-    # IMPORTANT: Always return the original adata object unchanged
+    # Use isin() which handles non-unique indices properly
+    existing_genes = [gene for gene in gene_list if gene in var_names]
     return existing_genes, adata
+
+# def filter_existing_genes(adata, gene_list):
+#     """
+#     Filter genes to only those present in the dataset, handling Ensembl ID conversion
+#     with a robust multi-step process without modifying the original AnnData object.
+
+#     Returns:
+#         existing_genes (list): List of genes that exist in the dataset
+#         adata (AnnData): The original adata object (unchanged)
+#     """
+#     if hasattr(adata, 'raw') and adata.raw is not None:
+#         var_names = adata.raw.var_names
+#     else:
+#         var_names = adata.var_names
+
+#     needs_conversion = len(var_names) > 0 and var_names[0].startswith('ENSG')
+
+#     all_searchable_names = set(var_names.tolist())
+
+#     if needs_conversion:
+#         print("Detected Ensembl IDs. Attempting conversion to gene symbols.")
+#         ensembl_ids_with_version = var_names.to_series()
+#         ensembl_ids_clean = ensembl_ids_with_version.str.split('.').str[0]
+        
+#         # --- Step 1: Try conversion with mygene ---
+#         print("Step 1: Querying with mygene...")
+#         mg = mygene.MyGeneInfo()
+#         try:
+#             gene_info = mg.querymany(
+#                 ensembl_ids_clean,
+#                 scopes='ensembl.gene',
+#                 fields='symbol',
+#                 species='human',
+#                 as_dataframe=True,
+#                 verbose=False
+#             )
+#             gene_info = gene_info[~gene_info.index.duplicated(keep='first')]
+#             mygene_map = gene_info['symbol'].dropna()
+#         except Exception as e:
+#             print(f"mygene query failed: {e}")
+#             mygene_map = pd.Series(dtype='object')
+        
+#         converted_symbols = ensembl_ids_clean.map(mygene_map)
+#         all_searchable_names.update(converted_symbols.dropna().tolist())
+
+#         # --- Step 2: Fallback to BioMart for remaining IDs ---
+#         unmapped_ids = ensembl_ids_clean[converted_symbols.isna()].tolist()
+#         if unmapped_ids:
+#             print(f"Step 2: {len(unmapped_ids)} IDs not mapped by mygene. Falling back to Ensembl BioMart...")
+#             biomart_map = map_ensembl_to_symbol_biomart(unmapped_ids)
+#             if not biomart_map.empty:
+#                 biomart_symbols = pd.Series(unmapped_ids).map(biomart_map)
+#                 all_searchable_names.update(biomart_symbols.dropna().tolist())
+
+#         print("Conversion attempt complete.")
+
+#     # --- Final Filtering ---
+#     existing_genes = [gene for gene in gene_list if gene in all_searchable_names]
+
+#     original_count = len(gene_list)
+#     found_count = len(existing_genes)
+#     print(f"Gene filtering complete: {found_count}/{original_count} genes found in dataset")
+#     if found_count < original_count:
+#         missing_genes = [gene for gene in gene_list if gene not in all_searchable_names]
+#         print(f"Missing genes: {missing_genes[:10]}{'...' if len(missing_genes) > 10 else ''}")
+
+#     return existing_genes, adata
 
 def save_analysis_results(adata, prefix, leiden_key='leiden', save_umap=True, 
                          save_dendrogram=True, save_dotplot=False, markers=None):
@@ -405,7 +446,7 @@ def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pva
         return {}
 
 def compare_cell_count(adata, cell_type):
-    from annotation import unified_cell_type_handler
+    from .annotation import unified_cell_type_handler
     cell_type = unified_cell_type_handler(cell_type)
     
     # Get all unique sample categories
@@ -434,9 +475,6 @@ def compare_cell_count(adata, cell_type):
         })
     
     return result_list
-
-def repeat():
-    return "Hello"
 
 if __name__ == "__main__":
     import pickle

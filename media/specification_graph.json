@@ -1,4 +1,7 @@
 {
+    "url": "bolt://localhost:7687",
+    "username": "neo4j",
+    "password": "37754262",
     "database": "human",
     "system": "Lymphatic System",
     "organ": "Peripheral blood"

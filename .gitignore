@@ -22,6 +22,7 @@ env/
 /data_store/
 /schatbot/scvi_model/
 /schatbot/enrichment/
+/schatbot/deg_res
 /qa_workflow_diagram.png
 /README_diagram_generation.md
 /simplified_workflow.mmd
