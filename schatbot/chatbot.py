@@ -693,10 +693,6 @@ class FunctionHistoryManager:
 # Enhanced Cache System with Smart Insights
 # ==============================================================================
 class SimpleIntelligentCache:
-    """
-    🧠 ENHANCED CACHE: Smart cache with analysis insights extraction
-    """
-    
     def __init__(self):
         # Map analysis types to their result directories (matching your current structure)
         self.cache_directories = {
@@ -1087,6 +1083,17 @@ class ChatState(TypedDict):
     # Conversation management
     conversation_complete: bool
     errors: List[str]
+    
+    # 🆕 CRITIC AGENT FIELDS
+    critic_iterations: int
+    critic_feedback_history: List[Dict[str, Any]]
+    plan_revision_history: List[Dict[str, Any]]
+    original_execution_complete: bool
+    cumulative_analysis_results: Dict[str, Any]
+    impossible_request_detected: bool
+    degradation_strategy: Optional[Dict[str, Any]]
+    error_recovery_strategy: Optional[Dict[str, Any]]
+    revision_applied: bool
 
 
 @dataclass
@@ -1108,6 +1115,45 @@ class ExecutionPlan:
     original_question: str
     plan_summary: str
     estimated_steps: int
+
+
+@dataclass
+class CriticEvaluation:
+    """Structured critic evaluation result"""
+    relevance_score: float
+    completeness_score: float  
+    missing_analyses: List[str]
+    recommendations: List[str]
+    needs_revision: bool
+    reasoning: str
+    evaluation_type: str
+
+
+class CriticLoopManager:
+    """Manages critic agent iteration cycles and prevents infinite loops"""
+    MAX_ITERATIONS = 3
+    
+    @staticmethod
+    def should_continue_iteration(state: ChatState) -> bool:
+        return (
+            state.get("critic_iterations", 0) < CriticLoopManager.MAX_ITERATIONS and
+            not state.get("impossible_request_detected", False) and
+            state.get("critic_feedback_history", []) and
+            state["critic_feedback_history"][-1]["needs_revision"]
+        )
+    
+    @staticmethod
+    def initialize_critic_state(state: ChatState) -> ChatState:
+        state.setdefault("critic_iterations", 0)
+        state.setdefault("critic_feedback_history", [])
+        state.setdefault("plan_revision_history", [])
+        state.setdefault("original_execution_complete", False)
+        state.setdefault("cumulative_analysis_results", {})
+        state.setdefault("impossible_request_detected", False)
+        state.setdefault("degradation_strategy", None)
+        state.setdefault("error_recovery_strategy", None)
+        state.setdefault("revision_applied", False)
+        return state
 
 
 # ==============================================================================
@@ -1139,7 +1185,14 @@ class MultiAgentChatBot:
         # 🧬 Initialize hierarchical management after adata is ready
         self._initialize_hierarchical_management()
         
-        # Create LangGraph workflow
+        # 🧬 UNIFIED: Initialize cell type extractor
+        self.cell_type_extractor = None
+        self._initialize_cell_type_extractor()
+        
+        # 🆕 Initialize critic loop manager
+        self.critic_loop_manager = CriticLoopManager()
+        
+        # Create LangGraph workflow with critic agent
         self.workflow = self._create_workflow()
         
     def _initialize_directories(self):
@@ -1173,6 +1226,36 @@ class MultiAgentChatBot:
             print("✅ Unified hierarchical cell type management initialized")
         else:
             print("⚠️ Cannot initialize hierarchical management without adata")
+    
+    def _initialize_cell_type_extractor(self):
+        """🧬 UNIFIED: Initialize centralized cell type extractor"""
+        if self.adata is not None:
+            self.cell_type_extractor = CellTypeExtractor(
+                hierarchy_manager=self.hierarchy_manager,
+                adata=self.adata
+            )
+            # Add historical function access
+            self.cell_type_extractor._get_historical_cell_types = self._get_historical_cell_types_for_extractor
+            print("✅ Unified cell type extractor initialized")
+        else:
+            print("⚠️ Cannot initialize cell type extractor without adata")
+    
+    def _get_historical_cell_types_for_extractor(self) -> List[str]:
+        """Get cell types from historical function executions for the extractor"""
+        cell_types = set()
+        
+        # Get recent analyses from history manager
+        recent_analyses = self.history_manager.get_recent_executions("perform_enrichment_analyses", limit=10)
+        recent_analyses.extend(self.history_manager.get_recent_executions("dea_split_by_condition", limit=10))
+        recent_analyses.extend(self.history_manager.get_recent_executions("process_cells", limit=10))
+        
+        for execution in recent_analyses:
+            if execution.get("success") and execution.get("parameters"):
+                cell_type = execution["parameters"].get("cell_type")
+                if cell_type and cell_type != "overall":
+                    cell_types.add(cell_type)
+        
+        return list(cell_types)
 
     def _extract_initial_cell_types(self, annotation_result: str) -> List[str]:
         """Extract cell types from initial annotation"""
@@ -1233,7 +1316,7 @@ class MultiAgentChatBot:
             },
             {
                 "name": "perform_enrichment_analyses",
-                "description": "Run enrichment analyses (reactome, go, kegg, gsea) on DE genes for a cell type. Use for pathway analysis.",
+                "description": "Run enrichment analyses (reactome, go, kegg, gsea) on DE genes for a cell type. Use for pathway analysis. This function enables the agent to answer questions related to pathway analysis.",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -1295,7 +1378,7 @@ class MultiAgentChatBot:
             },
             {
                 "name": "dea_split_by_condition",
-                "description": "Perform differential expression analysis split by condition. Use when comparing conditions.",
+                "description": "Perform differential expression analysis (DEA) split by condition. Use when comparing conditions. This function enables the agent to answer questions related to differential expression genes.",
                 "parameters": {
                     "type": "object",
                     "properties": {"cell_type": {"type": "string"}},
@@ -1355,34 +1438,53 @@ class MultiAgentChatBot:
 
     # ========== LangGraph Workflow Creation ==========
     def _create_workflow(self) -> StateGraph:
+        """Create enhanced workflow with critic agent system"""
         workflow = StateGraph(ChatState)
         
+        # Existing nodes
         workflow.add_node("input_processor", self.input_processor_node)
         workflow.add_node("planner", self.planner_node)
         workflow.add_node("status_checker", self.status_checker_node)
         workflow.add_node("executor", self.executor_node)
         workflow.add_node("evaluator", self.evaluator_node)
         workflow.add_node("response_generator", self.response_generator_node)
+        workflow.add_node("critic_agent", self.critic_agent_node)
+        workflow.add_node("planner_reviser", self.planner_reviser_node)
+        workflow.add_node("impossible_handler", self.impossible_handler_node)
         
         # Set entry point
         workflow.set_entry_point("input_processor")
         
+        # Original workflow connections
         workflow.add_edge("input_processor", "planner")
-        workflow.add_edge("planner", "status_checker")  # Validate plan before execution
+        workflow.add_edge("planner", "status_checker")
         workflow.add_edge("status_checker", "executor")
         workflow.add_edge("executor", "evaluator")
         
-        # Conditional routing from evaluator
+        # Routing from evaluator
         workflow.add_conditional_edges(
             "evaluator", 
             self.route_from_evaluator,
             {
                 "continue": "executor",
-                "complete": "response_generator"
+                "to_critic": "critic_agent"  
             }
         )
         
-        # End at response generator
+        workflow.add_conditional_edges(
+            "critic_agent",
+            self.route_from_critic,
+            {
+                "revise": "planner_reviser",
+                "complete": "response_generator",
+                "impossible": "impossible_handler"
+            }
+        )
+        
+        workflow.add_edge("planner_reviser", "status_checker")
+        workflow.add_edge("impossible_handler", "response_generator")
+        
+        # Final response generation
         workflow.add_edge("response_generator", END)
         
         return workflow.compile()
@@ -1705,8 +1807,7 @@ class MultiAgentChatBot:
                 func = self.function_mapping[step.function_name]
                 result = func(**step.parameters)
                 success = True
-                
-                # 🧬 Update hierarchical manager after process_cells
+            
                 if step.function_name == "process_cells" and self.hierarchy_manager:
                     new_cell_types = self._extract_cell_types_from_result(result)
                     if new_cell_types:
@@ -1874,67 +1975,16 @@ class MultiAgentChatBot:
         
         return state
 
-    # ========== 🎯 SOLUTION 1: Smart Cache Integration Methods ==========
+    # ========== Cache Integration Methods ==========
     
     def _get_relevant_cell_types_from_context(self, state: ChatState) -> List[str]:
-        """
-        🎯 SMART: Extract relevant cell types from execution context
-        No NLP needed - use LLM planning + execution history + state tracking
-        """
-        relevant_cell_types = set()
-        
-        print("🔍 Extracting cell types from execution context...")
-        
-        # 1. Extract from execution plan (LLM already identified these!)
-        if state.get("execution_plan") and state["execution_plan"].get("steps"):
-            for step in state["execution_plan"]["steps"]:
-                # Get cell type from step parameters
-                cell_type = step.get("parameters", {}).get("cell_type")
-                if cell_type and cell_type != "overall":
-                    relevant_cell_types.add(cell_type)
-                    print(f"   📋 From execution plan: {cell_type}")
-                
-                # Also check target_cell_type
-                target_cell_type = step.get("target_cell_type")
-                if target_cell_type and target_cell_type != "overall":
-                    relevant_cell_types.add(target_cell_type)
-                    print(f"   🎯 From target cell type: {target_cell_type}")
-        
-        # 2. Extract from execution history (what was actually analyzed)
-        if state.get("execution_history"):
-            for execution in state["execution_history"]:
-                if execution.get("success") and execution.get("step"):
-                    step = execution["step"]
-                    cell_type = step.get("parameters", {}).get("cell_type")
-                    if cell_type and cell_type != "overall":
-                        relevant_cell_types.add(cell_type)
-                        print(f"   ✅ From execution history: {cell_type}")
-        
-        # 3. Extract from function history (previous sessions)
-        recent_analyses = self.history_manager.get_recent_executions("perform_enrichment_analyses", limit=10)
-        recent_analyses.extend(self.history_manager.get_recent_executions("dea_split_by_condition", limit=10))
-        recent_analyses.extend(self.history_manager.get_recent_executions("process_cells", limit=10))
-        
-        for execution in recent_analyses:
-            if execution.get("success") and execution.get("parameters"):
-                cell_type = execution["parameters"].get("cell_type")
-                if cell_type and cell_type != "overall":
-                    relevant_cell_types.add(cell_type)
-                    print(f"   📜 From function history: {cell_type}")
-        
-        # 4. Fallback: Use available cell types from state
-        if not relevant_cell_types and state.get("available_cell_types"):
-            relevant_cell_types.update(state["available_cell_types"])
-            print(f"   🔄 Fallback to available cell types: {state['available_cell_types']}")
-        
-        # 5. Final fallback: Use initial cell types
-        if not relevant_cell_types and hasattr(self, 'initial_cell_types'):
-            relevant_cell_types.update(self.initial_cell_types)
-            print(f"   🆘 Final fallback to initial cell types: {self.initial_cell_types}")
-        
-        result = list(relevant_cell_types)
-        print(f"🔍 Context-based cell type extraction: {result}")
-        return result
+        """🧬 UNIFIED: Extract relevant cell types from execution context"""
+        if self.cell_type_extractor:
+            return self.cell_type_extractor.extract_from_execution_context(state, include_history=True)
+        else:
+            # Fallback if extractor not initialized
+            print("⚠️ Cell type extractor not initialized, using state fallback")
+            return state.get("available_cell_types", [])
 
     def _build_cached_analysis_context(self, cell_types: List[str]) -> str:
         """Build analysis context from cached results for relevant cell types"""
@@ -1975,12 +2025,8 @@ class MultiAgentChatBot:
         return analysis_context if analysis_context else "No cached analysis results found.\n"
 
     def _execute_final_question(self, state: ChatState) -> str:
-        """
-        🎯 ENHANCED: Execute final question with smart cache integration - no NLP needed!
-        """
         original_question = state["execution_plan"]["original_question"]
         
-        # 🎯 Method 1: Use execution context (recommended)
         relevant_cell_types = self._get_relevant_cell_types_from_context(state)
         cached_context = self._build_cached_analysis_context(relevant_cell_types)
         
@@ -2011,26 +2057,25 @@ class MultiAgentChatBot:
             hierarchy_context += f"• Current cell types: {lineage_summary['unique_current_types']}\n"
             hierarchy_context += f"• Processing operations: {lineage_summary['processing_snapshots']}\n\n"
         
-        # 🎯 ENHANCED: Create comprehensive final prompt with cached data
         final_prompt = f"""Based on the specific analysis results shown below, provide a comprehensive answer to the user's question.
 
-ORIGINAL QUESTION:
-{original_question}
+                            ORIGINAL QUESTION:
+                            {original_question}
 
-SPECIFIC ANALYSIS RESULTS FROM CACHE:
-{cached_context}
+                            SPECIFIC ANALYSIS RESULTS FROM CACHE:
+                            {cached_context}
 
-{hierarchy_context}{analysis_summary}RECENT CONVERSATION:
-{conversation_context}
+                            {hierarchy_context}{analysis_summary}RECENT CONVERSATION:
+                            {conversation_context}
 
-INSTRUCTIONS:
-1. Reference the SPECIFIC pathways, genes, and statistics shown above
-2. Use exact names and numbers from the cached results
-3. Explain the biological significance of these specific findings
-4. Connect the results directly to the user's question
-5. Be quantitative and specific, not generic
+                            INSTRUCTIONS:
+                            1. Reference the SPECIFIC pathways, genes, and statistics shown above
+                            2. Use exact names and numbers from the cached results
+                            3. Explain the biological significance of these specific findings
+                            4. Connect the results directly to the user's question
+                            5. Be quantitative and specific, not generic
 
-Your response should cite the actual analysis results, not general knowledge."""
+                            Your response should cite the actual analysis results, not general knowledge."""
 
         try:
             # Use OpenAI to generate comprehensive response
@@ -2109,9 +2154,13 @@ Your response should cite the actual analysis results, not general knowledge."""
             }
 
     # ========== Routing Functions ==========
-    def route_from_evaluator(self, state: ChatState) -> Literal["continue", "complete"]:
-        """Route from evaluator based on plan completion"""
-        return "complete" if state["conversation_complete"] else "continue"
+    def route_from_evaluator(self, state: ChatState) -> Literal["continue", "to_critic"]:
+        """Enhanced routing from evaluator - go to critic when execution is complete"""
+        
+        if state["conversation_complete"]:
+            return "to_critic"  # Route to critic agent instead of direct response
+        else:
+            return "continue"
 
     # ========== Public API ==========
     def send_message(self, message: str) -> str:
@@ -2132,11 +2181,26 @@ Your response should cite the actual analysis results, not general knowledge."""
             "missing_cell_types": [],
             "required_preprocessing": [],
             "conversation_complete": False,
-            "errors": []
+            "errors": [],
+            
+            # 🆕 Critic agent fields
+            "critic_iterations": 0,
+            "critic_feedback_history": [],
+            "plan_revision_history": [],
+            "original_execution_complete": False,
+            "cumulative_analysis_results": {},
+            "impossible_request_detected": False,
+            "degradation_strategy": None,
+            "error_recovery_strategy": None,
+            "revision_applied": False
         }
         
-        # Run the workflow
+        # Run the enhanced workflow with critic agent
         final_state = self.workflow.invoke(initial_state)
+        
+        # 🆕 Log critic agent statistics
+        self._log_critic_statistics(final_state)
+        
         return final_state["response"]
     
     def cleanup(self):
@@ -2154,6 +2218,10 @@ Your response should cite the actual analysis results, not general knowledge."""
         # Cleanup hierarchy manager
         if hasattr(self, 'hierarchy_manager') and self.hierarchy_manager:
             self.hierarchy_manager.close()
+        
+        # Cleanup cell type extractor
+        if hasattr(self, 'cell_type_extractor') and self.cell_type_extractor:
+            print("🧬 Cell type extractor cleaned up")
         
         print("🧹 Cleanup completed")
 
@@ -2174,76 +2242,15 @@ Your response should cite the actual analysis results, not general knowledge."""
         else:
             return "Invalid action. Use: stats, invalidate, clear_all"
 
-    # ========== 🧠 Debug Methods for Cache Testing ==========
-    
-    def debug_cache_status(self, cell_types: List[str] = None) -> Dict[str, Any]:
-        """Debug method to check cache status for specific cell types"""
-        if not cell_types:
-            cell_types = ["T cell", "B cell"]  # Default examples
-        
-        debug_info = {}
-        
-        for cell_type in cell_types:
-            debug_info[cell_type] = {
-                "enrichment_files": [],
-                "dea_files": [],
-                "insights_available": False
-            }
-            
-            # Check enrichment files
-            enrichment_patterns = self.simple_cache._get_cache_file_patterns("enrichment", cell_type, 
-                                                                            {"analyses": ["reactome", "go", "kegg", "gsea"]})
-            for pattern in enrichment_patterns:
-                matching_files = glob.glob(pattern)
-                for file_path in matching_files:
-                    if self.simple_cache._is_file_recent(file_path):
-                        debug_info[cell_type]["enrichment_files"].append(file_path)
-            
-            # Check DEA files
-            dea_patterns = self.simple_cache._get_cache_file_patterns("dea", cell_type)
-            for pattern in dea_patterns:
-                matching_files = glob.glob(pattern)
-                for file_path in matching_files:
-                    if self.simple_cache._is_file_recent(file_path):
-                        debug_info[cell_type]["dea_files"].append(file_path)
-            
-            # Test insights extraction
-            try:
-                insights = self.simple_cache.get_analysis_insights(cell_type)
-                debug_info[cell_type]["insights_available"] = bool(insights["summary"])
-                debug_info[cell_type]["insights_summary"] = insights["summary"]
-            except Exception as e:
-                debug_info[cell_type]["insights_error"] = str(e)
-        
-        return debug_info
-
     # ========== Helper Methods ==========
     def _parse_cell_types(self, cell_type_string: str) -> List[str]:
-        """Parse a cell type string that might contain multiple cell types"""
-        if not cell_type_string:
-            return []
-        
-        # Handle common separators
-        separators = [',', ' and ', ' & ', ';', ' vs ', ' versus ']
-        cell_types = [cell_type_string]
-        
-        for separator in separators:
-            new_cell_types = []
-            for ct in cell_types:
-                if separator in ct:
-                    new_cell_types.extend([part.strip() for part in ct.split(separator)])
-                else:
-                    new_cell_types.append(ct)
-            cell_types = new_cell_types
-        
-        # Clean and filter
-        cleaned_types = []
-        for ct in cell_types:
-            ct = ct.strip()
-            if ct and ct not in cleaned_types:
-                cleaned_types.append(ct)
-        
-        return cleaned_types
+        """🧬 UNIFIED: Parse a cell type string that might contain multiple cell types"""
+        if self.cell_type_extractor:
+            return self.cell_type_extractor.parse_multi_cell_type_string(cell_type_string)
+        else:
+            # Fallback if extractor not initialized
+            print("⚠️ Cell type extractor not initialized, using simple fallback")
+            return [cell_type_string] if cell_type_string else []
 
     def _summarize_functions(self, functions: List[Dict]) -> str:
         """Create a summary of available functions"""
@@ -2456,79 +2463,868 @@ Your response should cite the actual analysis results, not general knowledge."""
         )
 
     def _extract_cell_types_from_result(self, result: Any) -> List[str]:
-        """Extract cell types from annotation result with improved precision"""
-        cell_types = []
-        if not isinstance(result, str):
-            return cell_types
-        
-        text = result
-        
-        # PRIORITY 1: Extract from dictionary format (most reliable)
-        dict_pattern = r"group_to_cell_type\s*=\s*\{([^}]+)\}"
-        dict_match = re.search(dict_pattern, text)
-        if dict_match:
-            dict_content = dict_match.group(1)
-            # Extract values from the dictionary (cell types are the values)
-            value_pattern = r"'[^']*':\s*'([^']+)'"
-            values = re.findall(value_pattern, dict_content)
-            cell_types.extend(values)
-            print(f"✅ Extracted {len(values)} cell types from dictionary format")
-            
-            # If we found cell types in dictionary format, return them (most reliable)
-            if values:
-                return list(set(values))  # Remove duplicates
-        
-        # PRIORITY 2: Extract from markdown headers (secondary)
-        header_matches = re.findall(r"###\s*Cluster\s*\d+:\s*([^:\n]+)", text)
-        cell_types.extend([match.strip() for match in header_matches])
-        
-        # PRIORITY 3: Only look for very specific patterns if above methods fail
-        if not cell_types:
-            # More conservative patterns
-            specific_patterns = [
-                r"\b(T cell)s?\b",
-                r"\b(B cell)s?\b", 
-                r"\b(Natural killer cell)s?\b",
-                r"\b(Mononuclear phagocyte)s?\b",
-                r"\b(Plasmacytoid dendritic cell)s?\b",
-                # Add other known cell types as needed
-            ]
-            
-            for pattern in specific_patterns:
-                matches = re.findall(pattern, text, re.IGNORECASE)
-                cell_types.extend(matches)
-        
-        # Clean and deduplicate
-        cleaned_types = []
-        for cell_type in cell_types:
-            cleaned = cell_type.strip()
-            if (len(cleaned) > 2 and 
-                cleaned not in cleaned_types and
-                not self._is_invalid_cell_type(cleaned)):
-                cleaned_types.append(cleaned)
-        
-        return cleaned_types
+        """🧬 UNIFIED: Extract cell types from annotation result"""
+        if self.cell_type_extractor:
+            return self.cell_type_extractor.extract_from_annotation_result(result)
+        else:
+            # Fallback if extractor not initialized
+            print("⚠️ Cell type extractor not initialized, using fallback")
+            return []
     
     def _is_invalid_cell_type(self, cell_type: str) -> bool:
-        """Check if a cell type should be filtered out"""
-        invalid_patterns = [
-            r'^\d+',  # Pure numbers
-            r'^[a-z]+',  # All lowercase (likely not a proper cell type name)
-            r'^[A-Z]',  # Single capital letter
-            r'cluster',  # Contains 'cluster'
-            r'sample',   # Contains 'sample'  
-            r'condition', # Contains 'condition'
-            r'group',    # Contains 'group'
-            r'type',     # Just 'type'
-            r'analysis', # Contains 'analysis'
-        ]
+        """🧬 UNIFIED: Check if a cell type should be filtered out (delegated to extractor)"""
+        if self.cell_type_extractor:
+            return not self.cell_type_extractor._is_valid_cell_type(cell_type)
+        else:
+            # Fallback validation
+            return not cell_type or len(cell_type.strip()) <= 2
+
+    # ========== 🆕 NEW CRITIC AGENT NODE METHODS ==========
+
+    def critic_agent_node(self, state: ChatState) -> ChatState:
         
-        cell_type_lower = cell_type.lower()
-        for pattern in invalid_patterns:
-            if re.search(pattern, cell_type_lower):
-                return True
+        # Initialize critic state
+        state = CriticLoopManager.initialize_critic_state(state)
+        
+        # Extract information for evaluation
+        original_question = state["execution_plan"]["original_question"]
+        final_response = state["response"]
+        execution_history = state["execution_history"]
+        
+        # Extract response content
+        try:
+            response_data = json.loads(final_response)
+            response_content = response_data.get("response", "")
+        except:
+            response_content = final_response
+        
+        print(f"🔍 Critic Agent - Iteration {state['critic_iterations'] + 1}: Evaluating response quality...")
+        
+        # Perform comprehensive evaluation
+        evaluation = self._evaluate_response_quality(
+            original_question, 
+            response_content, 
+            execution_history,
+            state
+        )
+        
+        # Update state
+        state["critic_iterations"] += 1
+        state["critic_feedback_history"].append(evaluation)
+        state["original_execution_complete"] = True
+        
+        # Accumulate analysis results for context
+        self._accumulate_analysis_results(state, evaluation)
+        
+        print(f"✅ Critic evaluation complete:")
+        print(f"   • Relevance: {evaluation['relevance_score']:.2f}")
+        print(f"   • Completeness: {evaluation['completeness_score']:.2f}")
+        print(f"   • Needs revision: {evaluation['needs_revision']}")
+        print(f"   • Missing analyses: {evaluation['missing_analyses']}")
+        
+        return state
+
+    def planner_reviser_node(self, state: ChatState) -> ChatState:
+        """🆕 REUSABLE plan revision node with comprehensive error handling"""
+        
+        iteration = state.get("critic_iterations", 0)
+        latest_feedback = state["critic_feedback_history"][-1]
+        
+        print(f"🔄 Plan Revision - Iteration {iteration}")
+        
+        # Step 1: Detect impossible requests (CRITICAL for loop prevention)
+        impossible_patterns = self._detect_impossible_requests(state)
+        
+        if self._has_impossible_patterns(impossible_patterns):
+            print("🚫 Impossible requests detected - flagging for graceful degradation")
+            state["impossible_request_detected"] = True
+            state["degradation_strategy"] = self._handle_impossible_requests(impossible_patterns, state)
+            return state
+        
+        # Step 2: Handle execution errors
+        error_recovery = {}
+        if state.get("execution_history"):
+            error_recovery = self._handle_execution_errors(state["execution_history"], latest_feedback)
+            state["error_recovery_strategy"] = error_recovery
+        
+        # Step 3: Handle content gaps
+        content_revision = self._handle_content_gaps(latest_feedback, state["execution_plan"])
+        
+        # Step 4: Generate revised plan
+        revised_plan = self._generate_revised_plan(
+            state["execution_plan"],
+            content_revision,
+            error_recovery,
+            iteration
+        )
+        
+        # Step 5: Update state for status checker
+        state["execution_plan"] = revised_plan
+        state["current_step_index"] = 0  # Reset execution index
+        state["revision_applied"] = True
+        
+        # Record revision history
+        state["plan_revision_history"].append({
+            "iteration": iteration,
+            "reason": latest_feedback["reasoning"],
+            "content_changes": content_revision,
+            "error_recovery": error_recovery
+        })
+        
+        print(f"✅ Plan revised - Added {len(content_revision.get('add_steps', []))} steps")
+        
+        return state
+
+    def impossible_handler_node(self, state: ChatState) -> ChatState:
+        """🆕 Handle impossible requests with graceful degradation"""
+        
+        degradation_strategy = state.get("degradation_strategy", {})
+        
+        print("🚫 Handling impossible request with graceful degradation...")
+        
+        # Generate explanation response
+        explanation = self._generate_impossible_request_explanation(
+            state["execution_plan"]["original_question"],
+            degradation_strategy,
+            state
+        )
+        
+        # Update response
+        state["response"] = json.dumps({
+            "response": explanation,
+            "response_type": "impossible_request_handled"
+        })
+        
+        state["conversation_complete"] = True
+        
+        return state
+
+    def route_from_critic(self, state: ChatState) -> Literal["revise", "complete", "impossible"]:
+        """Enhanced routing from critic agent with impossible request detection"""
+        
+        # Check for impossible requests first
+        if state.get("impossible_request_detected"):
+            print("🚫 Routing to impossible request handler")
+            return "impossible"
+        
+        # Check iteration limit
+        if state["critic_iterations"] >= CriticLoopManager.MAX_ITERATIONS:
+            print(f"🔄 Maximum iterations ({CriticLoopManager.MAX_ITERATIONS}) reached - completing")
+            return "complete"
+        
+        # Check if revision is needed
+        if CriticLoopManager.should_continue_iteration(state):
+            print(f"🔄 Critic recommends revision - starting iteration {state['critic_iterations'] + 1}")
+            return "revise"
+        
+        print("✅ Critic satisfied with response - completing")
+        return "complete"
+
+    # ========== CRITIC EVALUATION METHODS ==========
+    def _evaluate_response_quality(self, question: str, response: str, 
+                                execution_history: List, state: ChatState) -> Dict:
+        """Enhanced critic evaluation that is cache-aware"""
+        
+        # Prepare execution summary
+        execution_summary = self._summarize_execution_history(execution_history)
+        
+        # Get available cell types for context
+        available_cell_types = ", ".join(state.get("available_cell_types", []))
+        
+        # Check for repeated failures
+        repeated_failures = self._detect_repeated_failures(state)
+        
+        relevant_cell_types = self._get_relevant_cell_types_from_context(state)
+        cache_analysis_summary = self._get_cache_analysis_summary(relevant_cell_types)
+        
+        comprehensive_analysis_context = self._build_comprehensive_analysis_context(state, execution_history)
+        
+        critic_prompt = f"""
+                        You are a scientific analysis critic evaluating single-cell RNA-seq analysis results.
+
+                        ORIGINAL QUESTION:
+                        {question}
+
+                        GENERATED RESPONSE:
+                        {response}
+
+                        ANALYSES PERFORMED IN CURRENT SESSION:
+                        {execution_summary}
+
+                        🆕 CACHED ANALYSIS RESULTS AVAILABLE:
+                        {cache_analysis_summary}
+
+                        🆕 COMPREHENSIVE ANALYSIS CONTEXT (Current + Cache + History):
+                        {comprehensive_analysis_context}
+
+                        AVAILABLE CELL TYPES IN DATASET:
+                        {available_cell_types}
+
+                        Available functions:
+                        {self._summarize_functions(self.function_descriptions)}
+
+                        CONTEXT:
+                        - Iteration: {state.get('critic_iterations', 0) + 1}/3
+                        - Previous failures: {repeated_failures}
+
+                        CACHE AWARENESS:
+                        - If the question asks for a summary/results of analyses (like GSEA, DEA), check if those results are available in the CACHED ANALYSIS RESULTS section
+                        - If cached results exist for the requested analysis and cell type, then the analysis HAS BEEN COMPLETED and should NOT be marked as missing
+                        - Only mark analyses as missing if they are truly not available anywhere (current session, cache, or history)
+
+                        Evaluate the response on these criteria:
+
+                        1. RELEVANCE (0.0-1.0): Does the response directly address what was asked?
+                        - Does it answer the specific question?
+                        - Are the right cell types being analyzed?
+
+                        2. COMPLETENESS (0.0-1.0): Are all parts of the question covered?
+                        - If asking for analysis results/summary, are cached results being used appropriately?
+                        - If comparing multiple cell types, were all compared?
+                        - Are visualizations included when appropriate?
+
+                        3. SCIENTIFIC RIGOR: Are conclusions supported by proper analysis?
+                        - Are the analysis methods appropriate?
+                        - Is statistical information provided when relevant?
+
+                        4. MISSING ELEMENTS: What specific analyses are missing?
+                        - Check cached results first before marking as missing
+                        - Only suggest new analyses if they are truly unavailable
+                        - Be specific about function names and parameters
+
+                        5. ERROR DETECTION: Are there any execution errors that need fixing?
+
+                        IMPORTANT CONSTRAINTS:
+                        - If cached results exist for the requested analysis type and cell type, DO NOT mark it as missing
+                        - Only suggest analyses for cell types that exist in the available cell types list
+                        - Don't suggest impossible analyses (e.g., cell types not in dataset)
+                        - Be specific about function names: use "perform_enrichment_analyses", "process_cells", "display_processed_umap", etc.
+
+                        Respond in JSON format:
+                        {{
+                            "relevance_score": 0.0-1.0,
+                            "completeness_score": 0.0-1.0,
+                            "needs_revision": true/false,
+                            "missing_analyses": ["specific analysis with function name and cell type (The function name should be exactly same as it is in the available function)"],
+                            "recommendations": ["actionable advice for improvement"],
+                            "reasoning": "Detailed explanation of evaluation including cache awareness",
+                            "evaluation_type": "content_gap|execution_error|quality_issue|cache_satisfied",
+                            "impossible_requests": ["requests that cannot be fulfilled with available data"],
+                            "cache_utilization": "How well the response utilized available cached results"
+                        }}
+                        """
+        
+        try:
+            response = openai.chat.completions.create(
+                model="gpt-4o",
+                temperature=0.1,
+                messages=[{"role": "user", "content": critic_prompt}],
+                response_format={"type": "json_object"}
+            )
+            
+            evaluation = json.loads(response.choices[0].message.content)
+            evaluation = self._sanitize_critic_evaluation_with_cache_awareness(evaluation, state)
+            
+            return evaluation
+            
+        except Exception as e:
+            print(f"❌ Critic evaluation failed: {e}")
+            # Fallback evaluation
+            return {
+                "relevance_score": 0.8,
+                "completeness_score": 0.8,
+                "needs_revision": False,
+                "missing_analyses": [],
+                "recommendations": [],
+                "reasoning": f"Critic evaluation failed: {e}",
+                "evaluation_type": "error",
+                "impossible_requests": [],
+                "cache_utilization": "Error in evaluation"
+            }
+
+    def _get_cache_analysis_summary(self, relevant_cell_types: List[str]) -> str:
+        """🆕 NEW: Get summary of what analyses are available in cache"""
+        
+        cache_summary = "CACHED ANALYSIS AVAILABILITY:\n"
+        
+        for cell_type in relevant_cell_types:
+            cache_summary += f"\n🧬 {cell_type.upper()}:\n"
+            
+            # Check for enrichment analyses in cache
+            enrichment_available = []
+            enrichment_patterns = self.simple_cache._get_cache_file_patterns("enrichment", cell_type, 
+                                                                            {"analyses": ["reactome", "go", "kegg", "gsea"]})
+            for pattern in enrichment_patterns:
+                matching_files = glob.glob(pattern)
+                for file_path in matching_files:
+                    if self.simple_cache._is_file_recent(file_path):
+                        analysis_name = self.simple_cache._extract_analysis_name_from_path(file_path)
+                        enrichment_available.append(analysis_name)
+            
+            if enrichment_available:
+                cache_summary += f"  ✅ ENRICHMENT ANALYSES: {', '.join(set(enrichment_available))}\n"
+            else:
+                cache_summary += f"  ❌ ENRICHMENT ANALYSES: None available\n"
+            
+            # Check for DEA analyses in cache
+            dea_available = []
+            dea_patterns = self.simple_cache._get_cache_file_patterns("dea", cell_type)
+            for pattern in dea_patterns:
+                matching_files = glob.glob(pattern)
+                for file_path in matching_files:
+                    if self.simple_cache._is_file_recent(file_path):
+                        condition = self.simple_cache._extract_condition_from_path(file_path)
+                        dea_available.append(condition)
+            
+            if dea_available:
+                cache_summary += f"  ✅ DEA ANALYSES: {', '.join(dea_available)}\n"
+            else:
+                cache_summary += f"  ❌ DEA ANALYSES: None available\n"
+        
+        return cache_summary
+
+    def _build_comprehensive_analysis_context(self, state: ChatState, execution_history: List) -> str:
+        """🆕 NEW: Build comprehensive context from current session + cache + function history"""
+        
+        context = "COMPREHENSIVE ANALYSIS STATUS:\n\n"
+        
+        # 1. Current session analyses
+        current_session_analyses = []
+        for execution in execution_history:
+            if execution["success"]:
+                func_name = execution["step"]["function_name"]
+                if func_name in ["perform_enrichment_analyses", "dea_split_by_condition", "process_cells"]:
+                    cell_type = execution["step"]["parameters"].get("cell_type", "unknown")
+                    current_session_analyses.append(f"{func_name}({cell_type})")
+        
+        if current_session_analyses:
+            context += "📋 CURRENT SESSION:\n"
+            for analysis in current_session_analyses:
+                context += f"  ✅ {analysis}\n"
+        else:
+            context += "📋 CURRENT SESSION: No analyses performed\n"
+        
+        # 2. Function history (previous sessions)
+        recent_analyses = self.history_manager.get_recent_executions("perform_enrichment_analyses", limit=5)
+        recent_analyses.extend(self.history_manager.get_recent_executions("dea_split_by_condition", limit=5))
+        recent_analyses.extend(self.history_manager.get_recent_executions("process_cells", limit=5))
+        
+        if recent_analyses:
+            context += "\n📜 PREVIOUS SESSIONS (Last 5 of each type):\n"
+            for execution in recent_analyses:
+                if execution.get("success"):
+                    func_name = execution["function_name"]
+                    cell_type = execution["parameters"].get("cell_type", "unknown")
+                    timestamp = execution.get("timestamp", "unknown")
+                    context += f"  ✅ {func_name}({cell_type}) - {timestamp}\n"
+        else:
+            context += "\n📜 PREVIOUS SESSIONS: No recent analyses found\n"
+        
+        # 3. Cache status summary
+        relevant_cell_types = self._get_relevant_cell_types_from_context(state)
+        cache_stats = {}
+        for cell_type in relevant_cell_types:
+            insights = self.simple_cache.get_analysis_insights(cell_type)
+            cache_stats[cell_type] = {
+                "enrichment_analyses": len(insights.get("enrichment_insights", {})),
+                "dea_analyses": len(insights.get("dea_insights", {}))
+            }
+        
+        context += "\n💾 CACHE STATUS:\n"
+        for cell_type, stats in cache_stats.items():
+            context += f"  🧬 {cell_type}: {stats['enrichment_analyses']} enrichment + {stats['dea_analyses']} DEA results cached\n"
+        
+        return context
+
+    def _sanitize_critic_evaluation_with_cache_awareness(self, evaluation: Dict, state: ChatState) -> Dict:
+        
+        available_cell_types = set(state.get("available_cell_types", []))
+        relevant_cell_types = self._get_relevant_cell_types_from_context(state)
+        
+        # Filter out analyses that are already available in cache
+        sanitized_missing = []
+        cache_satisfied = []
+        
+        for missing in evaluation.get("missing_analyses", []):
+            cell_type = self._extract_cell_type_from_analysis(missing)
+            
+            if cell_type and cell_type in relevant_cell_types:
+                # Check if this analysis is already available in cache
+                is_cached = self._is_analysis_cached(missing, cell_type)
+                
+                if is_cached:
+                    cache_satisfied.append(missing)
+                    print(f"🎯 Analysis already cached, removing from missing: {missing}")
+                else:
+                    # Not cached, keep as missing if cell type is available
+                    if cell_type in available_cell_types:
+                        sanitized_missing.append(missing)
+                    else:
+                        print(f"🚫 Cell type not available: {missing}")
+            else:
+                # Keep original logic for other cases
+                if cell_type and cell_type not in available_cell_types:
+                    if self.hierarchy_manager and self.hierarchy_manager.is_valid_cell_type(cell_type):
+                        sanitized_missing.append(missing)
+                    else:
+                        print(f"🚫 Filtered impossible request: {missing}")
+                else:
+                    sanitized_missing.append(missing)
+        
+        evaluation["missing_analyses"] = sanitized_missing
+        evaluation["cache_satisfied_analyses"] = cache_satisfied
+        
+        # If no valid missing analyses remain and cache satisfied some, don't revise
+        if not sanitized_missing and cache_satisfied:
+            evaluation["needs_revision"] = False
+            evaluation["reasoning"] += f" (Requested analyses are available in cache: {cache_satisfied})"
+            evaluation["evaluation_type"] = "cache_satisfied"
+        
+        return evaluation
+
+    def _is_analysis_cached(self, analysis_description: str, cell_type: str) -> bool:
+        """🆕 NEW: Check if a specific analysis is available in cache"""
+        
+        analysis_lower = analysis_description.lower()
+        
+        if "enrichment" in analysis_lower or "gsea" in analysis_lower or "pathway" in analysis_lower:
+            # Check enrichment cache
+            insights = self.simple_cache.get_analysis_insights(cell_type, ["enrichment"])
+            return len(insights.get("enrichment_insights", {})) > 0
+        
+        elif "dea" in analysis_lower or "differential" in analysis_lower:
+            # Check DEA cache
+            insights = self.simple_cache.get_analysis_insights(cell_type, ["dea"])
+            return len(insights.get("dea_insights", {})) > 0
+        
+        elif "process" in analysis_lower:
+            # Check if processed results exist
+            available_types = set(self.adata.obs["cell_type"].unique())
+            return cell_type in available_types
         
         return False
+
+    # ========== IMPOSSIBLE REQUEST DETECTION AND HANDLING ==========
+
+    def _detect_impossible_requests(self, state: ChatState) -> Dict:
+        """Enhanced impossible request detection with cache awareness"""
+        
+        impossible_patterns = {
+            "repeated_cell_type_failures": [],
+            "hierarchical_dead_ends": [],
+            "cache_misunderstanding": []  
+        }
+        
+        # Original logic...
+        if state.get("critic_feedback_history"):
+            cell_type_failures = {}
+            cache_available_but_marked_missing = []
+            
+            for iteration in state["critic_feedback_history"]:
+                for missing in iteration.get("missing_analyses", []):
+                    cell_type = self._extract_cell_type_from_analysis(missing)
+                    if cell_type:
+                        # 🆕 NEW: Check if this is actually available in cache
+                        if self._is_analysis_cached(missing, cell_type):
+                            cache_available_but_marked_missing.append({
+                                "analysis": missing,
+                                "cell_type": cell_type,
+                                "reason": "Available in cache but marked as missing"
+                            })
+                        else:
+                            cell_type_failures[cell_type] = cell_type_failures.get(cell_type, 0) + 1
+            
+            # 🆕 NEW: If analyses are repeatedly marked missing but are in cache, it's impossible
+            if cache_available_but_marked_missing:
+                impossible_patterns["cache_misunderstanding"] = cache_available_but_marked_missing
+            
+            # Rest of original logic for repeated failures...
+            for cell_type, failure_count in cell_type_failures.items():
+                if failure_count >= 2:
+                    alternatives = []
+                    if self.hierarchy_manager and hasattr(self.adata, 'obs'):
+                        alternatives = self.hierarchy_manager._suggest_similar_types(
+                            cell_type, set(self.adata.obs["cell_type"].unique())
+                        )
+                    
+                    impossible_patterns["repeated_cell_type_failures"].append({
+                        "cell_type": cell_type,
+                        "failure_count": failure_count,
+                        "alternatives": alternatives
+                    })
+        
+        # Rest of original logic...
+        if self.hierarchy_manager:
+            available_types = set(state.get("available_cell_types", []))
+            requested_types = self._extract_all_requested_cell_types(state)
+            
+            for req_type in requested_types:
+                if not self.hierarchy_manager.is_valid_cell_type(req_type):
+                    impossible_patterns["hierarchical_dead_ends"].append({
+                        "requested_type": req_type,
+                        "reason": "Not in cell type ontology",
+                        "suggestions": self.hierarchy_manager._suggest_similar_types(req_type, available_types)
+                    })
+        
+        return impossible_patterns
+
+    def _has_impossible_patterns(self, impossible_patterns: Dict) -> bool:
+        """Check if any impossible patterns were detected"""
+        return (
+            bool(impossible_patterns["repeated_cell_type_failures"]) or
+            bool(impossible_patterns["hierarchical_dead_ends"]) or
+            bool(impossible_patterns["resource_limitations"]) or
+            bool(impossible_patterns["cache_misunderstanding"])
+        )
+
+    def _handle_impossible_requests(self, impossible_patterns: Dict, state: ChatState) -> Dict:
+        """Generate graceful degradation strategy for impossible requests"""
+        
+        degradation_strategy = {
+            "acknowledge_limitations": [],
+            "propose_alternatives": [],
+            "modify_question_scope": []
+        }
+        
+        # Handle repeated cell type failures
+        for failure in impossible_patterns["repeated_cell_type_failures"]:
+            cell_type = failure["cell_type"]
+            alternatives = failure["alternatives"]
+            
+            if alternatives:
+                degradation_strategy["propose_alternatives"].append({
+                    "impossible_request": f"Analysis of {cell_type}",
+                    "alternatives": alternatives,
+                    "explanation": f"{cell_type} not available in dataset. Suggesting related cell types."
+                })
+            else:
+                degradation_strategy["acknowledge_limitations"].append({
+                    "limitation": f"{cell_type} analysis not possible",
+                    "reason": "Cell type not present in dataset and no suitable alternatives found"
+                })
+        
+        # Handle hierarchical dead ends
+        for dead_end in impossible_patterns["hierarchical_dead_ends"]:
+            degradation_strategy["modify_question_scope"].append({
+                "original_scope": dead_end["requested_type"],
+                "suggested_scope": dead_end["suggestions"],
+                "modification_reason": dead_end["reason"]
+            })
+        
+        return degradation_strategy
+
+    def _generate_impossible_request_explanation(self, original_question: str, 
+                                                degradation_strategy: Dict, 
+                                                state: ChatState) -> str:
+        """Generate explanation for impossible requests with alternatives"""
+        
+        explanation = f"I understand you're asking: **{original_question}**\n\n"
+        explanation += "After analyzing your data and attempting multiple approaches, I've identified some limitations:\n\n"
+        
+        # Handle acknowledged limitations
+        for limitation in degradation_strategy.get("acknowledge_limitations", []):
+            explanation += f"❌ **{limitation['limitation']}**: {limitation['reason']}\n"
+        
+        # Handle proposed alternatives
+        if degradation_strategy.get("propose_alternatives"):
+            explanation += "\n**However, I can offer these alternatives:**\n"
+            for alternative in degradation_strategy["propose_alternatives"]:
+                explanation += f"✅ Instead of {alternative['impossible_request']}, "
+                explanation += f"I can analyze: {', '.join(alternative['alternatives'])}\n"
+                explanation += f"   Reason: {alternative['explanation']}\n"
+        
+        # Handle scope modifications
+        if degradation_strategy.get("modify_question_scope"):
+            explanation += "\n**Suggested modifications to your question:**\n"
+            for modification in degradation_strategy["modify_question_scope"]:
+                explanation += f"🔄 Instead of '{modification['original_scope']}', "
+                explanation += f"consider: {', '.join(modification['suggested_scope'])}\n"
+                explanation += f"   Reason: {modification['modification_reason']}\n"
+        
+        explanation += f"\n**Available cell types in your dataset:** {', '.join(state.get('available_cell_types', []))}"
+        explanation += "\n\nWould you like me to proceed with any of the suggested alternatives?"
+        
+        return explanation
+
+    # ========== 🆕 CONTENT GAP AND ERROR HANDLING ==========
+
+    def _handle_content_gaps(self, critic_feedback: Dict, current_plan: Dict) -> Dict:
+        """Handle missing analyses or redundant steps"""
+        
+        missing_analyses = critic_feedback.get("missing_analyses", [])
+        
+        revision_actions = {
+            "add_steps": [],
+            "remove_steps": [],
+            "modify_steps": []
+        }
+        
+        # Add missing analyses
+        for missing in missing_analyses:
+            missing_lower = missing.lower()
+            
+            # Extract cell type from analysis description
+            cell_type = self._extract_cell_type_from_analysis(missing)
+            
+            if "compare" in missing_lower and "count" in missing_lower:
+                revision_actions["add_steps"].append({
+                    "step_type": "analysis",
+                    "function_name": "compare_cell_counts",
+                    "parameters": {"cell_type": cell_type} if cell_type else {},
+                    "description": f"Address critic feedback: {missing}",
+                    "target_cell_type": cell_type
+                })
+            
+            elif "enrichment" in missing_lower:
+                revision_actions["add_steps"].append({
+                    "step_type": "analysis",
+                    "function_name": "perform_enrichment_analyses",
+                    "parameters": {"cell_type": cell_type} if cell_type else {},
+                    "description": f"Address critic feedback: {missing}",
+                    "target_cell_type": cell_type
+                })
+            
+            elif "process" in missing_lower or "subtype" in missing_lower:
+                revision_actions["add_steps"].append({
+                    "step_type": "analysis",
+                    "function_name": "process_cells",
+                    "parameters": {"cell_type": cell_type} if cell_type else {},
+                    "description": f"Address critic feedback: {missing}",
+                    "target_cell_type": cell_type
+                })
+            
+            elif "visualization" in missing_lower or "umap" in missing_lower:
+                revision_actions["add_steps"].append({
+                    "step_type": "visualization",
+                    "function_name": "display_processed_umap",
+                    "parameters": {"cell_type": cell_type} if cell_type else {},
+                    "description": f"Address critic feedback: {missing}",
+                    "target_cell_type": cell_type
+                })
+            
+            elif "dea" in missing_lower or "differential" in missing_lower:
+                revision_actions["add_steps"].append({
+                    "step_type": "analysis", 
+                    "function_name": "dea_split_by_condition",
+                    "parameters": {"cell_type": cell_type} if cell_type else {},
+                    "description": f"Address critic feedback: {missing}",
+                    "target_cell_type": cell_type
+                })
+        
+        return revision_actions
+
+    def _handle_execution_errors(self, execution_history: List, critic_feedback: Dict) -> Dict:
+        """Smart error handling with multiple strategies"""
+        
+        failed_steps = [h for h in execution_history if not h["success"]]
+        
+        recovery_strategy = {
+            "error_analysis": [],
+            "recovery_actions": [],
+            "fallback_options": []
+        }
+        
+        for failed_step in failed_steps:
+            error_type = self._classify_error(failed_step["error"])
+            
+            if error_type == "CELL_TYPE_NOT_FOUND":
+                # Use hierarchical manager to suggest alternatives
+                cell_type = failed_step["step"]["parameters"].get("cell_type")
+                alternatives = []
+                if self.hierarchy_manager and cell_type and hasattr(self.adata, 'obs'):
+                    alternatives = self.hierarchy_manager._suggest_similar_types(
+                        cell_type, set(self.adata.obs["cell_type"].unique())
+                    )
+                
+                recovery_strategy["recovery_actions"].append({
+                    "action": "suggest_alternatives",
+                    "original_step": failed_step["step"],
+                    "alternatives": alternatives
+                })
+                
+            elif error_type == "INSUFFICIENT_DATA":
+                recovery_strategy["recovery_actions"].append({
+                    "action": "remove_with_explanation",
+                    "step_to_remove": failed_step["step"],
+                    "explanation": "Insufficient data for this analysis"
+                })
+                
+            elif error_type == "PARAMETER_ERROR":
+                recovery_strategy["recovery_actions"].append({
+                    "action": "fix_parameters",
+                    "original_step": failed_step["step"],
+                    "suggested_fix": self._suggest_parameter_fix(failed_step)
+                })
+                
+            else:
+                recovery_strategy["recovery_actions"].append({
+                    "action": "remove_step",
+                    "step_to_remove": failed_step["step"]
+                })
+        
+        return recovery_strategy
+
+    def _generate_revised_plan(self, original_plan: Dict, content_revision: Dict, 
+                              error_recovery: Dict, iteration: int) -> Dict:
+        """Generate comprehensive revised plan"""
+        
+        revised_steps = []
+        
+        # Keep successful steps from original plan
+        successful_original_steps = []
+        if original_plan.get("steps"):
+            for step in original_plan["steps"]:
+                successful_original_steps.append(step)
+        
+        # Apply error recovery - add corrected versions of failed steps
+        for recovery_action in error_recovery.get("recovery_actions", []):
+            if recovery_action["action"] == "fix_parameters":
+                fixed_step = recovery_action["original_step"].copy()
+                fixed_step["parameters"] = recovery_action["suggested_fix"]
+                fixed_step["description"] += f" (Fixed - Iteration {iteration})"
+                revised_steps.append(fixed_step)
+            elif recovery_action["action"] == "suggest_alternatives":
+                for alt in recovery_action["alternatives"]:
+                    alt_step = recovery_action["original_step"].copy()
+                    alt_step["parameters"]["cell_type"] = alt
+                    alt_step["description"] = f"Alternative analysis: {alt} (Iteration {iteration})"
+                    revised_steps.append(alt_step)
+        
+        # Add new content steps from critic feedback
+        for new_step in content_revision.get("add_steps", []):
+            new_step["description"] += f" (Added by critic - Iteration {iteration})"
+            revised_steps.append(new_step)
+        
+        # Combine successful original steps with new/fixed steps
+        all_steps = successful_original_steps + revised_steps
+        
+        return {
+            "steps": all_steps,
+            "original_question": original_plan["original_question"],
+            "plan_summary": f"Revised plan (Iteration {iteration}) - {len(all_steps)} steps",
+            "estimated_steps": len(all_steps),
+            "revision_iteration": iteration,
+            "revision_reason": f"Critic feedback and error recovery (Iteration {iteration})"
+        }
+
+    # ========== 🆕 UTILITY METHODS ==========
+
+    def _extract_cell_type_from_analysis(self, analysis_description: str) -> Optional[str]:
+        """🧬 UNIFIED: Extract cell type from analysis description"""
+        if self.cell_type_extractor:
+            return self.cell_type_extractor.extract_from_analysis_description(analysis_description)
+        else:
+            # Fallback if extractor not initialized
+            print("⚠️ Cell type extractor not initialized, using simple fallback")
+            return None
+
+    def _extract_all_requested_cell_types(self, state: ChatState) -> Set[str]:
+        """🧬 UNIFIED: Extract all requested cell types from state"""
+        if self.cell_type_extractor:
+            cell_types_list = self.cell_type_extractor.extract_from_execution_state(state)
+            return set(cell_types_list)
+        else:
+            # Fallback if extractor not initialized
+            print("⚠️ Cell type extractor not initialized, using simple fallback")
+            return set()
+
+    def _detect_repeated_failures(self, state: ChatState) -> List[str]:
+        """Detect patterns of repeated failures"""
+        
+        failures = []
+        
+        for execution in state.get("execution_history", []):
+            if not execution["success"]:
+                failures.append(execution["error"])
+        
+        return failures
+
+    def _classify_error(self, error_message: str) -> str:
+        """Classify error types for appropriate handling"""
+        
+        error_lower = error_message.lower()
+        
+        if "cell type" in error_lower and ("not found" in error_lower or "not exist" in error_lower):
+            return "CELL_TYPE_NOT_FOUND"
+        elif "insufficient" in error_lower or "not enough" in error_lower:
+            return "INSUFFICIENT_DATA"
+        elif "parameter" in error_lower or "argument" in error_lower:
+            return "PARAMETER_ERROR"
+        else:
+            return "UNKNOWN_ERROR"
+
+    def _suggest_parameter_fix(self, failed_step: Dict) -> Dict:
+        """Suggest parameter fixes for failed steps"""
+        
+        # Simple parameter fix suggestions
+        original_params = failed_step["step"]["parameters"]
+        suggested_params = original_params.copy()
+        
+        # Example fixes (extend based on common error patterns)
+        if "cell_type" in original_params:
+            # Try to standardize cell type name
+            cell_type = original_params["cell_type"]
+            if cell_type and not cell_type.endswith(" cell"):
+                suggested_params["cell_type"] = f"{cell_type} cell"
+        
+        return suggested_params
+    
+    def _summarize_execution_history(self, execution_history: List) -> str:
+        """Create summary of execution history for critic evaluation"""
+        
+        if not execution_history:
+            return "No analyses performed yet."
+        
+        summary = []
+        successful_count = 0
+        failed_count = 0
+        
+        for execution in execution_history:
+            if execution["success"]:
+                successful_count += 1
+                step_desc = execution["step"]["description"]
+                summary.append(f"✅ {step_desc}")
+            else:
+                failed_count += 1
+                step_desc = execution["step"]["description"]
+                error = execution["error"]
+                summary.append(f"❌ {step_desc} (Failed: {error})")
+        
+        header = f"EXECUTION SUMMARY ({successful_count} successful, {failed_count} failed):"
+        return header + "\n" + "\n".join(summary)
+
+    def _accumulate_analysis_results(self, state: ChatState, evaluation: Dict):
+        """Accumulate analysis results across iterations for context building"""
+        
+        current_results = state.get("cumulative_analysis_results", {})
+        
+        # Store this iteration's results
+        iteration = state["critic_iterations"]
+        current_results[f"iteration_{iteration}"] = {
+            "evaluation": evaluation,
+            "execution_history": state["execution_history"][-10:],  # Last 10 executions
+            "response": state["response"]
+        }
+        
+        state["cumulative_analysis_results"] = current_results
+
+    def _log_critic_statistics(self, final_state: ChatState):
+        """Log critic agent performance statistics"""
+        
+        print(f"\n📊 CRITIC AGENT STATISTICS:")
+        print(f"   • Total iterations: {final_state.get('critic_iterations', 0)}")
+        print(f"   • Plan revisions: {len(final_state.get('plan_revision_history', []))}")
+        print(f"   • Impossible request detected: {final_state.get('impossible_request_detected', False)}")
+        
+        if final_state.get("critic_feedback_history"):
+            avg_relevance = sum(f["relevance_score"] for f in final_state["critic_feedback_history"]) / len(final_state["critic_feedback_history"])
+            avg_completeness = sum(f["completeness_score"] for f in final_state["critic_feedback_history"]) / len(final_state["critic_feedback_history"])
+            print(f"   • Average relevance score: {avg_relevance:.2f}")
+            print(f"   • Average completeness score: {avg_completeness:.2f}")
+        
+        print(f"   • Final conversation status: {'Complete' if final_state['conversation_complete'] else 'Incomplete'}")
+
+    # ========== Routing Functions ==========
 
 
 # ==============================================================================
@@ -2543,3 +3339,291 @@ class ChatBot(MultiAgentChatBot):
             self.cleanup()
         except:
             pass
+
+
+# ==============================================================================
+# Unified Cell Type Extraction System
+# ==============================================================================
+
+class CellTypeExtractor:
+    """
+    🧬 UNIFIED: Centralized cell type extraction with multiple strategies
+    Consolidates all redundant cell type parsing logic into a single system
+    """
+    
+    def __init__(self, hierarchy_manager=None, adata=None):
+        self.hierarchy_manager = hierarchy_manager
+        self.adata = adata
+        
+        # Common cell type patterns for validation
+        self.valid_cell_type_patterns = [
+            r'\b(T cell)s?\b',
+            r'\b(B cell)s?\b', 
+            r'\b(Natural killer cell)s?\b',
+            r'\b(NK cell)s?\b',
+            r'\b(Mononuclear phagocyte)s?\b',
+            r'\b(Plasmacytoid dendritic cell)s?\b',
+            r'\b(Dendritic cell)s?\b',
+            r'\b(Macrophage)s?\b',
+            r'\b(Monocyte)s?\b',
+            r'\b([A-Z][a-z]+\s+cell)s?\b',  # Generic pattern for "Xyz cell"
+        ]
+        
+        # Common separators for multi-cell-type strings
+        self.cell_type_separators = [',', ' and ', ' & ', ';', ' vs ', ' versus ', ' or ']
+        
+        # Invalid patterns to filter out
+        self.invalid_patterns = [
+            r'^\d+$',        # Pure numbers
+            r'^[a-z]+$',     # All lowercase
+            r'^[A-Z]$',      # Single capital letter
+            r'cluster',      # Contains 'cluster'
+            r'sample',       # Contains 'sample'  
+            r'condition',    # Contains 'condition'
+            r'group',        # Contains 'group'
+            r'^type$',       # Just 'type'
+            r'analysis',     # Contains 'analysis'
+        ]
+    
+    def extract_from_annotation_result(self, result: Any) -> List[str]:
+        """
+        🎯 STRATEGY 1: Extract cell types from annotation results
+        Handles dictionary format, markdown headers, and text patterns
+        """
+        if not isinstance(result, str):
+            return []
+        
+        cell_types = []
+        text = str(result)
+        
+        # PRIORITY 1: Extract from dictionary format (most reliable)
+        dict_pattern = r"group_to_cell_type\s*=\s*\{([^}]+)\}"
+        dict_match = re.search(dict_pattern, text)
+        if dict_match:
+            dict_content = dict_match.group(1)
+            # Extract values from the dictionary (cell types are the values)
+            value_pattern = r"'[^']*':\s*'([^']+)'"
+            values = re.findall(value_pattern, dict_content)
+            cell_types.extend(values)
+            print(f"✅ Extracted {len(values)} cell types from dictionary format")
+            
+            # If we found cell types in dictionary format, return them (most reliable)
+            if values:
+                return self._clean_and_deduplicate(values)
+        
+        # PRIORITY 2: Extract from markdown headers
+        header_matches = re.findall(r"###\s*Cluster\s*\d+:\s*([^:\n]+)", text)
+        cell_types.extend([match.strip() for match in header_matches])
+        
+        # PRIORITY 3: Use specific known patterns if above methods fail
+        if not cell_types:
+            for pattern in self.valid_cell_type_patterns:
+                matches = re.findall(pattern, text, re.IGNORECASE)
+                cell_types.extend(matches)
+        
+        return self._clean_and_deduplicate(cell_types)
+    
+    def extract_from_analysis_description(self, analysis_description: str) -> Optional[str]:
+        """
+        🎯 STRATEGY 2: Extract single cell type from analysis description
+        Uses multiple regex patterns to find cell types in text
+        """
+        if not analysis_description:
+            return None
+        
+        # Common patterns for cell type extraction from analysis descriptions
+        patterns = [
+            r'analyze\s+([A-Z][a-z]*\s+cell)',
+            r'for\s+([A-Z][a-z]*\s+cell)', 
+            r'of\s+([A-Z][a-z]*\s+cell)',
+            r'([A-Z][a-z]*\s+cell)\s+analysis',
+            r'([A-Z][a-z]*\s+cell)\s+enrichment',
+            r'([A-Z][a-z]*\s+cell)\s+comparison',
+            r'([A-Z][a-z]*\s+cell)\s+dea',
+            r'([A-Z][a-z]*\s+cell)\s+markers'
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, analysis_description, re.IGNORECASE)
+            if match:
+                cell_type = match.group(1).strip()
+                if self._is_valid_cell_type(cell_type):
+                    return cell_type
+        
+        return None
+    
+    def parse_multi_cell_type_string(self, cell_type_string: str) -> List[str]:
+        """
+        🎯 STRATEGY 3: Parse strings that might contain multiple cell types
+        Handles various separators and formats
+        """
+        if not cell_type_string:
+            return []
+        
+        # Start with the original string
+        cell_types = [cell_type_string]
+        
+        # Apply each separator to split the string
+        for separator in self.cell_type_separators:
+            new_cell_types = []
+            for ct in cell_types:
+                if separator in ct:
+                    new_cell_types.extend([part.strip() for part in ct.split(separator)])
+                else:
+                    new_cell_types.append(ct)
+            cell_types = new_cell_types
+        
+        return self._clean_and_deduplicate(cell_types)
+    
+    def extract_from_execution_state(self, state: dict) -> List[str]:
+        """
+        🎯 STRATEGY 4: Extract all cell types from execution state
+        Combines execution plan, history, and critic feedback
+        """
+        cell_types = set()
+        
+        # From execution plan
+        if state.get("execution_plan") and state["execution_plan"].get("steps"):
+            for step in state["execution_plan"]["steps"]:
+                # Check parameters
+                cell_type = step.get("parameters", {}).get("cell_type")
+                if cell_type and cell_type != "overall":
+                    cell_types.update(self.parse_multi_cell_type_string(cell_type))
+                
+                # Check target_cell_type
+                target_cell_type = step.get("target_cell_type")
+                if target_cell_type and target_cell_type != "overall":
+                    cell_types.update(self.parse_multi_cell_type_string(target_cell_type))
+        
+        # From execution history
+        if state.get("execution_history"):
+            for execution in state["execution_history"]:
+                if execution.get("success") and execution.get("step"):
+                    step = execution["step"]
+                    cell_type = step.get("parameters", {}).get("cell_type")
+                    if cell_type and cell_type != "overall":
+                        cell_types.update(self.parse_multi_cell_type_string(cell_type))
+        
+        # From critic feedback
+        for feedback in state.get("critic_feedback_history", []):
+            for missing in feedback.get("missing_analyses", []):
+                cell_type = self.extract_from_analysis_description(missing)
+                if cell_type:
+                    cell_types.add(cell_type)
+        
+        return list(cell_types)
+    
+    def extract_from_execution_context(self, state: dict, include_history: bool = True) -> List[str]:
+        """
+        🎯 STRATEGY 5: Smart context-based extraction for cache and analysis
+        Prioritizes current execution context over historical data
+        """
+        relevant_cell_types = set()
+        
+        print("🔍 Extracting cell types from execution context...")
+        
+        # 1. PRIORITY: Current execution plan (LLM already identified these!)
+        if state.get("execution_plan") and state["execution_plan"].get("steps"):
+            for step in state["execution_plan"]["steps"]:
+                cell_type = step.get("parameters", {}).get("cell_type")
+                if cell_type and cell_type != "overall":
+                    parsed_types = self.parse_multi_cell_type_string(cell_type)
+                    relevant_cell_types.update(parsed_types)
+                    for ct in parsed_types:
+                        print(f"   📋 From execution plan: {ct}")
+                
+                target_cell_type = step.get("target_cell_type")
+                if target_cell_type and target_cell_type != "overall":
+                    parsed_types = self.parse_multi_cell_type_string(target_cell_type)
+                    relevant_cell_types.update(parsed_types)
+                    for ct in parsed_types:
+                        print(f"   🎯 From target cell type: {ct}")
+        
+        # 2. Current execution history (what was actually analyzed)
+        if state.get("execution_history"):
+            for execution in state["execution_history"]:
+                if execution.get("success") and execution.get("step"):
+                    step = execution["step"]
+                    cell_type = step.get("parameters", {}).get("cell_type")
+                    if cell_type and cell_type != "overall":
+                        parsed_types = self.parse_multi_cell_type_string(cell_type)
+                        relevant_cell_types.update(parsed_types)
+                        for ct in parsed_types:
+                            print(f"   ✅ From execution history: {ct}")
+        
+        # 3. Include historical data if requested
+        if include_history and hasattr(self, '_get_historical_cell_types'):
+            historical_types = self._get_historical_cell_types()
+            relevant_cell_types.update(historical_types)
+            for ct in historical_types:
+                print(f"   📜 From function history: {ct}")
+        
+        # 4. Fallbacks
+        if not relevant_cell_types:
+            fallback_types = self._get_fallback_cell_types(state)
+            relevant_cell_types.update(fallback_types)
+            print(f"   🔄 Using fallback cell types: {fallback_types}")
+        
+        result = list(relevant_cell_types)
+        print(f"🔍 Context-based extraction result: {result}")
+        return result
+    
+    def _clean_and_deduplicate(self, cell_types: List[str]) -> List[str]:
+        """Clean, validate, and deduplicate cell type list"""
+        cleaned_types = []
+        
+        for cell_type in cell_types:
+            cleaned = cell_type.strip()
+            
+            # Basic validation
+            if (len(cleaned) > 2 and 
+                cleaned not in cleaned_types and
+                self._is_valid_cell_type(cleaned)):
+                cleaned_types.append(cleaned)
+        
+        return cleaned_types
+    
+    def _is_valid_cell_type(self, cell_type: str) -> bool:
+        """Enhanced validation for cell types"""
+        if not cell_type:
+            return False
+        
+        cell_type_lower = cell_type.lower()
+        
+        # Check against invalid patterns
+        for pattern in self.invalid_patterns:
+            if re.search(pattern, cell_type_lower):
+                return False
+        
+        # If we have a hierarchy manager, use it for validation
+        if self.hierarchy_manager:
+            return self.hierarchy_manager.is_valid_cell_type(cell_type)
+        
+        # Basic validation: should contain "cell" or be a known cell type
+        if "cell" in cell_type_lower:
+            return True
+        
+        # Check against known patterns
+        for pattern in self.valid_cell_type_patterns:
+            if re.search(pattern, cell_type, re.IGNORECASE):
+                return True
+        
+        return False
+    
+    def _get_fallback_cell_types(self, state: dict) -> List[str]:
+        """Get fallback cell types when no extraction succeeds"""
+        # Try available cell types from state
+        if state.get("available_cell_types"):
+            return state["available_cell_types"]
+        
+        # Try extracting from adata if available
+        if self.adata and hasattr(self.adata, 'obs') and 'cell_type' in self.adata.obs.columns:
+            return list(self.adata.obs["cell_type"].unique())
+        
+        return []
+    
+    def _get_historical_cell_types(self) -> List[str]:
+        """Get cell types from historical function executions"""
+        # This would be implemented to get historical data
+        # For now, return empty list
+        return []
