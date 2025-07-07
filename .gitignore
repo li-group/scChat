@@ -29,3 +29,6 @@ env/
 /testing_no_rag.py
 /schatbot/copy1.py
 /schatbot/copy2.py
+.claude
+/schatbot/chatbot_original_backup.py
+/schatbot/instruction.md

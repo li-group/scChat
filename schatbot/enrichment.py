@@ -937,27 +937,31 @@ def perform_enrichment_analyses(
                 cell_type, sig_genes, gene_to_logfc,
                 p_value_threshold=pval_threshold,
                 top_n_terms=top_n_terms,
-                output_prefix="schatbot/enrichment/reactome"
+                output_prefix="schatbot/enrichment/reactome",
+                save_plots=False
             )
         elif key == "go":
             out = go_enrichment(
                 cell_type, sig_genes, gene_to_logfc,
                 p_value_threshold=pval_threshold,
                 top_n_terms=top_n_terms,
-                output_prefix="schatbot/enrichment/go"
+                output_prefix="schatbot/enrichment/go",
+                save_plots=False
             )
         elif key == "kegg":
             out = kegg_enrichment(
                 cell_type, sig_genes, gene_to_logfc,
                 p_value_threshold=pval_threshold,
                 top_n_terms=top_n_terms,
-                output_prefix="schatbot/enrichment/kegg"
+                output_prefix="schatbot/enrichment/kegg",
+                save_plots=False
             )
         else:  # gsea
             out = gsea_enrichment_analysis(
                 cell_type, sig_genes, gene_to_logfc,
                 top_n_terms=top_n_terms,
-                output_prefix="schatbot/enrichment/gsea"
+                output_prefix="schatbot/enrichment/gsea",
+                save_plots=False
             )
 
         # Convert any DataFrame → list of dicts
@@ -1020,27 +1024,31 @@ def perform_enrichment_analyses(
                         f"{cell_type}_{category}", condition_sig_genes, condition_gene_to_logfc,
                         p_value_threshold=pval_threshold,
                         top_n_terms=top_n_terms,
-                        output_prefix=output_prefix
+                        output_prefix=output_prefix,
+                        save_plots=False
                     )
                 elif key == "go":
                     out = go_enrichment(
                         f"{cell_type}_{category}", condition_sig_genes, condition_gene_to_logfc,
                         p_value_threshold=pval_threshold,
                         top_n_terms=top_n_terms,
-                        output_prefix=output_prefix
+                        output_prefix=output_prefix,
+                        save_plots=False
                     )
                 elif key == "kegg":
                     out = kegg_enrichment(
                         f"{cell_type}_{category}", condition_sig_genes, condition_gene_to_logfc,
                         p_value_threshold=pval_threshold,
                         top_n_terms=top_n_terms,
-                        output_prefix=output_prefix
+                        output_prefix=output_prefix,
+                        save_plots=False
                     )
                 else:  # gsea
                     out = gsea_enrichment_analysis(
                         f"{cell_type}_{category}", condition_sig_genes, condition_gene_to_logfc,
                         top_n_terms=top_n_terms,
-                        output_prefix=output_prefix
+                        output_prefix=output_prefix,
+                        save_plots=False
                     )
 
                 # Convert any DataFrame → list of dicts

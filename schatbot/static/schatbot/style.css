@@ -207,3 +207,49 @@ header h1 {
     height: 100vh;
   }
 }
+
+/* Plot container styling */
+.plot-container {
+  margin: 15px 0;
+  padding: 10px;
+  border: 1px solid var(--clr-secondary);
+  border-radius: 8px;
+  background-color: var(--clr-light);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.plot-container h4 {
+  margin: 0 0 10px 0;
+  color: var(--clr-accent);
+  font-size: 1.1em;
+  font-weight: 600;
+  border-bottom: 2px solid var(--clr-secondary);
+  padding-bottom: 5px;
+}
+
+.plot-container iframe {
+  border-radius: 6px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Enhanced system message styling for plots */
+.system-message iframe {
+  margin: 10px 0;
+  border: 1px solid var(--clr-secondary);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive plot styling */
+@media (max-width: 768px) {
+  .plot-container iframe {
+    width: 100% !important;
+    height: 600px !important;
+  }
+  
+  .system-message iframe {
+    width: 100% !important;
+    height: 600px !important;
+  }
+}
