@@ -7,7 +7,7 @@ import os
 import ast
 from langchain.schema import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
-from schatbot.utils import get_rag, get_subtypes, save_analysis_results, explain_gene, get_mapping, filter_existing_genes, extract_genes, get_h5ad
+from scchatbot.utils import get_rag, get_subtypes, save_analysis_results, explain_gene, get_mapping, filter_existing_genes, extract_genes, get_h5ad
 import re
 import scvi
 
@@ -179,12 +179,12 @@ def preprocess_data(adata, sample_mapping=None):
         SCVI.setup_anndata(adata, layer="counts", categorical_covariate_keys=["Exp_sample_category"],
                           continuous_covariate_keys=['pct_counts_mt', 'total_counts'])
         
-        if os.path.exists("schatbot/scvi_model") and any(os.scandir("schatbot/scvi_model")):
-            model = SCVI.load(dir_path="schatbot/scvi_model", adata=adata)
+        if os.path.exists("scchatbot/scvi_model") and any(os.scandir("scchatbot/scvi_model")):
+            model = SCVI.load(dir_path="scchatbot/scvi_model", adata=adata)
         else:
             model = scvi.model.SCVI(adata)
             model.train()
-            model.save("schatbot/scvi_model", overwrite=True)
+            model.save("scchatbot/scvi_model", overwrite=True)
 
         latent = model.get_latent_representation()
         adata.obsm['X_scVI'] = latent
@@ -379,7 +379,7 @@ def initial_cell_annotation(resolution=1):
     adata.obs['cell_type'] = 'Unknown'
     save_analysis_results(
         adata, 
-        prefix="schatbot/runtime_data/basic_data/Overall cells", 
+        prefix="scchatbot/runtime_data/basic_data/Overall cells", 
         save_dotplot=True, 
         markers=filtered_markers
     )
@@ -436,7 +436,7 @@ def process_cells(adata, cell_type, resolution=None):
     
     # Get subtypes from database
     markers_tree = get_subtypes(cell_type)
-    print(f"🔍 Retrieved markers_tree: {markers_tree}")
+    # print(f"🔍 Retrieved markers_tree: {markers_tree}")
     
     # 🚨 NEW: Check if cell type has no subtypes (leaf node)
     if not markers_tree or len(markers_tree) == 0:
@@ -619,7 +619,7 @@ def label_clusters(annotation_result, cell_type, adata):
                 save_dendrogram=False,
                 save_dotplot=False
             )
-            fname = f'schatbot/annotated_adata/{standardized_name}_annotated_adata.pkl'
+            fname = f'scchatbot/annotated_adata/{standardized_name}_annotated_adata.pkl'
             with open(fname, "wb") as file:
                 pickle.dump(adata, file)
         else:
@@ -633,7 +633,7 @@ def label_clusters(annotation_result, cell_type, adata):
                 save_dendrogram=False,
                 save_dotplot=False
             )
-            fname = f'schatbot/annotated_adata/{standardized_name}_annotated_adata.pkl'
+            fname = f'scchatbot/annotated_adata/{standardized_name}_annotated_adata.pkl'
             with open(fname, "wb") as file:
                 pickle.dump(specific_cells, file)
             return specific_cells

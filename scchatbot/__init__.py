@@ -15,14 +15,11 @@ from .chatbot import (
     ChatState,
     ExecutionStep,
     ExecutionPlan,
-    CriticEvaluation,
     HierarchicalCellTypeManager,
     CellTypeExtractor,
     FunctionHistoryManager,
     SimpleIntelligentCache,
     AnalysisFunctionWrapper,
-    CriticLoopManager,
-    CriticAgent,
     WorkflowNodes
 )
 
@@ -39,13 +36,10 @@ __all__ = [
     'ChatState',
     'ExecutionStep',
     'ExecutionPlan',
-    'CriticEvaluation',
     'HierarchicalCellTypeManager',
     'CellTypeExtractor',
     'FunctionHistoryManager',
     'SimpleIntelligentCache',
     'AnalysisFunctionWrapper',
-    'CriticLoopManager',
-    'CriticAgent',
     'WorkflowNodes'
 ]

@@ -427,8 +427,8 @@ def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pva
                                               (abs(data['logfoldchanges']) > logfc_threshold), 'names'])
             if save_csv:
                 file_name = f"{cell_type}_markers_{cat}.csv"
-                os.makedirs('schatbot/deg_res', exist_ok=True)
-                data.to_csv(f'schatbot/deg_res/{file_name}', index=False)
+                os.makedirs('scchatbot/deg_res', exist_ok=True)
+                data.to_csv(f'scchatbot/deg_res/{file_name}', index=False)
                 print(f"{cat} condition {cell_type} marker results saved to {file_name}")
             # Get description directly from JSON file
             description = None
@@ -478,7 +478,7 @@ def compare_cell_count(adata, cell_type):
 
 if __name__ == "__main__":
     import pickle
-    with open('schatbot/annotated_adata/Overall_annotated_adata.pkl', 'rb') as f:
+    with open('scchatbot/annotated_adata/Overall_annotated_adata.pkl', 'rb') as f:
         adata = pickle.load(f)
         
     result = compare_cell_count(adata, "Immune cell")

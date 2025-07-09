@@ -32,8 +32,7 @@ from .cell_type_models import (
     CellTypeLineage,
     ChatState,
     ExecutionStep,
-    ExecutionPlan,
-    CriticEvaluation
+    ExecutionPlan
 )
 
 from .cell_type_hierarchy import (
@@ -44,7 +43,6 @@ from .cell_type_hierarchy import (
 from .function_history import FunctionHistoryManager
 from .cache_manager import SimpleIntelligentCache
 from .analysis_wrapper import AnalysisFunctionWrapper
-from .critic_system import CriticLoopManager, CriticAgent
 from .workflow_nodes import WorkflowNodes
 
 
@@ -56,13 +54,10 @@ __all__ = [
     'ChatState',
     'ExecutionStep',
     'ExecutionPlan',
-    'CriticEvaluation',
     'HierarchicalCellTypeManager',
     'CellTypeExtractor',
     'FunctionHistoryManager',
     'SimpleIntelligentCache',
     'AnalysisFunctionWrapper',
-    'CriticLoopManager',
-    'CriticAgent',
     'WorkflowNodes'
 ]

@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class SchatbotConfig(AppConfig):
+class ScchatbotConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "schatbot"
+    name = "scchatbot"

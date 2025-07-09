@@ -25,20 +25,41 @@ class SimpleIntelligentCache:
     
     Handles caching of enrichment analyses, DEA results, visualizations,
     and other analysis outputs with automatic cache invalidation based on TTL.
+    
+    Public API Methods:
+    - get_analysis_insights(): Extract insights from cached analysis results
+    - check_cache(): Check for cached function results  
+    - ensure_cache_directories(): Create cache directory structure
+    - invalidate_cache(): Clear cached data
+    - get_cache_stats(): Get performance statistics
+    - cache_aware_function_wrapper(): Universal caching wrapper
+    
+    Public Convenience Methods:
+    - check_dea_cache_exists(): Check if DEA cache exists for cell type
+    - check_enrichment_cache_exists(): Check if enrichment cache exists for cell type
+    - has_cached_analysis(): Check if any analysis cache exists for cell type
+    - get_available_cached_cell_types(): Get list of cell types with cached results
+    - get_cache_summary(): Comprehensive cache status summary
+    - is_file_recent(): Check if file is within TTL
+    - get_cache_file_patterns(): Get file search patterns
+    - generate_cache_key(): Generate cache keys
+    - extract_analysis_name_from_path(): Extract analysis type from file path
+    - extract_condition_from_path(): Extract condition from DEA file path
+    - load_cached_result(): Load cached results from file patterns
     """
     
     def __init__(self):
         # Map analysis types to their result directories (matching your current structure)
         self.cache_directories = {
             "enrichment": {
-                "reactome": "schatbot/enrichment/reactome",
-                "go_bp": "schatbot/enrichment/go_bp", 
-                "go_mf": "schatbot/enrichment/go_mf",
-                "go_cc": "schatbot/enrichment/go_cc",
-                "kegg": "schatbot/enrichment/kegg",
-                "gsea": "schatbot/enrichment/gsea"
+                "reactome": "scchatbot/enrichment/reactome",
+                "go_bp": "scchatbot/enrichment/go_bp", 
+                "go_mf": "scchatbot/enrichment/go_mf",
+                "go_cc": "scchatbot/enrichment/go_cc",
+                "kegg": "scchatbot/enrichment/kegg",
+                "gsea": "scchatbot/enrichment/gsea"
             },
-            "dea": "schatbot/deg_res",
+            "dea": "scchatbot/deg_res",
             "visualizations": "umaps/annotated",
             "process_cells": "umaps/annotated"
         }
@@ -389,3 +410,200 @@ class SimpleIntelligentCache:
         except Exception as e:
             print(f"❌ Error computing {function_name}: {e}")
             raise e
+    
+    # Public wrapper methods for commonly used private functionality
+    
+    def check_dea_cache_exists(self, cell_type: str) -> bool:
+        """
+        Public wrapper: Check if DEA cache exists for a specific cell type.
+        
+        Args:
+            cell_type: The cell type to check
+            
+        Returns:
+            bool: True if recent DEA cache exists for the cell type
+        """
+        return self._check_dea_cache_exists(cell_type)
+    
+    def check_enrichment_cache_exists(self, cell_type: str) -> bool:
+        """
+        Public wrapper: Check if enrichment cache exists for a specific cell type.
+        
+        Args:
+            cell_type: The cell type to check
+            
+        Returns:
+            bool: True if recent enrichment cache exists for the cell type
+        """
+        return self._check_enrichment_cache_exists(cell_type)
+    
+    def is_file_recent(self, file_path: str, ttl_hours: float = None) -> bool:
+        """
+        Public wrapper: Check if a file is recent enough to be considered valid.
+        
+        Args:
+            file_path: Path to the file to check
+            ttl_hours: Custom TTL in hours (uses default if None)
+            
+        Returns:
+            bool: True if file exists and is within TTL
+        """
+        return self._is_file_recent(file_path, ttl_hours)
+    
+    def get_cache_file_patterns(self, analysis_type: str, cell_type: str, 
+                               parameters: dict = None) -> List[str]:
+        """
+        Public wrapper: Get file patterns to look for based on analysis type and parameters.
+        
+        Args:
+            analysis_type: Type of analysis ('enrichment', 'dea', 'visualization', etc.)
+            cell_type: The cell type for the analysis
+            parameters: Additional parameters to customize the search
+            
+        Returns:
+            List[str]: List of file patterns to search for
+        """
+        return self._get_cache_file_patterns(analysis_type, cell_type, parameters)
+    
+    def generate_cache_key(self, function_name: str, parameters: dict) -> str:
+        """
+        Public wrapper: Generate a cache key from function name and parameters.
+        
+        Args:
+            function_name: Name of the function
+            parameters: Dictionary of parameters
+            
+        Returns:
+            str: Generated cache key
+        """
+        return self._generate_cache_key(function_name, parameters)
+    
+    def extract_analysis_name_from_path(self, file_path: str) -> str:
+        """
+        Public wrapper: Extract analysis type from file path.
+        
+        Args:
+            file_path: Path to the analysis file
+            
+        Returns:
+            str: Analysis name (Reactome, GO_BP, KEGG, etc.)
+        """
+        return self._extract_analysis_name_from_path(file_path)
+    
+    def extract_condition_from_path(self, file_path: str) -> str:
+        """
+        Public wrapper: Extract condition from DEA file path.
+        
+        Args:
+            file_path: Path to the DEA file
+            
+        Returns:
+            str: Condition name extracted from filename
+        """
+        return self._extract_condition_from_path(file_path)
+    
+    def load_cached_result(self, file_patterns: List[str]) -> Tuple[Optional[Any], Optional[str]]:
+        """
+        Public wrapper: Load cached result from file patterns.
+        
+        Args:
+            file_patterns: List of file patterns to search
+            
+        Returns:
+            Tuple[Optional[Any], Optional[str]]: (cached_result, file_path) or (None, None)
+        """
+        return self._load_cached_result(file_patterns)
+    
+    # Additional convenience methods
+    
+    def has_cached_analysis(self, cell_type: str, analysis_type: str = "any") -> bool:
+        """
+        Check if any cached analysis exists for a cell type.
+        
+        Args:
+            cell_type: The cell type to check
+            analysis_type: Type to check ('dea', 'enrichment', 'any')
+            
+        Returns:
+            bool: True if cached analysis exists
+        """
+        if analysis_type == "any":
+            return (self.check_dea_cache_exists(cell_type) or 
+                   self.check_enrichment_cache_exists(cell_type))
+        elif analysis_type == "dea":
+            return self.check_dea_cache_exists(cell_type)
+        elif analysis_type == "enrichment":
+            return self.check_enrichment_cache_exists(cell_type)
+        else:
+            print(f"⚠️ Unknown analysis type: {analysis_type}")
+            return False
+    
+    def get_available_cached_cell_types(self, analysis_type: str = "any") -> List[str]:
+        """
+        Get list of cell types that have cached analysis results.
+        
+        Args:
+            analysis_type: Type to check ('dea', 'enrichment', 'any')
+            
+        Returns:
+            List[str]: List of cell types with cached results
+        """
+        cached_cell_types = set()
+        
+        # Check DEA cache directories
+        if analysis_type in ["dea", "any"]:
+            dea_dir = self.cache_directories["dea"]
+            if os.path.exists(dea_dir):
+                for file_path in glob.glob(f"{dea_dir}/*_markers_*.csv"):
+                    if self.is_file_recent(file_path):
+                        filename = os.path.basename(file_path)
+                        cell_type = filename.split('_markers_')[0]
+                        cached_cell_types.add(cell_type)
+        
+        # Check enrichment cache directories
+        if analysis_type in ["enrichment", "any"]:
+            enrichment_dirs = self.cache_directories["enrichment"]
+            for analysis_name, dir_path in enrichment_dirs.items():
+                if os.path.exists(dir_path):
+                    for file_path in glob.glob(f"{dir_path}/results_summary_*.csv"):
+                        if self.is_file_recent(file_path):
+                            filename = os.path.basename(file_path)
+                            cell_type = filename.replace('results_summary_', '').replace('.csv', '')
+                            cached_cell_types.add(cell_type)
+        
+        return sorted(list(cached_cell_types))
+    
+    def get_cache_summary(self) -> Dict[str, Any]:
+        """
+        Get comprehensive cache summary including available analyses.
+        
+        Returns:
+            Dict[str, Any]: Summary of cache status and available data
+        """
+        summary = {
+            "stats": self.get_cache_stats(),
+            "available_cell_types": {
+                "dea": self.get_available_cached_cell_types("dea"),
+                "enrichment": self.get_available_cached_cell_types("enrichment"),
+                "any": self.get_available_cached_cell_types("any")
+            },
+            "cache_directories": self.cache_directories,
+            "default_ttl_hours": self.default_ttl_hours
+        }
+        
+        # Count total files in each directory
+        summary["directory_file_counts"] = {}
+        for analysis_type, dirs in self.cache_directories.items():
+            if isinstance(dirs, dict):
+                for subtype, dir_path in dirs.items():
+                    if os.path.exists(dir_path):
+                        file_count = len([f for f in glob.glob(f"{dir_path}/*.csv") 
+                                        if self.is_file_recent(f)])
+                        summary["directory_file_counts"][f"{analysis_type}_{subtype}"] = file_count
+            else:
+                if os.path.exists(dirs):
+                    file_count = len([f for f in glob.glob(f"{dirs}/*.csv") 
+                                    if self.is_file_recent(f)])
+                    summary["directory_file_counts"][analysis_type] = file_count
+        
+        return summary

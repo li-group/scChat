@@ -60,16 +60,13 @@ class ChatState(TypedDict):
     conversation_complete: bool
     errors: List[str]
     
-    # 🆕 CRITIC AGENT FIELDS
-    critic_iterations: int
-    critic_feedback_history: List[Dict[str, Any]]
-    plan_revision_history: List[Dict[str, Any]]
-    original_execution_complete: bool
-    cumulative_analysis_results: Dict[str, Any]
-    impossible_request_detected: bool
-    degradation_strategy: Optional[Dict[str, Any]]
-    error_recovery_strategy: Optional[Dict[str, Any]]
-    revision_applied: bool
+    
+    # 🏛️ JURY SYSTEM FIELDS
+    jury_verdicts: Optional[Dict[str, Any]]  # Results from individual judges
+    jury_decision: Optional[Dict[str, Any]]  # Overall jury decision
+    revision_type: Optional[str]  # Type of revision applied: "presentation_only", "targeted_analysis", etc.
+    jury_iteration: int  # Number of jury evaluation cycles
+    conflict_resolution_applied: bool  # Whether conflict resolution was used
 
 
 @dataclass
@@ -93,13 +90,3 @@ class ExecutionPlan:
     estimated_steps: int
 
 
-@dataclass
-class CriticEvaluation:
-    """Structured critic evaluation result"""
-    relevance_score: float
-    completeness_score: float  
-    missing_analyses: List[str]
-    recommendations: List[str]
-    needs_revision: bool
-    reasoning: str
-    evaluation_type: str

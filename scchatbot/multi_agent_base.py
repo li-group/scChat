@@ -7,6 +7,7 @@ including initialization, component management, and workflow orchestration.
 
 import os
 import json
+import shutil
 from typing import Dict, Any, List, Literal
 
 import openai
@@ -30,7 +31,6 @@ from .function_history import FunctionHistoryManager
 from .cache_manager import SimpleIntelligentCache
 from .cell_type_hierarchy import HierarchicalCellTypeManager, CellTypeExtractor
 from .analysis_wrapper import AnalysisFunctionWrapper
-from .critic_system import CriticLoopManager, CriticAgent
 from .workflow_nodes import WorkflowNodes
 
 
@@ -64,7 +64,6 @@ class MultiAgentChatBot:
         # Setup functions and initialize data
         self.setup_functions()
         self._initialize_annotation()
-        
         # Initialize hierarchical management after adata is ready
         self._initialize_hierarchical_management()
         
@@ -72,14 +71,14 @@ class MultiAgentChatBot:
         self.cell_type_extractor = None
         self._initialize_cell_type_extractor()
         
-        # Initialize critic system
-        self.critic_agent = CriticAgent(
-            self.simple_cache, 
-            self.hierarchy_manager, 
-            self.history_manager, 
-            self.function_descriptions
+        # Initialize jury system (evaluation system)
+        from .jury_system_main import JurySystem
+        self.jury_system = JurySystem(
+            simple_cache=self.simple_cache,
+            hierarchy_manager=self.hierarchy_manager,
+            history_manager=self.history_manager,
+            function_descriptions=self.function_descriptions
         )
-        
         # Initialize workflow nodes
         self.workflow_nodes = WorkflowNodes(
             self.initial_annotation_content,
@@ -93,19 +92,24 @@ class MultiAgentChatBot:
             self.visualization_functions,
             self.simple_cache
         )
-        
         # Create LangGraph workflow
         self.workflow = self._create_workflow()
         
     def _initialize_directories(self):
         """Clean all directories at initialization"""
         directories_to_clear = [
-            'figures', 'process_cell_data', 'schatbot/annotated_adata',
-            'schatbot/enrichment', 'umaps/annotated', 'schatbot/runtime_data/basic_data/',
-            'schatbot/deg_res'
+            'figures', 'process_cell_data', 'scchatbot/annotated_adata',
+            'scchatbot/enrichment', 'umaps/annotated', 'scchatbot/runtime_data/basic_data/',
+            'scchatbot/deg_res', 'function_history'
         ]
         for directory in directories_to_clear:
             clear_directory(directory)
+            
+        # Clear execution history file specifically
+        execution_history_file = "function_history/execution_history.json"
+        if os.path.exists(execution_history_file):
+            os.remove(execution_history_file)
+            print(f"🧹 Cleared execution history: {execution_history_file}")
 
     def _initialize_annotation(self):
         """Initialize or load annotation data"""
@@ -369,68 +373,110 @@ class MultiAgentChatBot:
         }
 
     def _create_workflow(self) -> StateGraph:
-        """Create enhanced workflow with critic agent system"""
+        """Create enhanced workflow with jury-based evaluation system"""
         workflow = StateGraph(ChatState)
         
         # Add workflow nodes
         workflow.add_node("input_processor", self.workflow_nodes.input_processor_node)
         workflow.add_node("planner", self.workflow_nodes.planner_node)
-        workflow.add_node("status_checker", self.workflow_nodes.status_checker_node)
-        workflow.add_node("executor", self.workflow_nodes.executor_node)
         workflow.add_node("evaluator", self.workflow_nodes.evaluator_node)
+        workflow.add_node("executor", self.workflow_nodes.executor_node)
         workflow.add_node("response_generator", self.workflow_nodes.response_generator_node)
-        workflow.add_node("critic_agent", self.critic_agent.critic_agent_node)
-        workflow.add_node("planner_reviser", self.critic_agent.planner_reviser_node)
-        workflow.add_node("impossible_handler", self.critic_agent.impossible_handler_node)
+        
+        # Jury system nodes (new evaluation system)
+        workflow.add_node("jury_evaluation", self.jury_system.jury_evaluation_node)
+        workflow.add_node("conflict_resolution", self.jury_system.conflict_resolution_node)
+        workflow.add_node("targeted_revision", self.jury_system.targeted_revision_node)
+        
         
         # Set entry point
         workflow.set_entry_point("input_processor")
         
-        # Original workflow connections
+        # Main workflow connections
         workflow.add_edge("input_processor", "planner")
-        workflow.add_edge("planner", "status_checker")
-        workflow.add_edge("status_checker", "executor")
-        workflow.add_edge("executor", "evaluator")
+        workflow.add_edge("planner", "evaluator")
         
-        # Routing from evaluator
+        # Routing from evaluator to jury system or executor
         workflow.add_conditional_edges(
             "evaluator", 
             self.route_from_evaluator,
             {
                 "continue": "executor",
-                "to_critic": "critic_agent"  
+                "to_jury": "jury_evaluation"  # Route to jury when execution complete
             }
         )
         
+        # Routing from executor - either continue executing or go to jury when complete
         workflow.add_conditional_edges(
-            "critic_agent",
-            self.critic_agent.route_from_critic,
+            "executor",
+            self.route_from_executor,
             {
-                "revise": "planner_reviser",
-                "complete": "response_generator",
-                "impossible": "impossible_handler"
+                "continue": "executor",  # Continue with next step
+                "complete": "jury_evaluation"  # All steps done, go to jury
             }
         )
         
-        workflow.add_edge("planner_reviser", "status_checker")
-        workflow.add_edge("impossible_handler", "response_generator")
+        # Jury system routing
+        workflow.add_conditional_edges(
+            "jury_evaluation",
+            self.jury_system.route_from_jury,
+            {
+                "accept": "response_generator",
+                "revise_analysis": "targeted_revision",
+                "revise_presentation": "conflict_resolution"
+            }
+        )
+        
+        # Jury revision flows
+        workflow.add_edge("conflict_resolution", "response_generator")  # Presentation fixes go directly to response
+        workflow.add_edge("targeted_revision", "evaluator")  # Analysis revisions restart from evaluator
+        
         
         # Final response generation
         workflow.add_edge("response_generator", END)
         
         return workflow.compile()
 
-    def route_from_evaluator(self, state: ChatState) -> Literal["continue", "to_critic"]:
-        """Route from evaluator to continue execution or go to critic"""
+    def route_from_evaluator(self, state: ChatState) -> Literal["continue", "to_jury"]:
+        """Route from evaluator to continue execution or go to jury"""
+        
+        # Defensive check: ensure execution_plan exists
+        if not state.get("execution_plan") or not state["execution_plan"].get("steps"):
+            print("⚠️ Routing: No execution plan or steps found, completing conversation")
+            state["conversation_complete"] = True
+            return "to_jury"  # Route to jury to handle the error
+        
+        current_step_index = state.get("current_step_index", 0)
+        total_steps = len(state["execution_plan"]["steps"])
         
         # Check if all steps are complete
-        if state["current_step_index"] >= len(state["execution_plan"]["steps"]):
-            print("🏁 All execution steps complete - routing to critic for evaluation")
-            return "to_critic"
+        if current_step_index >= total_steps:
+            print("🏁 All execution steps complete - routing to jury for evaluation")
+            return "to_jury"
+        
+        # If plan needs processing and hasn't been processed yet, we'll process it and then continue
+        if not state.get("plan_processed"):
+            print("🔧 Plan needs processing - enhanced evaluator will process then continue")
+            return "continue"  # Enhanced evaluator will process the plan and set plan_processed=True
         
         # If there are more steps, continue execution
-        print(f"🔄 Continuing execution - step {state['current_step_index'] + 1}/{len(state['execution_plan']['steps'])}")
+        print(f"🔄 Continuing execution - step {current_step_index + 1}/{total_steps}")
         return "continue"
+
+    def route_from_executor(self, state: ChatState) -> Literal["continue", "complete"]:
+        """Route from executor - continue with next step or complete to jury"""
+        
+        # Check if execution is complete
+        current_step_index = state.get("current_step_index", 0)
+        execution_plan = state.get("execution_plan", {})
+        total_steps = len(execution_plan.get("steps", []))
+        
+        if current_step_index >= total_steps:
+            print("🏁 All execution steps complete - routing to jury")
+            return "complete"
+        else:
+            print(f"🔄 Executor continuing - next step {current_step_index + 1}/{total_steps}")
+            return "continue"
 
     def send_message(self, message: str) -> str:
         """Send a message to the chatbot and get response"""
@@ -455,16 +501,13 @@ class MultiAgentChatBot:
                 "conversation_complete": False,
                 "errors": [],
                 
-                # Critic agent fields
-                "critic_iterations": 0,
-                "critic_feedback_history": [],
-                "plan_revision_history": [],
-                "original_execution_complete": False,
-                "cumulative_analysis_results": {},
-                "impossible_request_detected": False,
-                "degradation_strategy": None,
-                "error_recovery_strategy": None,
-                "revision_applied": False
+                
+                # Jury system fields
+                "jury_verdicts": None,
+                "jury_decision": None,
+                "revision_type": None,
+                "jury_iteration": 0,
+                "conflict_resolution_applied": False
             }
             
             # Invoke the workflow with recursion limit
@@ -479,9 +522,37 @@ class MultiAgentChatBot:
             return f"I encountered an error: {e}"
 
     def cleanup(self):
-        """Cleanup resources"""
+        """Cleanup resources and clear analysis results"""
+        print("🧹 Starting cleanup...")
+        
+        # Close hierarchy manager connection
         if self.hierarchy_manager:
             self.hierarchy_manager.close()
+            
+        # Clear analysis result directories
+        directories_to_clear = [
+            'scchatbot/enrichment', 'scchatbot/deg_res', 'function_history',
+            'figures', 'umaps/annotated'
+        ]
+        
+        for directory in directories_to_clear:
+            try:
+                if os.path.exists(directory):
+                    clear_directory(directory)
+                    print(f"🧹 Cleared directory: {directory}")
+            except Exception as e:
+                print(f"⚠️ Failed to clear {directory}: {e}")
+        
+        # Remove execution history file
+        execution_history_file = "function_history/execution_history.json"
+        if os.path.exists(execution_history_file):
+            try:
+                os.remove(execution_history_file)
+                print(f"🧹 Removed execution history: {execution_history_file}")
+            except Exception as e:
+                print(f"⚠️ Failed to remove execution history: {e}")
+                
+        print("✅ Cleanup completed")
             
     def manage_cache(self, action: str, **kwargs):
         """Manage cache operations"""

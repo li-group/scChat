@@ -8,7 +8,7 @@ from gprofiler import GProfiler
 from typing import List, Dict, Any
 import gseapy as gp
 import re
-from schatbot.utils import dea_split_by_condition
+from scchatbot.utils import dea_split_by_condition
 
 def dea(adata, cell_type):
     try:
@@ -937,7 +937,7 @@ def perform_enrichment_analyses(
                 cell_type, sig_genes, gene_to_logfc,
                 p_value_threshold=pval_threshold,
                 top_n_terms=top_n_terms,
-                output_prefix="schatbot/enrichment/reactome",
+                output_prefix="scchatbot/enrichment/reactome",
                 save_plots=False
             )
         elif key == "go":
@@ -945,7 +945,7 @@ def perform_enrichment_analyses(
                 cell_type, sig_genes, gene_to_logfc,
                 p_value_threshold=pval_threshold,
                 top_n_terms=top_n_terms,
-                output_prefix="schatbot/enrichment/go",
+                output_prefix="scchatbot/enrichment/go",
                 save_plots=False
             )
         elif key == "kegg":
@@ -953,14 +953,14 @@ def perform_enrichment_analyses(
                 cell_type, sig_genes, gene_to_logfc,
                 p_value_threshold=pval_threshold,
                 top_n_terms=top_n_terms,
-                output_prefix="schatbot/enrichment/kegg",
+                output_prefix="scchatbot/enrichment/kegg",
                 save_plots=False
             )
         else:  # gsea
             out = gsea_enrichment_analysis(
                 cell_type, sig_genes, gene_to_logfc,
                 top_n_terms=top_n_terms,
-                output_prefix="schatbot/enrichment/gsea",
+                output_prefix="scchatbot/enrichment/gsea",
                 save_plots=False
             )
 
@@ -1007,7 +1007,7 @@ def perform_enrichment_analyses(
             
             # Create gene_to_logfc mapping for condition-specific genes
             # We'll need to read the saved CSV to get logfc values
-            csv_filename = f"schatbot/deg_res/{cell_type}_markers_{category}.csv"
+            csv_filename = f"scchatbot/deg_res/{cell_type}_markers_{category}.csv"
             condition_gene_to_logfc = {}
             if os.path.exists(csv_filename):
                 df_condition = pd.read_csv(csv_filename)
@@ -1017,7 +1017,7 @@ def perform_enrichment_analyses(
             
             for name in analyses:
                 key = name.lower()
-                output_prefix = f"schatbot/enrichment/{key}_{category}"
+                output_prefix = f"scchatbot/enrichment/{key}_{category}"
                 
                 if key == "reactome":
                     out = reactome_enrichment(

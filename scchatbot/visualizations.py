@@ -5,7 +5,7 @@ import plotly.figure_factory as ff
 import json
 from plotly.utils import PlotlyJSONEncoder
 import numpy as np
-from schatbot.annotation import unified_cell_type_handler
+from scchatbot.annotation import unified_cell_type_handler
 import plotly.io as pio
 import os
 import glob
@@ -20,20 +20,20 @@ def _find_enrichment_file(analysis: str, cell_type: str, condition: str = None) 
     
     # If specific condition is provided, use that folder
     if condition:
-        folder = f"schatbot/enrichment/{condition}"
+        folder = f"scchatbot/enrichment/{condition}"
         fname = f"results_summary_{cell_type}.csv"
     else:
         # Use default folder structure based on analysis type
         if base == "go":
             # For GO, we need to handle domain-specific subfolders
             # This is a simplified version - the calling function should handle domain logic
-            folder = f"schatbot/enrichment/go_bp"  # Default to BP
+            folder = f"scchatbot/enrichment/go_bp"  # Default to BP
             fname = f"results_summary_{cell_type}.csv"
         elif base.startswith("go_"):
-            folder = f"schatbot/enrichment/{base}"
+            folder = f"scchatbot/enrichment/{base}"
             fname = f"results_summary_{cell_type}.csv"
         else:
-            folder = f"schatbot/enrichment/{base}"
+            folder = f"scchatbot/enrichment/{base}"
             fname = f"results_summary_{cell_type}.csv"
     
     path = os.path.join(folder, fname)
@@ -48,9 +48,9 @@ def _find_enrichment_file(analysis: str, cell_type: str, condition: str = None) 
     # If still not found for GSEA, try glob patterns
     if base == "gsea" and not os.path.exists(path):
         search_patterns = [
-            f"schatbot/enrichment/gsea*/results_summary_{cell_type}.csv",
-            f"schatbot/enrichment/gsea/results_summary_*.csv",
-            f"schatbot/enrichment/gsea*/results_summary_*.csv"
+            f"scchatbot/enrichment/gsea*/results_summary_{cell_type}.csv",
+            f"scchatbot/enrichment/gsea/results_summary_*.csv",
+            f"scchatbot/enrichment/gsea*/results_summary_*.csv"
         ]
         
         for pattern in search_patterns:
@@ -250,14 +250,14 @@ def display_dotplot(cell_type: str = "Overall cells") -> str:
     
     # Try multiple possible locations for dot plot data
     possible_paths = [
-        f"schatbot/runtime_data/basic_data/{cell_type_formatted}_dot_plot_data.csv",
-        f"schatbot/runtime_data/basic_data/Overall cells_dot_plot_data.csv",
+        f"scchatbot/runtime_data/basic_data/{cell_type_formatted}_dot_plot_data.csv",
+        f"scchatbot/runtime_data/basic_data/Overall cells_dot_plot_data.csv",
         f"process_cell_data/{cell_type_formatted}_dot_plot_data.csv"
     ]
     
     # Use glob patterns to find any dot plot data files
     search_patterns = [
-        f"schatbot/runtime_data/basic_data/*dot_plot_data.csv",
+        f"scchatbot/runtime_data/basic_data/*dot_plot_data.csv",
         f"process_cell_data/*dot_plot_data.csv"
     ]
     
@@ -303,7 +303,7 @@ def display_dotplot(cell_type: str = "Overall cells") -> str:
 
 def display_umap(cell_type: str) -> str:
     cell_type_formatted = unified_cell_type_handler(cell_type)
-    umap_data = pd.read_csv(f'schatbot/runtime_data/process_cell_data/{cell_type_formatted}_umap_data.csv')
+    umap_data = pd.read_csv(f'scchatbot/runtime_data/process_cell_data/{cell_type_formatted}_umap_data.csv')
     if cell_type_formatted != "Overall cells":
         umap_data['original_cell_type'] = umap_data['cell_type']
         umap_data['cell_type'] = 'Unknown'
@@ -381,14 +381,14 @@ def display_cell_type_composition() -> str:
     """
     # Try multiple possible locations for dendrogram data
     possible_paths = [
-        "schatbot/runtime_data/basic_data/dendrogram_data.csv",
+        "scchatbot/runtime_data/basic_data/dendrogram_data.csv",
         "basic_data/dendrogram_data.csv",
-        "schatbot/runtime_data/basic_data/Overall cells_dendrogram_data.csv"
+        "scchatbot/runtime_data/basic_data/Overall cells_dendrogram_data.csv"
     ]
     
     # Use glob patterns to find any dendrogram data files
     search_patterns = [
-        "schatbot/runtime_data/basic_data/*dendrogram_data.csv",
+        "scchatbot/runtime_data/basic_data/*dendrogram_data.csv",
         "basic_data/*dendrogram_data.csv"
     ]
     

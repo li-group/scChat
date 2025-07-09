@@ -65,7 +65,7 @@ def upload_file(request):
 #     Combined view for chatbot UI (GET) and chat message processing (POST).
 #     """
 #     if request.method == "GET":
-#         return render(request, "schatbot/index.html")
+#         return render(request, "scchatbot/index.html")
 #     elif request.method == "POST":
 #         try:
 #             data = json.loads(request.body)
@@ -88,7 +88,7 @@ def chat_with_ai(request):
     print("chat_with_ai: Received a request with method", request.method)
     if request.method == "GET":
         print("chat_with_ai: Handling GET request - rendering index.html")
-        return render(request, "schatbot/index.html")
+        return render(request, "scchatbot/index.html")
     elif request.method == "POST":
         try:
             body = request.body.decode("utf-8")
@@ -132,7 +132,7 @@ from django.shortcuts import render
 from .visualizations import *
 def show_umap(request, cell_type="Overall"):
     plot_html = display_umap(cell_type)
-    return render(request, "schatbot/umap_template.html", {"plot_html": plot_html})
+    return render(request, "scchatbot/umap_template.html", {"plot_html": plot_html})
 
 
 # In views.py

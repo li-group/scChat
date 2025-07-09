@@ -8,7 +8,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'schatbot',  # Make sure to replace with your actual app name
+    'scchatbot',  # Make sure to replace with your actual app name
     # ...
 ]
 
@@ -30,7 +30,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 DEBUG = True
 
 from pathlib import Path
-ROOT_URLCONF = "schatbot.urls"
+ROOT_URLCONF = "scchatbot.urls"
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = "/static/"
 TEMPLATES = [
