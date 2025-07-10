@@ -76,16 +76,30 @@ class VerdictProcessorMixin:
         jury_decision = state.get("jury_decision", {})
         decision = jury_decision.get("decision", "REVISE_MAJOR")
         
+        # Check iteration limit (max 3 iterations)
+        jury_iteration = state.get("jury_iteration", 0)
+        MAX_JURY_ITERATIONS = 3
+        
+        if jury_iteration > MAX_JURY_ITERATIONS:
+            print(f"🏤 Jury iteration limit reached ({MAX_JURY_ITERATIONS}/{MAX_JURY_ITERATIONS}) - accepting current response")
+            # Update the jury decision to reflect forced acceptance
+            state["jury_decision"] = {
+                "decision": "ACCEPT",
+                "reasoning": f"Forced acceptance after {MAX_JURY_ITERATIONS} iterations",
+                "forced_by_limit": True
+            }
+            return "accept"
+        
         if decision == "ACCEPT":
             print("🏤 Jury accepts - proceeding to final response")
             return "accept"
         
         elif decision == "REVISE_PRESENTATION":
-            print("🎯 User intent issue - revising presentation only")
+            print(f"🎯 User intent issue - revising presentation only (iteration {jury_iteration}/{MAX_JURY_ITERATIONS})")
             return "revise_presentation"
         
         else:  # REVISE_MINOR or REVISE_MAJOR
-            print("🔬 Technical issues - revising analysis plan")
+            print(f"🔬 Technical issues - revising analysis plan (iteration {jury_iteration}/{MAX_JURY_ITERATIONS})")
             return "revise_analysis"
     
     def conflict_resolution_node(self, state: Dict[str, Any]) -> Dict[str, Any]:

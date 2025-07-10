@@ -5,7 +5,6 @@ import openai
 
 # To use the OpenAI API key from settings
 from django.conf import settings
-openai.api_key = settings.OPENAI_API_KEY
 
 router = Router()
 
@@ -14,16 +13,25 @@ def create_stream(request):
     user_content = request.GET.get('content', '')  # Get the content from the query parameter
 
     def event_stream():
-        for chunk in openai.ChatCompletion.create(
-            model='gpt-4',
+        client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+        
+        for chunk in client.chat.completions.create(
+            model='gpt-4o',
             messages=[{
                 "role": "user",
                 "content": f"{user_content}. The response should be returned in markdown formatting."
             }],
             stream=True,
         ):
-            chatcompletion_delta = chunk["choices"][0].get("delta", {})
-            data = json.dumps(dict(chatcompletion_delta))
+            chatcompletion_delta = chunk.choices[0].delta
+            # Convert delta to dict for JSON serialization
+            delta_dict = {}
+            if chatcompletion_delta.content:
+                delta_dict["content"] = chatcompletion_delta.content
+            if chatcompletion_delta.role:
+                delta_dict["role"] = chatcompletion_delta.role
+            
+            data = json.dumps(delta_dict)
             print(data)
             yield f'data: {data}\\n\\n'
 

@@ -1,0 +1,105 @@
+[
+    {
+      "question": "What canonical marker genes most effectively differentiate Regulatory T cells from Conventional memory CD4 T cell populations within our single-cell data?",
+      "condtion": "We already have immune cell and stem cell recognized in the dataset",
+      "correct_pipeline": [
+        {"function": "process_cells", "parameters": {"cell_type": "Immune cells"}, "description": "Process Immune cell to discover T cell"},
+        {"function": "validate_processing_results", "parameters": {"processed_parent": "Immune cell", "expected_children": []}, "description": "Validate that Immune cell processing discovered expected cell types"},
+        {"function": "process_cells", "parameters": {"cell_type": "T cells"}, "description": "Process T cell to discover Regulatory T cells and Conventional memory CD4 T cells"},
+        {"function": "validate_processing_results", "parameters": {"processed_parent": "T cell", "expected_children": []}, "description": "Validate that T cell processing discovered expected cell types"},
+        {"function": "dea_split_by_condition", "parameters": {"cell_type": "Regulatory T cells"}, "description": "Perform DEA to discover expressive genes for Regulatory T cells"},
+        {"function": "dea_split_by_condition", "parameters": {"cell_type": "Conventional memory CD4 T cells"}, "description": "Perform DEA to discover expressive genes for Conventional memory CD4 T cells"}
+      ],
+      "rationale": "Identifying unique marker genes requires separate processing and DEA of each cell population. Specifically, the DEA can get the expressive genes from both targeted cell types. Therefore, simply doing DEA is enough."
+    },
+    {
+      "question": "Given natural killer cells population expressing marker CD8A, what's the recommended method to distinguish this from the well-known Regulatory T cells?",
+      "condtion": "We already have immune cell and stem cell recognized in the dataset",
+      "correct_pipeline": [
+        {"function": "process_cells", "parameters": {"cell_type": "Immune cells"}, "description": "Process Immune cell to discover T cell"},
+        {"function": "validate_processing_results", "parameters": {"processed_parent": "Immune cell", "expected_children": []}, "description": "Validate that Immune cell processing discovered expected cell types"},
+        {"function": "process_cells", "parameters": {"cell_type": "T cells"}, "description": "Process T cell to discover Regulatory T cells and Conventional memory CD4 T cells"},
+        {"function": "validate_processing_results", "parameters": {"processed_parent": "T cell", "expected_children": []}, "description": "Validate that T cell processing discovered expected cell types"},
+        {"function": "dea_split_by_condition", "parameters": {"cell_type": "Regulatory T cells"}, "description": "Perform DEA to discover expressive genes for Regulatory T cells"},
+        {"function": "dea_split_by_condition", "parameters": {"cell_type": "Natural killer cells"}, "description": "Perform DEA to discover expressive genes for Natural killer cells"}
+      ],
+      "rationale": "Separate reclustering and DEA allow identification of distinguishing markers between populations. Specifically, the DEA can get the expressive genes from both targeted cell types. Therefore, simply doing DEA is enough."
+    },
+    {
+      "question": "We've detected significant enrichment in the GO term for both established T cells and natural killer cells. What's a suitable workflow to verify the identity of these findings?",
+      "condtion": "We already have immune cell and stem cell recognized in the dataset",
+      "correct_pipeline": [
+        {"function": "process_cells", "parameters": {"cell_type": "Immune cells"}},
+        {"function": "perform_enrichment_analyses", "parameters": {"cell_type": "T cells", "analyses": ["GO"]}},
+        {"function": "perform_enrichment_analyses", "parameters": {"cell_type": "Natural killer cells", "analyses": ["GO"]}}
+      ],
+      "rationale": "Performing enrichment analyses confirm its biological identity for both T cells and natural killer cells. Since the question is about GO term, and thus here we do go as the enrichment analysis only."
+    },
+    {
+      "question": "What kind of expression increase was observed for gene TOX in T cells when analyzing samples before and after treatment?",
+      "condtion": "We already have immune cell and stem cell recognized in the dataset",
+      "correct_pipeline": [
+        {"function": "process_cells", "parameters": {"cell_type": "Immune cells"}},
+        {"function": "dea_split_by_condition", "parameters": {"cell_type": "T cells"}}
+      ],
+      "rationale": "Differential expression analysis comparing pre- vs post-treatment conditions clarifies TOX expression changes."
+    },
+    {
+      "question": "Regarding T cells, was there a significant increase in expression of PDCD1 comparing condition pre-treatment with post-treatment?",
+      "condtion": "We already have immune cell and stem cell recognized in the dataset",
+      "correct_pipeline": [
+        {"function": "process_cells", "parameters": {"cell_type": "Immune cells"}},
+        {"function": "dea_split_by_condition", "parameters": {"cell_type": "T cells"}}
+      ],
+      "rationale": "DEA between treatment conditions effectively identifies significant changes in PDCD1 expression."
+    },
+    {
+      "question": "Verify if cell cycle and initiation pathway are statistically significant for T cells from patient group P1, P6, and P7?",
+      "situation": "We already have immune cell and stem cell recognized in the dataset",
+      "correct_pipeline": [
+        {"function": "process_cells", "parameters": {"cell_type": "Immune cells"}},
+        {"function": "perform_enrichment_analyses", "parameters": {"cell_type": "T cells", "analyses": ["KEGG, GO"]}}
+      ],
+      "rationale": "Performing enrichment analyses and visualizing them statistically validates pathway significance. Since cell cycle is a pathway from KEGG and initiation pathway is a pathway from GO. As a result, here we do both KEGG and GO as the enrichment analysis."
+    },
+    {
+      "question": "Given the CD4-positive naive T cells and CD4-positive memory T cells appear enriched in IFN-signature, how can we verify the biological identity of these populations?",
+      "situation": "We already have immune cell and stem cell recognized in the dataset",
+      "correct_pipeline": [
+        {"function": "process_cells", "parameters": {"cell_type": "Immune cells"}},
+        {"function": "process_cells", "parameters": {"cell_type": "T cells"}},
+        {"function": "perform_enrichment_analyses", "parameters": {"cell_type": "CD4-positive naive T cells", "analyses": ["GSEA"]}},
+        {"function": "perform_enrichment_analyses", "parameters": {"cell_type": "CD4-positive memory T cells", "analyses": ["GSEA"]}}
+      ],
+      "rationale": "Detailed processing and enrichment analyses validate the biological identity of novel populations. Since the IFN-signature is a pathway from GSEA, and thus here we do GSEA as the enrichment analysis only."
+    },
+    {
+      "question": "How might the interaction between T cell abundance and IFN-signature activity influence patient outcomes in glioblastoma treatment?",
+      "situation": "We already have immune cell and stem cell recognized in the dataset",
+      "correct_pipeline": [
+        {"function": "process_cells", "parameters": {"cell_type": "Immune cells"}},
+        {"function": "compare_cell_counts", "parameters": {"cell_type": "T cells"}},
+        {"function": "perform_enrichment_analyses", "parameters": {"cell_type": "T cells", "analyses": ["gsea"]}}
+      ],
+      "rationale": "Comparing cell counts and pathway enrichment directly elucidates correlations impacting clinical outcomes. Since the IFN-signature is a pathway from gsea, and thus here we do gsea as the enrichment analysis only."
+    },
+    {
+      "question": "Based on our analysis, how does the differential expression in T cells correspond with changes in TOX activity across treatment conditions?",
+      "situation": "We already have immune cell and stem cell recognized in the dataset",
+      "correct_pipeline": [
+        {"function": "process_cells", "parameters": {"cell_type": "Immune cells"}},
+        {"function": "dea_split_by_condition", "parameters": {"cell_type": "T cells"}}
+      ],
+      "rationale": "Simply testing DEA effectively capture relationships between gene expression."
+    },
+    {
+      "question": "Analyze and summarize the quantitative evidence supporting 'IFN-signature correlates positively with survival outcomes' from T cells. Clearly indicate key statistical metrics and identify the condition showing the largest measurable effect.",
+      "situation": "We already have immune cell and stem cell recognized in the dataset",
+      "correct_pipeline": [
+        {"function": "process_cells", "parameters": {"cell_type": "Immune cells"}},
+        {"function": "perform_enrichment_analyses", "parameters": {"cell_type": "T cells", "analyses": ["gsea"]}},
+        {"function": "compare_cell_counts", "parameters": {"cell_type": "T cells"}}
+      ],
+      "rationale": "Combined pathway and cell count analyses quantify correlations clearly indicating the condition with maximal effect. Since the IFN-signature is a pathway from gsea, and thus here we do gsea as the enrichment analysis only."
+    }
+  ]

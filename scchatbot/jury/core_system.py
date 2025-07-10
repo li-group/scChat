@@ -12,10 +12,8 @@ import asyncio
 import json
 from typing import Dict, Any, List, Literal
 
-from .jury_workflow_judge import WorkflowLogicEvaluator
-from .jury_efficiency_judge import EfficiencyEvaluator
-from .jury_completeness_judge import CompletenessEvaluator
-from .jury_user_intent_judge import UserIntentEvaluator
+from .jury_workflow_judge_unified import UnifiedWorkflowJudge
+from .jury_user_intent_judge_improved import ImprovedUserIntentEvaluator
 from .jury_conflict_resolution import ConflictResolutionEngine
 
 
@@ -57,20 +55,16 @@ class CoreSystemMixin:
         # Track jury evaluation counts
         self.jury_evaluation_count = 0
         
-        print("\n🏤 Jury System initialized with 4 specialized judges")
-        print("   • Workflow Logic Evaluator")
-        print("   • Efficiency Evaluator")
-        print("   • Completeness Evaluator")
-        print("   • User Intent Evaluator")
+        print("\n🏤 Jury System initialized with 2 specialized judges")
+        print("   • Unified Workflow Judge (combines logic, completeness, efficiency)")
+        print("   • Improved User Intent Evaluator (accepts truthful limitations)")
         print("   • Conflict Resolution Engine")
 
     def _initialize_jury_members(self) -> Dict[str, Any]:
         """Initialize all jury members with their specialized evaluators"""
         return {
-            "workflow_judge": WorkflowLogicEvaluator(),
-            "efficiency_judge": EfficiencyEvaluator(),
-            "completeness_judge": CompletenessEvaluator(),
-            "user_intent_judge": UserIntentEvaluator()
+            "workflow_judge": UnifiedWorkflowJudge(),
+            "user_intent_judge": ImprovedUserIntentEvaluator()
         }
 
     def jury_evaluation_node(self, state: Dict[str, Any]) -> Dict[str, Any]:
@@ -108,21 +102,25 @@ class CoreSystemMixin:
         state["jury_verdicts"] = jury_verdicts
         state["jury_decision"] = jury_decision
         
+        # Log jury verdicts to function_history
+        self._log_jury_verdicts_to_history(state, jury_verdicts, jury_decision)
+        
         # Log final decision
         decision_action = jury_decision.get("decision", "unknown")
         confidence = jury_decision.get("confidence", 0.0)
         print(f"🏤 Final Jury Decision: {decision_action.upper()} (confidence: {confidence:.2f})")
         
         # Add user intent guidance for response generation
-        if "user_intent" in jury_verdicts and jury_verdicts["user_intent"].get("approved", False):
-            user_intent_verdict = jury_verdicts["user_intent"]
+        if "user_intent_judge" in jury_verdicts and jury_verdicts["user_intent_judge"].get("pass", False):
+            user_intent_verdict = jury_verdicts["user_intent_judge"]
             state["user_intent_guidance"] = {
                 "answer_format": user_intent_verdict.get("answer_format", "direct_answer"),
                 "required_elements": user_intent_verdict.get("required_elements", []),
                 "key_focus_areas": user_intent_verdict.get("key_focus_areas", []),
-                "answer_template": user_intent_verdict.get("answer_template", "")
+                "improvement_direction": user_intent_verdict.get("improvement_suggestions", []),
+                "accepts_limitations": user_intent_verdict.get("accepts_limitations", True)
             }
-            print(f"🏤 Added user intent guidance: {state['user_intent_guidance']['answer_format']}")
+            print(f"🏤 Added user intent guidance: accepts limitations = {state['user_intent_guidance']['accepts_limitations']}")
         
         print("🏤 ==================== JURY EVALUATION END ====================\n")
         
@@ -131,9 +129,45 @@ class CoreSystemMixin:
     def _create_fallback_verdict(self, error_msg: str = "") -> Dict[str, Any]:
         """Create a fallback verdict when jury evaluation fails"""
         return {
-            "workflow_logic": {"approved": True, "reasoning": "Fallback approval due to evaluation error", "confidence": 0.5},
-            "efficiency": {"approved": True, "reasoning": "Fallback approval due to evaluation error", "confidence": 0.5},
-            "completeness": {"approved": True, "reasoning": "Fallback approval due to evaluation error", "confidence": 0.5},
-            "user_intent": {"approved": True, "reasoning": "Fallback approval due to evaluation error", "confidence": 0.5},
+            "workflow_judge": {"pass": True, "reasoning": "Fallback approval due to evaluation error", "score": 0.5},
+            "user_intent_judge": {"pass": True, "reasoning": "Fallback approval due to evaluation error", "score": 0.5},
             "evaluation_error": error_msg
         }
+    
+    def _log_jury_verdicts_to_history(self, state: Dict[str, Any], jury_verdicts: Dict[str, Any], jury_decision: Dict[str, Any]) -> None:
+        """Log jury verdicts and decision to function_history directory as JSON."""
+        import json
+        import os
+        from datetime import datetime
+        
+        try:
+            # Create function_history directory if it doesn't exist
+            history_dir = "function_history"
+            os.makedirs(history_dir, exist_ok=True)
+            
+            # Create filename with timestamp and iteration
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            iteration = state.get("jury_iteration", 0)
+            filename = f"jury_verdict_iter{iteration}_{timestamp}.json"
+            filepath = os.path.join(history_dir, filename)
+            
+            # Prepare jury evaluation data
+            jury_log = {
+                "timestamp": datetime.now().isoformat(),
+                "iteration": iteration,
+                "original_query": state.get("current_message", ""),
+                "execution_plan": state.get("execution_plan", {}),
+                "verdicts": jury_verdicts,
+                "final_decision": jury_decision,
+                "available_cell_types": state.get("available_cell_types", []),
+                "unavailable_cell_types": state.get("unavailable_cell_types", [])
+            }
+            
+            # Write to JSON file
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(jury_log, f, indent=2, ensure_ascii=False)
+            
+            print(f"📝 Jury verdicts saved to: {filepath}")
+            
+        except Exception as e:
+            print(f"⚠️ Failed to log jury verdicts: {e}")

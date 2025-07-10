@@ -1,55 +1,242 @@
 [
   {
-    "timestamp": "2025-07-09T15:46:19.279731",
+    "timestamp": "2025-07-10T12:32:32.308795",
     "function_name": "process_cells",
     "parameters": {
       "cell_type": "Immune cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Mononuclear phagocyte','1': 'T cell','2': 'T cell','3': 'T cell','4': 'Mononuclear phagocyte','5': 'Mononuclear phagocyte','6': 'T cell','7': 'Mononuclear phagocyte','8': 'Mononuclear phagocyte','9': 'Mononuclear phagocyte','10': 'Mononuclear phagocyte','11': 'Mononuclear phagocyte','12': 'Mononuclear phagocyte','13': 'Natural killer cell','14': 'Mononuclear phagocyte','15': 'B cell','16': 'Mononuclea"
+    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Mononuclear phagocyte', '1': 'T cell', '2': 'T cell', '3': 'T cell', '4': 'Mononuclear phagocyte', '5': 'Mononuclear phagocyte', '6': 'Mononuclear phagocyte', '7': 'Mononuclear phagocyte', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte', '10': 'Mononuclear phagocyte', '11': 'Mononuclear phagocyte', '12': 'Natural killer cell', '13': 'B cell', '14': 'Plasmacytoid dendritic cell', '15': 'Mono"
   },
   {
-    "timestamp": "2025-07-09T15:47:10.020367",
+    "timestamp": "2025-07-10T12:33:55.758527",
     "function_name": "process_cells",
     "parameters": {
       "cell_type": "T cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "Annotation complete for T cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Regulatory T cell', '1': 'CD8-positive effector T cell', '2': 'CD8-positive effector T cell', '3': 'T-helper 17 cell', '4': 'CD4-positive naive T cell', '5': 'Regulatory T cell', '6': 'Gamma delta T cell', '7': 'Regulatory T cell', '8': 'T-helper 17 cell', '9': 'T-helper 17 cell', '10': 'CD8-positive effector memory T cell', '11': 'CD8-positive effector T cell'}.\n\u2022 Top-genes per cluster: {'0': ['FYN', 'ROR"
+    "result_summary": "Annotation complete for T cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T-helper 17 cell', '1': 'CD8-positive effector T cell', '2': 'CD8-positive effector memory T cell', '3': 'CD4-positive naive T cell', '4': 'CD4-positive memory T cell', '5': 'Regulatory T cell', '6': 'NK T cell', '7': 'Gamma delta T cell', '8': 'Mucosal-associated invariant T cell', '9': 'Exhausted T cell', '10': 'CD8-positive exhausted T cell'}.\n\u2022 Top-genes per cluster: {'0': ['FYN', 'FOSB', 'RORA', 'IL10"
   },
   {
-    "timestamp": "2025-07-09T15:47:18.141956",
+    "timestamp": "2025-07-10T12:34:03.551776",
     "function_name": "dea_split_by_condition",
     "parameters": {
       "cell_type": "Regulatory T cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "{'dea_results': [{'category': 'p1_pre', 'significant_genes': ['MALAT1', 'PTPRC', 'SMCHD1', 'FUS', 'CCNL1', 'BCL11B', 'CELF2', 'ADGRE5', 'STAT4', 'SRSF7', 'CEMIP2', 'DDX3X', 'SLC2A3', 'LINC-PINT', 'HNRNPH1', 'TNFAIP3', 'PARP8', 'AKAP13', 'DDX24', 'OGT', 'ETS1', 'TRA2B', 'LINC01578', 'ITK', 'XIST', 'EML4', 'CHD2', 'CNOT6L', 'ZC3HAV1', 'CD44', 'CRYBG1', 'GLS', 'POLR2A', 'FYN', 'TSPYL2', 'RBM39', 'SYNE2', 'BRD2', 'ZFP36L2', 'AKNA', 'ARHGEF1', 'RNF213', 'IFRD1', 'IL7R', 'STK17B', 'PIK3R1', 'SRSF3', '"
+    "result_summary": "{'dea_results': [{'category': 'p1_post', 'significant_genes': ['IL32', 'TNFRSF4', 'S100A4', 'BATF', 'CTLA4', 'CD2', 'IL2RG', 'LTB', 'HLA-A', 'FOXP3', 'TIGIT', 'B2M', 'STK17B', 'HLA-B', 'LINC01943', 'SPOCK2', 'CD27', 'RPS26', 'IKZF2', 'CTSC', 'IL2RA', 'GBP5', 'TNFRSF1B', 'CD28', 'DUSP4', 'CKLF', 'RAC2', 'ENO1', 'ICOS', 'RNF213', 'ARID5B', 'TNFRSF18', 'CD3D', 'CXCR6', 'SH2D2A', 'PELI1', 'PIM1', 'CORO1B', 'CD3E', 'TRAC', 'TBC1D4', 'CYTIP', 'PCBP1', 'IL2RB', 'MIR4435-2HG', 'PFN1', 'PHTF2', 'NSD3', '"
   },
   {
-    "timestamp": "2025-07-09T15:47:18.229736",
+    "timestamp": "2025-07-10T12:34:11.924149",
     "function_name": "dea_split_by_condition",
     "parameters": {
       "cell_type": "CD4-positive memory T cell"
     },
     "success": true,
     "error": null,
-    "result_summary": null
+    "result_summary": "{'dea_results': [{'category': 'p1_pre', 'significant_genes': [], 'description': 'Pre-treatment sample from patient 1'}, {'category': 'p1_post', 'significant_genes': ['CD52', 'CD2', 'RPS29', 'GZMA', 'IFITM1', 'CD40LG', 'RPS18', 'TRBC2', 'OXNAD1', 'RPS19', 'RPL41', 'RPL28', 'RPS15A', 'CD3E', 'RPS27A', 'RPS25', 'RPL24', 'CD3G', 'TMA7', 'CD3D', 'RPS27', 'RPLP2', 'RPS12', 'BTG1', 'SH3BGRL3', 'RAC2', 'RPS3', 'IL32', 'FAU', 'ACAP1', 'RPL30', 'CD69', 'CRIP1', 'RPLP1', 'RPS21', 'RPL13', 'RPL23A', 'ZFP36L"
   },
   {
-    "timestamp": "2025-07-09T15:47:20.553892",
+    "timestamp": "2025-07-10T12:34:14.145723",
     "function_name": "display_dotplot",
     "parameters": {
-      "cell_types": [
-        "Regulatory T cells",
-        "Conventional memory CD4 T cells"
-      ]
+      "cell_type": "Regulatory T cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"21180fc7-5928-4c85-9896-ae6c3f4b2904\" class=\"plotly-graph-div\" style=\"height:800px; width:1200px;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (docume"
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"1c1f4ee0-ab7a-479a-a922-19e311e6cc7e\" class=\"plotly-graph-div\" style=\"height:800px; width:1200px;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (docume"
+  },
+  {
+    "timestamp": "2025-07-10T12:34:16.112482",
+    "function_name": "display_dotplot",
+    "parameters": {
+      "cell_type": "CD4-positive memory T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"c92aa8c0-9914-4e23-aba6-a992813d3d76\" class=\"plotly-graph-div\" style=\"height:800px; width:1200px;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (docume"
+  },
+  {
+    "timestamp": "2025-07-10T12:34:38.797856",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Immune cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Process cells completed, but no new cell types were discovered."
+  },
+  {
+    "timestamp": "2025-07-10T12:34:38.811250",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Process cells completed, but no new cell types were discovered."
+  },
+  {
+    "timestamp": "2025-07-10T12:34:38.815272",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Regulatory T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'status': 'cached_result', 'file_path': 'scchatbot/deg_res/Regulatory T cell_markers_p6_pre.csv', 'data':      names     scores  logfoldchanges         pvals     pvals_adj\n0     IL32  11.794817        4.160649  4.150999e-32  9.443107e-28\n1    CTLA4  10.122386        4.151916  4.395660e-24  4.999843e-20\n2      LTB   9.890569        3.432080  4.574237e-23  3.468644e-19\n3    TRBC2   9.740177        3.279785  2.032002e-22  1.089613e-18\n4     CD3D   9.723467        3.308258  2.394859e-22  1.089613e-"
+  },
+  {
+    "timestamp": "2025-07-10T12:34:38.827343",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "CD4-positive memory T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'status': 'cached_result', 'file_path': 'scchatbot/deg_res/CD4-positive memory T cell_markers_p1_pre.csv', 'data':         names    scores  logfoldchanges     pvals  pvals_adj\n0       CTLA4  2.436444        9.199449  0.014832        1.0\n1       S1PR4  2.434072        8.688062  0.014930        1.0\n2       RGS14  2.426954        8.220035  0.015226        1.0\n3   CHRM3-AS2  2.422210        8.250451  0.015426        1.0\n4        DPP4  2.422210        7.896691  0.015426        1.0\n..        ...     "
+  },
+  {
+    "timestamp": "2025-07-10T12:34:40.806365",
+    "function_name": "display_dotplot",
+    "parameters": {
+      "cell_type": "Regulatory T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"0e01f276-371f-4c8c-9e9d-b0688e9f0c61\" class=\"plotly-graph-div\" style=\"height:800px; width:1200px;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (docume"
+  },
+  {
+    "timestamp": "2025-07-10T12:34:42.722838",
+    "function_name": "display_dotplot",
+    "parameters": {
+      "cell_type": "CD4-positive memory T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"959df33b-1304-4ef0-bece-bf77bd6e1c65\" class=\"plotly-graph-div\" style=\"height:800px; width:1200px;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (docume"
+  },
+  {
+    "timestamp": "2025-07-10T12:35:14.106359",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Immune cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Process cells completed, but no new cell types were discovered."
+  },
+  {
+    "timestamp": "2025-07-10T12:35:14.120633",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Process cells completed, but no new cell types were discovered."
+  },
+  {
+    "timestamp": "2025-07-10T12:35:14.123807",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Regulatory T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'status': 'cached_result', 'file_path': 'scchatbot/deg_res/Regulatory T cell_markers_p6_pre.csv', 'data':      names     scores  logfoldchanges         pvals     pvals_adj\n0     IL32  11.794817        4.160649  4.150999e-32  9.443107e-28\n1    CTLA4  10.122386        4.151916  4.395660e-24  4.999843e-20\n2      LTB   9.890569        3.432080  4.574237e-23  3.468644e-19\n3    TRBC2   9.740177        3.279785  2.032002e-22  1.089613e-18\n4     CD3D   9.723467        3.308258  2.394859e-22  1.089613e-"
+  },
+  {
+    "timestamp": "2025-07-10T12:35:14.133642",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "CD4-positive memory T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'status': 'cached_result', 'file_path': 'scchatbot/deg_res/CD4-positive memory T cell_markers_p1_pre.csv', 'data':         names    scores  logfoldchanges     pvals  pvals_adj\n0       CTLA4  2.436444        9.199449  0.014832        1.0\n1       S1PR4  2.434072        8.688062  0.014930        1.0\n2       RGS14  2.426954        8.220035  0.015226        1.0\n3   CHRM3-AS2  2.422210        8.250451  0.015426        1.0\n4        DPP4  2.422210        7.896691  0.015426        1.0\n..        ...     "
+  },
+  {
+    "timestamp": "2025-07-10T12:35:16.073998",
+    "function_name": "display_dotplot",
+    "parameters": {
+      "cell_type": "Regulatory T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"bd39faf7-41b2-4356-8611-23b32ffc0c47\" class=\"plotly-graph-div\" style=\"height:800px; width:1200px;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (docume"
+  },
+  {
+    "timestamp": "2025-07-10T12:35:17.982171",
+    "function_name": "display_dotplot",
+    "parameters": {
+      "cell_type": "CD4-positive memory T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"b1c6c4be-b2d4-46c7-8851-bd725343ee7a\" class=\"plotly-graph-div\" style=\"height:800px; width:1200px;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (docume"
+  },
+  {
+    "timestamp": "2025-07-10T12:35:43.585850",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Immune cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Process cells completed, but no new cell types were discovered."
+  },
+  {
+    "timestamp": "2025-07-10T12:35:43.594695",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Process cells completed, but no new cell types were discovered."
+  },
+  {
+    "timestamp": "2025-07-10T12:35:43.597592",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Regulatory T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'status': 'cached_result', 'file_path': 'scchatbot/deg_res/Regulatory T cell_markers_p6_pre.csv', 'data':      names     scores  logfoldchanges         pvals     pvals_adj\n0     IL32  11.794817        4.160649  4.150999e-32  9.443107e-28\n1    CTLA4  10.122386        4.151916  4.395660e-24  4.999843e-20\n2      LTB   9.890569        3.432080  4.574237e-23  3.468644e-19\n3    TRBC2   9.740177        3.279785  2.032002e-22  1.089613e-18\n4     CD3D   9.723467        3.308258  2.394859e-22  1.089613e-"
+  },
+  {
+    "timestamp": "2025-07-10T12:35:43.604062",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "CD4-positive memory T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'status': 'cached_result', 'file_path': 'scchatbot/deg_res/CD4-positive memory T cell_markers_p1_pre.csv', 'data':         names    scores  logfoldchanges     pvals  pvals_adj\n0       CTLA4  2.436444        9.199449  0.014832        1.0\n1       S1PR4  2.434072        8.688062  0.014930        1.0\n2       RGS14  2.426954        8.220035  0.015226        1.0\n3   CHRM3-AS2  2.422210        8.250451  0.015426        1.0\n4        DPP4  2.422210        7.896691  0.015426        1.0\n..        ...     "
+  },
+  {
+    "timestamp": "2025-07-10T12:35:45.581567",
+    "function_name": "display_dotplot",
+    "parameters": {
+      "cell_type": "Regulatory T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"8b9a8abc-9ffd-431c-9bec-d976d3a0f79a\" class=\"plotly-graph-div\" style=\"height:800px; width:1200px;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (docume"
+  },
+  {
+    "timestamp": "2025-07-10T12:35:47.526433",
+    "function_name": "display_dotplot",
+    "parameters": {
+      "cell_type": "CD4-positive memory T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"55bd0fd3-2b2b-47be-9b75-1fe9f73f7c39\" class=\"plotly-graph-div\" style=\"height:800px; width:1200px;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (docume"
   }
 ]

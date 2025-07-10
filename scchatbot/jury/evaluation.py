@@ -49,10 +49,8 @@ class EvaluationCoordinatorMixin:
         
         # Prepare targeted inputs for each judge
         judge_inputs = {
-            "workflow_judge": self._prepare_workflow_judge_inputs(state),
-            "efficiency_judge": self._prepare_efficiency_judge_inputs(state),
-            "completeness_judge": self._prepare_completeness_judge_inputs(state),
-            "user_intent_judge": self._prepare_user_intent_judge_inputs(state)
+            "workflow_judge": self._prepare_unified_workflow_judge_inputs(state),
+            "user_intent_judge": self._prepare_improved_user_intent_judge_inputs(state)
         }
         
         # Run each judge with their targeted inputs
@@ -86,11 +84,11 @@ class EvaluationCoordinatorMixin:
         
         return jury_verdicts
     
-    def _prepare_workflow_judge_inputs(self, state: Dict[str, Any]) -> Dict[str, Any]:
+    def _prepare_unified_workflow_judge_inputs(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Prepare minimal inputs for workflow judge with smart execution summaries.
+        Prepare inputs for unified workflow judge that combines logic, completeness, and efficiency.
         
-        Workflow judge needs: plan structure, step sequence, smart execution summary, and cell type status.
+        Unified judge needs: plan structure, execution summary, and cell type status.
         """
         execution_plan = state.get("execution_plan", {})
         execution_history = state.get("execution_history", [])
@@ -105,61 +103,14 @@ class EvaluationCoordinatorMixin:
             "available_cell_types": available_cell_types,
             "unavailable_cell_types": unavailable_cell_types,
             "original_query": state.get("current_message", ""),
-            "judge_type": "workflow_logic"
+            "judge_type": "unified_workflow"
         }
     
-    def _prepare_efficiency_judge_inputs(self, state: Dict[str, Any]) -> Dict[str, Any]:
+    def _prepare_improved_user_intent_judge_inputs(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Prepare minimal inputs for efficiency judge.
+        Prepare inputs for improved user intent judge that accepts truthful limitations.
         
-        Efficiency judge needs: execution plan, function descriptions, and execution metrics.
-        """
-        execution_plan = state.get("execution_plan", {})
-        execution_history = state.get("execution_history", [])
-        
-        # Calculate execution metrics
-        total_steps = len(execution_plan.get("steps", []))
-        successful_steps = len([h for h in execution_history if h.get("success", False)])
-        failed_steps = len([h for h in execution_history if not h.get("success", False)])
-        
-        return {
-            "execution_plan": execution_plan,
-            "function_descriptions": self.function_descriptions,
-            "execution_metrics": {
-                "total_steps": total_steps,
-                "successful_steps": successful_steps,
-                "failed_steps": failed_steps,
-                "completion_rate": successful_steps / max(total_steps, 1)
-            },
-            "original_query": state.get("current_message", ""),
-            "judge_type": "efficiency"
-        }
-    
-    def _prepare_completeness_judge_inputs(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Prepare minimal inputs for completeness judge.
-        
-        Completeness judge needs: execution plan, execution history, and context analysis.
-        """
-        execution_plan = state.get("execution_plan", {})
-        execution_history = state.get("execution_history", [])
-        
-        # Build comprehensive analysis context
-        analysis_context = self._build_comprehensive_analysis_context(state, execution_history)
-        
-        return {
-            "execution_plan": execution_plan,
-            "execution_history": self._truncate_execution_history_for_judges(execution_history),
-            "analysis_context": analysis_context,
-            "original_query": state.get("current_message", ""),
-            "judge_type": "completeness"
-        }
-    
-    def _prepare_user_intent_judge_inputs(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Prepare minimal inputs for user intent judge.
-        
-        User intent judge needs: original question, execution plan, and analysis context.
+        Improved judge needs: original question, execution plan, and analysis context.
         """
         execution_plan = state.get("execution_plan", {})
         execution_history = state.get("execution_history", [])
@@ -175,5 +126,5 @@ class EvaluationCoordinatorMixin:
             "execution_plan": execution_plan,
             "analysis_context": analysis_context,
             "relevant_cell_types": relevant_cell_types,
-            "judge_type": "user_intent"
+            "judge_type": "improved_user_intent"
         }

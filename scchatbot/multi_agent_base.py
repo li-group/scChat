@@ -381,7 +381,8 @@ class MultiAgentChatBot:
         workflow.add_node("planner", self.workflow_nodes.planner_node)
         workflow.add_node("evaluator", self.workflow_nodes.evaluator_node)
         workflow.add_node("executor", self.workflow_nodes.executor_node)
-        workflow.add_node("response_generator", self.workflow_nodes.response_generator_node)
+        workflow.add_node("response_generator", self.workflow_nodes.unified_response_generator_node)  # NEW: Use unified generator
+        workflow.add_node("plot_integration", self.workflow_nodes.add_plots_to_final_response)  # NEW: Add plots post-jury
         
         # Jury system nodes (new evaluation system)
         workflow.add_node("jury_evaluation", self.jury_system.jury_evaluation_node)
@@ -396,63 +397,65 @@ class MultiAgentChatBot:
         workflow.add_edge("input_processor", "planner")
         workflow.add_edge("planner", "evaluator")
         
-        # Routing from evaluator to jury system or executor
+        # Routing from evaluator to continue execution or generate response
         workflow.add_conditional_edges(
             "evaluator", 
             self.route_from_evaluator,
             {
                 "continue": "executor",
-                "to_jury": "jury_evaluation"  # Route to jury when execution complete
+                "to_response": "response_generator"  # NEW: Route to response generator when execution complete
             }
         )
         
-        # Routing from executor - either continue executing or go to jury when complete
+        # Routing from executor - either continue executing or generate response when complete
         workflow.add_conditional_edges(
             "executor",
             self.route_from_executor,
             {
                 "continue": "executor",  # Continue with next step
-                "complete": "jury_evaluation"  # All steps done, go to jury
+                "complete": "response_generator"  # NEW: All steps done, generate response first
             }
         )
+        
+        # NEW: Response generator always goes to jury for evaluation
+        workflow.add_edge("response_generator", "jury_evaluation")
         
         # Jury system routing
         workflow.add_conditional_edges(
             "jury_evaluation",
             self.jury_system.route_from_jury,
             {
-                "accept": "response_generator",
+                "accept": "plot_integration",  # NEW: Accepted responses go to plot integration first
                 "revise_analysis": "targeted_revision",
                 "revise_presentation": "conflict_resolution"
             }
         )
         
         # Jury revision flows
-        workflow.add_edge("conflict_resolution", "response_generator")  # Presentation fixes go directly to response
+        workflow.add_edge("conflict_resolution", "response_generator")  # Presentation fixes go back to response generator
         workflow.add_edge("targeted_revision", "evaluator")  # Analysis revisions restart from evaluator
         
-        
-        # Final response generation
-        workflow.add_edge("response_generator", END)
+        # Final response generation with plots
+        workflow.add_edge("plot_integration", END)  # NEW: Plot integration is the final step
         
         return workflow.compile()
 
-    def route_from_evaluator(self, state: ChatState) -> Literal["continue", "to_jury"]:
+    def route_from_evaluator(self, state: ChatState) -> Literal["continue", "to_response"]:
         """Route from evaluator to continue execution or go to jury"""
         
         # Defensive check: ensure execution_plan exists
         if not state.get("execution_plan") or not state["execution_plan"].get("steps"):
-            print("⚠️ Routing: No execution plan or steps found, completing conversation")
+            print("⚠️ Routing: No execution plan or steps found, generating response")
             state["conversation_complete"] = True
-            return "to_jury"  # Route to jury to handle the error
+            return "to_response"  # Route to response generator to handle the error
         
         current_step_index = state.get("current_step_index", 0)
         total_steps = len(state["execution_plan"]["steps"])
         
         # Check if all steps are complete
         if current_step_index >= total_steps:
-            print("🏁 All execution steps complete - routing to jury for evaluation")
-            return "to_jury"
+            print("🏁 All execution steps complete - routing to response generation")
+            return "to_response"
         
         # If plan needs processing and hasn't been processed yet, we'll process it and then continue
         if not state.get("plan_processed"):
@@ -464,7 +467,7 @@ class MultiAgentChatBot:
         return "continue"
 
     def route_from_executor(self, state: ChatState) -> Literal["continue", "complete"]:
-        """Route from executor - continue with next step or complete to jury"""
+        """Route from executor - continue with next step or complete to response generation"""
         
         # Check if execution is complete
         current_step_index = state.get("current_step_index", 0)
@@ -472,7 +475,7 @@ class MultiAgentChatBot:
         total_steps = len(execution_plan.get("steps", []))
         
         if current_step_index >= total_steps:
-            print("🏁 All execution steps complete - routing to jury")
+            print("🏁 All execution steps complete - routing to response generation")
             return "complete"
         else:
             print(f"🔄 Executor continuing - next step {current_step_index + 1}/{total_steps}")
