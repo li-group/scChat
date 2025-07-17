@@ -2,7 +2,7 @@
 Shared utilities module.
 
 This module contains common utilities and functions
-used across both workflow and jury systems.
+used across the workflow system.
 """
 
 from .cell_type_utils import (

@@ -4,7 +4,7 @@ Unified response generation for workflow nodes.
 This module contains:
 - unified_response_generator_node implementation
 - LLM synthesis-based response generation
-- Plot integration after jury approval
+- Plot integration after response generation
 - Analysis result extraction utilities
 """
 
@@ -31,7 +31,7 @@ class ResponseMixin:
         # 1. Extract relevant results using shared utilities
         key_findings = extract_key_findings_from_execution(state.get("execution_history", []))
         
-        # 2. Get user intent guidance if available (from jury feedback)
+        # 2. Get user intent guidance if available
         user_intent_guidance = state.get("user_intent_guidance", {})
         
         # 3. Get failed analyses for transparency
@@ -52,7 +52,7 @@ class ResponseMixin:
             print(f"❌ LLM synthesis failed: {e}")
             response_text = "I encountered an error generating the response. Please try again."
         
-        # 6. Store response WITHOUT plots (jury will evaluate this)
+        # 6. Store response WITHOUT plots (plots added separately)
         # Format as JSON for compatibility with views.py
         response_data = {
             "response": response_text,
@@ -84,7 +84,7 @@ class ResponseMixin:
     
     def _create_enhanced_synthesis_prompt(self, original_question: str, key_findings: Dict[str, Any], 
                                          failed_analyses: List[Dict], user_intent_feedback: Dict) -> str:
-        """Create prompt that incorporates jury feedback for better responses."""
+        """Create prompt for synthesizing analysis results."""
         
         prompt = f"""You are a single-cell RNA-seq analysis expert. 
 
@@ -102,14 +102,13 @@ FAILED ANALYSES:
             for failure in failed_analyses:
                 prompt += f"- {failure['function']}: {failure['error']}\n"
 
-        # Add jury feedback if this is a revision
+        # Add user intent feedback if available
         if user_intent_feedback:
             prompt += f"""
-IMPORTANT FEEDBACK FROM REVIEW:
+USER INTENT GUIDANCE:
 - Answer Format Required: {user_intent_feedback.get('answer_format', 'direct_answer')}
 - Key Elements to Include: {', '.join(user_intent_feedback.get('required_elements', []))}
 - Focus Areas: {', '.join(user_intent_feedback.get('key_focus_areas', []))}
-- Specific Guidance: {user_intent_feedback.get('improvement_direction', '')}
 """
 
         prompt += """
@@ -168,7 +167,7 @@ Answer:"""
         return available_plots
     
     def add_plots_to_final_response(self, state: ChatState) -> ChatState:
-        """Add plots to response AFTER jury approval."""
+        """Add plots to response after generation."""
         
         # This method is only called when workflow routes to plot_integration,
         # which means the response has been approved (either normally or by iteration limit)

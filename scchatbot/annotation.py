@@ -351,7 +351,8 @@ def initial_cell_annotation(resolution=1):
     matplotlib.use('Agg')
     path = get_h5ad("media", ".h5ad")
     if not path:
-        return ".h5ad file isn't given, unable to generate UMAP."
+        # Return 5 None values to match expected unpacking
+        return None, None, None, ".h5ad file isn't given, unable to generate UMAP.", None
     adata = sc.read_h5ad(path)
     sample_mapping = get_mapping("media")
     if sample_mapping:
@@ -413,7 +414,7 @@ def initial_cell_annotation(resolution=1):
     ]
     model = ChatOpenAI(
         model="gpt-4o",
-        temperature=0,
+        temperature=0
     )
     results = model.invoke(messages)
     annotation_result = results.content

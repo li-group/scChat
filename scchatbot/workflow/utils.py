@@ -232,7 +232,7 @@ class UtilsMixin:
         """
         Enhance the initial plan by adding cell discovery steps if needed.
         
-        Uses the jury system's proven cell type extraction and discovery logic.
+        Uses proven cell type extraction and discovery logic.
         """
         if not plan_data or not self.hierarchy_manager:
             return plan_data

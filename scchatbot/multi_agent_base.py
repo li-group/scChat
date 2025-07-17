@@ -46,7 +46,7 @@ class MultiAgentChatBot:
     def __init__(self):
         # Initialize core components
         self._initialize_directories()
-        self.api_key = os.getenv("OPENAI_API_KEY", "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")
+        self.api_key = os.getenv("OPENAI_API_KEY")
         openai.api_key = self.api_key
         self.adata = None
         
@@ -71,14 +71,7 @@ class MultiAgentChatBot:
         self.cell_type_extractor = None
         self._initialize_cell_type_extractor()
         
-        # Initialize jury system (evaluation system)
-        from .jury_system_main import JurySystem
-        self.jury_system = JurySystem(
-            simple_cache=self.simple_cache,
-            hierarchy_manager=self.hierarchy_manager,
-            history_manager=self.history_manager,
-            function_descriptions=self.function_descriptions
-        )
+        # Jury system removed - simplified workflow
         # Initialize workflow nodes
         self.workflow_nodes = WorkflowNodes(
             self.initial_annotation_content,
@@ -114,15 +107,24 @@ class MultiAgentChatBot:
     def _initialize_annotation(self):
         """Initialize or load annotation data"""
         gene_dict, marker_tree, adata, explanation, annotation_result = initial_cell_annotation()
-        self.adata = adata
-        self.initial_cell_types = self._extract_initial_cell_types(annotation_result)
-        self.initial_annotation_content = (
-            f"Initial annotation complete.\n"
-            f"• Annotation Result: {annotation_result}\n" 
-            f"• Top‐genes per cluster: {gene_dict}\n"
-            f"• Marker‐tree: {marker_tree}\n"
-            f"• Explanation: {explanation}"
-        )
+        
+        # Handle case where h5ad file is not provided
+        if adata is None:
+            print(f"⚠️ Warning: {explanation}")
+            # Set defaults for missing data
+            self.adata = None
+            self.initial_cell_types = []
+            self.initial_annotation_content = f"Warning: {explanation}"
+        else:
+            self.adata = adata
+            self.initial_cell_types = self._extract_initial_cell_types(annotation_result)
+            self.initial_annotation_content = (
+                f"Initial annotation complete.\n"
+                f"• Annotation Result: {annotation_result}\n" 
+                f"• Top‐genes per cluster: {gene_dict}\n"
+                f"• Marker‐tree: {marker_tree}\n"
+                f"• Explanation: {explanation}"
+            )
 
     def _initialize_hierarchical_management(self):
         """Initialize hierarchical cell type management"""
@@ -373,7 +375,7 @@ class MultiAgentChatBot:
         }
 
     def _create_workflow(self) -> StateGraph:
-        """Create enhanced workflow with jury-based evaluation system"""
+        """Create simplified workflow without jury system"""
         workflow = StateGraph(ChatState)
         
         # Add workflow nodes
@@ -381,93 +383,39 @@ class MultiAgentChatBot:
         workflow.add_node("planner", self.workflow_nodes.planner_node)
         workflow.add_node("evaluator", self.workflow_nodes.evaluator_node)
         workflow.add_node("executor", self.workflow_nodes.executor_node)
-        workflow.add_node("response_generator", self.workflow_nodes.unified_response_generator_node)  # NEW: Use unified generator
-        workflow.add_node("plot_integration", self.workflow_nodes.add_plots_to_final_response)  # NEW: Add plots post-jury
-        
-        # Jury system nodes (new evaluation system)
-        workflow.add_node("jury_evaluation", self.jury_system.jury_evaluation_node)
-        workflow.add_node("conflict_resolution", self.jury_system.conflict_resolution_node)
-        workflow.add_node("targeted_revision", self.jury_system.targeted_revision_node)
-        
+        workflow.add_node("response_generator", self.workflow_nodes.unified_response_generator_node)
+        workflow.add_node("plot_integration", self.workflow_nodes.add_plots_to_final_response)
         
         # Set entry point
         workflow.set_entry_point("input_processor")
         
-        # Main workflow connections
+        # Main workflow connections - NEW PIPELINE: planner -> executor -> evaluator
         workflow.add_edge("input_processor", "planner")
-        workflow.add_edge("planner", "evaluator")
+        workflow.add_edge("planner", "executor")  # Changed: planner now goes to executor
         
-        # Routing from evaluator to continue execution or generate response
-        workflow.add_conditional_edges(
-            "evaluator", 
-            self.route_from_evaluator,
-            {
-                "continue": "executor",
-                "to_response": "response_generator"  # NEW: Route to response generator when execution complete
-            }
-        )
-        
-        # Routing from executor - either continue executing or generate response when complete
+        # Routing from executor - execute steps or evaluate when complete
         workflow.add_conditional_edges(
             "executor",
             self.route_from_executor,
             {
                 "continue": "executor",  # Continue with next step
-                "complete": "response_generator"  # NEW: All steps done, generate response first
+                "evaluate": "evaluator"  # All steps done, go to evaluator
             }
         )
         
-        # NEW: Response generator always goes to jury for evaluation
-        workflow.add_edge("response_generator", "jury_evaluation")
+        # Evaluator reviews execution and routes to response generation
+        workflow.add_edge("evaluator", "response_generator")
         
-        # Jury system routing
-        workflow.add_conditional_edges(
-            "jury_evaluation",
-            self.jury_system.route_from_jury,
-            {
-                "accept": "plot_integration",  # NEW: Accepted responses go to plot integration first
-                "revise_analysis": "targeted_revision",
-                "revise_presentation": "conflict_resolution"
-            }
-        )
-        
-        # Jury revision flows
-        workflow.add_edge("conflict_resolution", "response_generator")  # Presentation fixes go back to response generator
-        workflow.add_edge("targeted_revision", "evaluator")  # Analysis revisions restart from evaluator
+        # Direct path: response generator goes directly to plot integration
+        workflow.add_edge("response_generator", "plot_integration")
         
         # Final response generation with plots
-        workflow.add_edge("plot_integration", END)  # NEW: Plot integration is the final step
+        workflow.add_edge("plot_integration", END)
         
         return workflow.compile()
 
-    def route_from_evaluator(self, state: ChatState) -> Literal["continue", "to_response"]:
-        """Route from evaluator to continue execution or go to jury"""
-        
-        # Defensive check: ensure execution_plan exists
-        if not state.get("execution_plan") or not state["execution_plan"].get("steps"):
-            print("⚠️ Routing: No execution plan or steps found, generating response")
-            state["conversation_complete"] = True
-            return "to_response"  # Route to response generator to handle the error
-        
-        current_step_index = state.get("current_step_index", 0)
-        total_steps = len(state["execution_plan"]["steps"])
-        
-        # Check if all steps are complete
-        if current_step_index >= total_steps:
-            print("🏁 All execution steps complete - routing to response generation")
-            return "to_response"
-        
-        # If plan needs processing and hasn't been processed yet, we'll process it and then continue
-        if not state.get("plan_processed"):
-            print("🔧 Plan needs processing - enhanced evaluator will process then continue")
-            return "continue"  # Enhanced evaluator will process the plan and set plan_processed=True
-        
-        # If there are more steps, continue execution
-        print(f"🔄 Continuing execution - step {current_step_index + 1}/{total_steps}")
-        return "continue"
-
-    def route_from_executor(self, state: ChatState) -> Literal["continue", "complete"]:
-        """Route from executor - continue with next step or complete to response generation"""
+    def route_from_executor(self, state: ChatState) -> Literal["continue", "evaluate"]:
+        """Route from executor - continue with next step or go to evaluator"""
         
         # Check if execution is complete
         current_step_index = state.get("current_step_index", 0)
@@ -475,8 +423,8 @@ class MultiAgentChatBot:
         total_steps = len(execution_plan.get("steps", []))
         
         if current_step_index >= total_steps:
-            print("🏁 All execution steps complete - routing to response generation")
-            return "complete"
+            print("🏁 All execution steps complete - routing to evaluator")
+            return "evaluate"
         else:
             print(f"🔄 Executor continuing - next step {current_step_index + 1}/{total_steps}")
             return "continue"
@@ -491,7 +439,6 @@ class MultiAgentChatBot:
                 "response": "",
                 "available_cell_types": [],
                 "adata": None,
-                "initial_plan": None,
                 "execution_plan": None,
                 "current_step_index": 0,
                 "execution_history": [],
@@ -502,15 +449,7 @@ class MultiAgentChatBot:
                 "missing_cell_types": [],
                 "required_preprocessing": [],
                 "conversation_complete": False,
-                "errors": [],
-                
-                
-                # Jury system fields
-                "jury_verdicts": None,
-                "jury_decision": None,
-                "revision_type": None,
-                "jury_iteration": 0,
-                "conflict_resolution_applied": False
+                "errors": []
             }
             
             # Invoke the workflow with recursion limit

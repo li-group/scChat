@@ -25,81 +25,65 @@ class EvaluationMixin:
     
     def evaluator_node(self, state: ChatState) -> ChatState:
         """
-        Evaluator with light consolidation, validation, and routing.
+        Evaluator reviews execution results and prepares for response generation.
         
-        Combines functionality from evaluator + status_checker:
-        - Step management and completion detection
-        - Light plan consolidation (remove consecutive duplicates only)
-        - Plan validation (add validation steps)
-        - Missing cell type warnings (but preserve discovery paths)
-        - Routing to executor or jury
+        NEW ROLE: Post-execution review (called AFTER all execution steps complete)
+        - Review execution history for completeness
+        - Identify any failed steps or missing results
+        - Prepare context for response generation
+        - Mark conversation as complete
         
         Args:
-            state: Current workflow state
+            state: Current workflow state with completed execution
             
         Returns:
-            Updated state with processed execution plan
+            Updated state ready for response generation
         """
         
-        # Handle plan conversion: initial_plan → execution_plan
-        if not state.get("execution_plan") and state.get("initial_plan"):
-            print("🔄 Evaluator: Converting initial_plan to execution_plan")
-            state["execution_plan"] = state["initial_plan"].copy()
-            state["execution_plan"]["original_question"] = state.get("current_message", "")
+        print("🏁 Evaluator: Reviewing execution results...")
         
         # Defensive check: ensure execution_plan exists
         if not state.get("execution_plan"):
-            print("⚠️ Evaluator: No execution plan or initial plan found, cannot proceed")
+            print("⚠️ Evaluator: No execution plan found")
             state["conversation_complete"] = True
             return state
         
-        # Defensive check: ensure execution_plan has steps
-        if not state["execution_plan"].get("steps"):
-            print("⚠️ Evaluator: Execution plan has no steps, cannot proceed")
-            state["conversation_complete"] = True
-            return state
+        # Count successful and failed steps
+        execution_history = state.get("execution_history", [])
+        successful_steps = [h for h in execution_history if h.get("success", False)]
+        failed_steps = [h for h in execution_history if not h.get("success", False)]
         
-        # Check if execution is complete
-        current_step_index = state.get("current_step_index", 0)
-        total_steps = len(state["execution_plan"]["steps"])
+        print(f"✅ Execution Summary:")
+        print(f"   • Total steps executed: {len(execution_history)}")
+        print(f"   • Successful: {len(successful_steps)}")
+        print(f"   • Failed: {len(failed_steps)}")
         
-        if current_step_index >= total_steps:
-            print("🏁 All execution steps complete - routing to jury for evaluation")
-            return state  # Will be routed to jury by conditional routing
+        # Log any failures for response generation awareness
+        if failed_steps:
+            print(f"⚠️ {len(failed_steps)} steps failed:")
+            for failed in failed_steps:
+                step_desc = failed.get("step", {}).get("description", "Unknown step")
+                error = failed.get("error", "Unknown error")
+                print(f"   • {step_desc}: {error}")
         
-        # Check if plan has already been processed to avoid duplicate work
-        # IMPORTANT: Also check if this plan has already been enhanced by counting validation steps
-        validation_steps = len([s for s in state["execution_plan"]["steps"] if s.get("step_type") == "validation"])
-        process_cells_steps = len([s for s in state["execution_plan"]["steps"] if s.get("function_name") == "process_cells"])
+        # Review available results
+        if self.history_manager:
+            available_results = self.history_manager.get_available_results()
+            if available_results:
+                print("📊 Available analysis results:")
+                if "enrichment_analyses" in available_results:
+                    print(f"   • Enrichment analyses: {list(available_results['enrichment_analyses'].keys())}")
+                if "dea_analyses" in available_results:
+                    print(f"   • DEA analyses: {list(available_results['dea_analyses'])}")
+                if "processed_cell_types" in available_results:
+                    print(f"   • Processed cell types: {available_results['processed_cell_types']}")
         
-        if state.get("plan_processed") or (validation_steps > 0 and validation_steps >= process_cells_steps):
-            print(f"✅ Plan already processed (validation_steps={validation_steps}, process_cells_steps={process_cells_steps}), continuing with execution")
-            return state  # Will be routed to executor
-            
-        print(f"🔧 Evaluator processing plan with {total_steps} steps...")
+        # Mark conversation as ready for response generation
+        state["conversation_complete"] = True
         
-        # Apply light processing to the plan
-        original_step_count = len(state["execution_plan"]["steps"])
+        print("✅ Evaluator: Execution review complete, proceeding to response generation")
         
-        # 1. Light consolidation - only remove exact consecutive duplicates but preserve discovery paths
-        state["execution_plan"] = self._light_consolidate_process_cells(state["execution_plan"])
-        
-        # 2. Light validation - only log warnings for missing cell types (don't remove steps)
-        self._log_missing_cell_type_warnings(state["execution_plan"])
-        
-        # 3. Add validation steps after process_cells operations
-        state["execution_plan"] = self._add_validation_steps_after_process_cells(state["execution_plan"])
-        
-        final_step_count = len(state["execution_plan"]["steps"])
-        print(f"✅ Evaluator: {original_step_count} → {final_step_count} steps")
-        print(f"   • {len([s for s in state['execution_plan']['steps'] if s.get('function_name') == 'process_cells'])} process_cells steps")
-        print(f"   • {len([s for s in state['execution_plan']['steps'] if s.get('step_type') == 'validation'])} validation steps")
-        print(f"   • {len([s for s in state['execution_plan']['steps'] if s.get('step_type') == 'analysis'])} analysis steps")
-        
-        # Mark plan as processed to prevent duplicate processing
-        state["plan_processed"] = True
-        
-        return state  # Will be routed to executor
+        return state
 
     def _light_consolidate_process_cells(self, execution_plan: Dict[str, Any]) -> Dict[str, Any]:
         """

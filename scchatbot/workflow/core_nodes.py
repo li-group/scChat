@@ -45,7 +45,6 @@ class CoreNodes:
         # Initialize state variables
         state["available_cell_types"] = self.initial_cell_types
         state["adata"] = self.adata
-        state["initial_plan"] = None
         state["execution_plan"] = None
         state["current_step_index"] = 0
         state["execution_history"] = []
@@ -54,13 +53,6 @@ class CoreNodes:
         state["function_args"] = None
         state["conversation_complete"] = False
         state["errors"] = []
-        
-        # Initialize jury system fields
-        state["jury_verdicts"] = None
-        state["jury_decision"] = None
-        state["revision_type"] = None
-        state["jury_iteration"] = 0
-        state["conflict_resolution_applied"] = False
         
         # Load function history and memory context
         state["function_history_summary"] = self.history_manager.get_available_results()
@@ -198,13 +190,30 @@ class CoreNodes:
             if unavailable_cell_types:
                 enhanced_plan = self._skip_unavailable_cell_steps(enhanced_plan, unavailable_cell_types)
             
-            # Store as initial plan (will be validated by enhanced evaluator)
-            state["initial_plan"] = enhanced_plan
+            # Apply plan processing (moved from evaluator)
+            # 1. Light consolidation - only remove exact consecutive duplicates
+            enhanced_plan = self._light_consolidate_process_cells(enhanced_plan)
+            
+            # 2. Light validation - only log warnings for missing cell types
+            self._log_missing_cell_type_warnings(enhanced_plan)
+            
+            # 3. Add validation steps after process_cells operations
+            enhanced_plan = self._add_validation_steps_after_process_cells(enhanced_plan)
+            
+            # Store as execution plan directly (planner now outputs final plan)
+            state["execution_plan"] = enhanced_plan
+            state["execution_plan"]["original_question"] = message
+            
+            # Log plan statistics
+            print(f"✅ Planner created execution plan with {len(enhanced_plan['steps'])} steps")
+            print(f"   • {len([s for s in enhanced_plan['steps'] if s.get('function_name') == 'process_cells'])} process_cells steps")
+            print(f"   • {len([s for s in enhanced_plan['steps'] if s.get('step_type') == 'validation'])} validation steps")
+            print(f"   • {len([s for s in enhanced_plan['steps'] if s.get('step_type') == 'analysis'])} analysis steps")
             
         except Exception as e:
             print(f"Planning error: {e}")
             # Fallback: create a simple conversational response plan
-            state["initial_plan"] = {
+            state["execution_plan"] = {
                 "plan_summary": "Fallback conversational response",
                 "steps": [{
                     "step_type": "conversation",
@@ -454,7 +463,7 @@ class CoreNodes:
         """
         Enhance the initial plan by adding cell discovery steps if needed.
         
-        Uses the jury system's proven cell type extraction and discovery logic.
+        Uses proven cell type extraction and discovery logic.
         """
         if not plan_data or not self.hierarchy_manager:
             return plan_data

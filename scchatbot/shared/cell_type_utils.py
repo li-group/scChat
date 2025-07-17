@@ -1,8 +1,8 @@
 """
 Shared cell type utilities.
 
-This module contains cell type related functions used by both
-workflow and jury systems, eliminating code duplication.
+This module contains cell type related functions used by the
+workflow system, eliminating code duplication.
 """
 
 import json

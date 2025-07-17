@@ -1,5 +1,5 @@
 """
-Shared result extraction utilities for jury system and response generation.
+Shared result extraction utilities for response generation.
 
 This module provides functions to extract key findings from analysis results,
 optimizing for token usage while preserving essential information.
@@ -10,7 +10,7 @@ from typing import Dict, Any, List
 
 def extract_key_findings_from_execution(execution_history: List[Dict]) -> Dict[str, Any]:
     """
-    Extract key findings from execution history - used by both jury and response generation.
+    Extract key findings from execution history for response generation.
     
     Args:
         execution_history: List of execution steps with results

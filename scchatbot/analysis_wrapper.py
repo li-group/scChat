@@ -31,8 +31,17 @@ class AnalysisFunctionWrapper:
             
             print(f"🧬 Performing enrichment analysis on {metadata.get('cell_count', 'unknown')} cells")
             
-            # Call original function with resolved adata
-            result = perform_enrichment_analyses(analysis_adata, cell_type, **kwargs)
+            # Filter kwargs to only include valid parameters for perform_enrichment_analyses
+            valid_params = {'analyses', 'logfc_threshold', 'pval_threshold', 'top_n_terms', 'include_condition_split'}
+            filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_params}
+            
+            if len(filtered_kwargs) != len(kwargs):
+                invalid_params = set(kwargs.keys()) - valid_params
+                print(f"⚠️ Filtered out invalid enrichment parameters: {invalid_params}")
+                print(f"✅ Valid parameters passed: {filtered_kwargs}")
+            
+            # Call original function with resolved adata and filtered parameters
+            result = perform_enrichment_analyses(analysis_adata, cell_type, **filtered_kwargs)
             
             # Add hierarchy metadata to result
             if isinstance(result, dict):
@@ -58,8 +67,17 @@ class AnalysisFunctionWrapper:
             
             print(f"🧬 Performing DEA on {metadata.get('cell_count', 'unknown')} cells")
             
-            # Call original function with resolved adata
-            result = dea_split_by_condition(analysis_adata, cell_type, **kwargs)
+            # Filter kwargs to only include valid parameters for dea_split_by_condition
+            valid_params = {'n_genes', 'logfc_threshold', 'pval_threshold', 'save_csv'}
+            filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_params}
+            
+            if len(filtered_kwargs) != len(kwargs):
+                invalid_params = set(kwargs.keys()) - valid_params
+                print(f"⚠️ Filtered out invalid DEA parameters: {invalid_params}")
+                print(f"✅ Valid parameters passed: {filtered_kwargs}")
+            
+            # Call original function with resolved adata and filtered parameters
+            result = dea_split_by_condition(analysis_adata, cell_type, **filtered_kwargs)
             
             # Add metadata
             if isinstance(result, (list, dict)):

@@ -41,8 +41,7 @@ class ChatState(TypedDict):
     adata: Optional[Any]
     
     # Planning and execution
-    initial_plan: Optional[Dict[str, Any]]  # Initial plan before validation
-    execution_plan: Optional[Dict[str, Any]]  # Validated plan after status checking
+    execution_plan: Optional[Dict[str, Any]]  # Final execution plan from planner
     current_step_index: int
     execution_history: List[Dict[str, Any]]
     
@@ -59,14 +58,6 @@ class ChatState(TypedDict):
     # Conversation management
     conversation_complete: bool
     errors: List[str]
-    
-    
-    # 🏛️ JURY SYSTEM FIELDS
-    jury_verdicts: Optional[Dict[str, Any]]  # Results from individual judges
-    jury_decision: Optional[Dict[str, Any]]  # Overall jury decision
-    revision_type: Optional[str]  # Type of revision applied: "presentation_only", "targeted_analysis", etc.
-    jury_iteration: int  # Number of jury evaluation cycles
-    conflict_resolution_applied: bool  # Whether conflict resolution was used
 
 
 @dataclass
