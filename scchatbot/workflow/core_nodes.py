@@ -15,6 +15,15 @@ from ..cell_type_models import ChatState, ExecutionStep
 from langchain_core.messages import HumanMessage, AIMessage
 from ..shared import extract_cell_types_from_question, needs_cell_discovery, create_cell_discovery_steps
 
+# Import EnrichmentChecker with error handling
+try:
+    from ..enrichment_checker import EnrichmentChecker
+    ENRICHMENT_CHECKER_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ EnrichmentChecker not available: {e}")
+    EnrichmentChecker = None
+    ENRICHMENT_CHECKER_AVAILABLE = False
+
 
 class CoreNodes:
     """Core workflow nodes for input processing, planning, and execution."""
@@ -32,6 +41,24 @@ class CoreNodes:
         self.function_mapping = function_mapping
         self.visualization_functions = visualization_functions
         self.simple_cache = simple_cache
+        
+        # Initialize EnrichmentChecker with error handling
+        self.enrichment_checker = None
+        self.enrichment_checker_available = False
+        
+        if ENRICHMENT_CHECKER_AVAILABLE:
+            try:
+                self.enrichment_checker = EnrichmentChecker()
+                self.enrichment_checker_available = (
+                    self.enrichment_checker.connection_status == "connected"
+                )
+                print(f"✅ EnrichmentChecker initialized: {self.enrichment_checker.connection_status}")
+            except Exception as e:
+                print(f"⚠️ EnrichmentChecker initialization failed: {e}")
+                self.enrichment_checker = None
+                self.enrichment_checker_available = False
+        else:
+            print("⚠️ EnrichmentChecker module not available")
     
     def input_processor_node(self, state: ChatState) -> ChatState:
         """Process incoming user message and initialize state"""
@@ -82,7 +109,7 @@ class CoreNodes:
     def _create_enhanced_plan(self, state: ChatState, message: str, available_functions: List, available_cell_types: List[str], function_history: Dict, unavailable_cell_types: List[str], query_type: str) -> ChatState:
         """Create enhanced plan using LLM with query type-specific guidance"""
         
-        # Get query type-specific instructions
+        # Get query type-specific instructions 
         query_guidance = self._get_query_type_guidance(query_type)
         
         planning_prompt = f"""
@@ -151,15 +178,13 @@ class CoreNodes:
         - Do NOT create complex analysis plans for interpretive questions
         
         ENRICHMENT ANALYSIS GUIDELINES:
-        - If user mentions specific analysis types, use them in the "analyses" parameter:
-          * "GSEA" or "gene set enrichment" → "analyses": ["gsea"]
-          * "GO" or "gene ontology" → "analyses": ["go"] 
-          * "KEGG" or "pathway" → "analyses": ["kegg"]
-          * "REACTOME" → "analyses": ["reactome"]
-        - If no specific type mentioned, omit "analyses" parameter (defaults to all types)
+        - For enrichment analysis steps, use MINIMAL parameters - only specify "cell_type"
+        - Do NOT specify "analyses", "gene_set_library", or "pathway_include" parameters
+        - The EnrichmentChecker will automatically determine optimal analysis methods and parameters
         - Examples:
-          * "Run GSEA analysis" → "analyses": ["gsea"]
-          * "Run enrichment analysis" → no analyses parameter (uses all)
+          * "Run GSEA analysis on T cells" → {{"cell_type": "T cell"}} (EnrichmentChecker adds analyses)
+          * "Find pathways enriched in B cells" → {{"cell_type": "B cell"}} (EnrichmentChecker determines methods)
+          * "Analyze immune pathways" → {{"cell_type": "Immune cell"}} (EnrichmentChecker handles targeting)
           
         VISUALIZATION GUIDELINES:
         - For enrichment visualization, ALWAYS prefer "display_enrichment_visualization":
@@ -185,6 +210,9 @@ class CoreNodes:
             
             # 🧬 ENHANCED PLANNER: Add cell discovery if needed 
             enhanced_plan = self._add_cell_discovery_to_plan(plan_data, message, available_cell_types)
+            
+            # Apply enrichment enhancement to all enrichment steps
+            enhanced_plan = self._enhance_all_enrichment_steps(enhanced_plan, message)
             
             # Skip steps for unavailable cell types
             if unavailable_cell_types:
@@ -261,10 +289,10 @@ class CoreNodes:
             return """
         🎯 PATHWAY-SPECIFIC QUERY DETECTED:
         - This query asks about specific pathway analysis (GSEA, GO, KEGG, REACTOME)
-        - FOCUS: Create a streamlined plan targeting the specific pathway analysis mentioned
-        - PRIORITY: Use the exact analysis type mentioned in the query
+        - FOCUS: Create a streamlined plan targeting enrichment analysis
+        - PRIORITY: Use minimal enrichment steps - EnrichmentChecker will optimize them
         - EFFICIENCY: Avoid unnecessary broader analyses unless specifically requested
-        - EXAMPLE: For "GSEA analysis of T cells" → focus on enrichment_analysis with "analyses": ["gsea"]
+        - EXAMPLE: For "GSEA analysis of T cells" → {{"cell_type": "T cell"}} (EnrichmentChecker handles method selection)
         """
         
         elif query_type == "markers":
@@ -710,3 +738,129 @@ class CoreNodes:
         # This is a simplified version - in a real implementation this would
         # use the cache manager and provide comprehensive analysis
         return f"Based on the analysis performed, here's a comprehensive answer to your question: {original_question}"
+
+    def _enhance_enrichment_step(self, step: Dict[str, Any], message: str) -> Dict[str, Any]:
+        """
+        Enhance enrichment analysis step using EnrichmentChecker intelligence.
+        
+        Args:
+            step: Enrichment step from planner with minimal parameters
+            message: Original user message for context
+            
+        Returns:
+            Enhanced step with optimal analyses and parameters
+        """
+        if not self.enrichment_checker_available:
+            print("⚠️ EnrichmentChecker unavailable, using step as-is")
+            return step
+        
+        try:
+            # Extract pathway terms from user message for context
+            pathway_terms = self._extract_pathway_terms_from_message(message)
+            
+            print(f"🧬 Enhancing enrichment step with user context: {pathway_terms or 'general analysis'}")
+            
+            # Create plan step for EnrichmentChecker
+            enrichment_plan_step = {
+                "function_name": "perform_enrichment_analyses",
+                "parameters": {
+                    "cell_type": step.get("parameters", {}).get("cell_type", "unknown"),
+                    "pathway_include": pathway_terms  # Use extracted terms or None
+                }
+            }
+            
+            # Get pathway enhancement
+            enhanced_plan = self.enrichment_checker.enhance_enrichment_plan(enrichment_plan_step)
+            
+            # Apply enhancements to the original step
+            enhanced_step = step.copy()
+            if "parameters" not in enhanced_step:
+                enhanced_step["parameters"] = {}
+                
+            # Add EnrichmentChecker recommendations
+            enhanced_step["parameters"].update({
+                "analyses": enhanced_plan["parameters"].get("analyses", ["gsea"])
+            })
+            
+            # Only add gene_set_library if it's provided (for GSEA)
+            if enhanced_plan["parameters"].get("gene_set_library"):
+                enhanced_step["parameters"]["gene_set_library"] = enhanced_plan["parameters"]["gene_set_library"]
+            
+            # Update description
+            validation_details = enhanced_plan.get("validation_details", {})
+            if validation_details:
+                enhanced_step["description"] += f" (Enhanced with pathway intelligence: {validation_details.get('total_recommendations', 0)} recommendations)"
+            
+            print(f"✅ Enhanced enrichment step: {enhanced_step['parameters']}")
+            
+            # Log enhancement statistics
+            enhancement_data = {
+                "recommended_analyses": enhanced_step["parameters"]["analyses"],
+                "gene_set_library": enhanced_step["parameters"].get("gene_set_library"),
+                "pathway_terms": pathway_terms,
+                "validation_details": validation_details
+            }
+            self._log_pathway_enhancement_stats(enhancement_data)
+            
+            return enhanced_step
+            
+        except Exception as e:
+            print(f"⚠️ Enrichment step enhancement failed: {e}")
+            return step  # Return original step on failure
+
+    def _extract_pathway_terms_from_message(self, message: str) -> str:
+        """Extract pathway terms from user message using simple keyword matching."""
+        # Simple extraction - could be enhanced with LLM in future
+        pathway_keywords = [
+            "interferon", "ifn", "apoptosis", "cell cycle", "inflammation",
+            "immune", "signaling", "metabolism", "proliferation", "differentiation",
+            "pathway", "response", "activation", "inhibition", "regulation",
+            "stimulated", "enrichment", "enriched", "analysis", "pathways"
+        ]
+        
+        message_lower = message.lower()
+        found_terms = []
+        
+        for keyword in pathway_keywords:
+            if keyword in message_lower:
+                found_terms.append(keyword)
+        
+        return " ".join(found_terms) if found_terms else None
+
+    def _enhance_all_enrichment_steps(self, plan_data: Dict[str, Any], message: str) -> Dict[str, Any]:
+        """Enhance all enrichment analysis steps in the plan using EnrichmentChecker."""
+        enhanced_steps = []
+        
+        for step in plan_data.get("steps", []):
+            if step.get("function_name") == "perform_enrichment_analyses":
+                # Enhance this enrichment step
+                enhanced_step = self._enhance_enrichment_step(step, message)
+                enhanced_steps.append(enhanced_step)
+            else:
+                # Keep non-enrichment steps as-is
+                enhanced_steps.append(step)
+        
+        plan_data["steps"] = enhanced_steps
+        return plan_data
+
+
+    def _log_pathway_enhancement_stats(self, enhancement_data: Dict[str, Any]) -> None:
+        """Log pathway enhancement statistics for monitoring."""
+        if not enhancement_data:
+            return
+        
+        validation_details = enhancement_data.get("validation_details", {})
+        
+        print("📊 PATHWAY ENHANCEMENT STATS:")
+        print(f"   • Recommended analyses: {enhancement_data['recommended_analyses']}")
+        print(f"   • Confidence: {enhancement_data.get('confidence', 0.0):.2f}")
+        print(f"   • Total recommendations: {validation_details.get('total_recommendations', 0)}")
+        print(f"   • Pathway matches: {len(validation_details.get('pathway_matches', []))}")
+
+    def __del__(self):
+        """Cleanup EnrichmentChecker connection on destruction."""
+        if hasattr(self, 'enrichment_checker') and self.enrichment_checker:
+            try:
+                self.enrichment_checker.close()
+            except:
+                pass  # Ignore cleanup errors

@@ -32,7 +32,7 @@ class AnalysisFunctionWrapper:
             print(f"🧬 Performing enrichment analysis on {metadata.get('cell_count', 'unknown')} cells")
             
             # Filter kwargs to only include valid parameters for perform_enrichment_analyses
-            valid_params = {'analyses', 'logfc_threshold', 'pval_threshold', 'top_n_terms', 'include_condition_split'}
+            valid_params = {'analyses', 'logfc_threshold', 'pval_threshold', 'top_n_terms', 'include_condition_split', 'gene_set_library'}
             filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_params}
             
             if len(filtered_kwargs) != len(kwargs):

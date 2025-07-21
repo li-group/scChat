@@ -884,7 +884,8 @@ def perform_enrichment_analyses(
     logfc_threshold: float = 1.0,
     pval_threshold: float = 0.05,
     top_n_terms: int = 10,
-    include_condition_split: bool = True
+    include_condition_split: bool = True,
+    gene_set_library: str = None
 ) -> Dict[str, Any]:
     """
     Runs reactome, go, kegg, gsea on DE genes for both full dataset and condition-specific datasets.
@@ -905,6 +906,9 @@ def perform_enrichment_analyses(
         Number of top terms to display.
     include_condition_split : bool, default=True
         Whether to perform condition-specific enrichment analysis.
+    gene_set_library : str, optional
+        Gene set library to use for GSEA analysis. Only used when 'gsea' is in analyses.
+        Examples: 'MSigDB_Hallmark_2020', 'MSigDB_Canonical_Pathways', etc.
     
     Returns:
     --------
@@ -957,8 +961,11 @@ def perform_enrichment_analyses(
                 save_plots=False
             )
         else:  # gsea
+            # Use provided gene_set_library or default
+            gsea_library = gene_set_library if gene_set_library else "MSigDB_Hallmark_2020"
             out = gsea_enrichment_analysis(
                 cell_type, sig_genes, gene_to_logfc,
+                gene_set_library=gsea_library,
                 top_n_terms=top_n_terms,
                 output_prefix="scchatbot/enrichment/gsea",
                 save_plots=False
@@ -1044,8 +1051,11 @@ def perform_enrichment_analyses(
                         save_plots=False
                     )
                 else:  # gsea
+                    # Use provided gene_set_library or default
+                    gsea_library = gene_set_library if gene_set_library else "MSigDB_Hallmark_2020"
                     out = gsea_enrichment_analysis(
                         f"{cell_type}_{category}", condition_sig_genes, condition_gene_to_logfc,
+                        gene_set_library=gsea_library,
                         top_n_terms=top_n_terms,
                         output_prefix=output_prefix,
                         save_plots=False
@@ -1155,7 +1165,48 @@ def perform_enrichment_analyses(
                 else:
                     final_result += f"    • {analysis.upper()}: No significant terms\n"
     
-    return {
+    # Prepare analysis-specific results for extract_enrichment_key_findings compatibility
+    analysis_specific_results = {}
+    
+    
+    for analysis_type in analyses:
+        analysis_key = analysis_type.lower()
+        
+        if analysis_key in per_analysis_full:
+            analysis_data = per_analysis_full[analysis_key]
+            summary_results = analysis_data.get("summary_results", [])
+            
+            
+            # Extract top terms and p-values
+            top_terms_list = []
+            top_pvalues_list = []
+            
+            for entry in summary_results[:top_n_terms]:
+                # Extract term name
+                term_name = entry.get("Term") or entry.get("name") or entry.get("pathway", "Unknown")
+                top_terms_list.append(term_name)
+                
+                # Extract p-value
+                p_val = entry.get("p_value") or entry.get("pvalue") or entry.get("P-value", "N/A")
+                top_pvalues_list.append(p_val)
+            
+            analysis_specific_results[analysis_key] = {
+                "top_terms": top_terms_list,
+                "top_pvalues": top_pvalues_list,
+                "total_significant": len(summary_results)
+            }
+            
+        else:
+            # No results for this analysis
+            analysis_specific_results[analysis_key] = {
+                "top_terms": [],
+                "top_pvalues": [],
+                "total_significant": 0
+            }
+    
+    # Combine existing structure with analysis-specific results
+    result_dict = {
+        # Existing fields for backward compatibility
         "formatted_summary": final_result,
         "top_terms": top_terms,
         "significant_genes": {
@@ -1168,3 +1219,9 @@ def perform_enrichment_analyses(
             "condition_descriptions": {cat: data.get("description", "") for cat, data in condition_results.items()}
         }
     }
+    
+    # Add analysis-specific results as top-level keys
+    result_dict.update(analysis_specific_results)
+    
+    
+    return result_dict

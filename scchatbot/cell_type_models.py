@@ -55,6 +55,9 @@ class ChatState(TypedDict):
     missing_cell_types: List[str]
     required_preprocessing: List[Dict[str, Any]]
     
+    # Query classification
+    query_type: Optional[str]                      # Detected query type
+    
     # Conversation management
     conversation_complete: bool
     errors: List[str]
