@@ -26,7 +26,7 @@ class ResponseMixin:
         Generate response using LLM synthesis of all analysis results.
         This method replaces the complex template-based response logic.
         """
-        print("🎯 UNIFIED: Generating LLM-synthesized response...")
+        print("🎯 UNIFIED: Generating LLM-synthesized response with conversation awareness...")
         
         # 1. Extract relevant results using shared utilities
         key_findings = extract_key_findings_from_execution(state.get("execution_history", []))
@@ -37,22 +37,34 @@ class ResponseMixin:
         # 3. Get failed analyses for transparency
         failed_analyses = self._get_failed_analyses(state)
         
-        # 4. Generate synthesis prompt
+        # 4. Check if we have conversation context from vector search
+        conversation_context = None
+        if state.get("has_conversation_context"):
+            # Extract conversation context from messages
+            for msg in state.get("messages", []):
+                if (isinstance(msg, AIMessage) and 
+                    msg.content.startswith("CONVERSATION_CONTEXT:")):
+                    conversation_context = msg.content[21:]  # Remove prefix
+                    print(f"🎯 UNIFIED: Found conversation context ({len(conversation_context)} chars)")
+                    break
+        
+        # 5. Generate synthesis prompt with conversation awareness
         synthesis_prompt = self._create_enhanced_synthesis_prompt(
             original_question=state.get("current_message", ""),
             key_findings=key_findings,
             failed_analyses=failed_analyses,
-            user_intent_feedback=user_intent_guidance
+            user_intent_feedback=user_intent_guidance,
+            conversation_context=conversation_context
         )
         
-        # 5. Get LLM response (text only, no plots yet)
+        # 6. Get LLM response (text only, no plots yet)
         try:
             response_text = self._call_llm_for_synthesis(synthesis_prompt)
         except Exception as e:
             print(f"❌ LLM synthesis failed: {e}")
             response_text = "I encountered an error generating the response. Please try again."
         
-        # 6. Store response WITHOUT plots (plots added separately)
+        # 7. Store response WITHOUT plots (plots added separately)
         # Format as JSON for compatibility with views.py
         response_data = {
             "response": response_text,
@@ -83,44 +95,60 @@ class ResponseMixin:
         return failed_analyses
     
     def _create_enhanced_synthesis_prompt(self, original_question: str, key_findings: Dict[str, Any], 
-                                         failed_analyses: List[Dict], user_intent_feedback: Dict) -> str:
-        """Create prompt for synthesizing analysis results."""
+                                         failed_analyses: List[Dict], user_intent_feedback: Dict,
+                                         conversation_context: str = None) -> str:
+        """Create prompt for synthesizing analysis results with conversation awareness."""
         
         prompt = f"""You are a single-cell RNA-seq analysis expert. 
 
-USER'S QUESTION: "{original_question}"
+                    USER'S QUESTION: "{original_question}"
+                    """
 
-ANALYSIS RESULTS:
-{format_findings_for_synthesis(key_findings)}
-"""
+        # Add conversation context if available
+        if conversation_context:
+            prompt += f"""
+                        {conversation_context}
+
+                        Please consider the conversation history above when formulating your response.
+                        """
+
+        prompt += f"""
+                    CURRENT ANALYSIS RESULTS:
+                    {format_findings_for_synthesis(key_findings)}
+                    """
 
         # Add failed analyses if any
         if failed_analyses:
-            prompt += f"""
-FAILED ANALYSES:
-"""
+            prompt += "\n\nFAILED ANALYSES:\n"
             for failure in failed_analyses:
                 prompt += f"- {failure['function']}: {failure['error']}\n"
 
         # Add user intent feedback if available
         if user_intent_feedback:
             prompt += f"""
-USER INTENT GUIDANCE:
-- Answer Format Required: {user_intent_feedback.get('answer_format', 'direct_answer')}
-- Key Elements to Include: {', '.join(user_intent_feedback.get('required_elements', []))}
-- Focus Areas: {', '.join(user_intent_feedback.get('key_focus_areas', []))}
-"""
+                        USER INTENT GUIDANCE:
+                        - Answer Format Required: {user_intent_feedback.get('answer_format', 'direct_answer')}
+                        - Key Elements to Include: {', '.join(user_intent_feedback.get('required_elements', []))}
+                        - Focus Areas: {', '.join(user_intent_feedback.get('key_focus_areas', []))}
+                        """
 
         prompt += """
-INSTRUCTIONS:
-1. Answer the user's question directly using the available data
-2. Use specific gene names, pathways, and statistics from the results
-3. If analyses failed, acknowledge this but provide insights using available data and biological knowledge
-4. For comparisons, list concrete distinguishing features with specific molecular evidence
-5. Be comprehensive but concise
-6. Focus on answering the specific question asked, not providing general information
+                INSTRUCTIONS:
+                1. Answer the user's question directly using the available data
+                2. Use specific gene names, pathways, and statistics from the results
+                3. If analyses failed, acknowledge this but provide insights using available data and biological knowledge
+                4. For comparisons, list concrete distinguishing features with specific molecular evidence
+                5. Be comprehensive but concise
+                6. Focus on answering the specific question asked, not providing general information"""
+        
+        # Add conversation-aware instructions if context exists
+        if conversation_context:
+            prompt += """
+                    7. Consider the conversation history and maintain continuity
+                    8. Reference specific previous discussions when relevant
+                    9. If the user is referring to something from earlier, address it specifically"""
 
-Answer:"""
+        prompt += "\n\nAnswer:"
         
         return prompt
     

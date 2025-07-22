@@ -8,7 +8,6 @@ This module contains the basic node implementations:
 """
 
 import json
-import openai
 from typing import Dict, Any, List
 from datetime import datetime
 
@@ -62,10 +61,52 @@ class CoreNodes:
             print("⚠️ EnrichmentChecker module not available")
     
     def input_processor_node(self, state: ChatState) -> ChatState:
-        """Process incoming user message and initialize state"""
+        """Process incoming user message with LLM-driven conversation context retrieval"""
         # Initialize state if this is a new conversation
         if not state.get("messages"):
             state["messages"] = [AIMessage(content=self.initial_annotation_content)]
+        
+        current_message = state["current_message"]
+        state["has_conversation_context"] = False
+        
+        # Use LLM to determine if context is needed and generate search queries
+        if hasattr(self.history_manager, 'search_conversations'):
+            context_analysis_prompt = f"""
+User asked: "{current_message}"
+
+If this question seems to reference or build upon previous conversations, 
+generate 1-3 search queries to find relevant context.
+
+Return a JSON list of search queries, or an empty list if no context is needed.
+Only return the JSON list, nothing else.
+"""
+            
+            try:
+                # LLM decides if context is needed and what to search for
+                search_queries_json = self._call_llm(context_analysis_prompt)
+                search_queries = json.loads(search_queries_json)
+                
+                if search_queries:
+                    print(f"🧠 LLM generated {len(search_queries)} search queries: {search_queries}")
+                    
+                    # Retrieve context using LLM-generated queries
+                    all_results = []
+                    for query in search_queries[:3]:  # Limit to 3 queries
+                        results = self.history_manager.search_conversations(query, k=2)
+                        all_results.extend(results)
+                    
+                    if all_results:
+                        # Format and add context to state
+                        context = self.history_manager.format_search_results(all_results)
+                        state["messages"].append(
+                            AIMessage(content=f"CONVERSATION_CONTEXT: {context}")
+                        )
+                        state["has_conversation_context"] = True
+                        print(f"✅ Retrieved conversation context ({len(context)} chars)")
+                    
+            except Exception as e:
+                # Silent fail - continue without context
+                print(f"⚠️ Context retrieval skipped: {e}")
         
         # Add user message
         state["messages"].append(HumanMessage(content=state["current_message"]))
@@ -200,14 +241,25 @@ class CoreNodes:
         """
         
         try:
-            response = openai.chat.completions.create(
+            from langchain_openai import ChatOpenAI
+            from langchain_core.messages import SystemMessage, HumanMessage
+            
+            # Create messages in LangChain format
+            messages = [
+                SystemMessage(content="You are a bioinformatics analysis planner. Generate execution plans in JSON format."),
+                HumanMessage(content=planning_prompt)
+            ]
+            
+            # Initialize model
+            model = ChatOpenAI(
                 model="gpt-4o",
-                messages=[{"role": "user", "content": planning_prompt}],
                 temperature=0.1,
-                response_format={"type": "json_object"}
+                model_kwargs={"response_format": {"type": "json_object"}}
             )
             
-            plan_data = json.loads(response.choices[0].message.content)
+            # Get response
+            response = model.invoke(messages)
+            plan_data = json.loads(response.content)
             
             # 🧬 ENHANCED PLANNER: Add cell discovery if needed 
             enhanced_plan = self._add_cell_discovery_to_plan(plan_data, message, available_cell_types)
@@ -1232,6 +1284,33 @@ class CoreNodes:
         
         print(f"{'='*60}\n")
 
+    def _call_llm(self, prompt: str) -> str:
+        """Simple LLM call for analysis tasks using LangChain"""
+        try:
+            from langchain_openai import ChatOpenAI
+            from langchain_core.messages import SystemMessage, HumanMessage
+            
+            # Create messages in LangChain format
+            messages = [
+                SystemMessage(content="You are a helpful assistant that analyzes questions and generates search queries."),
+                HumanMessage(content=prompt)
+            ]
+            
+            # Initialize model
+            model = ChatOpenAI(
+                model="gpt-4",
+                temperature=0.1,  # Low temperature for consistency
+                max_tokens=500   # Reasonable limit for search queries
+            )
+            
+            # Get response
+            response = model.invoke(messages)
+            return response.content.strip()
+            
+        except Exception as e:
+            print(f"⚠️ LLM call failed: {e}")
+            return "[]"  # Safe default for JSON parsing
+    
     def __del__(self):
         """Cleanup EnrichmentChecker connection on destruction."""
         if hasattr(self, 'enrichment_checker') and self.enrichment_checker:

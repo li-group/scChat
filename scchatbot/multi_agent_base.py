@@ -28,6 +28,7 @@ from .visualizations import (
 from .utils import clear_directory
 from .cell_type_models import ChatState
 from .function_history import FunctionHistoryManager
+from .enhanced_function_history import EnhancedFunctionHistoryManager
 from .cache_manager import SimpleIntelligentCache
 from .cell_type_hierarchy import HierarchicalCellTypeManager, CellTypeExtractor
 from .analysis_wrapper import AnalysisFunctionWrapper
@@ -51,7 +52,7 @@ class MultiAgentChatBot:
         self.adata = None
         
         # Initialize memory and awareness systems
-        self.history_manager = FunctionHistoryManager()
+        self.history_manager = EnhancedFunctionHistoryManager()
         
         # Initialize intelligent cache with insights
         self.simple_cache = SimpleIntelligentCache()
@@ -451,8 +452,8 @@ class MultiAgentChatBot:
         else:
             return "continue"
 
-    def send_message(self, message: str) -> str:
-        """Send a message to the chatbot and get response"""
+    def send_message(self, message: str, session_id: str = "default") -> str:
+        """Send a message to the chatbot and get response with conversation tracking"""
         try:
             # Create initial state with all required fields
             initial_state: ChatState = {
@@ -471,15 +472,49 @@ class MultiAgentChatBot:
                 "missing_cell_types": [],
                 "required_preprocessing": [],
                 "conversation_complete": False,
-                "errors": []
+                "errors": [],
+                "session_id": session_id  # Add session tracking
             }
             
             # Invoke the workflow with recursion limit
             config = RunnableConfig(recursion_limit=100)
             final_state = self.workflow.invoke(initial_state, config=config)
             
-            # Extract response - return it directly as the original did
-            return final_state.get("response", "Analysis completed, but no response generated.")
+            # Extract response
+            response = final_state.get("response", "Analysis completed, but no response generated.")
+            
+            # Record conversation in vector database if using enhanced history manager
+            if hasattr(self.history_manager, 'record_conversation_with_vector'):
+                try:
+                    # Extract clean response text
+                    if response.startswith('{'):
+                        response_data = json.loads(response)
+                        response_text = response_data.get("response", response)
+                    else:
+                        response_text = response
+                    
+                    # Get analysis context for richer metadata
+                    analysis_context = {
+                        "execution_steps": len(final_state.get("execution_history", [])),
+                        "successful_analyses": len([h for h in final_state.get("execution_history", []) 
+                                                  if h.get("success", False)]),
+                        "available_cell_types": final_state.get("available_cell_types", []),
+                        "has_plots": bool(final_state.get("available_plots", []))
+                    }
+                    
+                    # Record in vector database
+                    self.history_manager.record_conversation_with_vector(
+                        user_message=message,
+                        bot_response=response_text,
+                        session_id=session_id,
+                        analysis_context=analysis_context
+                    )
+                    print("✅ Conversation recorded in vector database")
+                    
+                except Exception as e:
+                    print(f"⚠️ Failed to record conversation in vector database: {e}")
+            
+            return response
                 
         except Exception as e:
             print(f"❌ Error in workflow execution: {e}")

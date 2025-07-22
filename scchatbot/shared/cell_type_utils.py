@@ -6,7 +6,6 @@ workflow system, eliminating code duplication.
 """
 
 import json
-import openai
 from typing import List, Dict, Any
 
 
@@ -71,14 +70,25 @@ def extract_cell_types_from_question(question: str, hierarchy_manager=None) -> L
     """
     
     try:
-        response = openai.chat.completions.create(
+        from langchain_openai import ChatOpenAI
+        from langchain_core.messages import SystemMessage, HumanMessage
+        
+        # Create messages in LangChain format
+        messages = [
+            SystemMessage(content="You are an expert in single-cell analysis and cell type identification. Generate responses in JSON format."),
+            HumanMessage(content=llm_prompt)
+        ]
+        
+        # Initialize model
+        model = ChatOpenAI(
             model="gpt-4o",
-            messages=[{"role": "user", "content": llm_prompt}],
             temperature=0.1,
-            response_format={"type": "json_object"}
+            model_kwargs={"response_format": {"type": "json_object"}}
         )
         
-        result = json.loads(response.choices[0].message.content)
+        # Get response
+        response = model.invoke(messages)
+        result = json.loads(response.content)
         identified_types = result.get("identified_cell_types", [])
         reasoning = result.get("reasoning", "")
         

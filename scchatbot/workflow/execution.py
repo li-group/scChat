@@ -9,7 +9,6 @@ This module contains execution-related methods extracted from workflow_nodes.py:
 """
 
 import json
-import openai
 import re
 from typing import Dict, Any, List
 
@@ -73,15 +72,26 @@ class ExecutionMixin:
                             Your response should cite the actual analysis results, not general knowledge or previous conversations."""
 
         try:
-            # Use OpenAI to generate comprehensive response
-            response = openai.chat.completions.create(
+            # Use LangChain to generate comprehensive response
+            from langchain_openai import ChatOpenAI
+            from langchain_core.messages import SystemMessage, HumanMessage
+            
+            # Create messages in LangChain format
+            messages = [
+                SystemMessage(content="You are an expert in single-cell RNA-seq analysis. Provide comprehensive, scientifically accurate responses."),
+                HumanMessage(content=final_prompt)
+            ]
+            
+            # Initialize model
+            model = ChatOpenAI(
                 model="gpt-4o",
-                messages=[{"role": "user", "content": final_prompt}],
                 temperature=0.2,  # Lower temperature for more consistent responses
                 max_tokens=1500
             )
             
-            final_answer = response.choices[0].message.content
+            # Get response
+            response = model.invoke(messages)
+            final_answer = response.content
             
             # 📊 Log cache usage
             if cached_context and "No cached analysis results found" not in cached_context:

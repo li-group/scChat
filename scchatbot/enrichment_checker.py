@@ -4,12 +4,8 @@ import os
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 
-try:
-    import openai
-    OPENAI_AVAILABLE = True
-except ImportError:
-    OPENAI_AVAILABLE = False
-    openai = None
+# OpenAI functionality now handled through LangChain
+OPENAI_AVAILABLE = True
 
 try:
     from dotenv import load_dotenv
@@ -269,15 +265,26 @@ class EnrichmentChecker:
             
             Return only the JSON:"""
             
-            response = openai.chat.completions.create(
+            from langchain_openai import ChatOpenAI
+            from langchain_core.messages import SystemMessage, HumanMessage
+            
+            # Create messages in LangChain format
+            messages = [
+                SystemMessage(content="You are an expert in pathway analysis. Generate responses in JSON format."),
+                HumanMessage(content=prompt)
+            ]
+            
+            # Initialize model
+            model = ChatOpenAI(
                 model="gpt-4o",
-                messages=[{"role": "user", "content": prompt}],
                 temperature=0.1,
                 max_tokens=500,
-                response_format={"type": "json_object"}
+                model_kwargs={"response_format": {"type": "json_object"}}
             )
             
-            content = response.choices[0].message.content.strip()
+            # Get response
+            response = model.invoke(messages)
+            content = response.content.strip()
             
             # Clean up the response to extract JSON
             if not content:
@@ -913,14 +920,25 @@ class EnrichmentChecker:
             Clean pathway term:
             """
             
-            response = openai.chat.completions.create(
+            from langchain_openai import ChatOpenAI
+            from langchain_core.messages import SystemMessage, HumanMessage
+            
+            # Create messages in LangChain format
+            messages = [
+                SystemMessage(content="You are an expert at cleaning pathway query terms."),
+                HumanMessage(content=prompt)
+            ]
+            
+            # Initialize model
+            model = ChatOpenAI(
                 model="gpt-4o",
-                messages=[{"role": "user", "content": prompt}],
                 temperature=0.1,
                 max_tokens=200
             )
             
-            cleaned = response.choices[0].message.content.strip()
+            # Get response
+            response = model.invoke(messages)
+            cleaned = response.content.strip()
             print(f"✅ EnrichmentChecker: Cleaned '{pathway_query}' → '{cleaned}'")
             return cleaned
             
@@ -1184,14 +1202,25 @@ class EnrichmentChecker:
             Synonyms:
             """
             
-            response = openai.chat.completions.create(
+            from langchain_openai import ChatOpenAI
+            from langchain_core.messages import SystemMessage, HumanMessage
+            
+            # Create messages in LangChain format
+            messages = [
+                SystemMessage(content="You are an expert in biological pathway terminology. Generate biological synonyms."),
+                HumanMessage(content=prompt)
+            ]
+            
+            # Initialize model
+            model = ChatOpenAI(
                 model="gpt-4o",
-                messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
                 max_tokens=100
             )
             
-            content = response.choices[0].message.content.strip()
+            # Get response
+            response = model.invoke(messages)
+            content = response.content.strip()
             synonyms = [line.strip().lstrip('- ') for line in content.split('\n') if line.strip() and not line.strip().startswith('Query:')]
             
             print(f"🔍 Generated synonyms for '{pathway_query}': {synonyms}")
