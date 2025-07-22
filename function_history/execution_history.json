@@ -1,6 +1,6 @@
 [
   {
-    "timestamp": "2025-07-22T16:24:11.789627",
+    "timestamp": "2025-07-22T16:45:36.625845",
     "function_name": "process_cells",
     "parameters": {
       "cell_type": "Stromal cell"
@@ -10,34 +10,34 @@
     "result_summary": "Annotation complete for Stromal cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Beam cell', '1': 'Fibroblast', '2': 'Trabecular meshwork cell', '3': 'Mural cell', '4': 'Endothelial cell', '5': 'Fibroblast', '6': 'Fibroblast', '7': 'Fibroblast', '8': 'Fibroblast', '9': 'Fibroblast', '10': 'Myocyte'}.\n\u2022 Top-genes per cluster: {'0': ['PTGDS', 'MMP2', 'COL6A2', 'COL15A1', 'CTSK', 'DCN', 'CLEC11A', 'RAMP2', 'COL6A1', 'S100A4', 'FABP5', 'APOE', 'EDNRB', 'SERPINF1', 'MDK', 'CFD', 'APOD"
   },
   {
-    "timestamp": "2025-07-22T16:25:49.950767",
+    "timestamp": "2025-07-22T16:46:07.132397",
     "function_name": "perform_enrichment_analyses",
     "parameters": {
       "cell_type": "Endothelial cell",
       "analyses": [
         "go",
-        "reactome",
         "kegg",
+        "reactome",
         "gsea"
       ],
       "gene_set_library": "MSigDB_Hallmark_2020"
     },
     "success": true,
     "error": null,
-    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Endothelial cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, reactome, kegg, gsea\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 100\\n\\n  \u2022 GO Results:\\n    1. cell adhesion (p-value: 7.239053219693741e-11)\\n       Genes: \\n    2. blood vessel morphogenesis (p-v"
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Endothelial cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, kegg, reactome, gsea\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 100\\n\\n  \u2022 GO Results:\\n    1. cell adhesion (p-value: 7.239053219693741e-11)\\n       Genes: \\n    2. blood vessel morphogenesis (p-v"
   },
   {
-    "timestamp": "2025-07-22T16:25:50.254700",
+    "timestamp": "2025-07-22T16:46:07.419838",
     "function_name": "display_enrichment_visualization",
     "parameters": {
       "analysis": "gsea"
     },
     "success": true,
     "error": null,
-    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"fdb56896-c242-4f7b-bbd4-8ecae7b89975\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
+    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"af6389f7-3af8-4bd0-b604-44940d386342\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
   },
   {
-    "timestamp": "2025-07-22T16:26:26.429704",
+    "timestamp": "2025-07-22T16:46:31.044907",
     "function_name": "process_cells",
     "parameters": {
       "cell_type": "Stromal cell"
@@ -47,7 +47,7 @@
     "result_summary": "Process cells completed, but no new cell types were discovered."
   },
   {
-    "timestamp": "2025-07-22T16:26:26.433434",
+    "timestamp": "2025-07-22T16:46:31.048068",
     "function_name": "perform_enrichment_analyses",
     "parameters": {
       "cell_type": "Endothelial cell",
@@ -61,13 +61,13 @@
     "result_summary": "{'status': 'cached_result', 'file_path': 'scchatbot/enrichment/gsea/results_summary_Endothelial cell.csv', 'data':                                  Term   p_value  ...  avg_log2fc                              intersecting_genes\n0           Interferon Gamma Response  0.000007  ...    3.780070  SELP;CD74;ARL4A;PNP;IFI27;VAMP5;HLA-DRB1;ICAM1\n1                   KRAS Signaling Up  0.000007  ...    4.723465   ABCB1;SPARCL1;CPE;TFPI;ADGRL4;GNG11;MPZL2;ENG\n2                IL-2/STAT5 Signaling  0.00006"
   },
   {
-    "timestamp": "2025-07-22T16:26:26.476599",
+    "timestamp": "2025-07-22T16:46:31.091481",
     "function_name": "display_enrichment_visualization",
     "parameters": {
       "analysis": "gsea"
     },
     "success": true,
     "error": null,
-    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"13fa2059-940b-4bf4-b2c6-41a124041d9b\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
+    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"65ed5934-a99c-40f3-9a76-ddd01eda6877\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
   }
 ]

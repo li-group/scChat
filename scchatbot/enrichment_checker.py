@@ -13,10 +13,6 @@ try:
 except ImportError:
     pass
 
-# Set OpenAI API key if available
-if OPENAI_AVAILABLE:
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-
 try:
     from neo4j import GraphDatabase
     NEO4J_AVAILABLE = True

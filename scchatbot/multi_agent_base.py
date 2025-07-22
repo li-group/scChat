@@ -28,7 +28,6 @@ from .visualizations import (
 from .utils import clear_directory
 from .cell_type_models import ChatState
 from .function_history import FunctionHistoryManager
-from .enhanced_function_history import EnhancedFunctionHistoryManager
 from .cache_manager import SimpleIntelligentCache
 from .cell_type_hierarchy import HierarchicalCellTypeManager, CellTypeExtractor
 from .analysis_wrapper import AnalysisFunctionWrapper
@@ -52,7 +51,7 @@ class MultiAgentChatBot:
         self.adata = None
         
         # Initialize memory and awareness systems
-        self.history_manager = EnhancedFunctionHistoryManager()
+        self.history_manager = FunctionHistoryManager()
         
         # Initialize intelligent cache with insights
         self.simple_cache = SimpleIntelligentCache()
