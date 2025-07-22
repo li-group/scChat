@@ -48,7 +48,7 @@ def extract_cell_types_from_question(question: str, hierarchy_manager=None) -> L
     USER QUESTION: "{question}"
     
     VALID CELL TYPES FROM DATABASE:
-    {', '.join(valid_cell_types[:50])}{'...' if len(valid_cell_types) > 50 else ''}
+    {', '.join(valid_cell_types)}
     
     Your task:
     1. Identify any cell types mentioned in the question (handle synonyms, abbreviations, variations)

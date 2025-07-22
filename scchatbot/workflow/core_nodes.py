@@ -10,6 +10,7 @@ This module contains the basic node implementations:
 import json
 import openai
 from typing import Dict, Any, List
+from datetime import datetime
 
 from ..cell_type_models import ChatState, ExecutionStep
 from langchain_core.messages import HumanMessage, AIMessage
@@ -344,6 +345,73 @@ class CoreNodes:
         - EFFICIENCY: Include appropriate analysis and visualization steps
         """
 
+    def _store_execution_result(self, step_data: Dict, result: Any, success: bool) -> Dict[str, Any]:
+        """
+        New intelligent result storage that preserves structure for critical functions
+        """
+        function_name = step_data.get("function_name", "")
+        
+        # Critical functions that need full structure preservation
+        STRUCTURE_PRESERVED_FUNCTIONS = {
+            "perform_enrichment_analyses",
+            "dea_split_by_condition", 
+            "process_cells",
+            "compare_cell_counts"
+        }
+        
+        if function_name in STRUCTURE_PRESERVED_FUNCTIONS and success:
+            return {
+                "result_type": "structured",
+                "result": result,  # Full structured data
+                "result_summary": self._create_result_summary(function_name, result)
+            }
+        
+        elif function_name.startswith("display_") and success:
+            # Visualization functions - keep HTML but add metadata
+            return {
+                "result_type": "visualization", 
+                "result": result,  # Full HTML
+                "result_metadata": self._extract_viz_metadata(function_name, result),
+                "result_summary": f"Visualization generated: {function_name}"
+            }
+        
+        else:
+            # Other functions - use existing truncation
+            return {
+                "result_type": "text",
+                "result": str(result)[:500] if result else "Success",
+                "result_summary": str(result)[:100] if result else "Success"
+            }
+
+    def _create_result_summary(self, function_name: str, result: Any) -> str:
+        """Create human-readable summaries for logging while preserving full data"""
+        
+        if function_name == "perform_enrichment_analyses" and isinstance(result, dict):
+            summary_parts = []
+            for analysis_type in ["go", "kegg", "reactome", "gsea"]:
+                if analysis_type in result:
+                    count = result[analysis_type].get("total_significant", 0)
+                    summary_parts.append(f"{analysis_type.upper()}: {count} terms")
+            return f"Enrichment: {', '.join(summary_parts)}"
+        
+        elif function_name == "process_cells":
+            if isinstance(result, str) and "discovered" in result.lower():
+                return f"Process cells: Discovery completed"
+            return f"Process cells: {str(result)[:100]}"
+        
+        elif function_name == "dea_split_by_condition":
+            return f"DEA: Analysis completed"
+        
+        return str(result)[:100]
+
+    def _extract_viz_metadata(self, function_name: str, result: Any) -> Dict[str, Any]:
+        """Extract metadata from visualization results"""
+        return {
+            "visualization_type": function_name,
+            "html_length": len(result) if isinstance(result, str) else 0,
+            "contains_html": bool(isinstance(result, str) and ('<div' in result or '<html' in result))
+        }
+
     def executor_node(self, state: ChatState) -> ChatState:
         """Execute the current step in the plan with hierarchy awareness and validation"""
         if not state["execution_plan"] or state["current_step_index"] >= len(state["execution_plan"]["steps"]):
@@ -413,8 +481,30 @@ class CoreNodes:
                 if step.function_name in self.visualization_functions:
                     print(f"🔍 STEP DEBUG: Calling visualization function '{step.function_name}' with step parameters: {step.parameters}")
                 
+                # For visualization functions, enhance parameters with cell_type from execution context if missing
+                enhanced_params = step.parameters.copy()
+                if step.function_name in self.visualization_functions and "cell_type" not in enhanced_params:
+                    # Look for cell_type in recent execution history
+                    execution_history = state.get("execution_history", [])
+                    
+                    for recent_execution in reversed(execution_history[-5:]):  # Check last 5 executions
+                        step_data = recent_execution.get("step", {})
+                        step_params = step_data.get("parameters", {})
+                        
+                        if recent_execution.get("success") and "cell_type" in step_params:
+                            cell_type = step_params["cell_type"]
+                            if cell_type != "overall":  # Skip generic cell types
+                                enhanced_params["cell_type"] = cell_type
+                                print(f"🔧 Enhanced visualization with cell_type from execution context: {cell_type}")
+                                break
+                    
+                    # If still no cell_type found, use default
+                    if "cell_type" not in enhanced_params:
+                        enhanced_params["cell_type"] = "overall"
+                        print(f"⚠️ WARNING: cell_type defaulted to 'overall' - this may indicate planner issue.")
+                
                 func = self.function_mapping[step.function_name]
-                result = func(**step.parameters)
+                result = func(**enhanced_params)
                 success = True
             
                 if step.function_name == "process_cells" and self.hierarchy_manager:
@@ -460,23 +550,27 @@ class CoreNodes:
                 error=error_msg
             )
         
-        # Record execution in state with special handling for visualization functions
-        is_visualization = step_data.get("function_name", "") in self.visualization_functions
-        
-        # Don't truncate visualization results as they contain HTML plots
-        if is_visualization and result and isinstance(result, str):
-            stored_result = str(result)  # Keep full HTML content
-            print(f"🎨 Visualization result stored: {len(stored_result)} chars, contains HTML: {bool('<div' in stored_result or '<html' in stored_result)}")
-        else:
-            stored_result = str(result)[:500] if result else "Success"  # Truncate other results
+        # Record execution in state using new structured storage approach
+        result_storage = self._store_execution_result(step_data, result, success)
         
         state["execution_history"].append({
             "step_index": state["current_step_index"],
             "step": step_data,
             "success": success,
-            "result": stored_result,
+            "result": result_storage["result"],  # Full structure preserved for critical functions
+            "result_type": result_storage["result_type"],
+            "result_summary": result_storage["result_summary"],  # For logging
             "error": error_msg
         })
+        
+        # Log storage decision for monitoring
+        function_name = step_data.get("function_name", "")
+        if result_storage["result_type"] == "structured":
+            print(f"📊 Structured storage: {function_name} - Full data preserved")
+        elif result_storage["result_type"] == "visualization":
+            print(f"🎨 Visualization storage: {function_name} - HTML preserved")
+        else:
+            print(f"📄 Text storage: {function_name} - Truncated to 500 chars")
         
         # Increment step index if step was successful
         if success:
@@ -856,6 +950,287 @@ class CoreNodes:
         print(f"   • Confidence: {enhancement_data.get('confidence', 0.0):.2f}")
         print(f"   • Total recommendations: {validation_details.get('total_recommendations', 0)}")
         print(f"   • Pathway matches: {len(validation_details.get('pathway_matches', []))}")
+
+    def step_evaluator_node(self, state: ChatState) -> ChatState:
+        """
+        Version 1: Step-by-step evaluation with checking only (NO plan modifications)
+        
+        Evaluates the most recent execution step and logs detailed findings.
+        Builds evaluation history for future adaptive capabilities.
+        """
+        
+        print("🔍 STEP EVALUATOR V1: Starting step-by-step evaluation...")
+        
+        # Get the most recent execution
+        execution_history = state.get("execution_history", [])
+        if not execution_history:
+            print("⚠️ No execution history found for evaluation")
+            state["last_step_evaluation"] = {"status": "no_history", "critical_failure": False}
+            return state
+        
+        last_execution = execution_history[-1]
+        step_index = last_execution.get("step_index", -1)
+        
+        # FIX: The execution history stores function_name directly, not in a 'step' sub-dict
+        function_name = last_execution.get('function_name', 'unknown')
+        
+        print(f"🔍 Evaluating step {step_index + 1}: {function_name}")
+        
+        # Perform comprehensive evaluation
+        evaluation = self._evaluate_single_step_v1(last_execution, state)
+        
+        # Store evaluation results
+        state["last_step_evaluation"] = evaluation
+        
+        # Build evaluation history
+        step_eval_history = state.get("step_evaluation_history", [])
+        step_eval_history.append(evaluation)
+        state["step_evaluation_history"] = step_eval_history
+        
+        # Log results (for monitoring and debugging)
+        self._log_step_evaluation(evaluation)
+        
+        print(f"✅ STEP EVALUATOR V1: Evaluation complete for step {step_index + 1}")
+        return state
+
+    def _evaluate_single_step_v1(self, execution: Dict[str, Any], state: ChatState) -> Dict[str, Any]:
+        """Comprehensive step evaluation leveraging fixed storage format"""
+        
+        # FIX: The execution history structure stores data directly, not in 'step' sub-dict
+        result = execution.get("result")
+        result_summary = execution.get("result_summary")  # This might be the actual result
+        result_type = execution.get("result_type", "text")
+        success = execution.get("success", False)
+        function_name = execution.get("function_name", "")
+        step_index = execution.get("step_index", -1)
+        
+        # Use result_summary if result is None (common case)
+        if result is None and result_summary is not None:
+            result = result_summary
+        
+        
+        # Base evaluation structure
+        evaluation = {
+            "step_index": step_index,
+            "function_name": function_name,
+            "success": success,
+            "result_type": result_type,
+            "timestamp": datetime.now().isoformat(),
+            "evaluation_version": "v1_checking_only",
+            "critical_failure": False
+        }
+        
+        if not success:
+            # Evaluate failure
+            evaluation.update(self._evaluate_step_failure(execution, state))
+        else:
+            # Evaluate success - use appropriate method based on result type
+            if result_type == "structured":
+                evaluation.update(self._evaluate_structured_result(function_name, result, state))
+            else:
+                evaluation.update(self._evaluate_text_result(function_name, result, state))
+            
+            # Function-specific evaluations
+            evaluation.update(self._evaluate_function_specific(function_name, result, result_type, state))
+        
+        return evaluation
+
+    def _evaluate_step_failure(self, execution: Dict[str, Any], state: ChatState) -> Dict[str, Any]:
+        """Evaluate failed execution steps"""
+        error_msg = execution.get("error", "Unknown error")
+        function_name = execution.get("function_name", "")
+        
+        # Determine if this is a critical failure
+        critical_errors = [
+            "ImportError", "ModuleNotFoundError", "AttributeError",
+            "FileNotFoundError", "PermissionError"
+        ]
+        
+        is_critical = any(critical_error in error_msg for critical_error in critical_errors)
+        
+        return {
+            "failure_evaluation": {
+                "error_message": error_msg,
+                "error_category": "system_error" if is_critical else "analysis_error",
+                "suggested_action": "abort_workflow" if is_critical else "continue_with_caution"
+            },
+            "critical_failure": is_critical
+        }
+
+    def _evaluate_structured_result(self, function_name: str, result: Any, state: ChatState) -> Dict[str, Any]:
+        """Evaluate structured results from critical functions"""
+        return {
+            "data_quality": "high_structured_access",
+            "data_completeness": "full",
+            "parsing_issues": None
+        }
+
+    def _evaluate_text_result(self, function_name: str, result: Any, state: ChatState) -> Dict[str, Any]:
+        """Evaluate legacy text results"""
+        result_length = len(str(result)) if result else 0
+        
+        return {
+            "data_quality": "legacy_text_parsing",
+            "data_completeness": "limited" if result_length >= 500 else "full",
+            "parsing_issues": "truncation_likely" if result_length >= 500 else None
+        }
+
+    def _evaluate_function_specific(self, function_name: str, result: Any, 
+                                   result_type: str, state: ChatState) -> Dict[str, Any]:
+        """Function-specific evaluation logic"""
+        
+        if function_name == "perform_enrichment_analyses":
+            return self._evaluate_enrichment_analysis(result, result_type, state)
+        
+        elif function_name == "process_cells":
+            return self._evaluate_process_cells(result, result_type, state)
+        
+        elif function_name == "dea_split_by_condition":
+            return self._evaluate_dea_analysis(result, result_type, state)
+        
+        elif function_name.startswith("display_"):
+            return self._evaluate_visualization(function_name, result, result_type, state)
+        
+        return {"function_evaluation": "generic_success"}
+
+    def _evaluate_enrichment_analysis(self, result: Any, result_type: str, state: ChatState) -> Dict[str, Any]:
+        """Detailed enrichment analysis evaluation"""
+        
+        if result_type == "structured":
+            # Direct structured access - no parsing needed!
+            pathway_counts = {}
+            total_pathways = 0
+            significant_methods = []
+            
+            # Add type check before dictionary access
+            if not isinstance(result, dict):
+                return {"error": f"Expected dict but got {type(result)}"}
+            
+            for analysis_type in ["go", "kegg", "reactome", "gsea"]:
+                if analysis_type in result and isinstance(result[analysis_type], dict):
+                    count = result[analysis_type].get("total_significant", 0)
+                    pathway_counts[analysis_type] = count
+                    total_pathways += count
+                    
+                    if count > 0:
+                        significant_methods.append(analysis_type.upper())
+            
+            evaluation = {
+                "enrichment_evaluation": {
+                    "pathway_counts": pathway_counts,
+                    "total_significant_pathways": total_pathways,
+                    "successful_methods": significant_methods,
+                    "method_count": len(significant_methods),
+                    "data_quality": "high_structured_access",
+                    "top_pathways": {
+                        method.lower(): result.get(method.lower(), {}).get("top_terms", [])[:3]
+                        for method in significant_methods
+                    }
+                }
+            }
+            
+            # Quality assessment
+            if total_pathways == 0:
+                evaluation["enrichment_evaluation"]["concerns"] = [
+                    "No significant pathways found in any method",
+                    "Consider adjusting parameters or trying different approaches"
+                ]
+            elif total_pathways > 100:
+                evaluation["enrichment_evaluation"]["highlights"] = [
+                    f"Rich pathway enrichment found ({total_pathways} total)",
+                    f"Successful methods: {', '.join(significant_methods)}"
+                ]
+            
+            return evaluation
+        
+        else:
+            # Legacy text parsing (will be deprecated after storage fix)
+            return {"enrichment_evaluation": {"data_quality": "legacy_text_parsing"}}
+
+    def _evaluate_process_cells(self, result: Any, result_type: str, state: ChatState) -> Dict[str, Any]:
+        """Evaluate process_cells analysis"""
+        if isinstance(result, str):
+            discovered = "discovered" in result.lower()
+            return {
+                "process_cells_evaluation": {
+                    "discovery_status": "successful" if discovered else "no_new_types",
+                    "discovered_cell_types": []  # Would need parsing for actual types
+                }
+            }
+        return {"process_cells_evaluation": {"status": "completed"}}
+
+    def _evaluate_dea_analysis(self, result: Any, result_type: str, state: ChatState) -> Dict[str, Any]:
+        """Evaluate DEA analysis"""
+        return {"dea_evaluation": {"status": "completed"}}
+
+    def _evaluate_visualization(self, function_name: str, result: Any, result_type: str, state: ChatState) -> Dict[str, Any]:
+        """Evaluate visualization generation"""
+        html_length = len(result) if isinstance(result, str) else 0
+        contains_html = isinstance(result, str) and ('<div' in result or '<html' in result)
+        
+        return {
+            "visualization_evaluation": {
+                "type": function_name,
+                "html_generated": contains_html,
+                "html_length": html_length,
+                "status": "success" if contains_html else "no_html_content"
+            }
+        }
+
+    def _log_step_evaluation(self, evaluation: Dict[str, Any]) -> None:
+        """Comprehensive evaluation logging for monitoring and debugging"""
+        
+        step_index = evaluation.get("step_index", -1)
+        function_name = evaluation.get("function_name", "unknown")
+        success = evaluation.get("success", False)
+        result_type = evaluation.get("result_type", "unknown")
+        
+        print(f"\n{'='*60}")
+        print(f"📊 STEP EVALUATION REPORT - Step {step_index + 1}")
+        print(f"{'='*60}")
+        print(f"Function: {function_name}")
+        print(f"Success: {'✅' if success else '❌'} ({success})")
+        print(f"Result Type: {result_type}")
+        print(f"Timestamp: {evaluation.get('timestamp', 'unknown')}")
+        
+        if not success:
+            print(f"❌ FAILURE ANALYSIS:")
+            failure_eval = evaluation.get("failure_evaluation", {})
+            print(f"   Error Type: {failure_eval.get('error_category', 'Unknown')}")
+            print(f"   Critical: {'🚨 YES' if evaluation.get('critical_failure') else '⚠️ No'}")
+            
+        else:
+            print(f"✅ SUCCESS ANALYSIS:")
+            
+            # Function-specific reporting
+            if "enrichment_evaluation" in evaluation:
+                enrich_eval = evaluation["enrichment_evaluation"]
+                pathway_counts = enrich_eval.get("pathway_counts", {})
+                
+                print(f"   🧬 ENRICHMENT RESULTS:")
+                for method, count in pathway_counts.items():
+                    status = "✅" if count > 0 else "⭕"
+                    print(f"      {status} {method.upper()}: {count} pathways")
+                
+                total = enrich_eval.get("total_significant_pathways", 0)
+                print(f"   📊 Total Significant: {total} pathways")
+                print(f"   🎯 Data Quality: {enrich_eval.get('data_quality', 'unknown')}")
+                
+                if enrich_eval.get("top_pathways"):
+                    print(f"   🔝 Sample Pathways:")
+                    for method, pathways in enrich_eval.get("top_pathways", {}).items():
+                        if pathways:
+                            print(f"      {method}: {', '.join(pathways[:2])}")
+            
+            elif "process_cells_evaluation" in evaluation:
+                process_eval = evaluation["process_cells_evaluation"]
+                discovered = process_eval.get("discovered_cell_types", [])
+                print(f"   🧬 PROCESS CELLS RESULTS:")
+                print(f"      Discovered: {len(discovered)} new cell types")
+                for cell_type in discovered[:3]:  # Show first 3
+                    print(f"         - {cell_type}")
+        
+        print(f"{'='*60}\n")
 
     def __del__(self):
         """Cleanup EnrichmentChecker connection on destruction."""

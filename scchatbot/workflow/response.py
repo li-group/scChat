@@ -75,8 +75,8 @@ class ResponseMixin:
         for step in state.get("execution_history", []):
             if not step.get("success", True):  # Failed step
                 failed_analyses.append({
-                    "function": step.get("step", {}).get("function_name", "unknown"),
-                    "parameters": step.get("step", {}).get("parameters", {}),
+                    "function": step.get("function_name", "unknown"),
+                    "parameters": step.get("parameters", {}),
                     "error": step.get("error", "Unknown error")
                 })
         
@@ -152,9 +152,9 @@ Answer:"""
         
         for step in state.get("execution_history", []):
             if step.get("success", False):
-                function_name = step.get("step", {}).get("function_name", "")
+                function_name = step.get("function_name", "")
                 if function_name.startswith("display_"):
-                    parameters = step.get("step", {}).get("parameters", {})
+                    parameters = step.get("parameters", {})
                     cell_type = parameters.get("cell_type", "unknown")
                     
                     # Create description of the available plot
@@ -240,19 +240,20 @@ Answer:"""
                 print(f"🎨 PLOT EXTRACTION: Reached max plots limit ({MAX_PLOTS}), stopping")
                 break
                 
-            function_name = execution.get("step", {}).get("function_name", "")
+            # FIX: execution history stores function data directly, not in 'step' sub-dict
+            function_name = execution.get("function_name", "")
             success = execution.get("success", False)
-            has_result = execution.get("result") is not None
+            # Check both 'result' and 'result_summary' for visualization content
+            result = execution.get("result") or execution.get("result_summary")
+            has_result = result is not None
             
             print(f"🎨 PLOT EXTRACTION: Step {i+1}: {function_name}, success={success}, has_result={has_result}")
             
             if (success and 
                 function_name.startswith("display_") and
                 has_result and 
-                isinstance(execution.get("result"), str) and
-                ("<div" in execution.get("result") or "<html" in execution.get("result"))):
-                
-                result = execution.get("result")
+                isinstance(result, str) and
+                ("<div" in result or "<html" in result)):
                 result_length = len(result)
                 
                 # Check size limit
@@ -270,9 +271,8 @@ Answer:"""
                 
                 seen_plots.add(plot_fingerprint)
                 
-                # Get description
-                step = execution["step"]
-                description = self._generate_visualization_description(step, result)
+                # Get description - execution stores data directly, not in nested 'step'
+                description = self._generate_visualization_description(execution, result)
                 plot_descriptions.append(f"<h4>{description}</h4>")
                 plots.append(result)
                 
@@ -299,10 +299,10 @@ Answer:"""
             print("🎨 PLOT EXTRACTION: No valid plots found")
             return ""
     
-    def _generate_visualization_description(self, step: Dict, result: str) -> str:
+    def _generate_visualization_description(self, execution: Dict, result: str) -> str:
         """Generate a descriptive summary for visualization functions"""
-        function_name = step["function_name"]
-        parameters = step.get("parameters", {})
+        function_name = execution["function_name"]
+        parameters = execution.get("parameters", {})
         
         # Create user-friendly descriptions for different visualization types
         descriptions = {

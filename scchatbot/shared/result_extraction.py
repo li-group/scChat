@@ -49,40 +49,46 @@ def extract_key_findings_from_execution(execution_history: List[Dict]) -> Dict[s
     
     
     for step in execution_history:
-        function_name = step.get("step", {}).get("function_name", "")
-        parameters = step.get("step", {}).get("parameters", {})
+        # FIX: execution history stores function data directly, not in 'step' sub-dict
+        function_name = step.get("function_name", "")
+        parameters = step.get("parameters", {})
         cell_type = parameters.get("cell_type", "unknown")
         
         if step.get("success", False):
             findings["successful_steps"] += 1
             result = step.get("result")
-            
-            # Handle case where result is stringified - try to parse it back to dict
-            if isinstance(result, str) and result.strip().startswith('{'):
-                try:
-                    import json
-                    # First try json.loads
-                    result = json.loads(result)
-                except (json.JSONDecodeError, ValueError):
-                    try:
-                        import ast
-                        result = ast.literal_eval(result)
-                    except (ValueError, SyntaxError):
-                        try:
-                            # Last resort: eval (safe because we control the execution environment)
-                            result = eval(result)
-                        except Exception as e:
-                            pass
+            result_type = step.get("result_type", "text")  # Default to legacy
             
             # Extract key findings based on function type
             if function_name == "perform_enrichment_analyses":
-                # Handle case where result might be wrapped by analysis wrapper
-                if isinstance(result, dict) and any(key in result for key in ["dea_results", "hierarchy_metadata"]):
-                    # Result is from analysis wrapper - extract the actual enrichment result
-                    actual_result = result.get("enrichment_results", result)
+                if result_type == "structured":
+                    # NEW: Direct structured access
+                    findings["successful_analyses"][f"enrichment_{cell_type}"] = _extract_enrichment_structured(result)
                 else:
-                    actual_result = result
-                findings["successful_analyses"][f"enrichment_{cell_type}"] = extract_enrichment_key_findings(actual_result, all_logs)
+                    # LEGACY: Handle stringified results and text parsing fallback
+                    if isinstance(result, str) and result.strip().startswith('{'):
+                        try:
+                            import json
+                            # First try json.loads
+                            result = json.loads(result)
+                        except (json.JSONDecodeError, ValueError):
+                            try:
+                                import ast
+                                result = ast.literal_eval(result)
+                            except (ValueError, SyntaxError):
+                                try:
+                                    # Last resort: eval (safe because we control the execution environment)
+                                    result = eval(result)
+                                except Exception as e:
+                                    pass
+                    
+                    # Handle case where result might be wrapped by analysis wrapper
+                    if isinstance(result, dict) and any(key in result for key in ["dea_results", "hierarchy_metadata"]):
+                        # Result is from analysis wrapper - extract the actual enrichment result
+                        actual_result = result.get("enrichment_results", result)
+                    else:
+                        actual_result = result
+                    findings["successful_analyses"][f"enrichment_{cell_type}"] = extract_enrichment_key_findings(actual_result, all_logs)
             
             elif function_name == "dea_split_by_condition":
                 findings["successful_analyses"][f"dea_{cell_type}"] = extract_dea_key_findings(result)
@@ -480,3 +486,33 @@ def _format_single_analysis(analysis_data: Dict[str, Any]) -> str:
         if '<div' in data_str or '<html' in data_str or '<script' in data_str:
             return f"  Visualization generated successfully"
         return f"  {data_str[:100]}..."
+
+
+def _extract_enrichment_structured(structured_result: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Extract findings directly from structured enrichment result
+    
+    Args:
+        structured_result: Full structured dictionary from perform_enrichment_analyses
+        
+    Returns:
+        Dict with top findings from each analysis type
+    """
+    
+    key_findings = {}
+    
+    # Direct access to structured data - no parsing needed!
+    analysis_types = ["reactome", "go", "kegg", "gsea"]
+    
+    for analysis_type in analysis_types:
+        if analysis_type in structured_result:
+            analysis_data = structured_result[analysis_type]
+            
+            if isinstance(analysis_data, dict):
+                key_findings[analysis_type] = {
+                    "top_terms": analysis_data.get("top_terms", [])[:5],
+                    "p_values": analysis_data.get("top_pvalues", [])[:5],
+                    "total_significant": analysis_data.get("total_significant", 0)
+                }
+    
+    return key_findings

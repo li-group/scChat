@@ -381,30 +381,41 @@ class MultiAgentChatBot:
         # Add workflow nodes
         workflow.add_node("input_processor", self.workflow_nodes.input_processor_node)
         workflow.add_node("planner", self.workflow_nodes.planner_node)
-        workflow.add_node("evaluator", self.workflow_nodes.evaluator_node)
         workflow.add_node("executor", self.workflow_nodes.executor_node)
+        workflow.add_node("step_evaluator", self.workflow_nodes.step_evaluator_node)  # NEW
+        workflow.add_node("final_evaluator", self.workflow_nodes.evaluator_node)
         workflow.add_node("response_generator", self.workflow_nodes.unified_response_generator_node)
         workflow.add_node("plot_integration", self.workflow_nodes.add_plots_to_final_response)
         
         # Set entry point
         workflow.set_entry_point("input_processor")
         
-        # Main workflow connections - NEW PIPELINE: planner -> executor -> evaluator
+        # Main workflow connections - NEW PIPELINE: planner -> executor -> step_evaluator -> (continue|complete)
         workflow.add_edge("input_processor", "planner")
-        workflow.add_edge("planner", "executor")  # Changed: planner now goes to executor
+        workflow.add_edge("planner", "executor")
         
-        # Routing from executor - execute steps or evaluate when complete
+        # Modified routing: executor → step_evaluator → (continue|complete)
         workflow.add_conditional_edges(
             "executor",
             self.route_from_executor,
             {
-                "continue": "executor",  # Continue with next step
-                "evaluate": "evaluator"  # All steps done, go to evaluator
+                "step_evaluate": "step_evaluator",
+                "complete": "final_evaluator"
             }
         )
         
-        # Evaluator reviews execution and routes to response generation
-        workflow.add_edge("evaluator", "response_generator")
+        workflow.add_conditional_edges(
+            "step_evaluator", 
+            self.route_from_step_evaluator,
+            {
+                "continue": "executor",
+                "complete": "final_evaluator",
+                "abort": "response_generator"
+            }
+        )
+        
+        # Final evaluator reviews execution and routes to response generation
+        workflow.add_edge("final_evaluator", "response_generator")
         
         # Direct path: response generator goes directly to plot integration
         workflow.add_edge("response_generator", "plot_integration")
@@ -414,19 +425,30 @@ class MultiAgentChatBot:
         
         return workflow.compile()
 
-    def route_from_executor(self, state: ChatState) -> Literal["continue", "evaluate"]:
-        """Route from executor - continue with next step or go to evaluator"""
+    def route_from_executor(self, state: ChatState) -> Literal["step_evaluate", "complete"]:
+        """Always route to step evaluator unless no steps executed"""
         
-        # Check if execution is complete
+        execution_history = state.get("execution_history", [])
         current_step_index = state.get("current_step_index", 0)
-        execution_plan = state.get("execution_plan", {})
-        total_steps = len(execution_plan.get("steps", []))
+        total_steps = len(state.get("execution_plan", {}).get("steps", []))
         
-        if current_step_index >= total_steps:
-            print("🏁 All execution steps complete - routing to evaluator")
-            return "evaluate"
+        if execution_history and current_step_index <= total_steps:
+            return "step_evaluate"
         else:
-            print(f"🔄 Executor continuing - next step {current_step_index + 1}/{total_steps}")
+            return "complete"
+
+    def route_from_step_evaluator(self, state: ChatState) -> Literal["continue", "complete", "abort"]:
+        """Route based on step evaluation results"""
+        
+        step_evaluation = state.get("last_step_evaluation", {})
+        current_step_index = state.get("current_step_index", 0) 
+        total_steps = len(state.get("execution_plan", {}).get("steps", []))
+        
+        if step_evaluation.get("critical_failure", False):
+            return "abort"
+        elif current_step_index >= total_steps:
+            return "complete"
+        else:
             return "continue"
 
     def send_message(self, message: str) -> str:

@@ -41,7 +41,8 @@ def get_significant_gene(adata, cell_type, logfc_threshold=1, pval_threshold=0.0
     return sig, gene_to_logfc
 
 def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold=0.05, top_n_terms=10, 
-                        save_raw=True, save_summary=True, save_plots=True, output_prefix="reactome"):
+                        save_raw=True, save_summary=True, save_plots=True, output_prefix="reactome",
+                        significance_threshold=0.05):
     """
     Performs Reactome pathway enrichment analysis on differentially expressed genes for a specific cell type.
     
@@ -65,6 +66,8 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
         Whether to save plots.
     output_prefix : str, default="reactome"
         Prefix to use for output filenames.
+    significance_threshold : float, default=0.05
+        P-value threshold for filtering results to save (only terms with p < threshold are saved to CSV).
         
     Returns:
     --------
@@ -99,19 +102,25 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
     results['raw_results'] = reactome_enrichment_results
     
     if not reactome_enrichment_results.empty:
-        # Save raw Reactome results
-        if save_raw:
+        # Filter for significant results only
+        significant_raw_results = reactome_enrichment_results[reactome_enrichment_results['p_value'] < significance_threshold]
+        
+        # Save raw Reactome results (only significant)
+        if save_raw and not significant_raw_results.empty:
             # raw_output_filename = f"{output_prefix}_results_raw_{cell_type}.csv"
             raw_output_filename = os.path.join(
             output_prefix,
             f"results_raw_{cell_type}.csv"
             )
-            reactome_enrichment_results.to_csv(raw_output_filename, index=False)
+            significant_raw_results.to_csv(raw_output_filename, index=False)
 
         
-        # Post-processing
+        # Post-processing - only process significant results
         reactome_enrichment_dict = {}
         for index, row in reactome_enrichment_results.iterrows():
+            # Skip non-significant results
+            if row['p_value'] >= significance_threshold:
+                continue
             term_id = row['native']
             if not all(col in row for col in ['name', 'p_value', 'source', 'intersection_size', 'intersections']):
                 continue
@@ -168,8 +177,10 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
                 for term_id, info in reactome_enrichment_dict.items()
             ])
             
-            # Sort by p-value
+            # Sort by p-value and filter for significant results only
             reactome_output_df = reactome_output_df.sort_values('p_value')
+            # Filter for significant results in summary
+            reactome_output_df = reactome_output_df[reactome_output_df['p_value'] < significance_threshold]
             results['summary_results'] = reactome_output_df
             
             # Save summarized results
@@ -271,7 +282,7 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
 
 def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold=0.05, top_n_terms=10, 
                   go_domains=['BP', 'MF', 'CC'], save_raw=True, save_summary=True, save_plots=True,
-                  output_prefix="go"):
+                  output_prefix="go", significance_threshold=0.05):
     """
     Performs Gene Ontology enrichment analysis on differentially expressed genes for a specific cell type.
     
@@ -297,6 +308,8 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
         Whether to save plots.
     output_prefix : str, default="go"
         Prefix to use for output filenames.
+    significance_threshold : float, default=0.05
+        P-value threshold for filtering results to save (only terms with p < threshold are saved to CSV).
         
     Returns:
     --------
@@ -343,18 +356,24 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
         results['raw_results'][domain] = go_enrichment_results
         
         if not go_enrichment_results.empty:
-            # Save raw GO results
-            if save_raw:
+            # Filter for significant results only
+            significant_raw_results = go_enrichment_results[go_enrichment_results['p_value'] < significance_threshold]
+            
+            # Save raw GO results (only significant)
+            if save_raw and not significant_raw_results.empty:
                 # raw_output_filename = f"{domain_prefix}_results_raw_{cell_type}.csv"
                 raw_output_filename = os.path.join(
                     domain_prefix,
                     f"results_raw_{cell_type}.csv"
                 )
-                go_enrichment_results.to_csv(raw_output_filename, index=False)
+                significant_raw_results.to_csv(raw_output_filename, index=False)
             
-            # Post-processing
+            # Post-processing - only process significant results
             go_enrichment_dict = {}
             for index, row in go_enrichment_results.iterrows():
+                # Skip non-significant results
+                if row['p_value'] >= significance_threshold:
+                    continue
                 term_id = row['native']
                 if not all(col in row for col in ['name', 'p_value', 'source', 'intersection_size', 'intersections']):
                     continue
@@ -411,8 +430,13 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                     for term_id, info in go_enrichment_dict.items()
                 ])
                 
-                # Sort by p-value
+                # Sort by p-value and filter for significant results only
                 go_output_df = go_output_df.sort_values('p_value')
+                original_count = len(go_output_df)
+                # Filter for significant results in summary
+                go_output_df = go_output_df[go_output_df['p_value'] < significance_threshold]
+                filtered_count = len(go_output_df)
+                print(f"📊 GO {domain}: {filtered_count}/{original_count} terms passed significance threshold (p < {significance_threshold})")
                 results['summary_results'][domain] = go_output_df
                 
                 # Save summarized results
@@ -513,7 +537,8 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
 
 
 def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold=0.05, top_n_terms=10,
-                    save_raw=True, save_summary=True, save_plots=True, output_prefix="kegg"):
+                    save_raw=True, save_summary=True, save_plots=True, output_prefix="kegg",
+                    significance_threshold=0.05):
     """
     Performs KEGG pathway enrichment analysis on differentially expressed genes for a specific cell type.
     
@@ -537,6 +562,8 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
         Whether to save plots.
     output_prefix : str, default="kegg"
         Prefix to use for output filenames.
+    significance_threshold : float, default=0.05
+        P-value threshold for filtering results to save (only terms with p < threshold are saved to CSV).
         
     Returns:
     --------
@@ -570,18 +597,24 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
     results['raw_results'] = kegg_enrichment_results
     
     if not kegg_enrichment_results.empty:
-        # Save raw KEGG results
-        if save_raw:
+        # Filter for significant results only
+        significant_raw_results = kegg_enrichment_results[kegg_enrichment_results['p_value'] < significance_threshold]
+        
+        # Save raw KEGG results (only significant)
+        if save_raw and not significant_raw_results.empty:
             # raw_output_filename = f"{output_prefix}_results_raw_{cell_type}.csv"
             raw_output_filename = os.path.join(
             output_prefix,
             f"results_raw_{cell_type}.csv"
             )
-            kegg_enrichment_results.to_csv(raw_output_filename, index=False)
+            significant_raw_results.to_csv(raw_output_filename, index=False)
         
-        # Post-processing
+        # Post-processing - only process significant results
         kegg_enrichment_dict = {}
         for index, row in kegg_enrichment_results.iterrows():
+            # Skip non-significant results
+            if row['p_value'] >= significance_threshold:
+                continue
             term_id = row['native']
             if not all(col in row for col in ['name', 'p_value', 'source', 'intersection_size', 'intersections']):
                 continue
@@ -638,8 +671,10 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
                 for term_id, info in kegg_enrichment_dict.items()
             ])
             
-            # Sort by p-value
+            # Sort by p-value and filter for significant results only
             kegg_output_df = kegg_output_df.sort_values('p_value')
+            # Filter for significant results in summary
+            kegg_output_df = kegg_output_df[kegg_output_df['p_value'] < significance_threshold]
             results['summary_results'] = kegg_output_df
             
             # Save summarized results
@@ -750,7 +785,8 @@ def gsea_enrichment_analysis(
     save_summary=True,
     save_plots=True,
     output_prefix="enrichment",
-    gsea_library_folder="gsea_library"
+    gsea_library_folder="gsea_library",
+    significance_threshold=0.05
 ):
     """
     Performs GSEA enrichment analysis on significant genes for a cell type.
@@ -758,6 +794,11 @@ def gsea_enrichment_analysis(
     - Auto-creates `output_prefix` folder.
     - If any .gmt found under `gsea_library_folder`, uses the first one.
     - Parses `Overlap` as "X/Y" into intersection_size, gene_set_size, gene_ratio.
+    
+    Parameters:
+    -----------
+    significance_threshold : float, default=0.05
+        P-value threshold for filtering results to save (only terms with p < threshold are saved to CSV).
     """
     os.makedirs(output_prefix, exist_ok=True)
 
@@ -789,14 +830,20 @@ def gsea_enrichment_analysis(
     df_raw = enr.results.copy()
     results['raw_results'] = df_raw
 
-    # 3) Save raw
+    # 3) Filter and save raw (only significant)
     if save_raw:
-        path = os.path.join(output_prefix, f"results_raw_{cell_type}.csv")
-        df_raw.to_csv(path, index=False)
+        # Filter for significant results
+        significant_raw = df_raw[df_raw['P-value'] < significance_threshold]
+        if not significant_raw.empty:
+            path = os.path.join(output_prefix, f"results_raw_{cell_type}.csv")
+            significant_raw.to_csv(path, index=False)
 
-    # 4) Post-process into list of dicts
+    # 4) Post-process into list of dicts - only significant results
     processed = []
     for _, row in df_raw.iterrows():
+        # Skip non-significant results
+        if row['P-value'] >= significance_threshold:
+            continue
         # parse Overlap "X/Y"
         overlap = str(row.get('Overlap', ""))
         m = re.match(r'(\d+)/(\d+)', overlap)
@@ -823,7 +870,7 @@ def gsea_enrichment_analysis(
             'intersecting_genes': ';'.join([g for g in genes if g in gene_to_logfc])
         })
 
-    df_sum = pd.DataFrame(processed).sort_values('p_value')
+    df_sum = pd.DataFrame(processed).sort_values('p_value') if processed else pd.DataFrame()
     results['summary_results'] = df_sum
 
     # 5) Save summary
@@ -942,7 +989,8 @@ def perform_enrichment_analyses(
                 p_value_threshold=pval_threshold,
                 top_n_terms=top_n_terms,
                 output_prefix="scchatbot/enrichment/reactome",
-                save_plots=False
+                save_plots=False,
+                significance_threshold=pval_threshold
             )
         elif key == "go":
             out = go_enrichment(
@@ -950,7 +998,8 @@ def perform_enrichment_analyses(
                 p_value_threshold=pval_threshold,
                 top_n_terms=top_n_terms,
                 output_prefix="scchatbot/enrichment/go",
-                save_plots=False
+                save_plots=False,
+                significance_threshold=pval_threshold
             )
         elif key == "kegg":
             out = kegg_enrichment(
@@ -958,7 +1007,8 @@ def perform_enrichment_analyses(
                 p_value_threshold=pval_threshold,
                 top_n_terms=top_n_terms,
                 output_prefix="scchatbot/enrichment/kegg",
-                save_plots=False
+                save_plots=False,
+                significance_threshold=pval_threshold
             )
         else:  # gsea
             # Use provided gene_set_library or default
@@ -968,14 +1018,31 @@ def perform_enrichment_analyses(
                 gene_set_library=gsea_library,
                 top_n_terms=top_n_terms,
                 output_prefix="scchatbot/enrichment/gsea",
-                save_plots=False
+                save_plots=False,
+                significance_threshold=pval_threshold
             )
 
         # Convert any DataFrame → list of dicts
         raw_df = out.get("raw_results")
         sum_df = out.get("summary_results")
-        raw_list = raw_df.to_dict(orient="records")   if hasattr(raw_df, "to_dict")   else []
-        sum_list = sum_df.to_dict(orient="records")   if hasattr(sum_df, "to_dict")   else []
+        
+        # Handle GO's nested structure (by domain) vs other analyses' flat structure
+        if key == "go":
+            # GO returns nested dicts by domain, flatten them
+            raw_list = []
+            sum_list = []
+            if isinstance(raw_df, dict):
+                for domain, df in raw_df.items():
+                    if hasattr(df, "to_dict"):
+                        raw_list.extend(df.to_dict(orient="records"))
+            if isinstance(sum_df, dict):
+                for domain, df in sum_df.items():
+                    if hasattr(df, "to_dict"):
+                        sum_list.extend(df.to_dict(orient="records"))
+        else:
+            # Other analyses return flat DataFrames
+            raw_list = raw_df.to_dict(orient="records") if hasattr(raw_df, "to_dict") else []
+            sum_list = sum_df.to_dict(orient="records") if hasattr(sum_df, "to_dict") else []
 
         per_analysis_full[key] = {
             "raw_results":   raw_list,
@@ -1032,7 +1099,8 @@ def perform_enrichment_analyses(
                         p_value_threshold=pval_threshold,
                         top_n_terms=top_n_terms,
                         output_prefix=output_prefix,
-                        save_plots=False
+                        save_plots=False,
+                        significance_threshold=pval_threshold
                     )
                 elif key == "go":
                     out = go_enrichment(
@@ -1040,7 +1108,8 @@ def perform_enrichment_analyses(
                         p_value_threshold=pval_threshold,
                         top_n_terms=top_n_terms,
                         output_prefix=output_prefix,
-                        save_plots=False
+                        save_plots=False,
+                        significance_threshold=pval_threshold
                     )
                 elif key == "kegg":
                     out = kegg_enrichment(
@@ -1048,7 +1117,8 @@ def perform_enrichment_analyses(
                         p_value_threshold=pval_threshold,
                         top_n_terms=top_n_terms,
                         output_prefix=output_prefix,
-                        save_plots=False
+                        save_plots=False,
+                        significance_threshold=pval_threshold
                     )
                 else:  # gsea
                     # Use provided gene_set_library or default
@@ -1058,14 +1128,31 @@ def perform_enrichment_analyses(
                         gene_set_library=gsea_library,
                         top_n_terms=top_n_terms,
                         output_prefix=output_prefix,
-                        save_plots=False
+                        save_plots=False,
+                        significance_threshold=pval_threshold
                     )
 
                 # Convert any DataFrame → list of dicts
                 raw_df = out.get("raw_results")
                 sum_df = out.get("summary_results")
-                raw_list = raw_df.to_dict(orient="records")   if hasattr(raw_df, "to_dict")   else []
-                sum_list = sum_df.to_dict(orient="records")   if hasattr(sum_df, "to_dict")   else []
+                
+                # Handle GO's nested structure (by domain) vs other analyses' flat structure
+                if key == "go":
+                    # GO returns nested dicts by domain, flatten them
+                    raw_list = []
+                    sum_list = []
+                    if isinstance(raw_df, dict):
+                        for domain, df in raw_df.items():
+                            if hasattr(df, "to_dict"):
+                                raw_list.extend(df.to_dict(orient="records"))
+                    if isinstance(sum_df, dict):
+                        for domain, df in sum_df.items():
+                            if hasattr(df, "to_dict"):
+                                sum_list.extend(df.to_dict(orient="records"))
+                else:
+                    # Other analyses return flat DataFrames
+                    raw_list = raw_df.to_dict(orient="records") if hasattr(raw_df, "to_dict") else []
+                    sum_list = sum_df.to_dict(orient="records") if hasattr(sum_df, "to_dict") else []
 
                 per_analysis_condition[key] = {
                     "raw_results":   raw_list,
