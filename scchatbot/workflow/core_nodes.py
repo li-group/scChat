@@ -154,6 +154,16 @@ Only return the JSON list, nothing else.
         # Get query type-specific instructions 
         query_guidance = self._get_query_type_guidance(query_type)
         
+        # Extract conversation context for semantic search awareness
+        conversation_context = ""
+        has_conversation_context = state.get("has_conversation_context", False)
+        if has_conversation_context:
+            # Extract conversation context from messages
+            for msg in state.get("messages", []):
+                if hasattr(msg, 'content') and msg.content.startswith("CONVERSATION_CONTEXT:"):
+                    conversation_context = msg.content[len("CONVERSATION_CONTEXT: "):]
+                    break
+        
         planning_prompt = f"""
         You are an intelligent planner for single-cell RNA-seq analysis. 
         
@@ -164,6 +174,7 @@ Only return the JSON list, nothing else.
         - Unavailable cell types: {', '.join(unavailable_cell_types)}
         - Previous analyses: {json.dumps(function_history, indent=2)}
         - Query type detected: {query_type}
+        {"- Conversation context: " + conversation_context if conversation_context else ""}
         
         Available functions:
         {self._summarize_functions(available_functions)}
@@ -238,6 +249,21 @@ Only return the JSON list, nothing else.
             - "visualize GSEA results" → use "display_enrichment_visualization" with "analysis": "gsea"  
             - "show ONLY barplot" → use "display_enrichment_barplot"
             - "display both plots" → use "display_enrichment_visualization" (default plot_type="both")
+            
+        SEMANTIC SEARCH GUIDELINES:
+        - For questions seeking specific pathway/term information beyond the top-ranked results, consider using "search_enrichment_semantic"
+        - Use semantic search when:
+          * User asks about specific pathways that might not be in top results (e.g., "cell cycle regulation", "apoptosis pathways")
+          * User references conversation context about previous analyses and wants to explore related pathways
+          * User wants to find terms similar to those mentioned in conversation context
+        - Parameters for search_enrichment_semantic:
+          * "query": the pathway/term to search for (e.g., "cell cycle regulation")
+          * "cell_type": target cell type (can be inferred from conversation context if not explicitly mentioned)
+          * Optional: "analysis_type", "condition", "limit"
+        - Examples:
+          * "Show me cell cycle related terms from the T cell analysis" → search_enrichment_semantic with query="cell cycle" and cell_type="T cell"
+          * "Are there any apoptosis pathways in our results?" → search_enrichment_semantic with query="apoptosis"
+          * "Find pathways similar to what we discussed earlier" → use conversation context to determine relevant search terms
         """
         
         try:
@@ -345,7 +371,9 @@ Only return the JSON list, nothing else.
         - FOCUS: Create a streamlined plan targeting enrichment analysis
         - PRIORITY: Use minimal enrichment steps - EnrichmentChecker will optimize them
         - EFFICIENCY: Avoid unnecessary broader analyses unless specifically requested
+        - SEMANTIC SEARCH: If asking about specific pathways that might not be top-ranked, consider search_enrichment_semantic
         - EXAMPLE: For "GSEA analysis of T cells" → {{"cell_type": "T cell"}} (EnrichmentChecker handles method selection)
+        - EXAMPLE: For "Show me cell cycle pathways in T cells" → search_enrichment_semantic with query="cell cycle" and cell_type="T cell"
         """
         
         elif query_type == "markers":
@@ -385,7 +413,9 @@ Only return the JSON list, nothing else.
         - FOCUS: Use conversational_response function for interpretive questions
         - PRIORITY: Avoid complex analysis plans for interpretation requests
         - EFFICIENCY: Single conversational step unless new analysis is specifically requested
+        - SEMANTIC SEARCH: If referencing specific pathways from conversation context, consider search_enrichment_semantic first
         - EXAMPLE: For "what does this mean?" → use conversational_response
+        - EXAMPLE: For "Show me those cell cycle terms we discussed" → search_enrichment_semantic based on conversation context
         """
         
         else:  # general
@@ -395,6 +425,7 @@ Only return the JSON list, nothing else.
         - FOCUS: Create a balanced plan covering the user's analytical needs
         - PRIORITY: Follow standard analysis workflow patterns
         - EFFICIENCY: Include appropriate analysis and visualization steps
+        - SEMANTIC SEARCH: Consider search_enrichment_semantic if the query involves specific pathway exploration
         """
 
     def _store_execution_result(self, step_data: Dict, result: Any, success: bool) -> Dict[str, Any]:
@@ -408,7 +439,8 @@ Only return the JSON list, nothing else.
             "perform_enrichment_analyses",
             "dea_split_by_condition", 
             "process_cells",
-            "compare_cell_counts"
+            "compare_cell_counts",
+            "search_enrichment_semantic"
         }
         
         if function_name in STRUCTURE_PRESERVED_FUNCTIONS and success:
@@ -453,6 +485,13 @@ Only return the JSON list, nothing else.
         
         elif function_name == "dea_split_by_condition":
             return f"DEA: Analysis completed"
+        
+        elif function_name == "search_enrichment_semantic":
+            if isinstance(result, str) and "enrichment terms" in result:
+                lines = result.split('\n')
+                term_count = len([line for line in lines if line.strip() and not line.startswith('##')])
+                return f"Semantic search: {term_count} matching terms found"
+            return f"Semantic search: Results found"
         
         return str(result)[:100]
 

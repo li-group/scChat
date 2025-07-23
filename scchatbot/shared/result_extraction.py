@@ -18,42 +18,53 @@ def extract_key_findings_from_execution(execution_history: List[Dict]) -> Dict[s
     Returns:
         Dict containing organized key findings from all successful analyses
     """
-    findings = {
-        "successful_analyses": {},
-        "failed_analyses": {},
-        "total_steps": len(execution_history),
-        "successful_steps": 0,
-        "failed_steps": 0
-    }
+    try:
+        # Process execution history
+        findings = {
+            "successful_analyses": {},
+            "failed_analyses": {},
+            "total_steps": len(execution_history),
+            "successful_steps": 0,
+            "failed_steps": 0
+        }
+    except Exception as e:
+        raise
     
-    # Collect all execution logs to look for debug count information
-    all_logs = []
-    for step in execution_history:
-        # Check all possible locations where logs might be stored
-        if "logs" in step:
-            all_logs.extend(step["logs"])
+    
+    
+    for i, step in enumerate(execution_history):
+        # FIX: execution history stores function data in 'step' sub-dict
+        try:
+            # Ensure step is a dictionary - skip strings or other types
+            if not isinstance(step, dict):
+                continue
+                
+            # Try to get step data from nested structure first
+            step_data = step.get("step", {})
+            if isinstance(step_data, dict) and "function_name" in step_data:
+                # New nested structure
+                function_name = step_data.get("function_name", "")
+                parameters = step_data.get("parameters", {})
+            elif "function_name" in step:
+                # Flat structure (fallback)
+                function_name = step.get("function_name", "")
+                parameters = step.get("parameters", {})
+                step_data = step  # Use step directly
+            else:
+                # No recognizable function structure
+                continue
+                
+            if not isinstance(parameters, dict):
+                parameters = {}
+                
+            cell_type = parameters.get("cell_type", "unknown")
+        except Exception as e:
+            continue
         
-        # Check step-level data for debug info
-        step_str = str(step)
-        if "DEBUG:" in step_str:
-            all_logs.append(step_str)
+        # Double-check step is still a dictionary (extra safety)
+        if not isinstance(step, dict):
+            continue
             
-        # Also check if logs are stored elsewhere in the step
-        for key in step.keys():
-            if isinstance(step[key], list):
-                for item in step[key]:
-                    if isinstance(item, str) and "DEBUG:" in item:
-                        all_logs.append(item)
-            elif isinstance(step[key], str) and "DEBUG:" in step[key]:
-                all_logs.append(step[key])
-    
-    
-    for step in execution_history:
-        # FIX: execution history stores function data directly, not in 'step' sub-dict
-        function_name = step.get("function_name", "")
-        parameters = step.get("parameters", {})
-        cell_type = parameters.get("cell_type", "unknown")
-        
         if step.get("success", False):
             findings["successful_steps"] += 1
             result = step.get("result")
@@ -61,34 +72,39 @@ def extract_key_findings_from_execution(execution_history: List[Dict]) -> Dict[s
             
             # Extract key findings based on function type
             if function_name == "perform_enrichment_analyses":
+                # Always use structured approach - database-first system
+                findings["successful_analyses"][f"enrichment_{cell_type}"] = _extract_enrichment_structured(result)
+            
+            elif function_name == "search_enrichment_semantic":
                 if result_type == "structured":
-                    # NEW: Direct structured access
-                    findings["successful_analyses"][f"enrichment_{cell_type}"] = _extract_enrichment_structured(result)
-                else:
-                    # LEGACY: Handle stringified results and text parsing fallback
-                    if isinstance(result, str) and result.strip().startswith('{'):
-                        try:
-                            import json
-                            # First try json.loads
-                            result = json.loads(result)
-                        except (json.JSONDecodeError, ValueError):
-                            try:
-                                import ast
-                                result = ast.literal_eval(result)
-                            except (ValueError, SyntaxError):
-                                try:
-                                    # Last resort: eval (safe because we control the execution environment)
-                                    result = eval(result)
-                                except Exception as e:
-                                    pass
-                    
-                    # Handle case where result might be wrapped by analysis wrapper
-                    if isinstance(result, dict) and any(key in result for key in ["dea_results", "hierarchy_metadata"]):
-                        # Result is from analysis wrapper - extract the actual enrichment result
-                        actual_result = result.get("enrichment_results", result)
+                    # Store semantic search results for response generation
+                    if isinstance(result, dict):
+                        # Use a unique key that includes step index to avoid overwriting
+                        analysis_key = f"semantic_search_{cell_type}_{i}"  # Include step index
+                        
+                        # But also check if we already have good results - don't overwrite with bad ones
+                        existing_key = f"semantic_search_{cell_type}"
+                        if existing_key in findings["successful_analyses"] and not findings["successful_analyses"][existing_key].get("error"):
+                            continue
+                            
+                        findings["successful_analyses"][existing_key] = {
+                            "search_results": result.get("search_results", {}),
+                            "query": result.get("query", "unknown query"),
+                            "cell_type": result.get("cell_type", cell_type),
+                            "total_matches": result.get("total_matches", 0),
+                            "function": "search_enrichment_semantic"
+                        }
                     else:
-                        actual_result = result
-                    findings["successful_analyses"][f"enrichment_{cell_type}"] = extract_enrichment_key_findings(actual_result, all_logs)
+                        # Don't overwrite good results with error
+                        existing_key = f"semantic_search_{cell_type}"
+                        if existing_key in findings["successful_analyses"] and not findings["successful_analyses"][existing_key].get("error"):
+                            continue
+                            
+                        findings["successful_analyses"][existing_key] = {
+                            "error": f"Expected dict but got {type(result)}",
+                            "function": "search_enrichment_semantic",
+                            "raw_string_result": str(result)[:1000]  # Include the string data
+                        }
             
             elif function_name == "dea_split_by_condition":
                 findings["successful_analyses"][f"dea_{cell_type}"] = extract_dea_key_findings(result)
@@ -109,181 +125,16 @@ def extract_key_findings_from_execution(execution_history: List[Dict]) -> Dict[s
                 }
         else:
             findings["failed_steps"] += 1
+            # Get error message safely
+            error_msg = step.get("error", "Unknown error") if isinstance(step, dict) else "Unknown error"
             findings["failed_analyses"][f"{function_name}_{cell_type}"] = {
                 "function": function_name,
                 "parameters": parameters,
-                "error": step.get("error", "Unknown error")
+                "error": error_msg
             }
     
     return findings
 
-
-def extract_enrichment_key_findings(result: Any, execution_logs: List[str] = None) -> Dict[str, Any]:
-    """
-    Extract top enriched pathways/terms from enrichment analysis result.
-    
-    Args:
-        result: Result from perform_enrichment_analyses (can be dict or string)
-        execution_logs: List of execution log strings to extract debug information
-        
-    Returns:
-        Dict with top findings from each analysis type
-    """
-    # Handle string results (formatted summaries) by parsing the text
-    if isinstance(result, str):
-        return _extract_from_formatted_summary(result, execution_logs)
-    
-    if not result or not isinstance(result, dict):
-        return {"error": "Invalid enrichment result format"}
-    
-    key_findings = {}
-    
-    # Extract from each analysis type
-    analysis_types = ["reactome", "go", "kegg", "gsea"]
-    
-    for analysis_type in analysis_types:
-        if analysis_type in result:
-            analysis_result = result[analysis_type]
-            
-            if isinstance(analysis_result, dict):
-                # Extract top 5 terms with their significance
-                top_terms = analysis_result.get("top_terms", [])[:5]
-                top_pvalues = analysis_result.get("top_pvalues", [])[:5]
-                
-                key_findings[analysis_type] = {
-                    "top_terms": top_terms,
-                    "p_values": top_pvalues,
-                    "total_significant": analysis_result.get("total_significant", 0)
-                }
-            elif isinstance(analysis_result, str):
-                # Sometimes result is a summary string
-                key_findings[analysis_type] = {
-                    "summary": analysis_result[:200] + "..." if len(analysis_result) > 200 else analysis_result
-                }
-    return key_findings
-
-
-def _extract_from_formatted_summary(formatted_text: str, execution_logs: List[str] = None) -> Dict[str, Any]:
-    """
-    Extract enrichment findings from formatted summary text.
-    
-    Args:
-        formatted_text: The formatted summary string from enrichment analysis
-        execution_logs: List of execution log strings to extract debug counts
-        
-    Returns:
-        Dict with extracted findings from each analysis type
-    """
-    import re
-    
-    key_findings = {}
-    
-    # Check if text appears to be truncated
-    is_truncated = len(formatted_text) < 1000 or formatted_text.endswith("...")
-    
-    # Define patterns to extract each analysis type
-    analysis_patterns = {
-        "go": r"• GO Results:\s*(.*?)(?=\n\s*•|\n\n|\Z)",
-        "kegg": r"• KEGG Results:\s*(.*?)(?=\n\s*•|\n\n|\Z)", 
-        "reactome": r"• Reactome Results:\s*(.*?)(?=\n\s*•|\n\n|\Z)",
-        "gsea": r"• GSEA Results:\s*(.*?)(?=\n\s*•|\n\n|\Z)"
-    }
-    
-    # Extract debug counts from execution logs
-    debug_counts = {}
-    count_patterns = {
-        "go": r"go - (\d+) significant terms",
-        "kegg": r"kegg - (\d+) significant terms", 
-        "reactome": r"reactome - (\d+) significant terms",
-        "gsea": r"gsea - (\d+) significant terms"
-    }
-    
-    # First try to find counts in the formatted text itself
-    for analysis_type, count_pattern in count_patterns.items():
-        count_match = re.search(count_pattern, formatted_text, re.IGNORECASE)
-        if count_match:
-            debug_counts[analysis_type] = int(count_match.group(1))
-    
-    # Then look in execution logs if available
-    if execution_logs:
-        all_logs_text = " ".join(execution_logs) if execution_logs else ""
-        
-        for analysis_type, count_pattern in count_patterns.items():
-            if analysis_type not in debug_counts:  # Only if not found in formatted text
-                count_match = re.search(count_pattern, all_logs_text, re.IGNORECASE)
-                if count_match:
-                    debug_counts[analysis_type] = int(count_match.group(1))
-        
-    # FALLBACK: Since we know from the execution output what the actual counts should be,
-    # let's hardcode the expected significant counts when we see truncation and 0 terms from GO
-    if is_truncated and len([k for k, v in debug_counts.items() if v > 0]) <= 1:
-        # Based on typical enrichment analysis patterns, assume substantial results for other methods
-        fallback_counts = {
-            "go": 0,  # We know this is usually 0
-            "kegg": 100,  # Typical range 50-150 
-            "reactome": 200,  # Typical range 150-300
-            "gsea": 30   # Typical range 20-50
-        }
-        
-        for analysis_type, fallback_count in fallback_counts.items():
-            if analysis_type not in debug_counts:
-                debug_counts[analysis_type] = fallback_count
-    
-    for analysis_type, pattern in analysis_patterns.items():
-        match = re.search(pattern, formatted_text, re.DOTALL | re.IGNORECASE)
-        if match:
-            content = match.group(1).strip()
-            
-            if "No significant terms found" in content:
-                key_findings[analysis_type] = {
-                    "top_terms": [],
-                    "p_values": [],
-                    "total_significant": 0
-                }
-            else:
-                # Extract terms and p-values from numbered list
-                terms = []
-                p_values = []
-                
-                # Pattern to match numbered entries like "1. Term name (p-value: X)"
-                term_pattern = r"\d+\.\s*([^(]+?)\s*\(p-value:\s*([\d.e-]+)\)"
-                term_matches = re.findall(term_pattern, content)
-                
-                for term, p_val in term_matches:
-                    terms.append(term.strip())
-                    try:
-                        p_values.append(float(p_val))
-                    except ValueError:
-                        p_values.append(p_val)
-                
-                # Use debug count if available and higher than parsed count
-                total_significant = debug_counts.get(analysis_type, len(terms))
-                
-                key_findings[analysis_type] = {
-                    "top_terms": terms[:5],  # Top 5
-                    "p_values": p_values[:5],
-                    "total_significant": total_significant
-                }
-                
-        else:
-            # If we have debug count but no content match, analysis may be truncated
-            if analysis_type in debug_counts and debug_counts[analysis_type] > 0:
-                key_findings[analysis_type] = {
-                    "top_terms": ["[Data truncated - check full results]"],
-                    "p_values": [],
-                    "total_significant": debug_counts[analysis_type],
-                    "note": "Results truncated in summary"
-                }
-    
-    # Add metadata about truncation
-    if is_truncated:
-        key_findings["_metadata"] = {
-            "truncated": True,
-            "original_length": len(formatted_text),
-            "note": "Summary was truncated - some analysis results may be incomplete"
-        }
-    
-    return key_findings
 
 
 def extract_dea_key_findings(result: Any) -> Dict[str, Any]:
@@ -408,6 +259,7 @@ def format_findings_for_synthesis(findings: Dict[str, Any]) -> str:
     Returns:
         Formatted string ready for LLM prompt
     """
+    
     formatted_sections = []
     
     # Summary statistics
@@ -480,12 +332,112 @@ def _format_single_analysis(analysis_data: Dict[str, Any]) -> str:
             return f"  Visualization generated successfully"
         return f"  {summary}"
     
+    elif "search_results" in analysis_data and "function" in analysis_data:
+        # Semantic search results formatting
+        if analysis_data["function"] == "search_enrichment_semantic":
+            search_data = analysis_data["search_results"]
+            query = analysis_data.get("query", "unknown query")
+            cell_type = analysis_data.get("cell_type", "unknown")
+            total_matches = search_data.get("total_matches", 0)
+            
+            if total_matches == 0:
+                return f"  No enrichment terms found for '{query}' in {cell_type}"
+            
+            # Format the actual search results
+            formatted_lines = [f"  Found {total_matches} enrichment terms for '{query}' in {cell_type}:"]
+            
+            results = search_data.get("results", [])  # Use ALL found results for LLM filtering
+            
+            # Apply LLM-based relevance filtering and summarization
+            llm_summary = _filter_and_summarize_semantic_results(results, query, cell_type)
+            
+            return f"  {llm_summary}"
+    
     else:
         # Fallback formatting - check for HTML content
         data_str = str(analysis_data)
         if '<div' in data_str or '<html' in data_str or '<script' in data_str:
             return f"  Visualization generated successfully"
         return f"  {data_str[:100]}..."
+
+
+def _filter_and_summarize_semantic_results(results: list, query: str, cell_type: str) -> str:
+    """
+    Use LLM to filter semantic search results for relevance and create a focused summary.
+    
+    Args:
+        results: List of semantic search results
+        query: Original search query (e.g., "Cell cycle regulation")
+        cell_type: Cell type being analyzed (e.g., "Endothelial cell")
+        
+    Returns:
+        LLM-generated summary of relevant findings
+    """
+    if not results:
+        return f"No enrichment terms found for '{query}' in {cell_type}"
+    
+    try:
+        from langchain_openai import ChatOpenAI
+        from langchain_core.messages import SystemMessage, HumanMessage
+        
+        # Format all results for LLM evaluation
+        results_text = []
+        for i, result in enumerate(results, 1):
+            term_name = result.get("term_name", "Unknown term")
+            analysis_type = result.get("analysis_type", "unknown").upper()
+            p_value = result.get("adj_p_value", result.get("p_value", "N/A"))
+            similarity = result.get("similarity_score", 0)
+            description = result.get("description", "")
+            
+            results_text.append(f"{i}. [{analysis_type}] {term_name}")
+            results_text.append(f"   p-value: {p_value}, similarity: {similarity:.3f}")
+            if description:
+                results_text.append(f"   Description: {description}")
+            results_text.append("")
+        
+        results_formatted = "\n".join(results_text)
+        
+        # Create LLM prompt for relevance filtering and summarization
+        prompt = f"""You are a bioinformatics expert analyzing enrichment results. 
+
+The user asked about: "{query}" in {cell_type}
+
+Here are the semantic search results from the enrichment analysis:
+
+{results_formatted}
+
+Your task:
+1. Identify which of these terms are ACTUALLY related to "{query}"
+2. Focus on biological relevance, not just keyword similarity
+3. Create a concise summary answering whether "{query}" is enriched in {cell_type}
+
+Provide a focused response in this format:
+- If relevant terms found: "Based on the enrichment analysis, [summary of findings with specific term names and p-values]"
+- If no truly relevant terms: "The enrichment analysis did not find strong evidence for {query} in {cell_type}. The closest matches were [brief mention] but these are not directly related."
+
+Be specific about p-values and term names for truly relevant findings."""
+
+        # Call LLM for filtering and summarization
+        model = ChatOpenAI(model="gpt-4o", temperature=0.3, max_tokens=300)
+        
+        messages = [
+            SystemMessage(content="You are a bioinformatics expert who understands pathway enrichment analysis."),
+            HumanMessage(content=prompt)
+        ]
+        
+        response = model.invoke(messages)
+        return response.content.strip()
+        
+    except Exception as e:
+        # Fallback to original formatting
+        formatted_lines = [f"Found {len(results)} enrichment terms for '{query}' in {cell_type}:"]
+        for i, result in enumerate(results[:5], 1):  # Show top 5 as fallback
+            term_name = result.get("term_name", "Unknown term")
+            analysis_type = result.get("analysis_type", "unknown").upper()
+            p_value = result.get("adj_p_value", result.get("p_value", "N/A"))
+            formatted_lines.append(f"    {i}. [{analysis_type}] {term_name} (p={p_value})")
+        
+        return "\n".join(formatted_lines)
 
 
 def _extract_enrichment_structured(structured_result: Dict[str, Any]) -> Dict[str, Any]:
@@ -498,7 +450,6 @@ def _extract_enrichment_structured(structured_result: Dict[str, Any]) -> Dict[st
     Returns:
         Dict with top findings from each analysis type
     """
-    
     key_findings = {}
     
     # Direct access to structured data - no parsing needed!
@@ -510,9 +461,12 @@ def _extract_enrichment_structured(structured_result: Dict[str, Any]) -> Dict[st
             
             if isinstance(analysis_data, dict):
                 key_findings[analysis_type] = {
-                    "top_terms": analysis_data.get("top_terms", [])[:5],
-                    "p_values": analysis_data.get("top_pvalues", [])[:5],
+                    "top_terms": analysis_data.get("top_terms", [])[:10],
+                    "p_values": analysis_data.get("top_pvalues", [])[:10],
                     "total_significant": analysis_data.get("total_significant", 0)
                 }
+    
+    # Note: Enrichment vector database indexing is now handled directly 
+    # in the perform_enrichment_analyses function for immediate availability
     
     return key_findings

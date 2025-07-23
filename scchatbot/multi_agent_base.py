@@ -343,6 +343,21 @@ class MultiAgentChatBot:
                 }
             },
             {
+                "name": "search_enrichment_semantic",
+                "description": "Search all enrichment terms semantically to find specific pathways or biological processes regardless of their ranking in top results. Use when user asks about specific pathways, terms, or biological processes that might not appear in standard top-5 visualizations. Provides comprehensive search across all indexed enrichment data.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {"type": "string", "description": "The biological pathway, process, or term to search for (e.g., 'cell cycle', 'apoptosis', 'DNA repair')"},
+                        "cell_type": {"type": "string", "description": "The cell type to search within. Can be inferred from conversation context if not explicitly mentioned."},
+                        "analysis_type_filter": {"type": "string", "enum": ["go", "kegg", "reactome", "gsea"], "description": "Optional: limit search to specific analysis type"},
+                        "condition_filter": {"type": "string", "description": "Optional: filter by specific experimental condition"},
+                        "k": {"type": "integer", "default": 10, "description": "Number of top results to return"}
+                    },
+                    "required": ["query"]
+                }
+            },
+            {
                 "name": "validate_processing_results",
                 "description": "Validate that process_cells discovered expected cell types. Internal validation step.",
                 "parameters": {
@@ -371,6 +386,7 @@ class MultiAgentChatBot:
             "dea_split_by_condition": self._wrap_dea_analysis,
             "compare_cell_counts": self._wrap_compare_cells,
             "conversational_response": self._wrap_conversational_response,
+            "search_enrichment_semantic": self._wrap_search_enrichment_semantic,
             "validate_processing_results": self._wrap_validate_processing_results,
         }
 
@@ -1048,3 +1064,155 @@ class MultiAgentChatBot:
                 cleaned_types.append(ct)
         
         return cleaned_types
+    
+    def _wrap_search_enrichment_semantic(self, **kwargs):
+        """
+        Conversation-aware semantic search wrapper for enrichment results.
+        
+        Implements Option C: fallback parameter resolution using conversation context.
+        """
+        query = kwargs.get("query", "")
+        cell_type = kwargs.get("cell_type", "")
+        analysis_type_filter = kwargs.get("analysis_type_filter")
+        condition_filter = kwargs.get("condition_filter") 
+        k = kwargs.get("k", 10)
+        
+        # Option C: Infer missing cell_type from conversation context
+        if not cell_type or cell_type == "unknown" or cell_type == "overall":
+            print(f"🔄 Cell type missing or generic ('{cell_type}'), inferring from context...")
+            
+            # Try to get cell_type from recent enrichment analyses
+            recent_analyses = self.history_manager.get_recent_executions("perform_enrichment_analyses", limit=3)
+            if recent_analyses:
+                inferred_cell_type = recent_analyses[-1]["parameters"].get("cell_type", "")
+                if inferred_cell_type and inferred_cell_type != "unknown":
+                    cell_type = inferred_cell_type
+                    print(f"✅ Inferred cell_type from recent analysis: '{cell_type}'")
+            
+            # Fallback: try to get from recent process_cells operations
+            if not cell_type or cell_type == "unknown":
+                recent_process = self.history_manager.get_recent_executions("process_cells", limit=2)
+                if recent_process:
+                    # Look for newly discovered cell types in the results
+                    for execution in reversed(recent_process):
+                        if execution.get("success") and execution.get("result"):
+                            result_str = str(execution["result"])
+                            if "Discovered new cell type:" in result_str:
+                                # Extract discovered cell types
+                                import re
+                                discoveries = re.findall(r"Discovered new cell type: ([^\\n]+)", result_str)
+                                if discoveries:
+                                    cell_type = discoveries[-1].strip()  # Use the last discovered type
+                                    print(f"✅ Inferred cell_type from process_cells result: '{cell_type}'")
+                                    break
+        
+        # Validate that we have required parameters
+        if not query:
+            return {"error": "Search query is required", "results": []}
+        
+        if not cell_type or cell_type == "unknown":
+            return {
+                "error": "Could not determine cell type from context. Please specify the cell type for semantic search.",
+                "query": query,
+                "results": []
+            }
+        
+        print(f"🔍 Semantic search: '{query}' in '{cell_type}' (k={k})")
+        
+        try:
+            # Call the vector database search
+            search_results = self.history_manager.search_enrichment_semantic(
+                query=query,
+                cell_type=cell_type,
+                condition_filter=condition_filter,
+                analysis_type_filter=analysis_type_filter,
+                k=k
+            )
+            
+            # Return structured data for response generation (instead of formatted string)
+            if search_results.get("total_matches", 0) > 0:
+                return {
+                    "search_results": search_results,
+                    "query": query,
+                    "cell_type": cell_type,
+                    "total_matches": search_results.get("total_matches", 0),
+                    "formatted_summary": self._format_semantic_search_results(search_results)
+                }
+            else:
+                return {
+                    "message": f"No enrichment terms found matching '{query}' in {cell_type}",
+                    "query": query,
+                    "cell_type": cell_type,
+                    "total_matches": 0,
+                    "suggestions": f"Try broader terms or check if enrichment analysis was performed for {cell_type}"
+                }
+        
+        except Exception as e:
+            print(f"❌ Semantic search failed: {e}")
+            return {
+                "error": f"Semantic search failed: {e}",
+                "query": query,
+                "cell_type": cell_type
+            }
+    
+    def _format_semantic_search_results(self, search_results: dict) -> str:
+        """Format semantic search results for user-friendly display"""
+        
+        if not search_results.get("results"):
+            return "No matching enrichment terms found."
+        
+        query = search_results.get("query", "")
+        cell_type = search_results.get("cell_type", "")
+        total_matches = search_results.get("total_matches", 0)
+        results = search_results.get("results", [])
+        
+        # Build formatted response
+        response_parts = []
+        response_parts.append(f"🔍 Found {total_matches} enrichment terms matching '{query}' in {cell_type}:")
+        response_parts.append("")
+        
+        # Group results by analysis type for better organization
+        by_analysis = {}
+        for result in results[:10]:  # Show top 10
+            analysis_type = result.get("analysis_type", "unknown").upper()
+            if analysis_type not in by_analysis:
+                by_analysis[analysis_type] = []
+            by_analysis[analysis_type].append(result)
+        
+        # Format each analysis type group
+        for analysis_type, analysis_results in by_analysis.items():
+            response_parts.append(f"📊 {analysis_type} Results:")
+            
+            for i, result in enumerate(analysis_results, 1):
+                term_name = result.get("term_name", "")
+                rank = result.get("rank", "?")
+                similarity = result.get("similarity_score", 0)
+                p_value = result.get("adj_p_value", "")
+                genes = result.get("intersecting_genes", "")
+                
+                # Format the result line
+                result_line = f"  {i}. {term_name}"
+                result_line += f" (rank: {rank}, similarity: {similarity:.3f}"
+                if p_value:
+                    result_line += f", p-value: {p_value:.2e}" if isinstance(p_value, float) else f", p-value: {p_value}"
+                result_line += ")"
+                
+                response_parts.append(result_line)
+                
+                # Add genes if available (first few only)
+                if genes:
+                    gene_list = genes.split(',')[:5]  # First 5 genes
+                    gene_str = ', '.join(gene_list)
+                    if len(genes.split(',')) > 5:
+                        gene_str += "..."
+                    response_parts.append(f"     Genes: {gene_str}")
+            
+            response_parts.append("")  # Empty line between analysis types
+        
+        # Add summary footer
+        if total_matches > 10:
+            response_parts.append(f"... and {total_matches - 10} more results")
+        
+        response_parts.append(f"💡 These terms were found regardless of their ranking in standard top-5 results.")
+        
+        return "\n".join(response_parts)

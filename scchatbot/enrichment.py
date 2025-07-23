@@ -1310,5 +1310,15 @@ def perform_enrichment_analyses(
     # Add analysis-specific results as top-level keys
     result_dict.update(analysis_specific_results)
     
+    # ENRICHMENT VECTOR DATABASE INTEGRATION
+    # Index enrichment results immediately for semantic search
+    try:
+        from .function_history import FunctionHistoryManager
+        history_manager = FunctionHistoryManager()
+        if hasattr(history_manager, 'index_enrichment_results_from_dual_csvs'):
+            history_manager.index_enrichment_results_from_dual_csvs(result_dict, cell_type)
+            print(f"✅ Enrichment vector database indexed: {cell_type}")
+    except Exception as e:
+        print(f"⚠️ Vector DB indexing failed (analysis results still available): {e}")
     
     return result_dict

@@ -13,7 +13,6 @@ from .cell_type_utils import (
 
 from .result_extraction import (
     extract_key_findings_from_execution,
-    extract_enrichment_key_findings,
     extract_dea_key_findings,
     extract_process_cells_findings,
     extract_comparison_findings,
@@ -25,7 +24,6 @@ __all__ = [
     'needs_cell_discovery', 
     'create_cell_discovery_steps',
     'extract_key_findings_from_execution',
-    'extract_enrichment_key_findings',
     'extract_dea_key_findings',
     'extract_process_cells_findings',
     'extract_comparison_findings',

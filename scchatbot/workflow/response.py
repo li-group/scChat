@@ -28,34 +28,59 @@ class ResponseMixin:
         """
         print("🎯 UNIFIED: Generating LLM-synthesized response with conversation awareness...")
         
-        # 1. Extract relevant results using shared utilities
-        key_findings = extract_key_findings_from_execution(state.get("execution_history", []))
+        try:
+            # 1. Extract relevant results using shared utilities
+            execution_history = state.get("execution_history", [])
+            if not isinstance(execution_history, list):
+                execution_history = list(execution_history) if hasattr(execution_history, '__iter__') else []
+            key_findings = extract_key_findings_from_execution(execution_history)
+            print("✅ Key findings extracted successfully")
+        except Exception as e:
+            print(f"❌ Error in extract_key_findings_from_execution: {e}")
+            raise
         
-        # 2. Get user intent guidance if available
-        user_intent_guidance = state.get("user_intent_guidance", {})
         
-        # 3. Get failed analyses for transparency
-        failed_analyses = self._get_failed_analyses(state)
+        # Skip user intent guidance (legacy code removed)
         
-        # 4. Check if we have conversation context from vector search
-        conversation_context = None
-        if state.get("has_conversation_context"):
-            # Extract conversation context from messages
-            for msg in state.get("messages", []):
-                if (isinstance(msg, AIMessage) and 
-                    msg.content.startswith("CONVERSATION_CONTEXT:")):
-                    conversation_context = msg.content[21:]  # Remove prefix
-                    print(f"🎯 UNIFIED: Found conversation context ({len(conversation_context)} chars)")
-                    break
+        try:
+            # 3. Get failed analyses for transparency
+            failed_analyses = self._get_failed_analyses(state)
+            print("✅ Failed analyses retrieved")
+        except Exception as e:
+            print(f"❌ Error getting failed analyses: {e}")
+            raise
         
-        # 5. Generate synthesis prompt with conversation awareness
-        synthesis_prompt = self._create_enhanced_synthesis_prompt(
-            original_question=state.get("current_message", ""),
-            key_findings=key_findings,
-            failed_analyses=failed_analyses,
-            user_intent_feedback=user_intent_guidance,
-            conversation_context=conversation_context
-        )
+        try:
+            # 4. Check if we have conversation context from vector search
+            conversation_context = None
+            if state.get("has_conversation_context"):
+                # Extract conversation context from messages
+                for msg in state.get("messages", []):
+                    if (isinstance(msg, AIMessage) and 
+                        msg.content.startswith("CONVERSATION_CONTEXT:")):
+                        conversation_context = msg.content[21:]  # Remove prefix
+                        print(f"🎯 UNIFIED: Found conversation context ({len(conversation_context)} chars)")
+                        break
+            print("✅ Conversation context processed")
+        except Exception as e:
+            print(f"❌ Error processing conversation context: {e}")
+            raise
+        
+        try:
+            # 5. Generate synthesis prompt with conversation awareness
+            synthesis_prompt = self._create_enhanced_synthesis_prompt(
+                original_question=state.get("current_message", ""),
+                key_findings=key_findings,
+                failed_analyses=failed_analyses,
+                conversation_context=conversation_context
+            )
+            print("✅ Synthesis prompt created")
+        except Exception as e:
+            print(f"❌ Error creating synthesis prompt: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
+        
         
         # 6. Get LLM response (text only, no plots yet)
         try:
@@ -85,17 +110,35 @@ class ResponseMixin:
         failed_analyses = []
         
         for step in state.get("execution_history", []):
+            # Skip if step is not a dictionary
+            if not isinstance(step, dict):
+                continue
+                
             if not step.get("success", True):  # Failed step
+                # Extract function name - handle both nested and flat structures
+                step_data = step.get("step", {})
+                if isinstance(step_data, dict) and "function_name" in step_data:
+                    # New nested structure
+                    function_name = step_data.get("function_name", "unknown")
+                    parameters = step_data.get("parameters", {})
+                elif "function_name" in step:
+                    # Flat structure (fallback)
+                    function_name = step.get("function_name", "unknown")
+                    parameters = step.get("parameters", {})
+                else:
+                    function_name = "unknown"
+                    parameters = {}
+                
                 failed_analyses.append({
-                    "function": step.get("function_name", "unknown"),
-                    "parameters": step.get("parameters", {}),
+                    "function": function_name,
+                    "parameters": parameters,
                     "error": step.get("error", "Unknown error")
                 })
         
         return failed_analyses
     
     def _create_enhanced_synthesis_prompt(self, original_question: str, key_findings: Dict[str, Any], 
-                                         failed_analyses: List[Dict], user_intent_feedback: Dict,
+                                         failed_analyses: List[Dict],
                                          conversation_context: str = None) -> str:
         """Create prompt for synthesizing analysis results with conversation awareness."""
         
@@ -123,14 +166,7 @@ class ResponseMixin:
             for failure in failed_analyses:
                 prompt += f"- {failure['function']}: {failure['error']}\n"
 
-        # Add user intent feedback if available
-        if user_intent_feedback:
-            prompt += f"""
-                        USER INTENT GUIDANCE:
-                        - Answer Format Required: {user_intent_feedback.get('answer_format', 'direct_answer')}
-                        - Key Elements to Include: {', '.join(user_intent_feedback.get('required_elements', []))}
-                        - Focus Areas: {', '.join(user_intent_feedback.get('key_focus_areas', []))}
-                        """
+        # User intent guidance removed
 
         prompt += """
                 INSTRUCTIONS:
@@ -180,9 +216,20 @@ class ResponseMixin:
         
         for step in state.get("execution_history", []):
             if step.get("success", False):
-                function_name = step.get("function_name", "")
-                if function_name.startswith("display_"):
+                # Handle both nested and flat execution history structures
+                step_data = step.get("step", {})
+                if isinstance(step_data, dict) and "function_name" in step_data:
+                    # New nested structure
+                    function_name = step_data.get("function_name", "")
+                    parameters = step_data.get("parameters", {})
+                elif "function_name" in step:
+                    # Flat structure (fallback)
+                    function_name = step.get("function_name", "")
                     parameters = step.get("parameters", {})
+                else:
+                    continue
+                    
+                if function_name.startswith("display_"):
                     cell_type = parameters.get("cell_type", "unknown")
                     
                     # Create description of the available plot
@@ -268,20 +315,43 @@ class ResponseMixin:
                 print(f"🎨 PLOT EXTRACTION: Reached max plots limit ({MAX_PLOTS}), stopping")
                 break
                 
-            # FIX: execution history stores function data directly, not in 'step' sub-dict
-            function_name = execution.get("function_name", "")
-            success = execution.get("success", False)
-            # Check both 'result' and 'result_summary' for visualization content
-            result = execution.get("result") or execution.get("result_summary")
+            # Handle both nested and flat execution history structures
+            step_data = execution.get("step", {})
+            if isinstance(step_data, dict) and "function_name" in step_data:
+                # New nested structure
+                function_name = step_data.get("function_name", "")
+                success = execution.get("success", False)
+                result = execution.get("result") or execution.get("result_summary")
+            elif "function_name" in execution:
+                # Flat structure (fallback)
+                function_name = execution.get("function_name", "")
+                success = execution.get("success", False)
+                result = execution.get("result") or execution.get("result_summary")
+            else:
+                # No recognizable function structure
+                function_name = ""
+                success = False
+                result = None
+            
             has_result = result is not None
             
             print(f"🎨 PLOT EXTRACTION: Step {i+1}: {function_name}, success={success}, has_result={has_result}")
             
-            if (success and 
-                function_name.startswith("display_") and
-                has_result and 
-                isinstance(result, str) and
-                ("<div" in result or "<html" in result)):
+            # Debug: Check result content for display_ functions
+            if function_name.startswith("display_") and has_result:
+                result_preview = str(result)[:200] if result else "None"
+                result_type = type(result).__name__
+                has_html = isinstance(result, str) and ("<div" in result or "<html" in result)
+                print(f"🎨 PLOT DEBUG: Result type={result_type}, length={len(str(result)) if result else 0}, has_html={has_html}")
+                print(f"🎨 PLOT DEBUG: Result preview: {result_preview}...")
+            
+            # Check for plots by function name OR by HTML content (fallback for storage bugs)
+            is_plot_function = function_name.startswith("display_")
+            is_html_content = (isinstance(result, str) and 
+                             ("<div" in result or "<html" in result) and 
+                             len(result) > 1000)  # Likely a plot if it's large HTML
+            
+            if (success and has_result and (is_plot_function or is_html_content)):
                 result_length = len(result)
                 
                 # Check size limit
@@ -299,12 +369,22 @@ class ResponseMixin:
                 
                 seen_plots.add(plot_fingerprint)
                 
-                # Get description - execution stores data directly, not in nested 'step'
-                description = self._generate_visualization_description(execution, result)
+                # Get description using extracted function_name
+                if is_plot_function:
+                    description = self._generate_visualization_description(function_name, step_data if "function_name" in step_data else execution, result)
+                else:
+                    # Fallback description for HTML content without display_ function name
+                    description = "Generated visualization plot"
                 plot_descriptions.append(f"<h4>{description}</h4>")
                 plots.append(result)
                 
-                print(f"🎨 PLOT EXTRACTION: Found unique plot {function_name} ({result_length} chars)")
+                # Determine plot type for description
+                if is_plot_function:
+                    plot_type = f"plot {function_name}"
+                else:
+                    plot_type = f"HTML content (likely visualization)"
+                
+                print(f"🎨 PLOT EXTRACTION: Found unique {plot_type} ({result_length} chars)")
         
         if plots:
             combined_plots = "".join([f"<div class='plot-container'>{desc}{plot}</div>" 
@@ -327,9 +407,8 @@ class ResponseMixin:
             print("🎨 PLOT EXTRACTION: No valid plots found")
             return ""
     
-    def _generate_visualization_description(self, execution: Dict, result: str) -> str:
+    def _generate_visualization_description(self, function_name: str, execution: Dict, result: str) -> str:
         """Generate a descriptive summary for visualization functions"""
-        function_name = execution["function_name"]
         parameters = execution.get("parameters", {})
         
         # Create user-friendly descriptions for different visualization types
