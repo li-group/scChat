@@ -60,16 +60,18 @@ class ResponseMixin:
             raise
         
         try:
-            # 4. Check if we have conversation context from vector search
+            # 4. Extract unified context (should now be clean with no accumulation)
             conversation_context = None
-            if state.get("has_conversation_context"):
-                # Extract conversation context from messages
-                for msg in state.get("messages", []):
-                    if (isinstance(msg, AIMessage) and 
-                        msg.content.startswith("CONVERSATION_CONTEXT:")):
-                        conversation_context = msg.content[21:]  # Remove prefix
-                        print(f"🎯 UNIFIED: Found conversation context ({len(conversation_context)} chars)")
-                        break
+            messages = state.get("messages", [])
+            
+            # Since we now clean old context, there should be at most ONE context message
+            for msg in messages:
+                if isinstance(msg, AIMessage) and any(prefix in msg.content for prefix in 
+                    ["CURRENT_SESSION_STATE:", "CONVERSATION_HISTORY:", "CONVERSATION_CONTEXT:"]):
+                    conversation_context = msg.content
+                    print(f"🎯 UNIFIED: Found context message ({len(conversation_context)} chars)")
+                    break
+            
             print("✅ Conversation context processed")
         except Exception as e:
             print(f"❌ Error processing conversation context: {e}")
@@ -160,9 +162,10 @@ class ResponseMixin:
         # Add conversation context if available
         if conversation_context:
             prompt += f"""
+                        CURRENT SESSION CONTEXT:
                         {conversation_context}
 
-                        Please consider the conversation history above when formulating your response.
+                        Please use the current session information above to provide accurate, context-aware responses.
                         """
 
         prompt += f"""

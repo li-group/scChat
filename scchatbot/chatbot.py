@@ -41,9 +41,8 @@ from .cell_type_hierarchy import (
 )
 
 from .function_history import FunctionHistoryManager
-from .cache_manager import SimpleIntelligentCache
 from .analysis_wrapper import AnalysisFunctionWrapper
-from .workflow_nodes import WorkflowNodes
+from .workflow import WorkflowNodes
 
 
 # For backward compatibility, export the main class
@@ -57,7 +56,6 @@ __all__ = [
     'HierarchicalCellTypeManager',
     'CellTypeExtractor',
     'FunctionHistoryManager',
-    'SimpleIntelligentCache',
     'AnalysisFunctionWrapper',
     'WorkflowNodes'
 ]

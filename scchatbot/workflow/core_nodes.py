@@ -30,7 +30,7 @@ class CoreNodes:
     
     def __init__(self, initial_annotation_content, initial_cell_types, adata, 
                  history_manager, hierarchy_manager, cell_type_extractor,
-                 function_descriptions, function_mapping, visualization_functions, simple_cache):
+                 function_descriptions, function_mapping, visualization_functions):
         self.initial_annotation_content = initial_annotation_content
         self.initial_cell_types = initial_cell_types
         self.adata = adata
@@ -40,7 +40,6 @@ class CoreNodes:
         self.function_descriptions = function_descriptions
         self.function_mapping = function_mapping
         self.visualization_functions = visualization_functions
-        self.simple_cache = simple_cache
         
         # Initialize EnrichmentChecker with error handling
         self.enrichment_checker = None
@@ -69,40 +68,112 @@ class CoreNodes:
         current_message = state["current_message"]
         state["has_conversation_context"] = False
         
-        # Use LLM to determine if context is needed and generate search queries
+        # Use LLM to determine what context information is needed
         if hasattr(self.history_manager, 'search_conversations'):
+            # Provide current session state information to LLM
+            available_cell_types = list(state.get("available_cell_types", []))
+            recent_analyses = [h.get("function_name") for h in state.get("execution_history", [])[-3:]]
+            
             context_analysis_prompt = f"""
                                         User asked: "{current_message}"
-
-                                        If this question seems to reference or build upon previous conversations, 
-                                        generate 1-3 search queries to find relevant context.
-
-                                        Return a JSON list of search queries, or an empty list if no context is needed.
+                                        
+                                        Current session context:
+                                        - Available cell types: {available_cell_types}
+                                        - Recent analyses: {recent_analyses}
+                                        
+                                        To answer this question, determine what context to provide:
+                                        
+                                        1. If asking about current state (what cell types, current results): ["current_session_state"]
+                                        2. If referencing previous work or asking follow-up questions: generate search queries for conversation history
+                                        3. If unclear or asking "what else": provide both current state AND search previous conversations
+                                        
+                                        Examples:
+                                        - "What cell types do we have?" → ["current_session_state"]
+                                        - "What about the pathway analysis we did before?" → ["pathway analysis results", "enrichment analysis"]  
+                                        - "What else?" → ["current_session_state", "recent analysis results", "what other analyses available"]
+                                        
+                                        Return a JSON list of search queries/context types, or an empty list if no context needed.
                                         Only return the JSON list, nothing else.
                                         """
             
             try:
                 # LLM decides if context is needed and what to search for
                 search_queries_json = self._call_llm(context_analysis_prompt)
-                search_queries = json.loads(search_queries_json)
+                print(f"🔍 LLM search query response: '{search_queries_json}'")
+                
+                # Handle empty or malformed JSON responses
+                if not search_queries_json or search_queries_json.strip() == "":
+                    print("⚠️ LLM returned empty response for context search")
+                    search_queries = []
+                else:
+                    try:
+                        # Strip markdown code blocks if present and handle truncated responses
+                        clean_json = search_queries_json.strip()
+                        
+                        # Handle various markdown formats
+                        if clean_json.startswith('```json'):
+                            clean_json = clean_json[7:]
+                        elif clean_json.startswith('```'):
+                            clean_json = clean_json[3:]
+                        
+                        if clean_json.endswith('```'):
+                            clean_json = clean_json[:-3]
+                        
+                        clean_json = clean_json.strip()
+                        
+                        # Handle empty or incomplete responses
+                        if not clean_json or clean_json == '':
+                            search_queries = []
+                        else:
+                            search_queries = json.loads(clean_json)
+                    except json.JSONDecodeError as json_error:
+                        print(f"⚠️ LLM returned malformed JSON: {json_error}")
+                        print(f"⚠️ Raw response: '{search_queries_json}'")
+                        search_queries = []
                 
                 if search_queries:
-                    print(f"🧠 LLM generated {len(search_queries)} search queries: {search_queries}")
+                    print(f"🧠 LLM requested {len(search_queries)} context sources: {search_queries}")
                     
-                    # Retrieve context using LLM-generated queries
-                    all_results = []
-                    for query in search_queries[:3]:  # Limit to 3 queries
-                        results = self.history_manager.search_conversations(query, k=2)
-                        all_results.extend(results)
+                    # 🧹 CLEAR OLD CONTEXT: Remove any existing context messages to avoid accumulation
+                    messages_to_keep = []
+                    context_messages_removed = 0
                     
-                    if all_results:
-                        # Format and add context to state
-                        context = self.history_manager.format_search_results(all_results)
-                        state["messages"].append(
-                            AIMessage(content=f"CONVERSATION_CONTEXT: {context}")
-                        )
+                    for msg in state.get("messages", []):
+                        if isinstance(msg, AIMessage) and any(prefix in msg.content for prefix in 
+                            ["CURRENT_SESSION_STATE:", "CONVERSATION_HISTORY:", "CONVERSATION_CONTEXT:"]):
+                            context_messages_removed += 1
+                            print(f"🧹 CONTEXT CLEANUP: Removing old context message ({len(msg.content)} chars)")
+                        else:
+                            messages_to_keep.append(msg)
+                    
+                    if context_messages_removed > 0:
+                        state["messages"] = messages_to_keep
+                        print(f"🧹 CONTEXT CLEANUP: Removed {context_messages_removed} old context messages")
+                    
+                    context_parts = []
+                    
+                    # Handle different types of context requests  
+                    for query in search_queries:
+                        if query == "current_session_state":
+                            # Add current session state information
+                            session_context = self._build_session_state_context(state)
+                            context_parts.append(f"CURRENT_SESSION_STATE: {session_context}")
+                            print(f"✅ Added current session state context ({len(session_context)} chars)")
+                            print(f"🔍 SESSION CONTEXT DEBUG: First 100 chars: '{session_context[:100]}...'")
+                        else:
+                            # Treat as conversation search query
+                            results = self.history_manager.search_conversations(query, k=2)
+                            if results:
+                                formatted_results = self.history_manager.format_search_results(results)
+                                context_parts.append(f"CONVERSATION_HISTORY: {formatted_results}")
+                                print(f"✅ Added conversation context for '{query}' ({len(formatted_results)} chars)")
+                    
+                    if context_parts:
+                        # Add fresh context to state
+                        full_context = "\n\n".join(context_parts)
+                        state["messages"].append(AIMessage(content=full_context))
                         state["has_conversation_context"] = True
-                        print(f"✅ Retrieved conversation context ({len(context)} chars)")
+                        print(f"✅ Added fresh unified context ({len(full_context)} chars)")
                     
             except Exception as e:
                 # Silent fail - continue without context
@@ -111,6 +182,62 @@ class CoreNodes:
         # Add user message
         state["messages"].append(HumanMessage(content=state["current_message"]))
         
+        # Continue with the rest of input processing
+        self._continue_input_processing(state)
+        return state
+    
+    def _build_session_state_context(self, state: ChatState) -> str:
+        """Build context from current session state and recent execution results"""
+        print(f"🔍 CONTEXT BUILDER: Building session context...")
+        context_parts = []
+        
+        # Available cell types with better formatting
+        available_cell_types = list(state.get("available_cell_types", []))
+        print(f"🔍 CONTEXT BUILDER: Found {len(available_cell_types)} cell types: {available_cell_types}")
+        
+        if available_cell_types:
+            context_parts.append(f"Cell types currently available in the dataset:")
+            for cell_type in sorted(available_cell_types):
+                context_parts.append(f"  • {cell_type}")
+            context_parts.append("")  # Add spacing
+        
+        # Recent execution history with better context
+        execution_history = state.get("execution_history", [])
+        if execution_history:
+            recent_steps = execution_history[-3:]  # Last 3 steps for brevity
+            successful_steps = [step for step in recent_steps if step.get("success")]
+            
+            if successful_steps:
+                context_parts.append("Recent analysis activities:")
+                for step in successful_steps:
+                    function_name = step.get("function_name", "unknown")
+                    params = step.get("parameters", {})
+                    cell_type = params.get("cell_type", "")
+                    
+                    # Create more natural descriptions
+                    if function_name == "perform_enrichment_analyses":
+                        desc = f"Enrichment analysis completed for {cell_type}"
+                    elif function_name == "process_cells":
+                        desc = f"Cell processing and annotation for {cell_type}"
+                    elif function_name == "search_enrichment_semantic":
+                        query = params.get("query", "")
+                        desc = f"Searched for '{query}' in {cell_type} results"
+                    elif function_name == "conversational_response":
+                        desc = "Provided response based on current data"
+                    else:
+                        desc = f"{function_name.replace('_', ' ').title()}"
+                        if cell_type:
+                            desc += f" for {cell_type}"
+                    
+                    context_parts.append(f"  • {desc}")
+                context_parts.append("")  # Add spacing
+        
+        result = "\n".join(context_parts) if context_parts else "No current session data available"
+        print(f"🔍 CONTEXT BUILDER: Generated {len(result)} chars, starts with: '{result[:50]}...'")
+        return result
+    
+    def _continue_input_processing(self, state: ChatState):
+        """Continue the input processing after context retrieval"""
         # ✅ SMART INITIALIZATION: Preserve discovered cell types across questions
         if not state.get("available_cell_types"):
             # First question or state is empty - use initial types
@@ -320,6 +447,10 @@ class CoreNodes:
             enhanced_plan = self._add_cell_discovery_to_plan(plan_data, message, available_cell_types)
             
             # Apply enrichment enhancement to all enrichment steps
+            print(f"🔍 ENRICHMENT DEBUG: Checking for enrichment steps in plan...")
+            enrichment_steps = [s for s in enhanced_plan.get("steps", []) if s.get("function_name") == "perform_enrichment_analyses"]
+            print(f"🔍 ENRICHMENT DEBUG: Found {len(enrichment_steps)} enrichment steps")
+            
             enhanced_plan = self._enhance_all_enrichment_steps(enhanced_plan, message)
             
             # Skip steps for unavailable cell types
@@ -364,11 +495,12 @@ class CoreNodes:
         return state
     
 
-    def _store_execution_result(self, step_data: Dict, result: Any, success: bool) -> Dict[str, Any]:
+    def _store_execution_result(self, step_data: Dict, result: Any, success: bool, original_function_name: str = None) -> Dict[str, Any]:
         """
         New intelligent result storage that preserves structure for critical functions
         """
-        function_name = step_data.get("function_name", "")
+        # Use provided original function name or fallback to step_data
+        function_name = original_function_name or step_data.get("function_name", "")
         
         # Critical functions that need full structure preservation
         STRUCTURE_PRESERVED_FUNCTIONS = {
@@ -449,6 +581,10 @@ class CoreNodes:
         step = ExecutionStep(**step_data)
         
         print(f"🔄 Executing step {state['current_step_index'] + 1}: {step.description}")
+        
+        # DEBUG: Log the original function name to track mutations
+        original_function_name = step_data.get("function_name", "unknown")
+        print(f"🔍 STORAGE DEBUG: Original function_name from plan: '{original_function_name}'")
         
         success = False
         result = None
@@ -578,11 +714,25 @@ class CoreNodes:
             )
         
         # Record execution in state using new structured storage approach
-        result_storage = self._store_execution_result(step_data, result, success)
+        # Pass original function name to prevent using mutated name
+        result_storage = self._store_execution_result(step_data, result, success, original_function_name)
+        
+        # CRITICAL FIX: Create a deep copy of step_data to prevent mutation issues
+        # This ensures each execution history entry has its own independent step data
+        import copy
+        step_data_copy = copy.deepcopy(step_data)
+        
+        # DEBUG: Check if function name was mutated
+        current_function_name = step_data.get("function_name", "unknown")
+        if current_function_name != original_function_name:
+            print(f"⚠️ MUTATION DETECTED: function_name changed from '{original_function_name}' to '{current_function_name}'")
+            # Fix the function name in the copy
+            step_data_copy["function_name"] = original_function_name
+            print(f"🔧 CORRECTED: Restored function_name to '{original_function_name}' in execution history")
         
         state["execution_history"].append({
             "step_index": state["current_step_index"],
-            "step": step_data,
+            "step": step_data_copy,  # Use copy to prevent mutation
             "success": success,
             "result": result_storage["result"],  # Full structure preserved for critical functions
             "result_type": result_storage["result_type"],
@@ -590,8 +740,8 @@ class CoreNodes:
             "error": error_msg
         })
         
-        # Log storage decision for monitoring
-        function_name = step_data.get("function_name", "")
+        # Log storage decision for monitoring (use original function name)
+        function_name = original_function_name  # Use original name, not potentially mutated one
         if result_storage["result_type"] == "structured":
             print(f"📊 Structured storage: {function_name} - Full data preserved")
         elif result_storage["result_type"] == "visualization":
@@ -612,21 +762,14 @@ class CoreNodes:
         """
         Enhance the initial plan by adding cell discovery steps if needed.
         
-        SHADOW MODE: Runs both old and new logic to compare results.
+        Uses V2 implementation that preserves LLM's analysis steps.
         """
-        # Run both versions
-        old_result = self._add_cell_discovery_to_plan_v1(plan_data.copy(), message, available_cell_types)
-        new_result = self._add_cell_discovery_to_plan_v2(plan_data.copy(), message, available_cell_types)
-        
-        # Compare and log differences
-        self._compare_discovery_plans(old_result, new_result)
-        
-        # For now, use old result (safe mode)
-        return old_result
+        return self._add_cell_discovery_to_plan_v2(plan_data, message, available_cell_types)
     
-    def _add_cell_discovery_to_plan_v1(self, plan_data: Dict[str, Any], message: str, available_cell_types: List[str]) -> Dict[str, Any]:
+    
+    def _add_cell_discovery_to_plan_v2(self, plan_data: Dict[str, Any], message: str, available_cell_types: List[str]) -> Dict[str, Any]:
         """
-        V1 (CURRENT): Original implementation that loses LLM analysis steps.
+        V2 (NEW): Preserves LLM's analysis steps while adding discovery.
         """
         if not plan_data or not self.hierarchy_manager:
             return plan_data
@@ -641,51 +784,6 @@ class CoreNodes:
         print(f"🧬 Planner identified needed cell types: {needed_cell_types}")
         print(f"🧬 Available cell types: {available_cell_types}")
         
-        # Fix cell type names in original plan steps first
-        original_steps = plan_data.get("steps", [])
-        corrected_steps = self._fix_cell_type_names_in_steps(original_steps, needed_cell_types, message)
-        plan_data["steps"] = corrected_steps
-        
-        # Check if discovery is needed
-        if needs_cell_discovery(needed_cell_types, available_cell_types):
-            print("🧬 Adding cell discovery steps to plan...")
-            
-            # Create discovery steps
-            discovery_steps = create_cell_discovery_steps(needed_cell_types, available_cell_types, "analysis", self.hierarchy_manager)
-            
-            if discovery_steps:
-                # Insert discovery steps at the beginning of the plan
-                plan_data["steps"] = discovery_steps + corrected_steps
-                
-                # Update plan summary
-                original_summary = plan_data.get("plan_summary", "")
-                plan_data["plan_summary"] = f"Discover needed cell types then {original_summary.lower()}"
-                
-                print(f"🧬 Enhanced plan with {len(discovery_steps)} discovery steps")
-            else:
-                print("🧬 No discovery steps created")
-        else:
-            print("🧬 All needed cell types already available")
-        
-        return plan_data
-    
-    def _add_cell_discovery_to_plan_v2(self, plan_data: Dict[str, Any], message: str, available_cell_types: List[str]) -> Dict[str, Any]:
-        """
-        V2 (NEW): Preserves LLM's analysis steps while adding discovery.
-        """
-        if not plan_data or not self.hierarchy_manager:
-            return plan_data
-        
-        # Extract cell types mentioned in the user's question
-        needed_cell_types = extract_cell_types_from_question(message, self.hierarchy_manager)
-        
-        if not needed_cell_types:
-            print("🔍 [V2] No specific cell types identified in question")
-            return plan_data
-        
-        print(f"🧬 [V2] Planner identified needed cell types: {needed_cell_types}")
-        print(f"🧬 [V2] Available cell types: {available_cell_types}")
-        
         # Step 1: Extract and categorize original steps
         original_steps = plan_data.get("steps", [])
         llm_analysis_steps = []
@@ -697,7 +795,7 @@ class CoreNodes:
             if func_name in ["perform_enrichment_analyses", "dea_split_by_condition", 
                            "compare_cell_counts", "analyze_cell_interaction"]:
                 llm_analysis_steps.append(step)
-                print(f"📋 [V2] Preserving LLM analysis step: {func_name}({step.get('parameters', {}).get('cell_type', 'unknown')})")
+                print(f"📋 Preserving LLM analysis step: {func_name}({step.get('parameters', {}).get('cell_type', 'unknown')})")
             else:
                 other_steps.append(step)
         
@@ -708,7 +806,7 @@ class CoreNodes:
         # Step 3: Create discovery steps ONLY (no analysis)
         discovery_steps = []
         if needs_cell_discovery(needed_cell_types, available_cell_types):
-            print("🧬 [V2] Creating discovery steps only...")
+            print("🧬 Creating discovery steps only...")
             discovery_steps = self._create_discovery_steps_only(needed_cell_types, available_cell_types)
         
         # Step 4: Add validation steps after discovery
@@ -730,7 +828,7 @@ class CoreNodes:
             original_summary = plan_data.get("plan_summary", "")
             plan_data["plan_summary"] = f"Discover needed cell types then {original_summary.lower()}"
         
-        print(f"📋 [V2] Plan merge complete:")
+        print(f"📋 Plan merge complete:")
         print(f"   - Discovery steps: {len(discovery_steps)}")
         print(f"   - Validation steps: {len(validation_steps)}")
         print(f"   - LLM analysis steps: {len(llm_analysis_steps)}")
@@ -747,7 +845,7 @@ class CoreNodes:
         
         for needed_type in needed_cell_types:
             if needed_type in available_cell_types:
-                print(f"✅ [V2] '{needed_type}' already available, no discovery needed")
+                print(f"✅ '{needed_type}' already available, no discovery needed")
                 continue
             
             # Find processing path using hierarchy manager
@@ -758,7 +856,7 @@ class CoreNodes:
                 path_result = self.hierarchy_manager.find_parent_path(needed_type, [available_type])
                 if path_result:
                     best_parent, processing_path = path_result
-                    print(f"🔄 [V2] Found path from '{best_parent}' to '{needed_type}': {' → '.join(processing_path)}")
+                    print(f"🔄 Found path from '{best_parent}' to '{needed_type}': {' → '.join(processing_path)}")
                     break
             
             if processing_path and len(processing_path) > 1:
@@ -782,9 +880,9 @@ class CoreNodes:
                             "description": f"Process {current_type} to discover {target_type}",
                             "expected_outcome": f"Discover {target_type} cell type"
                         })
-                        print(f"🧬 [V2] Added process_cells({current_type}) to discover {target_type}")
+                        print(f"🧬 Added process_cells({current_type}) to discover {target_type}")
             else:
-                print(f"⚠️ [V2] No processing path found for '{needed_type}'")
+                print(f"⚠️ No processing path found for '{needed_type}'")
         
         return discovery_steps
     
@@ -817,66 +915,6 @@ class CoreNodes:
         
         return validation_steps
     
-    def _compare_discovery_plans(self, old_result: Dict[str, Any], new_result: Dict[str, Any]) -> None:
-        """
-        Compare old and new discovery plans and log differences.
-        """
-        print("\n" + "="*60)
-        print("🔍 SHADOW MODE: Comparing V1 vs V2 Discovery Plans")
-        print("="*60)
-        
-        old_steps = old_result.get("steps", [])
-        new_steps = new_result.get("steps", [])
-        
-        # Categorize steps
-        def categorize_steps(steps):
-            categories = {
-                "discovery": [],
-                "validation": [],
-                "analysis": [],
-                "other": []
-            }
-            for step in steps:
-                func_name = step.get("function_name", "")
-                if func_name == "process_cells":
-                    categories["discovery"].append(step)
-                elif func_name == "validate_processing_results":
-                    categories["validation"].append(step)
-                elif func_name in ["perform_enrichment_analyses", "dea_split_by_condition", "compare_cell_counts"]:
-                    categories["analysis"].append(step)
-                else:
-                    categories["other"].append(step)
-            return categories
-        
-        old_categories = categorize_steps(old_steps)
-        new_categories = categorize_steps(new_steps)
-        
-        # Compare counts
-        print("\n📊 Step Count Comparison:")
-        print(f"   V1 Total: {len(old_steps)} | V2 Total: {len(new_steps)}")
-        print(f"   Discovery: V1={len(old_categories['discovery'])} | V2={len(new_categories['discovery'])}")
-        print(f"   Validation: V1={len(old_categories['validation'])} | V2={len(new_categories['validation'])}")
-        print(f"   Analysis: V1={len(old_categories['analysis'])} | V2={len(new_categories['analysis'])}")
-        print(f"   Other: V1={len(old_categories['other'])} | V2={len(new_categories['other'])}")
-        
-        # Show analysis steps difference (key issue)
-        if len(new_categories['analysis']) > len(old_categories['analysis']):
-            print("\n✅ V2 PRESERVES MORE ANALYSIS STEPS:")
-            for step in new_categories['analysis']:
-                cell_type = step.get("parameters", {}).get("cell_type", "unknown")
-                func = step.get("function_name")
-                print(f"   - {func}({cell_type})")
-        elif len(new_categories['analysis']) < len(old_categories['analysis']):
-            print("\n⚠️ V2 HAS FEWER ANALYSIS STEPS:")
-            missing = set(str(s) for s in old_categories['analysis']) - set(str(s) for s in new_categories['analysis'])
-            for s in missing:
-                print(f"   - {s}")
-        
-        # Check if any already-available cell types get analysis in V2 but not V1
-        print("\n🎯 Key Improvement Check:")
-        print("   Does V2 preserve analysis for already-available cell types?")
-        
-        print("\n" + "="*60 + "\n")
     
     def _fix_cell_type_names_in_steps(self, steps: List[Dict[str, Any]], correct_cell_types: List[str], original_question: str) -> List[Dict[str, Any]]:
         """
@@ -1166,10 +1204,12 @@ class CoreNodes:
 
     def _enhance_all_enrichment_steps(self, plan_data: Dict[str, Any], message: str) -> Dict[str, Any]:
         """Enhance all enrichment analysis steps in the plan using EnrichmentChecker."""
+        print(f"🧬 ENRICHMENT ENHANCER: Processing {len(plan_data.get('steps', []))} steps")
         enhanced_steps = []
         
-        for step in plan_data.get("steps", []):
+        for i, step in enumerate(plan_data.get("steps", [])):
             if step.get("function_name") == "perform_enrichment_analyses":
+                print(f"🧬 ENRICHMENT ENHANCER: Enhancing step {i+1}: {step.get('parameters', {}).get('cell_type', 'unknown')}")
                 # Enhance this enrichment step
                 enhanced_step = self._enhance_enrichment_step(step, message)
                 enhanced_steps.append(enhanced_step)

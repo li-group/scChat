@@ -28,10 +28,9 @@ from .visualizations import (
 from .utils import clear_directory
 from .cell_type_models import ChatState
 from .function_history import FunctionHistoryManager
-from .cache_manager import SimpleIntelligentCache
 from .cell_type_hierarchy import HierarchicalCellTypeManager, CellTypeExtractor
 from .analysis_wrapper import AnalysisFunctionWrapper
-from .workflow_nodes import WorkflowNodes
+from .workflow import WorkflowNodes
 
 
 class MultiAgentChatBot:
@@ -51,11 +50,8 @@ class MultiAgentChatBot:
         self.adata = None
         
         # Initialize memory and awareness systems
-        self.history_manager = FunctionHistoryManager()
+        self.history_manager = FunctionHistoryManager("conversation_history")
         
-        # Initialize intelligent cache with insights
-        self.simple_cache = SimpleIntelligentCache()
-        self.simple_cache.ensure_cache_directories()
         
         # Initialize hierarchical management components
         self.hierarchy_manager = None
@@ -82,8 +78,7 @@ class MultiAgentChatBot:
             self.cell_type_extractor,
             self.function_descriptions,
             self.function_mapping,
-            self.visualization_functions,
-            self.simple_cache
+            self.visualization_functions
         )
         # Create LangGraph workflow
         self.workflow = self._create_workflow()
@@ -587,18 +582,6 @@ class MultiAgentChatBot:
                 
         print("✅ Cleanup completed")
             
-    def manage_cache(self, action: str, **kwargs):
-        """Manage cache operations"""
-        if action == "invalidate":
-            self.simple_cache.invalidate_cache(**kwargs)
-        elif action == "stats":
-            return self.simple_cache.get_cache_stats()
-        elif action == "insights":
-            cell_type = kwargs.get("cell_type")
-            if cell_type:
-                return self.simple_cache.get_analysis_insights(cell_type)
-            else:
-                return "Cell type required for insights"
 
     # ========== Function Wrappers ==========
     
@@ -665,18 +648,8 @@ class MultiAgentChatBot:
         return wrapper
 
     def _wrap_enrichment_analysis(self, **kwargs):
-        """🧠 CACHED: Enrichment analysis with simple intelligent caching"""
-        
-        # Remove analysis_type from kwargs to avoid "multiple values" error
-        filtered_kwargs = {k: v for k, v in kwargs.items() if k != "analysis_type"}
-        
-        # Use cache-aware wrapper
-        return self.simple_cache.cache_aware_function_wrapper(
-            function_name="perform_enrichment_analyses",
-            analysis_type="enrichment", 
-            compute_function=lambda: self._compute_enrichment_analysis(**kwargs),
-            **filtered_kwargs
-        )
+        """Enrichment analysis wrapper"""
+        return self._compute_enrichment_analysis(**kwargs)
     
     def _compute_enrichment_analysis(self, **kwargs):
         """Internal method to compute enrichment analysis (extracted for caching)"""
@@ -699,15 +672,8 @@ class MultiAgentChatBot:
             return perform_enrichment_analyses(self.adata, **kwargs)
 
     def _wrap_dea_analysis(self, **kwargs):
-        """🧠 CACHED: DEA analysis with simple intelligent caching"""
-        
-        # Use cache-aware wrapper
-        return self.simple_cache.cache_aware_function_wrapper(
-            function_name="dea_split_by_condition",
-            analysis_type="dea", 
-            compute_function=lambda: self._compute_dea_analysis(**kwargs),
-            **kwargs
-        )
+        """DEA analysis wrapper"""
+        return self._compute_dea_analysis(**kwargs)
     
     def _compute_dea_analysis(self, **kwargs):
         """Internal method to compute DEA analysis (extracted for caching)"""
@@ -817,10 +783,7 @@ class MultiAgentChatBot:
                 return self._generate_general_interpretation(available_results, question_context)
             
             # Get specific insights for the requested cell type
-            if self.simple_cache:
-                insights = self.simple_cache.get_analysis_insights(cell_type)
-            else:
-                insights = {}
+            insights = {}
             
             # Check if we have any data for this cell type
             if not insights.get("enrichment_insights") and not insights.get("dea_insights"):
@@ -871,12 +834,7 @@ class MultiAgentChatBot:
                 summary_parts.append(f"📈 DEA completed for: {', '.join(dea)}")
             
             # If specific cell type requested, add detailed insights
-            if cell_type and self.simple_cache:
-                insights = self.simple_cache.get_analysis_insights(cell_type)
-                if insights.get("summary"):
-                    summary_parts.append(f"\n🎯 {cell_type} specific insights:")
-                    for insight in insights["summary"]:
-                        summary_parts.append(f"  • {insight}")
+            # Cache system removed - insights handled by unified result accessor
             
             if summary_parts:
                 return "\n".join(summary_parts)

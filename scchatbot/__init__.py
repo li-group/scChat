@@ -18,7 +18,6 @@ from .chatbot import (
     HierarchicalCellTypeManager,
     CellTypeExtractor,
     FunctionHistoryManager,
-    SimpleIntelligentCache,
     AnalysisFunctionWrapper,
     WorkflowNodes
 )
@@ -39,7 +38,6 @@ __all__ = [
     'HierarchicalCellTypeManager',
     'CellTypeExtractor',
     'FunctionHistoryManager',
-    'SimpleIntelligentCache',
     'AnalysisFunctionWrapper',
     'WorkflowNodes'
 ]

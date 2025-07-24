@@ -3,14 +3,9 @@ Execution logic for workflow nodes.
 
 This module contains execution-related methods extracted from workflow_nodes.py:
 - _execute_final_question(): Executes comprehensive final question using all available context
-- validate_processing_results(): Validates that process_cells discovered expected cell types
-- _update_available_cell_types_from_result(): Updates available cell types from processing results
-- _extract_cell_types_from_result(): Extracts cell types from analysis results
 """
 
-import json
-import re
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 from ..cell_type_models import ChatState
 
@@ -107,110 +102,3 @@ class ExecutionMixin:
             print(f"❌ {error_msg}")
             return error_msg
 
-    def validate_processing_results(self, processed_parent: str, expected_children: List[str]) -> Dict[str, Any]:
-        """Validate that process_cells discovered the expected cell types"""
-        if not self.adata:
-            return {"status": "error", "message": "No adata available"}
-        
-        current_cell_types = set(self.adata.obs["cell_type"].unique())
-        found_children = []
-        missing_children = []
-        
-        for expected_child in expected_children:
-            # Check exact match or fuzzy match
-            if expected_child in current_cell_types:
-                found_children.append(expected_child)
-            else:
-                # Try fuzzy matching
-                fuzzy_matches = [ct for ct in current_cell_types 
-                               if expected_child.lower() in ct.lower() or ct.lower() in expected_child.lower()]
-                if fuzzy_matches:
-                    found_children.extend(fuzzy_matches)
-                    print(f"🔄 Fuzzy match: '{expected_child}' → {fuzzy_matches}")
-                else:
-                    missing_children.append(expected_child)
-        
-        if missing_children:
-            print(f"⚠️ Validation Warning: Expected children not found: {missing_children}")
-            print(f"   Available cell types: {sorted(current_cell_types)}")
-            
-            # Try to suggest alternatives
-            suggestions = []
-            for missing in missing_children:
-                for available in current_cell_types:
-                    if self.hierarchy_manager and self.hierarchy_manager.get_cell_type_relation(missing, available).name in ["ANCESTOR", "DESCENDANT", "SIBLING"]:
-                        suggestions.append(f"'{missing}' → '{available}'")
-            
-            return {
-                "status": "partial_success" if found_children else "warning",
-                "message": f"Found {len(found_children)}/{len(expected_children)} expected cell types. Missing: {missing_children}",
-                "found_children": found_children,
-                "missing_children": missing_children,
-                "suggestions": suggestions,
-                "available_types": list(current_cell_types)
-            }
-        else:
-            return {
-                "status": "success",
-                "message": f"All {len(expected_children)} expected cell types found successfully",
-                "found_children": found_children,
-                "missing_children": [],
-                "available_types": list(current_cell_types)
-            }
-
-    def _update_available_cell_types_from_result(self, state: ChatState, result: Any) -> None:
-        """
-        Update available_cell_types with newly discovered cell types from process_cells result.
-        """
-        if not result:
-            return
-        
-        # Extract discovered cell types from the result
-        discovered_types = []
-        
-        try:
-            # The process_cells result should contain information about discovered cell types
-            # Check if result is a dict with discovered types
-            if isinstance(result, dict):
-                if "discovered_cell_types" in result:
-                    discovered_types = result["discovered_cell_types"]
-                elif "new_cell_types" in result:
-                    discovered_types = result["new_cell_types"]
-            
-            # If no explicit discovered types, try to extract from string result
-            elif isinstance(result, str):
-                # Look for patterns like "✅ Discovered new cell type: T cell"
-                discoveries = re.findall(r"✅ Discovered new cell type: ([^\\n]+)", result)
-                discovered_types.extend(discoveries)
-            
-            # Also check the hierarchy manager for newly available types
-            if self.hierarchy_manager and hasattr(self.hierarchy_manager, 'get_available_cell_types'):
-                current_available = self.hierarchy_manager.get_available_cell_types()
-                original_available = set(state.get("available_cell_types", []))
-                newly_available = set(current_available) - original_available
-                discovered_types.extend(list(newly_available))
-            
-            # Update state with newly discovered types
-            if discovered_types:
-                current_available = set(state.get("available_cell_types", []))
-                for cell_type in discovered_types:
-                    if cell_type and cell_type not in current_available:
-                        current_available.add(cell_type)
-                        print(f"🧬 Added newly discovered cell type to available list: '{cell_type}'")
-                
-                state["available_cell_types"] = list(current_available)
-                print(f"✅ Updated available cell types: {len(current_available)} types now available")
-        
-        except Exception as e:
-            print(f"⚠️ Error updating available cell types: {e}")
-            # Continue without failing
-
-    def _extract_cell_types_from_result(self, result: Any) -> List[str]:
-        """Extract cell types from analysis result"""
-        if self.cell_type_extractor:
-            return self.cell_type_extractor.extract_from_annotation_result(result)
-        else:
-            # Simple fallback extraction
-            if isinstance(result, str) and "cell_type" in result:
-                return ["T cell", "B cell"]  # Placeholder
-            return []

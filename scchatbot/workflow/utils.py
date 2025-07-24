@@ -75,42 +75,10 @@ class UtilsMixin:
             return state.get("available_cell_types", [])
 
     def _build_cached_analysis_context(self, cell_types: List[str]) -> str:
-        """Build analysis context from cached results for relevant cell types"""
-        analysis_context = ""
-        
-        for cell_type in cell_types:
-            print(f"🔍 Retrieving cached insights for {cell_type}...")
-            insights = self.simple_cache.get_analysis_insights(cell_type)
-            
-            if insights and insights.get("summary"):
-                analysis_context += f"\n🧬 **CACHED ANALYSIS RESULTS FOR {cell_type.upper()}**:\n"
-                
-                # Add enrichment insights with specific pathway names
-                for analysis_name, data in insights.get("enrichment_insights", {}).items():
-                    if data.get("top_terms"):
-                        top_terms = data["top_terms"][:3]  # Top 3 terms
-                        p_values = data.get("p_values", [])[:3]
-                        
-                        analysis_context += f"• **{analysis_name}**: "
-                        term_details = []
-                        for i, term in enumerate(top_terms):
-                            p_val = f" (p={p_values[i]:.2e})" if i < len(p_values) else ""
-                            term_details.append(f"{term}{p_val}")
-                        analysis_context += ", ".join(term_details)
-                        analysis_context += f" [{data.get('total_significant', 0)} total significant]\n"
-                
-                # Add DEA insights with specific gene information
-                for condition, data in insights.get("dea_insights", {}).items():
-                    analysis_context += f"• **DEA ({condition})**: {data.get('significant_genes', 0)} significant genes "
-                    analysis_context += f"({data.get('upregulated', 0)} ↑, {data.get('downregulated', 0)} ↓)\n"
-                    
-                    top_genes = data.get("top_genes", [])[:3]
-                    if top_genes:
-                        analysis_context += f"  Top upregulated: {', '.join(top_genes)}\n"
-                
-                analysis_context += "\n"
-        
-        return analysis_context if analysis_context else "No cached analysis results found.\n"
+        """Build analysis context - cache system removed, handled by unified result accessor"""
+        # Cache system removed - analysis context now handled by unified result accessor
+        # This method is kept for compatibility but returns empty context
+        return ""
 
     # ========== Execution Summary Generation ==========
     
