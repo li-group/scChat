@@ -12,20 +12,12 @@ from .cell_type_utils import (
 )
 
 from .result_extraction import (
-    extract_key_findings_from_execution,
-    extract_dea_key_findings,
-    extract_process_cells_findings,
-    extract_comparison_findings,
-    format_findings_for_synthesis
+    _filter_and_summarize_semantic_results
 )
 
 __all__ = [
     'extract_cell_types_from_question',
     'needs_cell_discovery', 
     'create_cell_discovery_steps',
-    'extract_key_findings_from_execution',
-    'extract_dea_key_findings',
-    'extract_process_cells_findings',
-    'extract_comparison_findings',
-    'format_findings_for_synthesis'
+    '_filter_and_summarize_semantic_results'
 ]

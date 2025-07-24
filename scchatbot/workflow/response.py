@@ -14,7 +14,8 @@ from langchain_core.messages import AIMessage, SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 
 from ..cell_type_models import ChatState
-from ..shared import extract_cell_types_from_question, extract_key_findings_from_execution, format_findings_for_synthesis
+from ..shared import extract_cell_types_from_question
+from .unified_result_accessor import get_unified_results_for_synthesis
 
 
 class ResponseMixin:
@@ -29,15 +30,23 @@ class ResponseMixin:
         print("🎯 UNIFIED: Generating LLM-synthesized response with conversation awareness...")
         
         try:
-            # 1. Extract relevant results using shared utilities
+            # 1. Extract relevant results using unified result accessor (NEW SYSTEM)
             execution_history = state.get("execution_history", [])
             if not isinstance(execution_history, list):
                 execution_history = list(execution_history) if hasattr(execution_history, '__iter__') else []
-            key_findings = extract_key_findings_from_execution(execution_history)
-            print("✅ Key findings extracted successfully")
+            
+            # Use new unified accessor that handles mixed storage patterns
+            formatted_findings = get_unified_results_for_synthesis(execution_history)
+            print("✅ Unified results extracted and formatted successfully")
+            
+            # No legacy fallback - unified accessor is the only method
+            if not formatted_findings or len(formatted_findings.strip()) < 50:
+                print("⚠️ Unified accessor returned minimal results")
+                formatted_findings = "No analysis results available for synthesis"
+            
         except Exception as e:
-            print(f"❌ Error in extract_key_findings_from_execution: {e}")
-            raise
+            print(f"❌ Error in unified result accessor: {e}")
+            formatted_findings = f"Error extracting analysis results: {e}"
         
         
         # Skip user intent guidance (legacy code removed)
@@ -68,9 +77,9 @@ class ResponseMixin:
         
         try:
             # 5. Generate synthesis prompt with conversation awareness
-            synthesis_prompt = self._create_enhanced_synthesis_prompt(
+            synthesis_prompt = self._create_enhanced_synthesis_prompt_with_formatted_findings(
                 original_question=state.get("current_message", ""),
-                key_findings=key_findings,
+                formatted_findings=formatted_findings,
                 failed_analyses=failed_analyses,
                 conversation_context=conversation_context
             )
@@ -137,10 +146,11 @@ class ResponseMixin:
         
         return failed_analyses
     
-    def _create_enhanced_synthesis_prompt(self, original_question: str, key_findings: Dict[str, Any], 
+    
+    def _create_enhanced_synthesis_prompt_with_formatted_findings(self, original_question: str, formatted_findings: str, 
                                          failed_analyses: List[Dict],
                                          conversation_context: str = None) -> str:
-        """Create prompt for synthesizing analysis results with conversation awareness."""
+        """Create prompt for synthesizing analysis results with pre-formatted findings from unified accessor."""
         
         prompt = f"""You are a single-cell RNA-seq analysis expert. 
 
@@ -157,7 +167,7 @@ class ResponseMixin:
 
         prompt += f"""
                     CURRENT ANALYSIS RESULTS:
-                    {format_findings_for_synthesis(key_findings)}
+                    {formatted_findings}
                     """
 
         # Add failed analyses if any

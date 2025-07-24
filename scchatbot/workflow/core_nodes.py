@@ -61,7 +61,7 @@ class CoreNodes:
             print("⚠️ EnrichmentChecker module not available")
     
     def input_processor_node(self, state: ChatState) -> ChatState:
-        """Process incoming user message with LLM-driven conversation context retrieval"""
+        """Process incoming user message with conversation-aware state preservation"""
         # Initialize state if this is a new conversation
         if not state.get("messages"):
             state["messages"] = [AIMessage(content=self.initial_annotation_content)]
@@ -72,14 +72,14 @@ class CoreNodes:
         # Use LLM to determine if context is needed and generate search queries
         if hasattr(self.history_manager, 'search_conversations'):
             context_analysis_prompt = f"""
-User asked: "{current_message}"
+                                        User asked: "{current_message}"
 
-If this question seems to reference or build upon previous conversations, 
-generate 1-3 search queries to find relevant context.
+                                        If this question seems to reference or build upon previous conversations, 
+                                        generate 1-3 search queries to find relevant context.
 
-Return a JSON list of search queries, or an empty list if no context is needed.
-Only return the JSON list, nothing else.
-"""
+                                        Return a JSON list of search queries, or an empty list if no context is needed.
+                                        Only return the JSON list, nothing else.
+                                        """
             
             try:
                 # LLM decides if context is needed and what to search for
@@ -111,12 +111,24 @@ Only return the JSON list, nothing else.
         # Add user message
         state["messages"].append(HumanMessage(content=state["current_message"]))
         
-        # Initialize state variables
-        state["available_cell_types"] = self.initial_cell_types
+        # ✅ SMART INITIALIZATION: Preserve discovered cell types across questions
+        if not state.get("available_cell_types"):
+            # First question or state is empty - use initial types
+            state["available_cell_types"] = self.initial_cell_types
+            print(f"🔄 Initialized with {len(self.initial_cell_types)} initial cell types")
+        else:
+            # Subsequent questions - preserve existing discovered types
+            existing_count = len(state["available_cell_types"])
+            print(f"✅ Preserving {existing_count} discovered cell types from previous operations")
+            
+            # Optional: Debug logging to track what types are preserved
+            print(f"   Preserved types: {sorted(state['available_cell_types'])}")
         state["adata"] = self.adata
+        
+        # Reset only transient state for new questions, preserve conversation context
         state["execution_plan"] = None
         state["current_step_index"] = 0
-        state["execution_history"] = []
+        state["execution_history"] = []  # Clear for new question
         state["function_result"] = None
         state["function_name"] = None
         state["function_args"] = None
@@ -134,25 +146,37 @@ Only return the JSON list, nothing else.
         return state
 
     def planner_node(self, state: ChatState) -> ChatState:
-        """Create initial execution plan with query type detection and enhanced prompting"""
+        """Create initial execution plan with current cell type awareness and enhanced prompting"""
         message = state["current_message"]
         available_functions = self.function_descriptions
         available_cell_types = state["available_cell_types"]
         function_history = state["function_history_summary"]
         unavailable_cell_types = state.get("unavailable_cell_types", [])
         
-        # Step 1: Query type detection for prompt enhancement
-        query_type = self._detect_query_type(message)
-        state["query_type"] = query_type
+        # 🧬 Enhanced cell type awareness logging
+        initial_count = len(self.initial_cell_types)
+        current_count = len(available_cell_types)
+        discovered_count = current_count - initial_count
         
-        # Step 2: Enhanced LLM-based planning with query type context
-        return self._create_enhanced_plan(state, message, available_functions, available_cell_types, function_history, unavailable_cell_types, query_type)
+        print(f"🧬 PLANNER: Cell type status for planning:")
+        print(f"   • Initial types: {initial_count}")
+        print(f"   • Currently available: {current_count}")
+        print(f"   • Discovered this session: {discovered_count}")
+        if unavailable_cell_types:
+            print(f"   • Failed discoveries: {len(unavailable_cell_types)} - {', '.join(unavailable_cell_types)}")
+        
+        # Show discovered types if any
+        if discovered_count > 0:
+            discovered_types = set(available_cell_types) - set(self.initial_cell_types)
+            print(f"   • New types discovered: {', '.join(sorted(discovered_types))}")
+        
+        print(f"🧬 Planning for question: '{message}'")
+        
+        # Enhanced LLM-based planning without artificial query type constraints
+        return self._create_enhanced_plan(state, message, available_functions, available_cell_types, function_history, unavailable_cell_types)
     
-    def _create_enhanced_plan(self, state: ChatState, message: str, available_functions: List, available_cell_types: List[str], function_history: Dict, unavailable_cell_types: List[str], query_type: str) -> ChatState:
-        """Create enhanced plan using LLM with query type-specific guidance"""
-        
-        # Get query type-specific instructions 
-        query_guidance = self._get_query_type_guidance(query_type)
+    def _create_enhanced_plan(self, state: ChatState, message: str, available_functions: List, available_cell_types: List[str], function_history: Dict, unavailable_cell_types: List[str]) -> ChatState:
+        """Create enhanced plan using semantic LLM understanding without artificial query type constraints"""
         
         # Extract conversation context for semantic search awareness
         conversation_context = ""
@@ -170,10 +194,10 @@ Only return the JSON list, nothing else.
         Create a step-by-step execution plan for the user query.
         
         CONTEXT:
-        - Available cell types: {', '.join(available_cell_types)}
-        - Unavailable cell types: {', '.join(unavailable_cell_types)}
+        - Currently available cell types ({len(available_cell_types)}): {', '.join(sorted(available_cell_types))}
+        {f"- Cell types that failed discovery ({len(unavailable_cell_types)}): {', '.join(sorted(unavailable_cell_types))}" if unavailable_cell_types else "- No failed cell type discoveries"}
+        - Cell type status: {'Expanded from initial set' if len(available_cell_types) > len(self.initial_cell_types) else 'Using initial cell types only'}
         - Previous analyses: {json.dumps(function_history, indent=2)}
-        - Query type detected: {query_type}
         {"- Conversation context: " + conversation_context if conversation_context else ""}
         
         Available functions:
@@ -181,7 +205,20 @@ Only return the JSON list, nothing else.
         
         User question: "{message}"
         
-        {query_guidance}
+        SEMANTIC DECISION FRAMEWORK:
+        🔬 USE ANALYSIS FUNCTIONS when the user wants to DISCOVER or ANALYZE data:
+        - Questions about relationships, abundance, pathways, cellular processes
+        - Requests to compare, find differences, or understand biological mechanisms  
+        - Examples: "What pathways are enriched?", "How do cell types differ?", "What is the relationship between X and Y?"
+        - → Use functions like: perform_enrichment_analyses, compare_cell_counts, dea_split_by_condition
+        
+        💬 USE CONVERSATIONAL RESPONSE only when the user wants to INTERPRET existing results:
+        - Questions asking for explanation of already-computed results
+        - Requests to clarify meaning of specific terms or findings
+        - Examples: "What does this pathway mean?", "Explain these results I'm seeing"
+        - → Use: conversational_response
+        
+        🎯 DEFAULT: When in doubt, prefer analysis over conversation. It's better to provide data-driven insights.
         
         Create a plan in this JSON format:
         {{
@@ -206,6 +243,8 @@ Only return the JSON list, nothing else.
         - Never put multiple cell types in a single parameter (e.g., don't use "T cells, B cells")
         - Use exact cell type names (e.g., "T cell", "B cell", not "T cells, B cells")
         - SKIP steps for unavailable cell types: {', '.join(unavailable_cell_types)}
+        - CELL TYPE STRATEGY: If a requested cell type is not in the available list, consider if it needs discovery
+        - AVAILABLE TYPES PRIORITY: Prefer using currently available cell types when possible
         - Focus on creating a logical flow to answer the user's question
         
         VISUALIZATION-ONLY DETECTION:
@@ -220,16 +259,6 @@ Only return the JSON list, nothing else.
           * "Run GSEA analysis and explain results"
           * "Compare T cell vs B cell enrichment"
           
-        CONVERSATIONAL QUESTION DETECTION:
-        - For interpretive questions about existing results, use "conversational_response" function
-        - Examples of conversational questions:
-          * "What can we tell from this GSEA analysis?"
-          * "What does allograft rejection behavior mean?"
-          * "How do you interpret these results?"
-          * "What are the biological implications?"
-        - Create simple plan with single conversational_response step for these questions
-        - Do NOT create complex analysis plans for interpretive questions
-        
         ENRICHMENT ANALYSIS GUIDELINES:
         - For enrichment analysis steps, use MINIMAL parameters - only specify "cell_type"
         - Do NOT specify "analyses", "gene_set_library", or "pathway_include" parameters
@@ -334,99 +363,6 @@ Only return the JSON list, nothing else.
             
         return state
     
-    def _detect_query_type(self, message: str) -> str:
-        """Detect the type of query to enable analysis-specific planning"""
-        message_lower = message.lower()
-        
-        # Specific pathway analysis
-        if any(keyword in message_lower for keyword in ["gsea", "gene set enrichment", "kegg", "reactome", "go", "gene ontology"]):
-            return "pathway_specific"
-        
-        # Marker analysis  
-        if any(keyword in message_lower for keyword in ["markers", "marker genes", "differentially expressed", "dea", "differential expression"]):
-            return "markers"
-        
-        # Visualization requests
-        if any(keyword in message_lower for keyword in ["show", "display", "plot", "visualize", "visualization"]):
-            return "visualization"
-        
-        # Comparison requests
-        if any(keyword in message_lower for keyword in ["compare", "comparison", "vs", "versus", "difference", "different"]):
-            return "comparison"
-        
-        # Conversational/interpretation
-        if any(keyword in message_lower for keyword in ["what", "how", "why", "explain", "interpret", "mean", "significance"]):
-            return "conversational"
-        
-        # Default to general analysis
-        return "general"
-    
-    def _get_query_type_guidance(self, query_type: str) -> str:
-        """Get query type-specific guidance for the planning prompt"""
-        
-        if query_type == "pathway_specific":
-            return """
-        🎯 PATHWAY-SPECIFIC QUERY DETECTED:
-        - This query asks about specific pathway analysis (GSEA, GO, KEGG, REACTOME)
-        - FOCUS: Create a streamlined plan targeting enrichment analysis
-        - PRIORITY: Use minimal enrichment steps - EnrichmentChecker will optimize them
-        - EFFICIENCY: Avoid unnecessary broader analyses unless specifically requested
-        - SEMANTIC SEARCH: If asking about specific pathways that might not be top-ranked, consider search_enrichment_semantic
-        - EXAMPLE: For "GSEA analysis of T cells" → {{"cell_type": "T cell"}} (EnrichmentChecker handles method selection)
-        - EXAMPLE: For "Show me cell cycle pathways in T cells" → search_enrichment_semantic with query="cell cycle" and cell_type="T cell"
-        """
-        
-        elif query_type == "markers":
-            return """
-        🎯 MARKER ANALYSIS QUERY DETECTED:
-        - This query asks about marker genes or differential expression
-        - FOCUS: Create a streamlined plan targeting differential expression analysis
-        - PRIORITY: Use run_dea function as the primary analysis method
-        - EFFICIENCY: Include visualization (dotplot) if requested
-        - EXAMPLE: For "marker genes of T cells" → focus on run_dea function
-        """
-        
-        elif query_type == "visualization":
-            return """
-        🎯 VISUALIZATION QUERY DETECTED:
-        - This query primarily asks for displaying/showing plots
-        - FOCUS: Create a visualization-focused plan
-        - PRIORITY: Set "visualization_only": true if no analysis is needed
-        - EFFICIENCY: Minimal analysis steps, maximum visualization focus
-        - EXAMPLE: For "show GSEA plot" → focus on display_enrichment_visualization
-        """
-        
-        elif query_type == "comparison":
-            return """
-        🎯 COMPARISON QUERY DETECTED:
-        - This query asks to compare different cell types or conditions
-        - FOCUS: Create separate analysis steps for each entity being compared
-        - PRIORITY: Ensure both/all entities get analyzed before comparison
-        - EFFICIENCY: Structure as: analyze A, analyze B, compare results
-        - EXAMPLE: For "T cells vs B cells" → separate steps for each cell type
-        """
-        
-        elif query_type == "conversational":
-            return """
-        🎯 CONVERSATIONAL/INTERPRETIVE QUERY DETECTED:
-        - This query asks for explanation or interpretation of results
-        - FOCUS: Use conversational_response function for interpretive questions
-        - PRIORITY: Avoid complex analysis plans for interpretation requests
-        - EFFICIENCY: Single conversational step unless new analysis is specifically requested
-        - SEMANTIC SEARCH: If referencing specific pathways from conversation context, consider search_enrichment_semantic first
-        - EXAMPLE: For "what does this mean?" → use conversational_response
-        - EXAMPLE: For "Show me those cell cycle terms we discussed" → search_enrichment_semantic based on conversation context
-        """
-        
-        else:  # general
-            return """
-        🎯 GENERAL ANALYSIS QUERY DETECTED:
-        - This query requires comprehensive analysis approach
-        - FOCUS: Create a balanced plan covering the user's analytical needs
-        - PRIORITY: Follow standard analysis workflow patterns
-        - EFFICIENCY: Include appropriate analysis and visualization steps
-        - SEMANTIC SEARCH: Consider search_enrichment_semantic if the query involves specific pathway exploration
-        """
 
     def _store_execution_result(self, step_data: Dict, result: Any, success: bool) -> Dict[str, Any]:
         """
@@ -676,7 +612,21 @@ Only return the JSON list, nothing else.
         """
         Enhance the initial plan by adding cell discovery steps if needed.
         
-        Uses proven cell type extraction and discovery logic.
+        SHADOW MODE: Runs both old and new logic to compare results.
+        """
+        # Run both versions
+        old_result = self._add_cell_discovery_to_plan_v1(plan_data.copy(), message, available_cell_types)
+        new_result = self._add_cell_discovery_to_plan_v2(plan_data.copy(), message, available_cell_types)
+        
+        # Compare and log differences
+        self._compare_discovery_plans(old_result, new_result)
+        
+        # For now, use old result (safe mode)
+        return old_result
+    
+    def _add_cell_discovery_to_plan_v1(self, plan_data: Dict[str, Any], message: str, available_cell_types: List[str]) -> Dict[str, Any]:
+        """
+        V1 (CURRENT): Original implementation that loses LLM analysis steps.
         """
         if not plan_data or not self.hierarchy_manager:
             return plan_data
@@ -718,6 +668,215 @@ Only return the JSON list, nothing else.
             print("🧬 All needed cell types already available")
         
         return plan_data
+    
+    def _add_cell_discovery_to_plan_v2(self, plan_data: Dict[str, Any], message: str, available_cell_types: List[str]) -> Dict[str, Any]:
+        """
+        V2 (NEW): Preserves LLM's analysis steps while adding discovery.
+        """
+        if not plan_data or not self.hierarchy_manager:
+            return plan_data
+        
+        # Extract cell types mentioned in the user's question
+        needed_cell_types = extract_cell_types_from_question(message, self.hierarchy_manager)
+        
+        if not needed_cell_types:
+            print("🔍 [V2] No specific cell types identified in question")
+            return plan_data
+        
+        print(f"🧬 [V2] Planner identified needed cell types: {needed_cell_types}")
+        print(f"🧬 [V2] Available cell types: {available_cell_types}")
+        
+        # Step 1: Extract and categorize original steps
+        original_steps = plan_data.get("steps", [])
+        llm_analysis_steps = []
+        other_steps = []
+        
+        for step in original_steps:
+            func_name = step.get("function_name", "")
+            # Preserve cell-type-specific analysis steps
+            if func_name in ["perform_enrichment_analyses", "dea_split_by_condition", 
+                           "compare_cell_counts", "analyze_cell_interaction"]:
+                llm_analysis_steps.append(step)
+                print(f"📋 [V2] Preserving LLM analysis step: {func_name}({step.get('parameters', {}).get('cell_type', 'unknown')})")
+            else:
+                other_steps.append(step)
+        
+        # Step 2: Fix cell type names in preserved steps
+        llm_analysis_steps = self._fix_cell_type_names_in_steps(llm_analysis_steps, needed_cell_types, message)
+        other_steps = self._fix_cell_type_names_in_steps(other_steps, needed_cell_types, message)
+        
+        # Step 3: Create discovery steps ONLY (no analysis)
+        discovery_steps = []
+        if needs_cell_discovery(needed_cell_types, available_cell_types):
+            print("🧬 [V2] Creating discovery steps only...")
+            discovery_steps = self._create_discovery_steps_only(needed_cell_types, available_cell_types)
+        
+        # Step 4: Add validation steps after discovery
+        validation_steps = []
+        if discovery_steps:
+            validation_steps = self._create_validation_steps(discovery_steps)
+        
+        # Step 5: Merge steps intelligently
+        final_steps = []
+        final_steps.extend(discovery_steps)
+        final_steps.extend(validation_steps)
+        final_steps.extend(llm_analysis_steps)  # Preserved!
+        final_steps.extend(other_steps)
+        
+        plan_data["steps"] = final_steps
+        
+        # Update plan summary
+        if discovery_steps:
+            original_summary = plan_data.get("plan_summary", "")
+            plan_data["plan_summary"] = f"Discover needed cell types then {original_summary.lower()}"
+        
+        print(f"📋 [V2] Plan merge complete:")
+        print(f"   - Discovery steps: {len(discovery_steps)}")
+        print(f"   - Validation steps: {len(validation_steps)}")
+        print(f"   - LLM analysis steps: {len(llm_analysis_steps)}")
+        print(f"   - Other steps: {len(other_steps)}")
+        
+        return plan_data
+    
+    def _create_discovery_steps_only(self, needed_cell_types: List[str], available_cell_types: List[str]) -> List[Dict[str, Any]]:
+        """
+        Create ONLY discovery steps, no analysis steps.
+        This is different from create_cell_discovery_steps which adds hardcoded analysis.
+        """
+        discovery_steps = []
+        
+        for needed_type in needed_cell_types:
+            if needed_type in available_cell_types:
+                print(f"✅ [V2] '{needed_type}' already available, no discovery needed")
+                continue
+            
+            # Find processing path using hierarchy manager
+            processing_path = None
+            best_parent = None
+            
+            for available_type in available_cell_types:
+                path_result = self.hierarchy_manager.find_parent_path(needed_type, [available_type])
+                if path_result:
+                    best_parent, processing_path = path_result
+                    print(f"🔄 [V2] Found path from '{best_parent}' to '{needed_type}': {' → '.join(processing_path)}")
+                    break
+            
+            if processing_path and len(processing_path) > 1:
+                # Add process_cells steps for the path
+                for i in range(len(processing_path) - 1):
+                    current_type = processing_path[i]
+                    target_type = processing_path[i + 1]
+                    
+                    # Check if we already have this step
+                    existing = any(
+                        s.get("function_name") == "process_cells" and 
+                        s.get("parameters", {}).get("cell_type") == current_type
+                        for s in discovery_steps
+                    )
+                    
+                    if not existing:
+                        discovery_steps.append({
+                            "step_type": "analysis",
+                            "function_name": "process_cells",
+                            "parameters": {"cell_type": current_type},
+                            "description": f"Process {current_type} to discover {target_type}",
+                            "expected_outcome": f"Discover {target_type} cell type"
+                        })
+                        print(f"🧬 [V2] Added process_cells({current_type}) to discover {target_type}")
+            else:
+                print(f"⚠️ [V2] No processing path found for '{needed_type}'")
+        
+        return discovery_steps
+    
+    def _create_validation_steps(self, discovery_steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Create validation steps for discovery steps.
+        """
+        validation_steps = []
+        
+        # Group discovery steps by their target
+        discovered_types = set()
+        for step in discovery_steps:
+            if step.get("function_name") == "process_cells":
+                # Extract what types will be discovered
+                desc = step.get("description", "")
+                if "to discover" in desc:
+                    target = desc.split("to discover")[-1].strip()
+                    discovered_types.add(target)
+        
+        if discovered_types:
+            validation_steps.append({
+                "step_type": "validation",
+                "function_name": "validate_processing_results",
+                "parameters": {
+                    "expected_cell_types": list(discovered_types)
+                },
+                "description": f"Validate that {', '.join(discovered_types)} processing discovered expected cell types",
+                "expected_outcome": "All expected cell types discovered successfully"
+            })
+        
+        return validation_steps
+    
+    def _compare_discovery_plans(self, old_result: Dict[str, Any], new_result: Dict[str, Any]) -> None:
+        """
+        Compare old and new discovery plans and log differences.
+        """
+        print("\n" + "="*60)
+        print("🔍 SHADOW MODE: Comparing V1 vs V2 Discovery Plans")
+        print("="*60)
+        
+        old_steps = old_result.get("steps", [])
+        new_steps = new_result.get("steps", [])
+        
+        # Categorize steps
+        def categorize_steps(steps):
+            categories = {
+                "discovery": [],
+                "validation": [],
+                "analysis": [],
+                "other": []
+            }
+            for step in steps:
+                func_name = step.get("function_name", "")
+                if func_name == "process_cells":
+                    categories["discovery"].append(step)
+                elif func_name == "validate_processing_results":
+                    categories["validation"].append(step)
+                elif func_name in ["perform_enrichment_analyses", "dea_split_by_condition", "compare_cell_counts"]:
+                    categories["analysis"].append(step)
+                else:
+                    categories["other"].append(step)
+            return categories
+        
+        old_categories = categorize_steps(old_steps)
+        new_categories = categorize_steps(new_steps)
+        
+        # Compare counts
+        print("\n📊 Step Count Comparison:")
+        print(f"   V1 Total: {len(old_steps)} | V2 Total: {len(new_steps)}")
+        print(f"   Discovery: V1={len(old_categories['discovery'])} | V2={len(new_categories['discovery'])}")
+        print(f"   Validation: V1={len(old_categories['validation'])} | V2={len(new_categories['validation'])}")
+        print(f"   Analysis: V1={len(old_categories['analysis'])} | V2={len(new_categories['analysis'])}")
+        print(f"   Other: V1={len(old_categories['other'])} | V2={len(new_categories['other'])}")
+        
+        # Show analysis steps difference (key issue)
+        if len(new_categories['analysis']) > len(old_categories['analysis']):
+            print("\n✅ V2 PRESERVES MORE ANALYSIS STEPS:")
+            for step in new_categories['analysis']:
+                cell_type = step.get("parameters", {}).get("cell_type", "unknown")
+                func = step.get("function_name")
+                print(f"   - {func}({cell_type})")
+        elif len(new_categories['analysis']) < len(old_categories['analysis']):
+            print("\n⚠️ V2 HAS FEWER ANALYSIS STEPS:")
+            missing = set(str(s) for s in old_categories['analysis']) - set(str(s) for s in new_categories['analysis'])
+            for s in missing:
+                print(f"   - {s}")
+        
+        # Check if any already-available cell types get analysis in V2 but not V1
+        print("\n🎯 Key Improvement Check:")
+        print("   Does V2 preserve analysis for already-available cell types?")
+        
+        print("\n" + "="*60 + "\n")
     
     def _fix_cell_type_names_in_steps(self, steps: List[Dict[str, Any]], correct_cell_types: List[str], original_question: str) -> List[Dict[str, Any]]:
         """
@@ -916,13 +1075,6 @@ Only return the JSON list, nothing else.
                 "available_types": list(current_cell_types)
             }
 
-    def _execute_final_question(self, state: ChatState) -> str:
-        """Execute a comprehensive final question using all available context"""
-        original_question = state["execution_plan"]["original_question"]
-        
-        # This is a simplified version - in a real implementation this would
-        # use the cache manager and provide comprehensive analysis
-        return f"Based on the analysis performed, here's a comprehensive answer to your question: {original_question}"
 
     def _enhance_enrichment_step(self, step: Dict[str, Any], message: str) -> Dict[str, Any]:
         """
@@ -1337,7 +1489,7 @@ Only return the JSON list, nothing else.
             
             # Initialize model
             model = ChatOpenAI(
-                model="gpt-4",
+                model="gpt-4o",
                 temperature=0.1,  # Low temperature for consistency
                 max_tokens=500   # Reasonable limit for search queries
             )

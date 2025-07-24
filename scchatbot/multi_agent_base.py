@@ -88,6 +88,10 @@ class MultiAgentChatBot:
         # Create LangGraph workflow
         self.workflow = self._create_workflow()
         
+        # Initialize session state management for conversation continuity
+        self.session_states = {}  # Dict to store state for each session
+        print("✅ Session state management initialized")
+        
     def _initialize_directories(self):
         """Clean all directories at initialization"""
         directories_to_clear = [
@@ -470,26 +474,37 @@ class MultiAgentChatBot:
     def send_message(self, message: str, session_id: str = "default") -> str:
         """Send a message to the chatbot and get response with conversation tracking"""
         try:
-            # Create initial state with all required fields
-            initial_state: ChatState = {
-                "messages": [],
-                "current_message": message,
-                "response": "",
-                "available_cell_types": [],
-                "adata": None,
-                "execution_plan": None,
-                "current_step_index": 0,
-                "execution_history": [],
-                "function_result": None,
-                "function_name": None,
-                "function_args": None,
-                "function_history_summary": {},
-                "missing_cell_types": [],
-                "required_preprocessing": [],
-                "conversation_complete": False,
-                "errors": [],
-                "session_id": session_id  # Add session tracking
-            }
+            # Get or create session state
+            if session_id in self.session_states:
+                # Reuse existing session state to preserve discovered cell types
+                initial_state = self.session_states[session_id].copy()
+                initial_state["current_message"] = message
+                initial_state["response"] = ""
+                initial_state["conversation_complete"] = False
+                initial_state["errors"] = []
+                print(f"🔄 Reusing session state for '{session_id}' with {len(initial_state.get('available_cell_types', []))} available cell types")
+            else:
+                # Create new initial state for new session
+                initial_state: ChatState = {
+                    "messages": [],
+                    "current_message": message,
+                    "response": "",
+                    "available_cell_types": [],
+                    "adata": None,
+                    "execution_plan": None,
+                    "current_step_index": 0,
+                    "execution_history": [],
+                    "function_result": None,
+                    "function_name": None,
+                    "function_args": None,
+                    "function_history_summary": {},
+                    "missing_cell_types": [],
+                    "required_preprocessing": [],
+                    "conversation_complete": False,
+                    "errors": [],
+                    "session_id": session_id  # Add session tracking
+                }
+                print(f"🆕 Creating new session state for '{session_id}'")
             
             # Invoke the workflow with recursion limit
             config = RunnableConfig(recursion_limit=100)
@@ -528,6 +543,10 @@ class MultiAgentChatBot:
                     
                 except Exception as e:
                     print(f"⚠️ Failed to record conversation in vector database: {e}")
+            
+            # Save the final state for this session to preserve discovered cell types
+            self.session_states[session_id] = final_state
+            print(f"💾 Session state saved for '{session_id}' with {len(final_state.get('available_cell_types', []))} available cell types")
             
             return response
                 
