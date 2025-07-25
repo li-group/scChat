@@ -50,12 +50,15 @@ class EnrichmentResultAccessor(ResultAccessorBase):
                 "source": "enrichment_csv_files"
             }
             
-            # Map analysis types to their directory names
+            # Get conditions dynamically from sample mapping
+            conditions = self._load_conditions_from_mapping()
+            
+            # Map analysis types to their directory names (both full dataset and condition-specific)
             analysis_dirs = {
-                "go": ["go_bp", "go_cc", "go_mf"],
-                "kegg": ["kegg"],
-                "reactome": ["reactome"], 
-                "gsea": ["gsea"]
+                "go": ["go_bp", "go_cc", "go_mf"] + [f"go_{condition}" for condition in conditions],
+                "kegg": ["kegg"] + [f"kegg_{condition}" for condition in conditions],
+                "reactome": ["reactome"] + [f"reactome_{condition}" for condition in conditions], 
+                "gsea": ["gsea"] + [f"gsea_{condition}" for condition in conditions]
             }
             
             for analysis_type in analyses:
@@ -132,6 +135,35 @@ class EnrichmentResultAccessor(ResultAccessorBase):
                 lines.append(f"    Total significant: {total} terms")
         
         return "\n".join(lines)
+    
+    def _load_conditions_from_mapping(self) -> List[str]:
+        """Load condition names dynamically from sample mapping file"""
+        try:
+            import json
+            import os
+            
+            mapping_file = "media/sample_mapping.json"
+            if os.path.exists(mapping_file):
+                with open(mapping_file, 'r') as f:
+                    mapping_data = json.load(f)
+                
+                # Get conditions from Sample categories or Sample description
+                conditions = []
+                if "Sample categories" in mapping_data:
+                    conditions.extend(mapping_data["Sample categories"].keys())
+                elif "Sample description" in mapping_data:
+                    conditions.extend(mapping_data["Sample description"].keys())
+                
+                # Keep original format as enrichment function saves with spaces, not underscores
+                conditions = list(conditions)
+                
+                print(f"🔍 ENRICHMENT: Loaded {len(conditions)} conditions from mapping file: {conditions}")
+                return conditions
+            else:
+                raise FileNotFoundError(f"Sample mapping file not found: {mapping_file}")
+                
+        except Exception as e:
+            raise Exception(f"Error loading conditions from mapping file: {e}")
 
 
 class DEAResultAccessor(ResultAccessorBase):
@@ -155,24 +187,32 @@ class DEAResultAccessor(ResultAccessorBase):
             }
             
             # Look for condition-specific marker files
-            # These are generated during DEA execution
-            potential_conditions = ["cataract", "basal_laminar_drusen", "age_related_macular_degeneration"]
+            # Load conditions dynamically from sample mapping file
+            potential_conditions = self._load_conditions_from_mapping()
             
             for condition in potential_conditions:
-                csv_path = f"scchatbot/dea/{cell_type}_markers_{condition}.csv"
+                csv_path = f"scchatbot/deg_res/{cell_type}_markers_{condition}.csv"
                 
                 if os.path.exists(csv_path):
                     try:
                         df = pd.read_csv(csv_path)
                         if len(df) > 0:
+                            # Debug: Print column names
+                            print(f"📊 DEA CSV columns for {condition}: {list(df.columns)}")
+                            
+                            # Determine the correct column names
+                            logfc_col = "log_fc" if "log_fc" in df.columns else "logFC" if "logFC" in df.columns else "logfoldchanges"
+                            pval_col = "p_adj" if "p_adj" in df.columns else "FDR" if "FDR" in df.columns else "pvals_adj"
+                            
                             # Separate upregulated and downregulated genes
-                            df_up = df[df.get("log_fc", df.get("logFC", 0)) > 0].nlargest(10, "log_fc" if "log_fc" in df.columns else "logFC")
-                            df_down = df[df.get("log_fc", df.get("logFC", 0)) < 0].nsmallest(10, "log_fc" if "log_fc" in df.columns else "logFC")
+                            # Extract top 50 genes to ensure important genes like CFD are included
+                            df_up = df[df[logfc_col] > 0].nlargest(100, logfc_col)
+                            df_down = df[df[logfc_col] < 0].nsmallest(100, logfc_col)
                             
                             results["conditions"][condition] = {
                                 "upregulated_genes": df_up.to_dict('records'),
                                 "downregulated_genes": df_down.to_dict('records'),
-                                "total_significant": len(df[df.get("p_adj", df.get("FDR", 1)) < 0.05]),
+                                "total_significant": len(df[df[pval_col] < 0.05]),
                                 "source_file": csv_path
                             }
                     except Exception as e:
@@ -199,30 +239,88 @@ class DEAResultAccessor(ResultAccessorBase):
             condition_name = condition.replace("_", " ").title()
             lines.append(f"  {condition_name}:")
             
-            # Format upregulated genes
-            up_genes = data.get("upregulated_genes", [])[:3]
-            if up_genes:
+            # Format upregulated genes - provide ALL extracted genes for complete LLM analysis
+            all_up_genes = data.get("upregulated_genes", [])
+            if all_up_genes:
+                # Show top 10 for summary
+                top_genes = all_up_genes[:10]
                 gene_strs = []
-                for gene in up_genes:
-                    gene_name = gene.get("gene", gene.get("Gene", "Unknown"))
-                    log_fc = gene.get("log_fc", gene.get("logFC", 0))
+                for gene in top_genes:
+                    gene_name = gene.get("names", gene.get("gene", gene.get("Gene", "Unknown")))
+                    log_fc = gene.get("logfoldchanges", gene.get("log_fc", gene.get("logFC", 0)))
                     gene_strs.append(f"{gene_name} (FC={log_fc:.2f})")
-                lines.append(f"    Upregulated: {', '.join(gene_strs)}")
+                lines.append(f"    Top 10 upregulated: {', '.join(gene_strs)}")
+                
+                # Provide ALL upregulated genes for LLM analysis (not just a subset)
+                total_up = len(all_up_genes)
+                lines.append(f"    Total upregulated genes available: {total_up}")
+                
+                # Include ALL genes in formatted output for complete LLM access
+                all_gene_strs = []
+                for gene in all_up_genes:
+                    gene_name = gene.get("names", gene.get("gene", gene.get("Gene", "Unknown")))
+                    log_fc = gene.get("logfoldchanges", gene.get("log_fc", gene.get("logFC", 0)))
+                    all_gene_strs.append(f"{gene_name} (FC={log_fc:.2f})")
+                lines.append(f"    All upregulated genes: {', '.join(all_gene_strs)}")
             
-            # Format downregulated genes  
-            down_genes = data.get("downregulated_genes", [])[:3]
-            if down_genes:
+            # Format downregulated genes - provide ALL extracted genes for complete LLM analysis
+            all_down_genes = data.get("downregulated_genes", [])
+            if all_down_genes:
+                # Show top 10 for summary
+                top_genes = all_down_genes[:10]
                 gene_strs = []
-                for gene in down_genes:
-                    gene_name = gene.get("gene", gene.get("Gene", "Unknown"))
-                    log_fc = gene.get("log_fc", gene.get("logFC", 0))
+                for gene in top_genes:
+                    gene_name = gene.get("names", gene.get("gene", gene.get("Gene", "Unknown")))
+                    log_fc = gene.get("logfoldchanges", gene.get("log_fc", gene.get("logFC", 0)))
                     gene_strs.append(f"{gene_name} (FC={log_fc:.2f})")
-                lines.append(f"    Downregulated: {', '.join(gene_strs)}")
+                lines.append(f"    Top 10 downregulated: {', '.join(gene_strs)}")
+                
+                # Provide ALL downregulated genes for LLM analysis
+                total_down = len(all_down_genes)
+                lines.append(f"    Total downregulated genes available: {total_down}")
+                
+                # Include ALL genes in formatted output for complete LLM access
+                all_gene_strs = []
+                for gene in all_down_genes:
+                    gene_name = gene.get("names", gene.get("gene", gene.get("Gene", "Unknown")))
+                    log_fc = gene.get("logfoldchanges", gene.get("log_fc", gene.get("logFC", 0)))
+                    all_gene_strs.append(f"{gene_name} (FC={log_fc:.2f})")
+                lines.append(f"    All downregulated genes: {', '.join(all_gene_strs)}")
             
             total = data.get("total_significant", 0)
             lines.append(f"    Total significant genes: {total}")
         
         return "\n".join(lines)
+    
+    def _load_conditions_from_mapping(self) -> List[str]:
+        """Load condition names dynamically from sample mapping file"""
+        try:
+            import json
+            import os
+            
+            mapping_file = "media/sample_mapping.json"
+            if os.path.exists(mapping_file):
+                with open(mapping_file, 'r') as f:
+                    mapping_data = json.load(f)
+                
+                # Get conditions from Sample categories or Sample description
+                conditions = []
+                if "Sample categories" in mapping_data:
+                    conditions.extend(mapping_data["Sample categories"].keys())
+                elif "Sample description" in mapping_data:
+                    conditions.extend(mapping_data["Sample description"].keys())
+                
+                # Keep original format as DEA function saves with spaces, not underscores
+                # From logs: "basal laminar drusen condition Pericyte marker results saved"
+                conditions = list(conditions)
+                
+                print(f"🔍 DEA: Loaded {len(conditions)} conditions from mapping file: {conditions}")
+                return conditions
+            else:
+                raise FileNotFoundError(f"Sample mapping file not found: {mapping_file}")
+                
+        except Exception as e:
+            raise Exception(f"Error loading conditions from mapping file: {e}")
 
 
 class CellCountResultAccessor(ResultAccessorBase):

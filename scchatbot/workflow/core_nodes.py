@@ -13,7 +13,7 @@ from datetime import datetime
 
 from ..cell_type_models import ChatState, ExecutionStep
 from langchain_core.messages import HumanMessage, AIMessage
-from ..shared import extract_cell_types_from_question, needs_cell_discovery, create_cell_discovery_steps
+from ..shared import extract_cell_types_from_question, needs_cell_discovery
 
 # Import EnrichmentChecker with error handling
 try:
@@ -671,7 +671,7 @@ class CoreNodes:
                 success = True
             
                 if step.function_name == "process_cells" and self.hierarchy_manager:
-                    new_cell_types = self._extract_cell_types_from_result(result)
+                    new_cell_types = self.cell_type_extractor.extract_from_annotation_result(result)
                     if new_cell_types:
                         print(f"🧬 Updating hierarchy manager with new cell types: {new_cell_types}")
                         self.hierarchy_manager.update_after_process_cells(
@@ -1004,15 +1004,6 @@ class CoreNodes:
         
         return "\n".join(summary)
 
-    def _extract_cell_types_from_result(self, result: Any) -> List[str]:
-        """Extract cell types from analysis result"""
-        if self.cell_type_extractor:
-            return self.cell_type_extractor.extract_from_annotation_result(result)
-        else:
-            # Simple fallback extraction
-            if isinstance(result, str) and "cell_type" in result:
-                return ["T cell", "B cell"]  # Placeholder
-            return []
 
     def _update_available_cell_types_from_result(self, state: ChatState, result: Any) -> None:
         """

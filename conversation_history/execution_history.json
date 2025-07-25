@@ -548,5 +548,296 @@
     "success": true,
     "error": null,
     "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"4d28ef6c-3d99-4151-a5f8-690bc0bb8475\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
+  },
+  {
+    "timestamp": "2025-07-24T20:06:13.522955",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Immune cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell', '1': 'T cell', '2': 'T cell', '3': 'B cell', '4': 'Mononuclear phagocyte', '5': 'T cell', '6': 'Natural killer cell', '7': 'Mast cell', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD"
+  },
+  {
+    "timestamp": "2025-07-24T20:06:37.968484",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Glial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Glial cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Schwann cell', '1': 'Schwann cell', '2': 'Muller cell', '3': 'Schwann cell', '4': 'Muller cell', '5': 'Schwann cell'}.\n\u2022 Top-genes per cluster: {'0': ['LGI4', 'NRXN1', 'CLU', 'CD9', 'SCN7A', 'NGFR', 'DKK3', 'GLUL', 'SLC1A3', 'RLBP1', 'CA3', 'NCAM1', 'SOX2', 'CA2', 'GFAP', 'PRX', 'APOE', 'L1CAM', 'MBP', 'MPZ', 'PLP1'], '1': ['LGI4', 'CLU', 'SCN7A', 'L1CAM', 'GFAP', 'DKK3', 'CD9', 'NCAM1', 'SOX2', 'NRXN1"
+  },
+  {
+    "timestamp": "2025-07-24T20:07:02.174475",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Mast cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for Mast cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 44\\n\\n  \u2022 GO Results:\\n    1. myeloid leukocyte activation (p-value: 0.0009375489382285551)\\n       Genes: \\n    2. myeloid cell activation "
+  },
+  {
+    "timestamp": "2025-07-24T20:07:02.185899",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "tumor microenvironment",
+      "cell_type": "Mast cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'tumor microenvironment' in Mast cell\", 'query': 'tumor microenvironment', 'cell_type': 'Mast cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Mast cell'}"
+  },
+  {
+    "timestamp": "2025-07-24T20:07:02.186849",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Mast cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-24T20:07:02.187722",
+    "function_name": "conversational_response",
+    "parameters": {},
+    "success": true,
+    "error": null,
+    "result_summary": "I'm ready to help with your single-cell analysis. Please let me know what you'd like to do."
+  },
+  {
+    "timestamp": "2025-07-25T00:05:09.953319",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Glial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Glial cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Schwann cell', '1': 'Schwann cell', '2': 'Muller cell', '3': 'Schwann cell', '4': 'Muller cell', '5': 'Schwann cell'}.\n\u2022 Top-genes per cluster: {'0': ['LGI4', 'NRXN1', 'CLU', 'CD9', 'SCN7A', 'NGFR', 'DKK3', 'GLUL', 'SLC1A3', 'RLBP1', 'CA3', 'NCAM1', 'SOX2', 'CA2', 'GFAP', 'PRX', 'APOE', 'L1CAM', 'MBP', 'MPZ', 'PLP1'], '1': ['LGI4', 'CLU', 'SCN7A', 'L1CAM', 'GFAP', 'DKK3', 'CD9', 'NCAM1', 'SOX2', 'NRXN1"
+  },
+  {
+    "timestamp": "2025-07-25T00:05:12.172679",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'dea_results': [{'category': 'cataract', 'significant_genes': ['PLP1', 'SPARC', 'GPM6B', 'MPZ', 'FXYD1', 'CD9', 'CDH19', 'S100B', 'ALDH1A1', 'PMP22', 'VWA1', 'CRYAB', 'CADM3', 'NDRG2', 'LGI4', 'GAS7', 'MAL', 'COL18A1', 'SAMHD1', 'TUBA1A', 'COL28A1', 'NRXN1', 'CNP', 'ITGB4', 'FOS', 'DST', 'ERBB3', 'MAP1B', 'SCN7A', 'LGALS1', 'SOX4', 'GPR155', 'LTBP4', 'PRKCA', 'NDRG1', 'HSPG2', 'CD59', 'CAVIN3', 'PRNP', 'TSPAN15', 'QKI', 'PDK4', 'KCNMB4', 'ID4', 'COL9A3', 'CHL1', 'S100A6', 'RGCC', 'SOX2', 'RHOB'"
+  },
+  {
+    "timestamp": "2025-07-25T00:05:44.829910",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Schwann cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Schwann cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 92\\n\\n  \u2022 GO Results:\\n    1. multicellular organism development (p-value: 2.9546209514470975e-13)\\n       Genes: \\n    2. system develop"
+  },
+  {
+    "timestamp": "2025-07-25T00:05:45.061933",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "gsea"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"5a710b7e-78bd-4eff-925f-7cafbb2f5f23\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
+  },
+  {
+    "timestamp": "2025-07-24T23:13:03.367820",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Glial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Glial cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Schwann cell', '1': 'Schwann cell', '2': 'Muller cell', '3': 'Schwann cell', '4': 'Muller cell', '5': 'Schwann cell'}.\n\u2022 Top-genes per cluster: {'0': ['LGI4', 'NRXN1', 'CLU', 'CD9', 'SCN7A', 'NGFR', 'DKK3', 'GLUL', 'SLC1A3', 'RLBP1', 'CA3', 'NCAM1', 'SOX2', 'CA2', 'GFAP', 'PRX', 'APOE', 'L1CAM', 'MBP', 'MPZ', 'PLP1'], '1': ['LGI4', 'CLU', 'SCN7A', 'L1CAM', 'GFAP', 'DKK3', 'CD9', 'NCAM1', 'SOX2', 'NRXN1"
+  },
+  {
+    "timestamp": "2025-07-24T23:13:05.694805",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'dea_results': [{'category': 'cataract', 'significant_genes': ['PLP1', 'SPARC', 'GPM6B', 'MPZ', 'FXYD1', 'CD9', 'CDH19', 'S100B', 'ALDH1A1', 'PMP22', 'VWA1', 'CRYAB', 'CADM3', 'NDRG2', 'LGI4', 'GAS7', 'MAL', 'COL18A1', 'SAMHD1', 'TUBA1A', 'COL28A1', 'NRXN1', 'CNP', 'ITGB4', 'FOS', 'DST', 'ERBB3', 'MAP1B', 'SCN7A', 'LGALS1', 'SOX4', 'GPR155', 'LTBP4', 'PRKCA', 'NDRG1', 'HSPG2', 'CD59', 'CAVIN3', 'PRNP', 'TSPAN15', 'QKI', 'PDK4', 'KCNMB4', 'ID4', 'COL9A3', 'CHL1', 'S100A6', 'RGCC', 'SOX2', 'RHOB'"
+  },
+  {
+    "timestamp": "2025-07-24T23:21:48.967788",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Glial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Glial cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Schwann cell', '1': 'Schwann cell', '2': 'Muller cell', '3': 'Schwann cell', '4': 'Muller cell', '5': 'Schwann cell'}.\n\u2022 Top-genes per cluster: {'0': ['LGI4', 'NRXN1', 'CLU', 'CD9', 'SCN7A', 'NGFR', 'DKK3', 'GLUL', 'SLC1A3', 'RLBP1', 'CA3', 'NCAM1', 'SOX2', 'CA2', 'GFAP', 'PRX', 'APOE', 'L1CAM', 'MBP', 'MPZ', 'PLP1'], '1': ['LGI4', 'CLU', 'SCN7A', 'L1CAM', 'GFAP', 'DKK3', 'CD9', 'NCAM1', 'SOX2', 'NRXN1"
+  },
+  {
+    "timestamp": "2025-07-24T23:21:51.258117",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'dea_results': [{'category': 'cataract', 'significant_genes': ['PLP1', 'SPARC', 'GPM6B', 'MPZ', 'FXYD1', 'CD9', 'CDH19', 'S100B', 'ALDH1A1', 'PMP22', 'VWA1', 'CRYAB', 'CADM3', 'NDRG2', 'LGI4', 'GAS7', 'MAL', 'COL18A1', 'SAMHD1', 'TUBA1A', 'COL28A1', 'NRXN1', 'CNP', 'ITGB4', 'FOS', 'DST', 'ERBB3', 'MAP1B', 'SCN7A', 'LGALS1', 'SOX4', 'GPR155', 'LTBP4', 'PRKCA', 'NDRG1', 'HSPG2', 'CD59', 'CAVIN3', 'PRNP', 'TSPAN15', 'QKI', 'PDK4', 'KCNMB4', 'ID4', 'COL9A3', 'CHL1', 'S100A6', 'RGCC', 'SOX2', 'RHOB'"
+  },
+  {
+    "timestamp": "2025-07-24T23:31:09.641267",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Glial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Glial cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Schwann cell', '1': 'Schwann cell', '2': 'Muller cell', '3': 'Schwann cell', '4': 'Muller cell', '5': 'Schwann cell'}.\n\u2022 Top-genes per cluster: {'0': ['LGI4', 'NRXN1', 'CLU', 'CD9', 'SCN7A', 'NGFR', 'DKK3', 'GLUL', 'SLC1A3', 'RLBP1', 'CA3', 'NCAM1', 'SOX2', 'CA2', 'GFAP', 'PRX', 'APOE', 'L1CAM', 'MBP', 'MPZ', 'PLP1'], '1': ['LGI4', 'CLU', 'SCN7A', 'L1CAM', 'GFAP', 'DKK3', 'CD9', 'NCAM1', 'SOX2', 'NRXN1"
+  },
+  {
+    "timestamp": "2025-07-24T23:31:11.856269",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'dea_results': [{'category': 'cataract', 'significant_genes': ['PLP1', 'SPARC', 'GPM6B', 'MPZ', 'FXYD1', 'CD9', 'CDH19', 'S100B', 'ALDH1A1', 'PMP22', 'VWA1', 'CRYAB', 'CADM3', 'NDRG2', 'LGI4', 'GAS7', 'MAL', 'COL18A1', 'SAMHD1', 'TUBA1A', 'COL28A1', 'NRXN1', 'CNP', 'ITGB4', 'FOS', 'DST', 'ERBB3', 'MAP1B', 'SCN7A', 'LGALS1', 'SOX4', 'GPR155', 'LTBP4', 'PRKCA', 'NDRG1', 'HSPG2', 'CD59', 'CAVIN3', 'PRNP', 'TSPAN15', 'QKI', 'PDK4', 'KCNMB4', 'ID4', 'COL9A3', 'CHL1', 'S100A6', 'RGCC', 'SOX2', 'RHOB'"
+  },
+  {
+    "timestamp": "2025-07-24T23:36:01.323671",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Glial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Glial cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Schwann cell', '1': 'Schwann cell', '2': 'Muller cell', '3': 'Schwann cell', '4': 'Muller cell', '5': 'Schwann cell'}.\n\u2022 Top-genes per cluster: {'0': ['LGI4', 'NRXN1', 'CLU', 'CD9', 'SCN7A', 'NGFR', 'DKK3', 'GLUL', 'SLC1A3', 'RLBP1', 'CA3', 'NCAM1', 'SOX2', 'CA2', 'GFAP', 'PRX', 'APOE', 'L1CAM', 'MBP', 'MPZ', 'PLP1'], '1': ['LGI4', 'CLU', 'SCN7A', 'L1CAM', 'GFAP', 'DKK3', 'CD9', 'NCAM1', 'SOX2', 'NRXN1"
+  },
+  {
+    "timestamp": "2025-07-24T23:36:03.609873",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'dea_results': [{'category': 'cataract', 'significant_genes': ['PLP1', 'SPARC', 'GPM6B', 'MPZ', 'FXYD1', 'CD9', 'CDH19', 'S100B', 'ALDH1A1', 'PMP22', 'VWA1', 'CRYAB', 'CADM3', 'NDRG2', 'LGI4', 'GAS7', 'MAL', 'COL18A1', 'SAMHD1', 'TUBA1A', 'COL28A1', 'NRXN1', 'CNP', 'ITGB4', 'FOS', 'DST', 'ERBB3', 'MAP1B', 'SCN7A', 'LGALS1', 'SOX4', 'GPR155', 'LTBP4', 'PRKCA', 'NDRG1', 'HSPG2', 'CD59', 'CAVIN3', 'PRNP', 'TSPAN15', 'QKI', 'PDK4', 'KCNMB4', 'ID4', 'COL9A3', 'CHL1', 'S100A6', 'RGCC', 'SOX2', 'RHOB'"
+  },
+  {
+    "timestamp": "2025-07-24T23:47:44.912713",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Glial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Glial cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Schwann cell', '1': 'Schwann cell', '2': 'Muller cell', '3': 'Schwann cell', '4': 'Muller cell', '5': 'Schwann cell'}.\n\u2022 Top-genes per cluster: {'0': ['LGI4', 'NRXN1', 'CLU', 'CD9', 'SCN7A', 'NGFR', 'DKK3', 'GLUL', 'SLC1A3', 'RLBP1', 'CA3', 'NCAM1', 'SOX2', 'CA2', 'GFAP', 'PRX', 'APOE', 'L1CAM', 'MBP', 'MPZ', 'PLP1'], '1': ['LGI4', 'CLU', 'SCN7A', 'L1CAM', 'GFAP', 'DKK3', 'CD9', 'NCAM1', 'SOX2', 'NRXN1"
+  },
+  {
+    "timestamp": "2025-07-24T23:47:47.228055",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'dea_results': [{'category': 'cataract', 'significant_genes': ['PLP1', 'SPARC', 'GPM6B', 'MPZ', 'FXYD1', 'CD9', 'CDH19', 'S100B', 'ALDH1A1', 'PMP22', 'VWA1', 'CRYAB', 'CADM3', 'NDRG2', 'LGI4', 'GAS7', 'MAL', 'COL18A1', 'SAMHD1', 'TUBA1A', 'COL28A1', 'NRXN1', 'CNP', 'ITGB4', 'FOS', 'DST', 'ERBB3', 'MAP1B', 'SCN7A', 'LGALS1', 'SOX4', 'GPR155', 'LTBP4', 'PRKCA', 'NDRG1', 'HSPG2', 'CD59', 'CAVIN3', 'PRNP', 'TSPAN15', 'QKI', 'PDK4', 'KCNMB4', 'ID4', 'COL9A3', 'CHL1', 'S100A6', 'RGCC', 'SOX2', 'RHOB'"
+  },
+  {
+    "timestamp": "2025-07-24T23:55:55.051796",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Stromal cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Stromal cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Beam cell', '1': 'Fibroblast', '2': 'Trabecular meshwork cell', '3': 'Mural cell', '4': 'Endothelial cell', '5': 'Fibroblast', '6': 'Fibroblast', '7': 'Fibroblast', '8': 'Fibroblast', '9': 'Fibroblast', '10': 'Myocyte'}.\n\u2022 Top-genes per cluster: {'0': ['PTGDS', 'MMP2', 'COL6A2', 'COL15A1', 'CTSK', 'DCN', 'CLEC11A', 'RAMP2', 'COL6A1', 'S100A4', 'FABP5', 'APOE', 'EDNRB', 'SERPINF1', 'MDK', 'CFD', 'APOD"
+  },
+  {
+    "timestamp": "2025-07-24T23:56:31.031800",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Mural cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Mural cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Pericyte', '1': 'Smooth muscle cell', '2': 'Smooth muscle cell', '3': 'Smooth muscle cell', '4': 'Pericyte'}.\n\u2022 Top-genes per cluster: {'0': ['ADIRF', 'NDUFA4L2', 'JAG1', 'SPARCL1', 'MYH11', 'GJA4', 'TPM2', 'MCAM', 'ACTG2', 'RERGL', 'PLN', 'COBLL1', 'CSPG4', 'MYL9', 'MYLK', 'SLIT3', 'TPPP3', 'HIGD1B', 'ITGA7', 'MEF2C', 'CAV1', 'ACTA2', 'PDGFRB', 'PLXDC1', 'PDGFRA'], '1': ['SYNPO2', 'COL1A1', 'MGP', 'CO"
+  },
+  {
+    "timestamp": "2025-07-24T23:56:33.365091",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Pericyte",
+      "gene": "PDK4",
+      "conditions": [
+        "Healthy",
+        "AMD"
+      ],
+      "regions": [
+        "Macula",
+        "Peripheral"
+      ]
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'dea_results': [{'category': 'cataract', 'significant_genes': ['ADIRF'], 'description': 'This is a condition where the lens of the eye becomes cloudy.'}, {'category': 'basal laminar drusen', 'significant_genes': ['C11orf96', 'TAGLN', 'ACTA2', 'CALD1', 'LPP', 'RGS5', 'TINAGL1', 'FILIP1L', 'MYL9', 'MAP3K20', 'MAP1B', 'CNN1', 'RBPMS', 'ARID5B', 'TPM1', 'LMOD1', 'CAVIN1', 'GJA4', 'SYNPO2', 'ADIRF', 'TIMP3', 'CSRP1', 'EPS8', 'NR2F2', 'SELENOM', 'AXL', 'A2M', 'COL4A2', 'JAG1', 'MFGE8', 'PARM1', 'SMTN"
+  },
+  {
+    "timestamp": "2025-07-25T00:03:45.832183",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Stromal cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Stromal cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Beam cell', '1': 'Fibroblast', '2': 'Trabecular meshwork cell', '3': 'Mural cell', '4': 'Endothelial cell', '5': 'Fibroblast', '6': 'Fibroblast', '7': 'Fibroblast', '8': 'Fibroblast', '9': 'Fibroblast', '10': 'Myocyte'}.\n\u2022 Top-genes per cluster: {'0': ['PTGDS', 'MMP2', 'COL6A2', 'COL15A1', 'CTSK', 'DCN', 'CLEC11A', 'RAMP2', 'COL6A1', 'S100A4', 'FABP5', 'APOE', 'EDNRB', 'SERPINF1', 'MDK', 'CFD', 'APOD"
+  },
+  {
+    "timestamp": "2025-07-25T00:04:29.370193",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Mural cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Mural cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Pericyte', '1': 'Smooth muscle cell', '2': 'Smooth muscle cell', '3': 'Smooth muscle cell', '4': 'Pericyte'}.\n\u2022 Top-genes per cluster: {'0': ['ADIRF', 'NDUFA4L2', 'JAG1', 'SPARCL1', 'MYH11', 'GJA4', 'TPM2', 'MCAM', 'ACTG2', 'RERGL', 'PLN', 'COBLL1', 'CSPG4', 'MYL9', 'MYLK', 'SLIT3', 'TPPP3', 'HIGD1B', 'ITGA7', 'MEF2C', 'CAV1', 'ACTA2', 'PDGFRB', 'PLXDC1', 'PDGFRA'], '1': ['SYNPO2', 'COL1A1', 'MGP', 'CO"
+  },
+  {
+    "timestamp": "2025-07-25T00:04:31.521827",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Pericyte",
+      "gene": "PDK4",
+      "conditions": [
+        "Healthy",
+        "AMD"
+      ],
+      "regions": [
+        "Macula",
+        "Peripheral"
+      ]
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'dea_results': [{'category': 'cataract', 'significant_genes': ['ADIRF'], 'description': 'This is a condition where the lens of the eye becomes cloudy.'}, {'category': 'basal laminar drusen', 'significant_genes': ['C11orf96', 'TAGLN', 'ACTA2', 'CALD1', 'LPP', 'RGS5', 'TINAGL1', 'FILIP1L', 'MYL9', 'MAP3K20', 'MAP1B', 'CNN1', 'RBPMS', 'ARID5B', 'TPM1', 'LMOD1', 'CAVIN1', 'GJA4', 'SYNPO2', 'ADIRF', 'TIMP3', 'CSRP1', 'EPS8', 'NR2F2', 'SELENOM', 'AXL', 'A2M', 'COL4A2', 'JAG1', 'MFGE8', 'PARM1', 'SMTN"
   }
 ]
