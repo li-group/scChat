@@ -8,6 +8,7 @@ This module contains the basic node implementations:
 """
 
 import json
+import re
 from typing import Dict, Any, List
 from datetime import datetime
 
@@ -1506,7 +1507,7 @@ class CoreNodes:
         
         print(f"{'='*60}\n")
 
-    def _call_llm(self, prompt: str) -> str:
+    def _call_llm(self, prompt: str, model_name: str = "gpt-4o") -> str:
         """Simple LLM call for analysis tasks using LangChain"""
         try:
             from langchain_openai import ChatOpenAI
@@ -1520,7 +1521,7 @@ class CoreNodes:
             
             # Initialize model
             model = ChatOpenAI(
-                model="gpt-4o",
+                model=model_name,
                 temperature=0.1,  # Low temperature for consistency
                 max_tokens=500   # Reasonable limit for search queries
             )
@@ -1532,6 +1533,312 @@ class CoreNodes:
         except Exception as e:
             print(f"⚠️ LLM call failed: {e}")
             return "[]"  # Safe default for JSON parsing
+    
+    def _classify_question_type(self, question: str) -> str:
+        """Classify question type using a smaller LLM for efficiency"""
+        
+        classification_prompt = f"""Classify the following biology question into ONE category:
+
+Question: "{question}"
+
+Categories:
+1. canonical_markers - Questions about well-known, established cell type markers (e.g., "What are canonical markers for...", "differentiate X from Y using markers")
+2. pathway_analysis - Questions about biological pathways, processes, or functional enrichment (e.g., "What pathways are enriched...", "biological processes in...")
+3. gene_expression - Questions about specific gene expression changes (e.g., "Is gene X upregulated...", "expression of Y in condition Z")
+4. cell_abundance - Questions about cell type counts or proportions (e.g., "How many X cells...", "proportion of Y cells")
+5. general_comparison - General comparison questions not fitting above categories
+
+Return ONLY the category name, nothing else.
+Category:"""
+        
+        try:
+            # Use smaller model for efficiency
+            response = self._call_llm(classification_prompt, model_name="gpt-4o-mini")
+            category = response.strip().lower()
+            
+            # Validate category
+            valid_categories = ["canonical_markers", "pathway_analysis", "gene_expression", 
+                              "cell_abundance", "general_comparison"]
+            
+            if category not in valid_categories:
+                print(f"⚠️ Invalid category '{category}', defaulting to general_comparison")
+                return "general_comparison"
+            
+            print(f"📊 Question classified as: {category}")
+            return category
+            
+        except Exception as e:
+            print(f"⚠️ Question classification failed: {e}")
+            return "general_comparison"
+    
+    def _post_execution_evaluation(self, state: ChatState) -> Dict[str, Any]:
+        """
+        Cell-type specific LLM-powered gap analysis - FINAL APPROACH
+        """
+        print("🔍 Starting post-execution evaluation...")
+        
+        original_question = state["execution_plan"]["original_question"]
+        
+        # Step 1: Extract mentioned cell types using existing function
+        mentioned_types = extract_cell_types_from_question(original_question, self.hierarchy_manager)
+        
+        # Classify question type for better result filtering
+        question_type = self._classify_question_type(original_question)
+        
+        if not mentioned_types:
+            print("📋 No specific cell types mentioned, skipping post-execution evaluation")
+            return {"mentioned_cell_types": [], "supplementary_steps": [], "evaluation_complete": True}
+        
+        supplementary_steps = []
+        evaluation_details = {}
+        
+        # Step 2: For each mentioned cell type, ask LLM what analyses are needed
+        for cell_type in mentioned_types:
+            print(f"🔍 Evaluating coverage for cell type: {cell_type}")
+            
+            # Step 2a: Get LLM recommendations for this specific cell type
+            required_analyses = self._get_llm_analysis_requirements(original_question, cell_type)
+            
+            # Step 2b: Check what was actually performed for this cell type
+            performed_analyses = self._get_performed_analyses_for_cell_type(state, cell_type)
+            
+            # Step 2c: Find gaps and generate steps
+            missing_steps = self._generate_missing_steps_for_cell_type(
+                cell_type, required_analyses, performed_analyses
+            )
+            
+            supplementary_steps.extend(missing_steps)
+            evaluation_details[cell_type] = {
+                "required_analyses": required_analyses,
+                "performed_analyses": performed_analyses,
+                "missing_steps_count": len(missing_steps)
+            }
+            
+            if missing_steps:
+                print(f"📋 Found {len(missing_steps)} missing steps for {cell_type}")
+            else:
+                print(f"✅ Complete coverage for {cell_type}")
+        
+        print(f"🔍 Post-execution evaluation complete: {len(supplementary_steps)} total supplementary steps")
+        
+        # Add analysis relevance hints based on question type
+        all_performed_analyses = {}
+        for cell_type, details in evaluation_details.items():
+            all_performed_analyses[cell_type] = details["performed_analyses"]
+        
+        analysis_relevance = self._get_analysis_relevance_hints(question_type, all_performed_analyses)
+        
+        return {
+            "mentioned_cell_types": mentioned_types,
+            "evaluation_details": evaluation_details,
+            "supplementary_steps": supplementary_steps,
+            "evaluation_complete": True,
+            "question_type": question_type,
+            "analysis_relevance": analysis_relevance
+        }
+
+    def _get_llm_analysis_requirements(self, original_question: str, cell_type: str) -> List[str]:
+        """Ask LLM what analyses this specific cell type needs"""
+        
+        # Get question type for context
+        question_type = self._classify_question_type(original_question)
+        
+        analysis_prompt = f"""You are analyzing what bioinformatics analyses are needed for a specific cell type.
+
+User Question: "{original_question}"
+Cell Type: "{cell_type}"
+Question Type: {question_type}
+
+Available analysis functions with detailed descriptions:
+
+CORE ANALYSIS FUNCTIONS:
+- perform_enrichment_analyses: Run enrichment analyses on DE genes for a cell type. Supports REACTOME (pathways), GO (gene ontology), KEGG (pathways), GSEA (gene set enrichment). Use for pathway analysis when user asks about biological processes, pathways, or gene function.
+
+- dea_split_by_condition: Perform differential expression analysis (DEA) split by condition. Use when comparing conditions or when user asks about gene expression differences between experimental groups.
+
+- compare_cell_counts: Compare cell counts between experimental conditions for specific cell types. Use when analyzing how cell type abundance differs across conditions (e.g., pre vs post treatment, healthy vs disease).
+
+VISUALIZATION FUNCTIONS:
+- display_enrichment_visualization: PREFERRED function for showing comprehensive enrichment visualization with both barplot and dotplot. Use after running enrichment analyses to visualize results.
+
+- display_dotplot: Display dotplot for annotated results. Use when user wants to see gene expression patterns across cell types.
+
+- display_cell_type_composition: Display cell type composition graph. Use when user wants to see the proportion of different cell types.
+
+- display_umap: Display basic UMAP without cell type annotations. Use for basic dimensionality reduction visualization.
+
+- display_processed_umap: Display UMAP with cell type annotations. Use when user wants to see cell type annotations on UMAP.
+
+SEARCH FUNCTIONS:
+- search_enrichment_semantic: Search all enrichment terms semantically to find specific pathways or biological processes. Use when user asks about specific pathways, terms, or biological processes that might not appear in standard top results.
+
+- conversational_response: Provide conversational response without function calls. Use for greetings, clarifications, explanations, or when no analysis is needed.
+
+Task: Determine which analyses are needed for {cell_type} to answer the user's question.
+
+IMPORTANT: The cell type "{cell_type}" already exists in the dataset. DO NOT suggest process_cells for this cell type.
+
+Consider based on question type:
+1. Canonical markers questions (differentiate X from Y, markers of X) → Use dea_split_by_condition ONLY
+2. Gene expression questions → Use dea_split_by_condition
+3. Pathway/biological process questions → Use perform_enrichment_analyses + search_enrichment_semantic
+4. Cell abundance questions → Use compare_cell_counts
+5. Specific pathway search → Use search_enrichment_semantic
+
+CRITICAL GUIDELINES FOR CANONICAL MARKERS:
+- For canonical markers questions, ONLY use dea_split_by_condition
+- DO NOT include enrichment analyses for marker identification
+- DO NOT suggest process_cells for already-available cell types
+- Visualization is optional for canonical markers
+
+GENERAL GUIDELINES:
+- Only include display_enrichment_visualization ONCE per cell type
+- Return ONLY a valid JSON array of function names, nothing else
+
+Example response for pathway question: ["perform_enrichment_analyses", "search_enrichment_semantic", "display_enrichment_visualization"]
+Example response for all kinds of markers: ["dea_split_by_condition"]
+
+Required analyses for {cell_type}:"""
+        
+        try:
+            response = self._call_llm(analysis_prompt)
+            print(f"🔍 LLM raw response for {cell_type}: '{response}' (length: {len(response)})")
+            
+            if not response or response.strip() == "":
+                print(f"⚠️ Empty LLM response for {cell_type}, using fallback")
+                return ["perform_enrichment_analyses"]
+            
+            # Try to extract JSON from response (handle cases with markdown code blocks)
+            response = response.strip()
+            
+            # Remove markdown code blocks if present
+            if response.startswith("```json"):
+                response = response.replace("```json", "").replace("```", "").strip()
+            elif response.startswith("```"):
+                response = response.replace("```", "").strip()
+            
+            # Look for JSON array pattern if response contains other text
+            json_match = re.search(r'\[.*?\]', response, re.DOTALL)
+            if json_match:
+                response = json_match.group(0)
+            
+            required_analyses = json.loads(response)
+            
+            # Ensure we got a list
+            if not isinstance(required_analyses, list):
+                print(f"⚠️ LLM returned {type(required_analyses)} instead of list for {cell_type}")
+                return ["perform_enrichment_analyses"]
+            
+            print(f"🧠 LLM recommends for {cell_type}: {required_analyses}")
+            return required_analyses
+        except json.JSONDecodeError as e:
+            print(f"⚠️ JSON parsing failed for {cell_type}: {e}")
+            print(f"⚠️ Raw response was: '{response}'")
+            return ["perform_enrichment_analyses"]  # Safe fallback
+        except Exception as e:
+            print(f"⚠️ LLM analysis requirement failed for {cell_type}: {e}")
+            return ["perform_enrichment_analyses"]  # Safe fallback
+
+    def _get_performed_analyses_for_cell_type(self, state: ChatState, cell_type: str) -> List[str]:
+        """Check what analyses were actually performed for a specific cell type"""
+        
+        performed_analyses = []
+        
+        for ex in state["execution_history"]:
+            if ex.get("success"):
+                function_name = ex.get("step", {}).get("function_name")
+                params = ex.get("step", {}).get("parameters", {})
+                ex_cell_type = params.get("cell_type")
+                
+                if ex_cell_type == cell_type and function_name:
+                    performed_analyses.append(function_name)
+        
+        # Remove duplicates while preserving order
+        unique_performed = []
+        for analysis in performed_analyses:
+            if analysis not in unique_performed:
+                unique_performed.append(analysis)
+        
+        print(f"📊 Actually performed for {cell_type}: {unique_performed}")
+        return unique_performed
+
+    def _generate_missing_steps_for_cell_type(self, cell_type: str, required_analyses: List[str], 
+                                            performed_analyses: List[str]) -> List[Dict[str, Any]]:
+        """Generate supplementary steps for missing analyses for a specific cell type"""
+        
+        missing_steps = []
+        
+        for required_function in required_analyses:
+            if required_function not in performed_analyses:
+                # Generate step using existing step format
+                step = {
+                    "step_type": "analysis" if not required_function.startswith("display_") else "visualization",
+                    "function_name": required_function,
+                    "parameters": {"cell_type": cell_type},
+                    "description": f"Post-evaluation: {required_function} for {cell_type}",
+                    "expected_outcome": f"Complete analysis coverage for {cell_type}",
+                    "target_cell_type": cell_type
+                }
+                
+                # Add specific parameters for visualization functions
+                if required_function == "display_enrichment_visualization":
+                    step["parameters"]["analysis"] = "gsea"  # Default analysis type
+                
+                missing_steps.append(step)
+                print(f"🔧 Generated missing step: {required_function}({cell_type})")
+        
+        return missing_steps
+    
+    def _get_analysis_relevance_hints(self, question_type: str, performed_analyses: Dict[str, List[str]]) -> Dict[str, Any]:
+        """Generate hints about which analyses are most relevant for the question type"""
+        
+        relevance_map = {
+            "canonical_markers": {
+                "primary": ["dea_split_by_condition"],
+                "secondary": ["display_dotplot"]
+            },
+            "pathway_analysis": {
+                "primary": ["perform_enrichment_analyses", "search_enrichment_semantic"],
+                "secondary": ["display_enrichment_visualization"]
+            },
+            "gene_expression": {
+                "primary": ["dea_split_by_condition"],
+                "secondary": ["display_dotplot"]
+            },
+            "cell_abundance": {
+                "primary": ["compare_cell_counts"],
+                "secondary": ["display_processed_umap"]
+            },
+            "general_comparison": {
+                "primary": ["dea_split_by_condition", "perform_enrichment_analyses"],
+                "secondary": ["search_enrichment_semantic", "display_enrichment_visualization"]
+            }
+        }
+        
+        relevance = relevance_map.get(question_type, relevance_map["general_comparison"])
+        
+        # Create hints for response generator
+        hints = {
+            "question_type": question_type,
+            "relevance_categories": relevance,
+            "guidance": self._get_response_guidance(question_type)
+        }
+        
+        print(f"📝 Generated relevance hints for {question_type} question")
+        return hints
+    
+    def _get_response_guidance(self, question_type: str) -> str:
+        """Get specific guidance for response generation based on question type"""
+        
+        guidance_map = {
+            "canonical_markers": "Focus on well-established markers from literature. Prioritize DEA results showing marker genes. Avoid emphasizing enrichment analysis unless directly relevant to marker function.",
+            "pathway_analysis": "Emphasize enrichment analysis results, biological processes, and pathway information. DEA results support pathway findings.",
+            "gene_expression": "Focus on specific gene expression values and fold changes from DEA. Show specific gene names and statistical significance.",  
+            "cell_abundance": "Prioritize cell count comparisons and composition visualizations. Focus on quantitative differences between conditions.",
+            "general_comparison": "Balance all available analyses based on what best answers the specific question."
+        }
+        
+        return guidance_map.get(question_type, guidance_map["general_comparison"])
     
     def __del__(self):
         """Cleanup EnrichmentChecker connection on destruction."""

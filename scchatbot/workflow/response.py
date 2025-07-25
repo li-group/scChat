@@ -78,14 +78,21 @@ class ResponseMixin:
             raise
         
         try:
-            # 5. Generate synthesis prompt with conversation awareness
+            # 5. Get post-execution evaluation results for question type and relevance hints
+            post_eval = state.get("post_execution_evaluation", {})
+            question_type = post_eval.get("question_type")
+            analysis_relevance = post_eval.get("analysis_relevance", {})
+            
+            # 6. Generate synthesis prompt with conversation awareness and relevance hints
             synthesis_prompt = self._create_enhanced_synthesis_prompt_with_formatted_findings(
                 original_question=state.get("current_message", ""),
                 formatted_findings=formatted_findings,
                 failed_analyses=failed_analyses,
-                conversation_context=conversation_context
+                conversation_context=conversation_context,
+                question_type=question_type,
+                analysis_relevance=analysis_relevance
             )
-            print("✅ Synthesis prompt created")
+            print("✅ Synthesis prompt created with relevance hints")
         except Exception as e:
             print(f"❌ Error creating synthesis prompt: {e}")
             import traceback
@@ -151,13 +158,32 @@ class ResponseMixin:
     
     def _create_enhanced_synthesis_prompt_with_formatted_findings(self, original_question: str, formatted_findings: str, 
                                          failed_analyses: List[Dict],
-                                         conversation_context: str = None) -> str:
+                                         conversation_context: str = None,
+                                         question_type: str = None,
+                                         analysis_relevance: Dict[str, Any] = None) -> str:
         """Create prompt for synthesizing analysis results with pre-formatted findings from unified accessor."""
         
         prompt = f"""You are a single-cell RNA-seq analysis expert. 
 
                     USER'S QUESTION: "{original_question}"
                     """
+        
+        # Add question type and guidance if available
+        if question_type and analysis_relevance:
+            guidance = analysis_relevance.get("guidance", "")
+            prompt += f"""
+                        QUESTION TYPE: {question_type}
+                        RESPONSE GUIDANCE: {guidance}
+                        """
+            
+            # Add analysis relevance hints
+            relevance_categories = analysis_relevance.get("relevance_categories", {})
+            if relevance_categories:
+                prompt += """
+                        ANALYSIS RELEVANCE:
+                        - Primary analyses (focus on these): """ + str(relevance_categories.get("primary", [])) + """
+                        - Secondary analyses (use for support): """ + str(relevance_categories.get("secondary", [])) + """
+                        """
 
         # Add conversation context if available
         if conversation_context:

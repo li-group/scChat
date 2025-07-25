@@ -78,6 +78,42 @@ class EvaluationMixin:
                 if "processed_cell_types" in available_results:
                     print(f"   • Processed cell types: {available_results['processed_cell_types']}")
         
+        # NEW: Add post-execution evaluation to check for missing analyses
+        print("🔍 Evaluator: Starting post-execution evaluation...")
+        
+        # Check if we have the post-execution evaluation methods available (from CoreNodes)
+        if hasattr(self, '_post_execution_evaluation'):
+            evaluation_result = self._post_execution_evaluation(state)
+            
+            # Store evaluation result in state for response generator
+            state["post_execution_evaluation"] = evaluation_result
+            
+            if evaluation_result.get("supplementary_steps"):
+                print(f"🔍 Post-execution evaluation found {len(evaluation_result['supplementary_steps'])} additional steps needed")
+                
+                # Add supplementary steps to execution plan
+                supplementary_steps = evaluation_result["supplementary_steps"]
+                current_steps = state["execution_plan"].get("steps", [])
+                state["execution_plan"]["steps"] = current_steps + supplementary_steps
+                
+                # Reset state to continue execution with supplementary steps
+                state["current_step_index"] = len(current_steps)  # Start from first supplementary step
+                state["conversation_complete"] = False  # Continue execution
+                
+                print(f"📋 Added {len(supplementary_steps)} supplementary steps to execution plan")
+                print("🔄 Returning to executor to process supplementary steps...")
+                
+                # Return state for continued execution
+                return state
+            else:
+                print("✅ Post-execution evaluation: No additional steps needed")
+                if evaluation_result.get("question_type"):
+                    print(f"📊 Question type: {evaluation_result['question_type']}")
+                if evaluation_result.get("analysis_relevance"):
+                    print(f"📝 Generated analysis relevance hints for response generation")
+        else:
+            print("⚠️ Post-execution evaluation methods not available")
+        
         # Mark conversation as ready for response generation
         state["conversation_complete"] = True
         

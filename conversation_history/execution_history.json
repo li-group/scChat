@@ -839,5 +839,942 @@
     "success": true,
     "error": null,
     "result_summary": "{'dea_results': [{'category': 'cataract', 'significant_genes': ['ADIRF'], 'description': 'This is a condition where the lens of the eye becomes cloudy.'}, {'category': 'basal laminar drusen', 'significant_genes': ['C11orf96', 'TAGLN', 'ACTA2', 'CALD1', 'LPP', 'RGS5', 'TINAGL1', 'FILIP1L', 'MYL9', 'MAP3K20', 'MAP1B', 'CNN1', 'RBPMS', 'ARID5B', 'TPM1', 'LMOD1', 'CAVIN1', 'GJA4', 'SYNPO2', 'ADIRF', 'TIMP3', 'CSRP1', 'EPS8', 'NR2F2', 'SELENOM', 'AXL', 'A2M', 'COL4A2', 'JAG1', 'MFGE8', 'PARM1', 'SMTN"
+  },
+  {
+    "timestamp": "2025-07-25T01:34:46.599531",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Glial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Glial cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Schwann cell', '1': 'Schwann cell', '2': 'Muller cell', '3': 'Schwann cell', '4': 'Muller cell', '5': 'Schwann cell'}.\n\u2022 Top-genes per cluster: {'0': ['LGI4', 'NRXN1', 'CLU', 'CD9', 'SCN7A', 'NGFR', 'DKK3', 'GLUL', 'SLC1A3', 'RLBP1', 'CA3', 'NCAM1', 'SOX2', 'CA2', 'GFAP', 'PRX', 'APOE', 'L1CAM', 'MBP', 'MPZ', 'PLP1'], '1': ['LGI4', 'CLU', 'SCN7A', 'L1CAM', 'GFAP', 'DKK3', 'CD9', 'NCAM1', 'SOX2', 'NRXN1"
+  },
+  {
+    "timestamp": "2025-07-25T01:34:49.057813",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'dea_results': [{'category': 'cataract', 'significant_genes': ['PLP1', 'SPARC', 'GPM6B', 'MPZ', 'FXYD1', 'CD9', 'CDH19', 'S100B', 'ALDH1A1', 'PMP22', 'VWA1', 'CRYAB', 'CADM3', 'NDRG2', 'LGI4', 'GAS7', 'MAL', 'COL18A1', 'SAMHD1', 'TUBA1A', 'COL28A1', 'NRXN1', 'CNP', 'ITGB4', 'FOS', 'DST', 'ERBB3', 'MAP1B', 'SCN7A', 'LGALS1', 'SOX4', 'GPR155', 'LTBP4', 'PRKCA', 'NDRG1', 'HSPG2', 'CD59', 'CAVIN3', 'PRNP', 'TSPAN15', 'QKI', 'PDK4', 'KCNMB4', 'ID4', 'COL9A3', 'CHL1', 'S100A6', 'RGCC', 'SOX2', 'RHOB'"
+  },
+  {
+    "timestamp": "2025-07-25T01:35:34.256846",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Stromal cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Stromal cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Beam cell', '1': 'Fibroblast', '2': 'Trabecular meshwork cell', '3': 'Mural cell', '4': 'Endothelial cell', '5': 'Fibroblast', '6': 'Fibroblast', '7': 'Fibroblast', '8': 'Fibroblast', '9': 'Fibroblast', '10': 'Myocyte'}.\n\u2022 Top-genes per cluster: {'0': ['PTGDS', 'MMP2', 'COL6A2', 'COL15A1', 'CTSK', 'DCN', 'CLEC11A', 'RAMP2', 'COL6A1', 'S100A4', 'FABP5', 'APOE', 'EDNRB', 'SERPINF1', 'MDK', 'CFD', 'APOD"
+  },
+  {
+    "timestamp": "2025-07-25T01:36:02.555273",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Mural cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Mural cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Smooth muscle cell', '1': 'Smooth muscle cell', '2': 'Smooth muscle cell', '3': 'Smooth muscle cell', '4': 'Pericyte'}.\n\u2022 Top-genes per cluster: {'0': ['ADIRF', 'NDUFA4L2', 'JAG1', 'SPARCL1', 'MYH11', 'GJA4', 'TPM2', 'MCAM', 'ACTG2', 'RERGL', 'PLN', 'COBLL1', 'CSPG4', 'MYL9', 'MYLK', 'SLIT3', 'TPPP3', 'HIGD1B', 'ITGA7', 'MEF2C', 'CAV1', 'ACTA2', 'PDGFRB', 'PLXDC1', 'PDGFRA'], '1': ['SYNPO2', 'COL1A1', "
+  },
+  {
+    "timestamp": "2025-07-25T01:36:04.087707",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Pericyte"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'dea_results': [{'category': 'basal laminar drusen', 'significant_genes': ['C11orf96', 'TAGLN', 'CFH', 'CALD1', 'GPRC5A', 'ARID5B', 'TIMP3', 'IGFBP5', 'DCN', 'ACTA2', 'TPM4', 'FILIP1L', 'H1-10', 'MAP1B', 'RGS5', 'LPP', 'GEM', 'TPM1', 'SELENOM', 'CAVIN1', 'LMOD1', 'HERPUD1', 'H2AJ', 'IGFBP4', 'RBPMS', 'TINAGL1', 'PARM1', 'SERTAD1', 'FADS3', 'MYL9', 'MAP3K20', 'CHSY1', 'EMP1', 'C1R', 'S100A6', 'PSMC3', 'NUPR1', 'A2M', 'SLC25A6', 'SYNPO2', 'PDIA6', 'NR2F2', 'CCN2', 'GABARAPL1', 'PDLIM3', 'FOXC1', "
+  },
+  {
+    "timestamp": "2025-07-25T01:36:13.544380",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Stromal cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Process cells completed, but no new cell types were discovered."
+  },
+  {
+    "timestamp": "2025-07-25T01:36:13.569896",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Mural cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Process cells completed, but no new cell types were discovered."
+  },
+  {
+    "timestamp": "2025-07-25T01:36:14.992667",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Pericyte"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'dea_results': [{'category': 'basal laminar drusen', 'significant_genes': ['C11orf96', 'TAGLN', 'CFH', 'CALD1', 'GPRC5A', 'ARID5B', 'TIMP3', 'IGFBP5', 'DCN', 'ACTA2', 'TPM4', 'FILIP1L', 'H1-10', 'MAP1B', 'RGS5', 'LPP', 'GEM', 'TPM1', 'SELENOM', 'CAVIN1', 'LMOD1', 'HERPUD1', 'H2AJ', 'IGFBP4', 'RBPMS', 'TINAGL1', 'PARM1', 'SERTAD1', 'FADS3', 'MYL9', 'MAP3K20', 'CHSY1', 'EMP1', 'C1R', 'S100A6', 'PSMC3', 'NUPR1', 'A2M', 'SLC25A6', 'SYNPO2', 'PDIA6', 'NR2F2', 'CCN2', 'GABARAPL1', 'PDLIM3', 'FOXC1', "
+  },
+  {
+    "timestamp": "2025-07-25T01:37:19.356937",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Immune cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell', '1': 'T cell', '2': 'T cell', '3': 'B cell', '4': 'Mononuclear phagocyte', '5': 'T cell', '6': 'Natural killer cell', '7': 'Mast cell', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD"
+  },
+  {
+    "timestamp": "2025-07-25T01:37:42.829041",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Mast cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for Mast cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 44\\n\\n  \u2022 GO Results:\\n    1. myeloid leukocyte activation (p-value: 0.0009375489382285551)\\n       Genes: \\n    2. myeloid cell activation "
+  },
+  {
+    "timestamp": "2025-07-25T01:37:42.846199",
+    "function_name": "compare_cell_counts",
+    "parameters": {
+      "cell_type": "Mast cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'count_results': [{'category': 'cataract', 'cell_count': 40, 'description': 'This is a condition where the lens of the eye becomes cloudy.'}, {'category': 'basal laminar drusen', 'cell_count': 6, 'description': \"These are deposits that accumulate between the RPE and Bruch's membrane and are a hallmark of aging and a risk factor for AMD.\"}, {'category': 'age related macular degeneration', 'cell_count': 21, 'description': 'This is a primary focus of the study as it is a leading cause of irreversi"
+  },
+  {
+    "timestamp": "2025-07-25T01:37:42.847669",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Mast cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T01:38:34.588437",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Mast cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for Mast cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 44\\n\\n  \u2022 GO Results:\\n    1. myeloid leukocyte activation (p-value: 0.0009375489382285551)\\n       Genes: \\n    2. myeloid cell activation "
+  },
+  {
+    "timestamp": "2025-07-25T01:39:06.815721",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Schwann cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Schwann cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 92\\n\\n  \u2022 GO Results:\\n    1. multicellular organism development (p-value: 2.9546209514470975e-13)\\n       Genes: \\n    2. system develop"
+  },
+  {
+    "timestamp": "2025-07-25T01:39:06.817840",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment",
+      "cell_type": "Mast cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Mast cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T01:39:06.818916",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment",
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Schwann cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T01:39:06.829583",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "tumor microenvironment",
+      "cell_type": "Mast cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'tumor microenvironment' in Mast cell\", 'query': 'tumor microenvironment', 'cell_type': 'Mast cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Mast cell'}"
+  },
+  {
+    "timestamp": "2025-07-25T01:39:06.837352",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "tumor microenvironment",
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'tumor microenvironment' in Schwann cell\", 'query': 'tumor microenvironment', 'cell_type': 'Schwann cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Schwann cell'}"
+  },
+  {
+    "timestamp": "2025-07-25T01:52:17.411553",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Immune cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell', '1': 'T cell', '2': 'T cell', '3': 'B cell', '4': 'Mononuclear phagocyte', '5': 'T cell', '6': 'Natural killer cell', '7': 'Mast cell', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD"
+  },
+  {
+    "timestamp": "2025-07-25T01:52:41.501123",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Mast cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for Mast cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 44\\n\\n  \u2022 GO Results:\\n    1. myeloid leukocyte activation (p-value: 0.0009375489382285551)\\n       Genes: \\n    2. myeloid cell activation "
+  },
+  {
+    "timestamp": "2025-07-25T01:52:41.515000",
+    "function_name": "compare_cell_counts",
+    "parameters": {
+      "cell_type": "Mast cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'count_results': [{'category': 'cataract', 'cell_count': 40, 'description': 'This is a condition where the lens of the eye becomes cloudy.'}, {'category': 'basal laminar drusen', 'cell_count': 6, 'description': \"These are deposits that accumulate between the RPE and Bruch's membrane and are a hallmark of aging and a risk factor for AMD.\"}, {'category': 'age related macular degeneration', 'cell_count': 21, 'description': 'This is a primary focus of the study as it is a leading cause of irreversi"
+  },
+  {
+    "timestamp": "2025-07-25T01:52:41.516805",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Mast cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T02:01:22.578434",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Immune cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell', '1': 'T cell', '2': 'T cell', '3': 'B cell', '4': 'Mononuclear phagocyte', '5': 'T cell', '6': 'Natural killer cell', '7': 'Mast cell', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD"
+  },
+  {
+    "timestamp": "2025-07-25T02:01:45.748489",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Mast cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for Mast cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 44\\n\\n  \u2022 GO Results:\\n    1. myeloid leukocyte activation (p-value: 0.0009375489382285551)\\n       Genes: \\n    2. myeloid cell activation "
+  },
+  {
+    "timestamp": "2025-07-25T02:01:45.768336",
+    "function_name": "compare_cell_counts",
+    "parameters": {
+      "cell_type": "Mast cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'count_results': [{'category': 'cataract', 'cell_count': 40, 'description': 'This is a condition where the lens of the eye becomes cloudy.'}, {'category': 'basal laminar drusen', 'cell_count': 6, 'description': \"These are deposits that accumulate between the RPE and Bruch's membrane and are a hallmark of aging and a risk factor for AMD.\"}, {'category': 'age related macular degeneration', 'cell_count': 21, 'description': 'This is a primary focus of the study as it is a leading cause of irreversi"
+  },
+  {
+    "timestamp": "2025-07-25T02:01:45.770797",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Mast cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T02:02:50.248941",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Glial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Glial cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Schwann cell', '1': 'Astrocyte', '2': 'Muller cell', '3': 'Schwann cell', '4': 'Muller cell', '5': 'Schwann cell'}.\n\u2022 Top-genes per cluster: {'0': ['LGI4', 'NRXN1', 'CLU', 'CD9', 'SCN7A', 'NGFR', 'DKK3', 'GLUL', 'SLC1A3', 'RLBP1', 'CA3', 'NCAM1', 'SOX2', 'CA2', 'GFAP', 'PRX', 'APOE', 'L1CAM', 'MBP', 'MPZ', 'PLP1'], '1': ['LGI4', 'CLU', 'SCN7A', 'L1CAM', 'GFAP', 'DKK3', 'CD9', 'NCAM1', 'SOX2', 'NRXN1', "
+  },
+  {
+    "timestamp": "2025-07-25T02:03:13.753097",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Mast cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for Mast cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 44\\n\\n  \u2022 GO Results:\\n    1. myeloid leukocyte activation (p-value: 0.0009375489382285551)\\n       Genes: \\n    2. myeloid cell activation "
+  },
+  {
+    "timestamp": "2025-07-25T02:03:44.544778",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Schwann cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Schwann cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 86\\n\\n  \u2022 GO Results:\\n    1. multicellular organismal process (p-value: 3.96017546215844e-14)\\n       Genes: \\n    2. multicellular orga"
+  },
+  {
+    "timestamp": "2025-07-25T02:03:44.546746",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Schwann cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T02:03:44.548147",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Schwann cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T02:03:44.556973",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "tumor microenvironment",
+      "cell_type": "Mast cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'tumor microenvironment' in Mast cell\", 'query': 'tumor microenvironment', 'cell_type': 'Mast cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Mast cell'}"
+  },
+  {
+    "timestamp": "2025-07-25T02:03:44.564950",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "tumor microenvironment",
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'tumor microenvironment' in Schwann cell\", 'query': 'tumor microenvironment', 'cell_type': 'Schwann cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Schwann cell'}"
+  },
+  {
+    "timestamp": "2025-07-25T02:18:30.408170",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Immune cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell', '1': 'T cell', '2': 'T cell', '3': 'B cell', '4': 'Mononuclear phagocyte', '5': 'T cell', '6': 'Natural killer cell', '7': 'Mast cell', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD"
+  },
+  {
+    "timestamp": "2025-07-25T02:18:52.608558",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Glial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Glial cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Schwann cell', '1': 'Schwann cell', '2': 'Muller cell', '3': 'Schwann cell', '4': 'Muller cell', '5': 'Schwann cell'}.\n\u2022 Top-genes per cluster: {'0': ['LGI4', 'NRXN1', 'CLU', 'CD9', 'SCN7A', 'NGFR', 'DKK3', 'GLUL', 'SLC1A3', 'RLBP1', 'CA3', 'NCAM1', 'SOX2', 'CA2', 'GFAP', 'PRX', 'APOE', 'L1CAM', 'MBP', 'MPZ', 'PLP1'], '1': ['LGI4', 'CLU', 'SCN7A', 'L1CAM', 'GFAP', 'DKK3', 'CD9', 'NCAM1', 'SOX2', 'NRXN1"
+  },
+  {
+    "timestamp": "2025-07-25T02:19:15.550457",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Mast cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for Mast cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 44\\n\\n  \u2022 GO Results:\\n    1. myeloid leukocyte activation (p-value: 0.0009375489382285551)\\n       Genes: \\n    2. myeloid cell activation "
+  },
+  {
+    "timestamp": "2025-07-25T02:19:49.242620",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Schwann cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Schwann cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 92\\n\\n  \u2022 GO Results:\\n    1. multicellular organism development (p-value: 2.9546209514470975e-13)\\n       Genes: \\n    2. system develop"
+  },
+  {
+    "timestamp": "2025-07-25T02:19:49.245366",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Schwann cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T02:19:49.246539",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Schwann cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T02:19:49.258310",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "tumor microenvironment",
+      "cell_type": "Mast cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'tumor microenvironment' in Mast cell\", 'query': 'tumor microenvironment', 'cell_type': 'Mast cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Mast cell'}"
+  },
+  {
+    "timestamp": "2025-07-25T02:19:49.268513",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "tumor microenvironment",
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'tumor microenvironment' in Schwann cell\", 'query': 'tumor microenvironment', 'cell_type': 'Schwann cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Schwann cell'}"
+  },
+  {
+    "timestamp": "2025-07-25T02:19:52.724783",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "cell_type": "Mast cell",
+      "analysis": "gsea"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"50e3fcf7-424d-4c20-a1c8-ae82e5e517c9\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
+  },
+  {
+    "timestamp": "2025-07-25T02:32:15.706333",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Immune cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell', '1': 'T cell', '2': 'T cell', '3': 'B cell', '4': 'Mononuclear phagocyte', '5': 'T cell', '6': 'Natural killer cell', '7': 'Mast cell', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD"
+  },
+  {
+    "timestamp": "2025-07-25T02:32:37.805610",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Mast cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for Mast cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 44\\n\\n  \u2022 GO Results:\\n    1. myeloid leukocyte activation (p-value: 0.0009375489382285551)\\n       Genes: \\n    2. myeloid cell activation "
+  },
+  {
+    "timestamp": "2025-07-25T02:32:37.819341",
+    "function_name": "compare_cell_counts",
+    "parameters": {
+      "cell_type": "Mast cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'count_results': [{'category': 'cataract', 'cell_count': 40, 'description': 'This is a condition where the lens of the eye becomes cloudy.'}, {'category': 'basal laminar drusen', 'cell_count': 6, 'description': \"These are deposits that accumulate between the RPE and Bruch's membrane and are a hallmark of aging and a risk factor for AMD.\"}, {'category': 'age related macular degeneration', 'cell_count': 21, 'description': 'This is a primary focus of the study as it is a leading cause of irreversi"
+  },
+  {
+    "timestamp": "2025-07-25T02:32:37.820874",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Mast cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T02:32:41.844055",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "cell_type": "Mast cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'error': 'Search query is required', 'results': []}"
+  },
+  {
+    "timestamp": "2025-07-25T02:33:37.224724",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Glial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Glial cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Schwann cell', '1': 'Schwann cell', '2': 'Muller cell', '3': 'Schwann cell', '4': 'Muller cell', '5': 'Schwann cell'}.\n\u2022 Top-genes per cluster: {'0': ['LGI4', 'NRXN1', 'CLU', 'CD9', 'SCN7A', 'NGFR', 'DKK3', 'GLUL', 'SLC1A3', 'RLBP1', 'CA3', 'NCAM1', 'SOX2', 'CA2', 'GFAP', 'PRX', 'APOE', 'L1CAM', 'MBP', 'MPZ', 'PLP1'], '1': ['LGI4', 'CLU', 'SCN7A', 'L1CAM', 'GFAP', 'DKK3', 'CD9', 'NCAM1', 'SOX2', 'NRXN1"
+  },
+  {
+    "timestamp": "2025-07-25T02:33:59.726809",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Mast cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for Mast cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 44\\n\\n  \u2022 GO Results:\\n    1. myeloid leukocyte activation (p-value: 0.0009375489382285551)\\n       Genes: \\n    2. myeloid cell activation "
+  },
+  {
+    "timestamp": "2025-07-25T02:34:31.189510",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Schwann cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Schwann cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 92\\n\\n  \u2022 GO Results:\\n    1. multicellular organism development (p-value: 2.9546209514470975e-13)\\n       Genes: \\n    2. system develop"
+  },
+  {
+    "timestamp": "2025-07-25T02:34:31.191613",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Schwann cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T02:34:31.193042",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Schwann cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T02:34:31.204015",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "tumor microenvironment",
+      "cell_type": "Mast cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'tumor microenvironment' in Mast cell\", 'query': 'tumor microenvironment', 'cell_type': 'Mast cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Mast cell'}"
+  },
+  {
+    "timestamp": "2025-07-25T02:34:31.214075",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "tumor microenvironment",
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'tumor microenvironment' in Schwann cell\", 'query': 'tumor microenvironment', 'cell_type': 'Schwann cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Schwann cell'}"
+  },
+  {
+    "timestamp": "2025-07-25T02:34:31.215573",
+    "function_name": "conversational_response",
+    "parameters": {},
+    "success": true,
+    "error": null,
+    "result_summary": "I'm ready to help with your single-cell analysis. Please let me know what you'd like to do."
+  },
+  {
+    "timestamp": "2025-07-25T02:34:34.749317",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "cell_type": "Mast cell",
+      "analysis": "gsea"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"05c2a4ac-a39c-41cc-8f85-a7573e390034\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
+  },
+  {
+    "timestamp": "2025-07-25T10:36:30.128878",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Stromal cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Stromal cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Beam cell', '1': 'Fibroblast', '2': 'Trabecular meshwork cell', '3': 'Mural cell', '4': 'Endothelial cell', '5': 'Fibroblast', '6': 'Fibroblast', '7': 'Fibroblast', '8': 'Fibroblast', '9': 'Fibroblast', '10': 'Myocyte'}.\n\u2022 Top-genes per cluster: {'0': ['PTGDS', 'MMP2', 'COL6A2', 'COL15A1', 'CTSK', 'DCN', 'CLEC11A', 'RAMP2', 'COL6A1', 'S100A4', 'FABP5', 'APOE', 'EDNRB', 'SERPINF1', 'MDK', 'CFD', 'APOD"
+  },
+  {
+    "timestamp": "2025-07-25T10:37:02.728407",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Endothelial cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Endothelial cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 100\\n\\n  \u2022 GO Results:\\n    1. cell adhesion (p-value: 7.239053219693741e-11)\\n       Genes: \\n    2. blood vessel morphogenesis (p-v"
+  },
+  {
+    "timestamp": "2025-07-25T10:37:02.742002",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "fibroblast markers",
+      "cell_type": "Endothelial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'fibroblast markers' in Endothelial cell\", 'query': 'fibroblast markers', 'cell_type': 'Endothelial cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Endothelial cell'}"
+  },
+  {
+    "timestamp": "2025-07-25T10:37:02.743610",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Endothelial cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T10:37:27.746328",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Endothelial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Endothelial cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Lymphatic endothelial cell', '1': 'Lymphatic endothelial cell', '2': 'Lymphatic endothelial cell', '3': 'Lymphatic endothelial cell', '4': 'Arterial endothelial cell'}.\n\u2022 Top-genes per cluster: {'0': ['CD9', 'SELE', 'MMRN1', 'LYVE1', 'EMCN', 'CDH5', 'FN1', 'PROX1', 'SPARCL1', 'GJA4', 'VEGFC', 'A2M', 'ACKR1', 'VWA1', 'BMX', 'PDPN', 'CCL21', 'HPGD', 'KDR', 'EDNRB', 'HEY2', 'CA4', 'IL1RL1', 'FABP5',"
+  },
+  {
+    "timestamp": "2025-07-25T10:37:27.983067",
+    "function_name": "display_processed_umap",
+    "parameters": {
+      "cell_type": "Endothelial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"11625b61-00b1-4ac4-9eb3-6c89a2fa2618\" class=\"plotly-graph-div\" style=\"height:800px; width:1200px;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (docume"
+  },
+  {
+    "timestamp": "2025-07-25T10:38:01.039270",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Fibroblast"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Fibroblast\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: reactome, go, kegg, gsea\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 100\\n\\n  \u2022 REACTOME Results:\\n    1. Regulation of Insulin-like Growth Factor (IGF) transport and uptake by Insulin-like Growth Factor Bind"
+  },
+  {
+    "timestamp": "2025-07-25T10:38:01.041603",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "cell_type": "Fibroblast"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'error': 'Search query is required', 'results': []}"
+  },
+  {
+    "timestamp": "2025-07-25T10:38:01.080188",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "cell_type": "Fibroblast",
+      "analysis": "gsea"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"adae5d8b-22b9-4a39-922b-7e7cc6fd3e95\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
+  },
+  {
+    "timestamp": "2025-07-25T10:39:34.827728",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Immune cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell', '1': 'T cell', '2': 'T cell', '3': 'B cell', '4': 'Mononuclear phagocyte', '5': 'T cell', '6': 'Natural killer cell', '7': 'Mast cell', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD"
+  },
+  {
+    "timestamp": "2025-07-25T10:39:55.479122",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Glial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Glial cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Schwann cell', '1': 'Schwann cell', '2': 'Muller cell', '3': 'Schwann cell', '4': 'Muller cell', '5': 'Schwann cell'}.\n\u2022 Top-genes per cluster: {'0': ['LGI4', 'NRXN1', 'CLU', 'CD9', 'SCN7A', 'NGFR', 'DKK3', 'GLUL', 'SLC1A3', 'RLBP1', 'CA3', 'NCAM1', 'SOX2', 'CA2', 'GFAP', 'PRX', 'APOE', 'L1CAM', 'MBP', 'MPZ', 'PLP1'], '1': ['LGI4', 'CLU', 'SCN7A', 'L1CAM', 'GFAP', 'DKK3', 'CD9', 'NCAM1', 'SOX2', 'NRXN1"
+  },
+  {
+    "timestamp": "2025-07-25T10:40:17.748080",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Mast cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for Mast cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 44\\n\\n  \u2022 GO Results:\\n    1. myeloid leukocyte activation (p-value: 0.0009375489382285551)\\n       Genes: \\n    2. myeloid cell activation "
+  },
+  {
+    "timestamp": "2025-07-25T10:40:50.998873",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Schwann cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Schwann cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 92\\n\\n  \u2022 GO Results:\\n    1. multicellular organism development (p-value: 2.9546209514470975e-13)\\n       Genes: \\n    2. system develop"
+  },
+  {
+    "timestamp": "2025-07-25T10:40:51.001003",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment",
+      "cell_type": "Mast cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Mast cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T10:40:51.002330",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment",
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Schwann cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T10:40:51.013519",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "tumor microenvironment",
+      "cell_type": "Mast cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'tumor microenvironment' in Mast cell\", 'query': 'tumor microenvironment', 'cell_type': 'Mast cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Mast cell'}"
+  },
+  {
+    "timestamp": "2025-07-25T10:40:51.025231",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "tumor microenvironment",
+      "cell_type": "Schwann cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'tumor microenvironment' in Schwann cell\", 'query': 'tumor microenvironment', 'cell_type': 'Schwann cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Schwann cell'}"
+  },
+  {
+    "timestamp": "2025-07-25T11:06:01.069160",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Stromal cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Stromal cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Beam cell', '1': 'Fibroblast', '2': 'Trabecular meshwork cell', '3': 'Mural cell', '4': 'Endothelial cell', '5': 'Fibroblast', '6': 'Fibroblast', '7': 'Fibroblast', '8': 'Fibroblast', '9': 'Fibroblast', '10': 'Myocyte'}.\n\u2022 Top-genes per cluster: {'0': ['PTGDS', 'MMP2', 'COL6A2', 'COL15A1', 'CTSK', 'DCN', 'CLEC11A', 'RAMP2', 'COL6A1', 'S100A4', 'FABP5', 'APOE', 'EDNRB', 'SERPINF1', 'MDK', 'CFD', 'APOD"
+  },
+  {
+    "timestamp": "2025-07-25T11:06:33.436645",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Endothelial cell",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Endothelial cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 100\\n\\n  \u2022 GO Results:\\n    1. cell adhesion (p-value: 7.239053219693741e-11)\\n       Genes: \\n    2. blood vessel morphogenesis (p-v"
+  },
+  {
+    "timestamp": "2025-07-25T11:07:06.354605",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Fibroblast",
+      "analyses": [
+        "go",
+        "gsea",
+        "kegg",
+        "reactome"
+      ],
+      "gene_set_library": "MSigDB_Hallmark_2020"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Fibroblast\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go, gsea, kegg, reactome\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 100\\n\\n  \u2022 GO Results:\\n    1. circulatory system development (p-value: 2.1202845283832958e-14)\\n       Genes: \\n    2. skeletal system dev"
+  },
+  {
+    "timestamp": "2025-07-25T11:07:06.356923",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment",
+      "cell_type": "Endothelial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Endothelial cell. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T11:07:06.358368",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "enrichment",
+      "cell_type": "Fibroblast"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Enrichment data not available for enrichment analysis of Fibroblast. Please run the enrichment analysis first."
+  },
+  {
+    "timestamp": "2025-07-25T11:07:14.199029",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Endothelial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'dea_results': [{'category': 'cataract', 'significant_genes': ['IFI27', 'TM4SF1', 'VWF', 'ECSCR', 'FKBP1A', 'SPARCL1', 'CLEC14A', 'RAMP3', 'ACKR1', 'LMO2', 'ADIRF', 'EMCN', 'CD59', 'PRSS23', 'PDLIM1', 'ESAM', 'SLCO2A1', 'MMRN2', 'TINAGL1', 'THBD', 'NNMT', 'MMRN1', 'ADGRL4', 'CAV1', 'ETS2', 'TM4SF18', 'CRIP2', 'MYCT1', 'MPZL2', 'DNASE1L3', 'NPDC1', 'CAVIN1', 'SELP', 'CD74', 'GIMAP7', 'CLEC3B', 'ENG', 'TCN2', 'RAB11A', 'IGFBP4', 'TGFBR2', 'TNFSF10', 'RNASE1', 'NEDD9', 'ITM2A', 'JAM2', 'CAV2', 'HL"
+  },
+  {
+    "timestamp": "2025-07-25T11:07:16.478610",
+    "function_name": "dea_split_by_condition",
+    "parameters": {
+      "cell_type": "Fibroblast"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'dea_results': [{'category': 'cataract', 'significant_genes': ['IGF2', 'MGP', 'GSN', 'EDN3', 'BMP5', 'ALKAL2', 'IGFBP5', 'IFITM3', 'GMDS', 'EFEMP1', 'MDK', 'FBLN1', 'IGFBP6', 'PCOLCE', 'ID3', 'ANGPT1', 'RAMP2', 'TSC22D1', 'CEBPD', 'GGT5', 'CYP1B1', 'MGST1', 'LEPR', 'CP', 'STOM', 'TPM1', 'SMOC1', 'GADD45B', 'RBP4', 'TPM2', 'FHL2', 'TAGLN', 'EBF1', 'SELENOM', 'NECAB1', 'PITX2', 'PLPP3', 'ID1', 'GAS1', 'C1S', 'IGFBP7', 'FMOD', 'OLFML3', 'PLA2G2A', 'BAMBI', 'C1R', 'FHL1', 'C3', 'FOXC1', 'CALD1', 'M"
   }
 ]
