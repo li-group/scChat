@@ -92,13 +92,13 @@ class MultiAgentChatBot:
         directories_to_clear = [
             'figures', 'process_cell_data', 'scchatbot/annotated_adata',
             'scchatbot/enrichment', 'umaps/annotated', 'scchatbot/runtime_data/basic_data/',
-            'scchatbot/deg_res', 'function_history'
+            'scchatbot/deg_res', 'conversation_history'
         ]
         for directory in directories_to_clear:
             clear_directory(directory)
             
         # Clear execution history file specifically
-        execution_history_file = "function_history/execution_history.json"
+        execution_history_file = "conversation_history/execution_history.json"
         if os.path.exists(execution_history_file):
             os.remove(execution_history_file)
             print(f"🧹 Cleared execution history: {execution_history_file}")

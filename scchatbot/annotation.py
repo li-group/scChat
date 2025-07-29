@@ -605,10 +605,39 @@ def label_clusters(annotation_result, cell_type, adata):
     base_form = standardize_cell_type(cell_type).lower()
     try:
         adata = adata.copy()
-        start_idx = annotation_result.find("{")
-        end_idx = annotation_result.rfind("}") + 1
-        str_map = annotation_result[start_idx:end_idx]
-        map2 = ast.literal_eval(str_map)
+        
+        # More robust parsing approach
+        # First try to find the dictionary pattern
+        import re
+        dict_pattern = r'\{[^{}]*\}'
+        matches = re.findall(dict_pattern, annotation_result)
+        
+        if not matches:
+            # If no simple dict found, try to extract between first { and last }
+            start_idx = annotation_result.find("{")
+            end_idx = annotation_result.rfind("}") + 1
+            if start_idx != -1 and end_idx > start_idx:
+                str_map = annotation_result[start_idx:end_idx]
+            else:
+                raise ValueError("No dictionary found in annotation result")
+        else:
+            # Use the largest match (likely the main dictionary)
+            str_map = max(matches, key=len)
+        
+        # Clean up the string before parsing
+        str_map = str_map.strip()
+        
+        # Try to parse with ast.literal_eval first (safer)
+        try:
+            map2 = ast.literal_eval(str_map)
+        except (SyntaxError, ValueError):
+            # If that fails, try json.loads as backup
+            import json
+            # Replace single quotes with double quotes for JSON compatibility
+            json_str = str_map.replace("'", '"')
+            map2 = json.loads(json_str)
+        
+        # Ensure all keys are strings
         map2 = {str(key): value for key, value in map2.items()}
         if base_form == "overall":
             adata.obs['cell_type'] = 'Unknown'
@@ -640,6 +669,12 @@ def label_clusters(annotation_result, cell_type, adata):
             return specific_cells
     except (SyntaxError, ValueError) as e:
         print(f"Error in parsing the map: {e}")
+        print(f"Annotation result was: {annotation_result}")
+        print(f"Extracted string map: {str_map if 'str_map' in locals() else 'Not extracted'}")
+        # Return adata unchanged instead of crashing
+    except Exception as e:
+        print(f"Unexpected error in label_clusters: {e}")
+        print(f"Annotation result was: {annotation_result}")
     return adata
 
 
