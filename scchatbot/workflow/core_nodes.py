@@ -17,9 +17,10 @@ from langchain_core.messages import HumanMessage, AIMessage
 from ..shared import extract_cell_types_from_question, needs_cell_discovery
 
 # Import EnrichmentChecker with error handling
+# ABLATION STUDY: EnrichmentChecker disabled for testing
 try:
     from ..enrichment_checker import EnrichmentChecker
-    ENRICHMENT_CHECKER_AVAILABLE = True
+    ENRICHMENT_CHECKER_AVAILABLE = True  # 🔴 DISABLED for ablation study
 except ImportError as e:
     print(f"⚠️ EnrichmentChecker not available: {e}")
     EnrichmentChecker = None
@@ -465,8 +466,8 @@ class CoreNodes:
             # 2. Light validation - only log warnings for missing cell types
             self._log_missing_cell_type_warnings(enhanced_plan)
             
-            # 3. Add validation steps after process_cells operations
-            enhanced_plan = self._add_validation_steps_after_process_cells(enhanced_plan)
+            # 3. Skip adding validation steps - they're already added by discovery pipeline
+            # enhanced_plan = self._add_validation_steps_after_process_cells(enhanced_plan)
             
             # Store as execution plan directly (planner now outputs final plan)
             state["execution_plan"] = enhanced_plan
@@ -579,6 +580,27 @@ class CoreNodes:
             return state
             
         step_data = state["execution_plan"]["steps"][state["current_step_index"]]
+        
+        # Check if this step should be skipped
+        if step_data.get("skip_reason"):
+            print(f"⏭️ Skipping step {state['current_step_index'] + 1}: {step_data.get('skip_reason')}")
+            
+            # Record skipped step in execution history for post-execution awareness
+            state["execution_history"].append({
+                "step_index": state["current_step_index"],
+                "step": step_data.copy(),
+                "success": False,
+                "result": None,
+                "result_type": "skipped",
+                "result_summary": f"Skipped - {step_data.get('skip_reason')}",
+                "error": step_data.get('skip_reason'),
+                "skipped": True  # Flag to distinguish from failures
+            })
+            
+            state["current_step_index"] += 1
+            # Don't run intelligent evaluator for skipped steps - nothing to evaluate
+            return state
+        
         step = ExecutionStep(**step_data)
         
         print(f"🔄 Executing step {state['current_step_index'] + 1}: {step.description}")
@@ -604,6 +626,8 @@ class CoreNodes:
                 if result["status"] == "success":
                     success = True
                     print(f"✅ Validation passed: {result['message']}")
+                    # Update available cell types with discovered types
+                    state["available_cell_types"] = result["available_types"]
                 elif result["status"] == "partial_success":
                     success = True  # Continue but with warnings
                     print(f"⚠️ Validation partial: {result['message']}")
@@ -629,6 +653,10 @@ class CoreNodes:
                         current_unavailable = state.get("unavailable_cell_types", [])
                         state["unavailable_cell_types"] = list(set(current_unavailable + expected_types))
                         print(f"📋 Added to unavailable cell types (validation failed): {expected_types}")
+                
+                # CRITICAL FIX: Update subsequent analysis steps to use actually discovered cell types
+                if success and result.get("found_children"):
+                    self._update_remaining_steps_with_discovered_types(state, result)
                 
             # Handle final question step differently
             elif step.step_type == "final_question":
@@ -750,10 +778,16 @@ class CoreNodes:
         else:
             print(f"📄 Text storage: {function_name} - Truncated to 500 chars")
         
-        # Increment step index if step was successful
-        if success:
+        # Increment step index if step was successful OR if it's a validation step
+        # (validation steps should always advance to avoid infinite loops)
+        should_advance = success or step.step_type == "validation"
+        
+        if should_advance:
             state["current_step_index"] += 1
-            print(f"🔄 Advanced to step {state['current_step_index'] + 1}")
+            if success:
+                print(f"🔄 Advanced to step {state['current_step_index'] + 1}")
+            else:
+                print(f"🔄 Advanced to step {state['current_step_index'] + 1} (validation failure, but continuing)")
         else:
             print(f"❌ Step failed, not advancing. Still on step {state['current_step_index'] + 1}")
             
@@ -810,16 +844,21 @@ class CoreNodes:
             print("🧬 Creating discovery steps only...")
             discovery_steps = self._create_discovery_steps_only(needed_cell_types, available_cell_types)
         
-        # Step 4: Add validation steps after discovery
+        # Step 4: Skip validation steps - intelligent evaluator handles validation
         validation_steps = []
-        if discovery_steps:
-            validation_steps = self._create_validation_steps(discovery_steps)
+        # if discovery_steps:
+        #     validation_steps = self._create_validation_steps(discovery_steps)
         
-        # Step 5: Merge steps intelligently
+        # Step 5: Update analysis steps to use discovered cell types instead of parent types
+        updated_analysis_steps = self._update_analysis_steps_for_discovered_types(
+            llm_analysis_steps, needed_cell_types, available_cell_types
+        )
+        
+        # Step 6: Merge steps intelligently
         final_steps = []
         final_steps.extend(discovery_steps)
         final_steps.extend(validation_steps)
-        final_steps.extend(llm_analysis_steps)  # Preserved!
+        final_steps.extend(updated_analysis_steps)  # Updated to use discovered types!
         final_steps.extend(other_steps)
         
         plan_data["steps"] = final_steps
@@ -843,7 +882,9 @@ class CoreNodes:
         This is different from create_cell_discovery_steps which adds hardcoded analysis.
         """
         discovery_steps = []
+        parent_to_children = {}  # Track what each parent should discover
         
+        # Step 1: Build parent → children mapping from all paths
         for needed_type in needed_cell_types:
             if needed_type in available_cell_types:
                 print(f"✅ '{needed_type}' already available, no discovery needed")
@@ -861,58 +902,66 @@ class CoreNodes:
                     break
             
             if processing_path and len(processing_path) > 1:
-                # Add process_cells steps for the path
+                # Build parent → children mapping for this path
                 for i in range(len(processing_path) - 1):
-                    current_type = processing_path[i]
-                    target_type = processing_path[i + 1]
+                    parent_type = processing_path[i]
+                    child_type = processing_path[i + 1]
                     
-                    # Check if we already have this step
-                    existing = any(
-                        s.get("function_name") == "process_cells" and 
-                        s.get("parameters", {}).get("cell_type") == current_type
-                        for s in discovery_steps
-                    )
+                    if parent_type not in parent_to_children:
+                        parent_to_children[parent_type] = []
                     
-                    if not existing:
-                        discovery_steps.append({
-                            "step_type": "analysis",
-                            "function_name": "process_cells",
-                            "parameters": {"cell_type": current_type},
-                            "description": f"Process {current_type} to discover {target_type}",
-                            "expected_outcome": f"Discover {target_type} cell type"
-                        })
-                        print(f"🧬 Added process_cells({current_type}) to discover {target_type}")
+                    if child_type not in parent_to_children[parent_type]:
+                        parent_to_children[parent_type].append(child_type)
             else:
                 print(f"⚠️ No processing path found for '{needed_type}'")
+        
+        # Step 2: Create process_cells steps with expected_children metadata
+        for parent_type, expected_children in parent_to_children.items():
+            # Check if we already have this step
+            existing = any(
+                s.get("function_name") == "process_cells" and 
+                s.get("parameters", {}).get("cell_type") == parent_type
+                for s in discovery_steps
+            )
+            
+            if not existing:
+                discovery_steps.append({
+                    "step_type": "analysis",
+                    "function_name": "process_cells",
+                    "parameters": {"cell_type": parent_type},
+                    "description": f"Process {parent_type} to discover {', '.join(expected_children)}",
+                    "expected_outcome": f"Discover {', '.join(expected_children)} cell type(s)",
+                    "expected_children": expected_children
+                })
+                print(f"🧬 Added process_cells({parent_type}) to discover {expected_children}")
         
         return discovery_steps
     
     def _create_validation_steps(self, discovery_steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
-        Create validation steps for discovery steps.
+        Create validation steps for discovery steps using metadata.
         """
         validation_steps = []
         
-        # Group discovery steps by their target
-        discovered_types = set()
+        # Create individual validation steps for each process_cells step
         for step in discovery_steps:
             if step.get("function_name") == "process_cells":
-                # Extract what types will be discovered
-                desc = step.get("description", "")
-                if "to discover" in desc:
-                    target = desc.split("to discover")[-1].strip()
-                    discovered_types.add(target)
-        
-        if discovered_types:
-            validation_steps.append({
-                "step_type": "validation",
-                "function_name": "validate_processing_results",
-                "parameters": {
-                    "expected_cell_types": list(discovered_types)
-                },
-                "description": f"Validate that {', '.join(discovered_types)} processing discovered expected cell types",
-                "expected_outcome": "All expected cell types discovered successfully"
-            })
+                cell_type = step.get("parameters", {}).get("cell_type")
+                expected_children = step.get("expected_children", [])
+                
+                if cell_type and expected_children:
+                    validation_steps.append({
+                        "step_type": "validation",
+                        "function_name": "validate_processing_results",
+                        "parameters": {
+                            "processed_parent": cell_type,
+                            "expected_children": expected_children
+                        },
+                        "description": f"Validate that {cell_type} processing discovered expected cell types: {', '.join(expected_children)}",
+                        "expected_outcome": f"Confirm {', '.join(expected_children)} are available after processing {cell_type}",
+                        "target_cell_type": None
+                    })
+                    print(f"🔍 Created validation step for process_cells({cell_type}) expecting: {expected_children}")
         
         return validation_steps
     
@@ -968,6 +1017,121 @@ class CoreNodes:
             corrected_steps.append(corrected_step)
         
         return corrected_steps
+    
+    def _update_analysis_steps_for_discovered_types(self, analysis_steps: List[Dict[str, Any]], 
+                                                   needed_cell_types: List[str], 
+                                                   available_cell_types: List[str]) -> List[Dict[str, Any]]:
+        """
+        Update analysis steps to use discovered specific cell types instead of parent types.
+        
+        For example, if we have an analysis step for "Immune cell" but we're discovering 
+        "Regulatory T cell" and "CD4-positive memory T cell", create separate analysis 
+        steps for each discovered type.
+        """
+        updated_steps = []
+        
+        for step in analysis_steps:
+            step_cell_type = step.get("parameters", {}).get("cell_type")
+            
+            # Check if this step uses a parent cell type that we're discovering from
+            if step_cell_type in available_cell_types:
+                # This step uses a parent type - check if we're discovering specific types from it
+                types_to_discover_from_parent = [
+                    needed_type for needed_type in needed_cell_types 
+                    if needed_type not in available_cell_types
+                ]
+                
+                if types_to_discover_from_parent:
+                    # Create analysis steps for each specific discovered type
+                    for discovered_type in types_to_discover_from_parent:
+                        # Check if this type will actually be discovered (not in unavailable list)
+                        # We'll assume it might be discovered for now - validation will catch failures
+                        
+                        updated_step = step.copy()
+                        updated_step["parameters"] = step["parameters"].copy()
+                        updated_step["parameters"]["cell_type"] = discovered_type
+                        
+                        # Update description to reflect the specific cell type
+                        original_desc = step.get("description", "")
+                        updated_desc = original_desc.replace(step_cell_type, discovered_type)
+                        updated_step["description"] = updated_desc
+                        
+                        updated_steps.append(updated_step)
+                        print(f"🔄 Updated analysis step: {step.get('function_name')}({step_cell_type}) → {step.get('function_name')}({discovered_type})")
+                else:
+                    # No discovery needed, keep original step
+                    updated_steps.append(step)
+            else:
+                # This step doesn't use a parent type, keep as-is
+                updated_steps.append(step)
+        
+        return updated_steps
+    
+    def _update_remaining_steps_with_discovered_types(self, state: ChatState, validation_result: Dict[str, Any]) -> None:
+        """
+        Update remaining analysis steps to use actually discovered cell types instead of unavailable ones.
+        
+        This is called after validation to ensure subsequent analysis steps use real discovered types.
+        """
+        execution_plan = state.get("execution_plan", {})
+        steps = execution_plan.get("steps", [])
+        current_step_index = state.get("current_step_index", 0)
+        
+        # Get the mapping of what was expected vs what was actually found
+        expected_children = validation_result.get("missing_children", []) + validation_result.get("found_children", [])
+        found_children = validation_result.get("found_children", [])
+        missing_children = validation_result.get("missing_children", [])
+        
+        print(f"🔄 Updating remaining steps: expected={expected_children}, found={found_children}, missing={missing_children}")
+        
+        # Build replacement mapping
+        replacement_mapping = {}
+        
+        # For missing children, add them to unavailable (already done above)
+        # For found children that are subtypes, we need to map the originals to the subtypes
+        processed_parent = None
+        for i in range(current_step_index):
+            step = steps[i]
+            if step.get("step_type") == "validation" and step.get("parameters", {}).get("processed_parent"):
+                processed_parent = step["parameters"]["processed_parent"]
+                break
+        
+        if processed_parent:
+            # Map any analysis steps that reference missing expected children to use found subtypes instead
+            for missing_child in missing_children:
+                # If we expected "Regulatory T cell" but found subtypes like "Memory T cell", 
+                # we need to create analysis steps for the found subtypes
+                for found_child in found_children:
+                    replacement_mapping[missing_child] = found_child
+                    break  # Use first found subtype as replacement
+        
+        # Update remaining steps
+        updated_count = 0
+        for i in range(current_step_index + 1, len(steps)):
+            step = steps[i]
+            step_cell_type = step.get("parameters", {}).get("cell_type")
+            
+            if step_cell_type in missing_children:
+                # This step references a missing cell type
+                if step_cell_type in replacement_mapping:
+                    # Replace with discovered subtype
+                    new_cell_type = replacement_mapping[step_cell_type]
+                    steps[i]["parameters"]["cell_type"] = new_cell_type
+                    
+                    # Update description
+                    old_desc = step.get("description", "")
+                    new_desc = old_desc.replace(step_cell_type, new_cell_type)
+                    steps[i]["description"] = new_desc
+                    
+                    print(f"🔄 Updated step {i+1}: {step.get('function_name')}({step_cell_type}) → {step.get('function_name')}({new_cell_type})")
+                    updated_count += 1
+                else:
+                    # Mark this step to be skipped (cell type unavailable)
+                    steps[i]["skip_reason"] = f"Cell type '{step_cell_type}' not discovered"
+                    print(f"⏭️ Marked step {i+1} for skipping: {step.get('function_name')}({step_cell_type})")
+        
+        if updated_count > 0:
+            print(f"✅ Updated {updated_count} remaining analysis steps to use discovered cell types")
 
     def _skip_unavailable_cell_steps(self, plan: Dict[str, Any], unavailable_cell_types: List[str]) -> Dict[str, Any]:
         """Skip steps for unavailable cell types"""
@@ -1064,18 +1228,28 @@ class CoreNodes:
         missing_children = []
         
         for expected_child in expected_children:
-            # Check exact match or fuzzy match
+            # Check exact match first
             if expected_child in current_cell_types:
                 found_children.append(expected_child)
+                print(f"✅ Exact match found: '{expected_child}'")
             else:
-                # Try fuzzy matching
-                fuzzy_matches = [ct for ct in current_cell_types 
-                               if expected_child.lower() in ct.lower() or ct.lower() in expected_child.lower()]
-                if fuzzy_matches:
-                    found_children.extend(fuzzy_matches)
-                    print(f"🔄 Fuzzy match: '{expected_child}' → {fuzzy_matches}")
+                # Check if any discovered types are subtypes of the expected type using hierarchy
+                subtypes_found = []
+                if self.hierarchy_manager:
+                    for available_type in current_cell_types:
+                        try:
+                            relation = self.hierarchy_manager.get_cell_type_relation(available_type, expected_child)
+                            if relation.name == "DESCENDANT":
+                                subtypes_found.append(available_type)
+                        except:
+                            continue
+                
+                if subtypes_found:
+                    found_children.extend(subtypes_found)
+                    print(f"✅ Subtype validation: '{expected_child}' satisfied by subtypes: {subtypes_found}")
                 else:
                     missing_children.append(expected_child)
+                    print(f"❌ Missing expected cell type: '{expected_child}' (no exact match or valid subtypes)")
         
         if missing_children:
             print(f"⚠️ Validation Warning: Expected children not found: {missing_children}")
@@ -1228,13 +1402,15 @@ class CoreNodes:
 
     def step_evaluator_node(self, state: ChatState) -> ChatState:
         """
-        Version 1: Step-by-step evaluation with checking only (NO plan modifications)
+        Version 2: Intelligent Step-by-Step Evaluator with Proactive Problem Solving
         
-        Evaluates the most recent execution step and logs detailed findings.
-        Builds evaluation history for future adaptive capabilities.
+        Analyzes each completed step and takes context-aware actions:
+        - For process_cells: Validates discovered types and updates remaining plan
+        - For failed analyses: Records errors for final response
+        - For successful steps: Logs progress and insights
         """
         
-        print("🔍 STEP EVALUATOR V1: Starting step-by-step evaluation...")
+        print("🧠 INTELLIGENT EVALUATOR V2: Starting context-aware evaluation...")
         
         # Get the most recent execution
         execution_history = state.get("execution_history", [])
@@ -1245,28 +1421,286 @@ class CoreNodes:
         
         last_execution = execution_history[-1]
         step_index = last_execution.get("step_index", -1)
+        success = last_execution.get("success", False)
         
-        # FIX: The execution history stores function_name directly, not in a 'step' sub-dict
-        function_name = last_execution.get('function_name', 'unknown')
+        # Get function name from step data (more reliable)
+        step_data = last_execution.get("step", {})
+        function_name = step_data.get('function_name', 'unknown')
         
-        print(f"🔍 Evaluating step {step_index + 1}: {function_name}")
+        print(f"🧠 Evaluating step {step_index + 1}: {function_name} ({'✅ Success' if success else '❌ Failed'})")
         
-        # Perform comprehensive evaluation
-        evaluation = self._evaluate_single_step_v1(last_execution, state)
+        # Function-specific intelligent evaluation
+        evaluation_result = self._intelligent_function_evaluation(last_execution, state)
         
         # Store evaluation results
-        state["last_step_evaluation"] = evaluation
+        state["last_step_evaluation"] = evaluation_result
         
         # Build evaluation history
         step_eval_history = state.get("step_evaluation_history", [])
-        step_eval_history.append(evaluation)
+        step_eval_history.append(evaluation_result)
         state["step_evaluation_history"] = step_eval_history
         
-        # Log results (for monitoring and debugging)
-        self._log_step_evaluation(evaluation)
-        
-        print(f"✅ STEP EVALUATOR V1: Evaluation complete for step {step_index + 1}")
+        print(f"✅ INTELLIGENT EVALUATOR V2: Evaluation complete for step {step_index + 1}")
         return state
+    
+    def _intelligent_function_evaluation(self, execution: Dict[str, Any], state: ChatState) -> Dict[str, Any]:
+        """
+        Context-aware evaluation that takes different actions based on function type and result.
+        """
+        step_data = execution.get("step", {})
+        function_name = step_data.get('function_name', 'unknown')
+        success = execution.get("success", False)
+        result = execution.get("result")
+        step_index = execution.get("step_index", -1)
+        
+        evaluation = {
+            "step_index": step_index,
+            "function_name": function_name,
+            "success": success,
+            "timestamp": datetime.now().isoformat(),
+            "evaluation_version": "v2_intelligent_proactive",
+            "actions_taken": []
+        }
+        
+        if function_name == "process_cells":
+            return self._evaluate_process_cells_intelligently(execution, state, evaluation)
+        elif function_name in ["dea_split_by_condition", "perform_enrichment_analyses"]:
+            return self._evaluate_analysis_function_intelligently(execution, state, evaluation)
+        elif function_name.startswith("display_"):
+            return self._evaluate_visualization_intelligently(execution, state, evaluation)
+        else:
+            return self._evaluate_generic_function(execution, state, evaluation)
+    
+    def _evaluate_process_cells_intelligently(self, execution: Dict[str, Any], 
+                                            state: ChatState, evaluation: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Intelligent evaluation of process_cells: Validates discovered types and updates plan.
+        """
+        step_data = execution.get("step", {})
+        result = execution.get("result")
+        success = execution.get("success", False)
+        cell_type = step_data.get("parameters", {}).get("cell_type")
+        
+        print(f"🧬 PROCESS_CELLS ANALYSIS: Evaluating {cell_type} processing...")
+        
+        if not success:
+            evaluation["process_cells_evaluation"] = {
+                "status": "failed",
+                "message": "Process cells execution failed",
+                "cell_type": cell_type
+            }
+            # Record error for final response
+            self._record_execution_error(state, f"Failed to process {cell_type}", execution)
+            return evaluation
+        
+        # Extract what was actually discovered
+        current_cell_types = set(self.adata.obs["cell_type"].unique()) if self.adata else set()
+        
+        # Check if we have expected children for this process_cells step
+        expected_children = step_data.get("expected_children", [])
+        
+        if expected_children:
+            # Validate discovered types
+            validation_result = self._validate_discovered_types(expected_children, current_cell_types)
+            
+            evaluation["process_cells_evaluation"] = {
+                "status": "validated",
+                "cell_type": cell_type,
+                "expected_children": expected_children,
+                "found_children": validation_result["found_children"],
+                "missing_children": validation_result["missing_children"],
+                "validation_status": validation_result["status"]
+            }
+            
+            # PROACTIVE ACTION: Update remaining steps based on what was actually discovered
+            if validation_result["missing_children"]:
+                actions = self._update_plan_for_missing_cell_types(
+                    state, validation_result["missing_children"]
+                )
+                evaluation["actions_taken"].extend(actions)
+                
+                # Add missing types to unavailable list
+                current_unavailable = state.get("unavailable_cell_types", [])
+                state["unavailable_cell_types"] = list(set(current_unavailable + validation_result["missing_children"]))
+                
+                print(f"📋 Updated unavailable cell types: +{validation_result['missing_children']}")
+            
+            # Update available cell types
+            state["available_cell_types"] = list(current_cell_types)
+            
+        else:
+            # No expected children specified, just log what was discovered
+            evaluation["process_cells_evaluation"] = {
+                "status": "completed",
+                "cell_type": cell_type,
+                "discovered_types": list(current_cell_types)
+            }
+        
+        return evaluation
+    
+    def _validate_discovered_types(self, expected_children: list, current_cell_types: set) -> Dict[str, Any]:
+        """Validate if expected cell types were discovered (with hierarchy awareness)."""
+        found_children = []
+        missing_children = []
+        
+        for expected_child in expected_children:
+            if expected_child in current_cell_types:
+                found_children.append(expected_child)
+                print(f"✅ Exact match found: '{expected_child}'")
+            else:
+                # Check if any discovered types are subtypes using hierarchy
+                subtypes_found = []
+                if self.hierarchy_manager:
+                    for available_type in current_cell_types:
+                        try:
+                            relation = self.hierarchy_manager.get_cell_type_relation(available_type, expected_child)
+                            if relation.name == "DESCENDANT":
+                                subtypes_found.append(available_type)
+                        except:
+                            continue
+                
+                if subtypes_found:
+                    found_children.extend(subtypes_found)
+                    print(f"✅ Subtype validation: '{expected_child}' satisfied by subtypes: {subtypes_found}")
+                else:
+                    missing_children.append(expected_child)
+                    print(f"❌ Missing expected cell type: '{expected_child}' (no exact match or valid subtypes)")
+        
+        if missing_children:
+            status = "partial_success" if found_children else "failed"
+        else:
+            status = "success"
+        
+        return {
+            "status": status,
+            "found_children": found_children,
+            "missing_children": missing_children,
+            "available_types": list(current_cell_types)
+        }
+    
+    def _update_plan_for_missing_cell_types(self, state: ChatState, 
+                                          missing_types: list) -> list:
+        """
+        Skip all steps referencing missing cell types.
+        No alternatives - just transparently skip what's unavailable.
+        """
+        actions_taken = []
+        execution_plan = state.get("execution_plan", {})
+        steps = execution_plan.get("steps", [])
+        current_step_index = state.get("current_step_index", 0)
+        
+        print(f"🔧 PLAN UPDATE: Skipping steps for missing types {missing_types}")
+        print(f"   Current step index: {current_step_index}, Total steps: {len(steps)}")
+        
+        steps_skipped = 0
+        
+        for i in range(len(steps)):
+            step = steps[i]
+            step_cell_type = step.get("parameters", {}).get("cell_type")
+            step_description = step.get("description", "")
+            
+            # Check if step references missing cell types in parameters OR description
+            references_missing_type = False
+            if step_cell_type and step_cell_type in missing_types:
+                references_missing_type = True
+                missing_ref = step_cell_type
+            else:
+                # Check if any missing type is mentioned in the description
+                for missing_type in missing_types:
+                    if missing_type in step_description:
+                        references_missing_type = True
+                        missing_ref = missing_type
+                        break
+            
+            # Skip if this step doesn't reference any missing cell types
+            if not references_missing_type:
+                continue
+            
+            # Skip if step is already marked for skipping
+            if step.get("skip_reason"):
+                continue
+                
+            print(f"🔍 Found step {i+1} referencing missing cell type '{missing_ref}': {step.get('function_name')}")
+            
+            # Skip ALL steps referencing missing cell types, including current step
+            steps[i]["skip_reason"] = f"Cell type '{missing_ref}' was not discovered and is unavailable"
+            actions_taken.append(f"Skipped step {i+1}: {step.get('function_name')} (references {missing_ref})")
+            steps_skipped += 1
+            print(f"⏭️ Skipped step {i+1}: {step.get('function_name')} (references {missing_ref})")
+        
+        if steps_skipped > 0:
+            print(f"✅ Plan update complete: {steps_skipped} steps marked for skipping")
+        else:
+            print("✅ No steps needed skipping")
+        
+        return actions_taken
+    
+    
+    def _evaluate_analysis_function_intelligently(self, execution: Dict[str, Any], 
+                                                state: ChatState, evaluation: Dict[str, Any]) -> Dict[str, Any]:
+        """Intelligent evaluation of analysis functions (DEA, enrichment)."""
+        success = execution.get("success", False)
+        step_data = execution.get("step", {})
+        function_name = step_data.get('function_name', 'unknown')
+        cell_type = step_data.get("parameters", {}).get("cell_type")
+        
+        if not success:
+            error_msg = execution.get("error", "Unknown error")
+            print(f"📊 ANALYSIS ERROR: {function_name}({cell_type}) failed: {error_msg}")
+            
+            # Record meaningful error for final response
+            self._record_execution_error(state, f"{function_name} failed for {cell_type}: {error_msg}", execution)
+            
+            evaluation["analysis_evaluation"] = {
+                "status": "failed",
+                "function": function_name,
+                "cell_type": cell_type,
+                "error": error_msg
+            }
+        else:
+            print(f"✅ ANALYSIS SUCCESS: {function_name}({cell_type}) completed")
+            evaluation["analysis_evaluation"] = {
+                "status": "success",
+                "function": function_name,
+                "cell_type": cell_type
+            }
+        
+        return evaluation
+    
+    def _evaluate_visualization_intelligently(self, execution: Dict[str, Any], 
+                                            state: ChatState, evaluation: Dict[str, Any]) -> Dict[str, Any]:
+        """Intelligent evaluation of visualization functions."""
+        success = execution.get("success", False)
+        step_data = execution.get("step", {})
+        function_name = step_data.get('function_name', 'unknown')
+        
+        evaluation["visualization_evaluation"] = {
+            "status": "success" if success else "failed",
+            "function": function_name
+        }
+        
+        return evaluation
+    
+    def _evaluate_generic_function(self, execution: Dict[str, Any], 
+                                 state: ChatState, evaluation: Dict[str, Any]) -> Dict[str, Any]:
+        """Generic evaluation for other function types."""
+        success = execution.get("success", False)
+        evaluation["generic_evaluation"] = {"status": "success" if success else "failed"}
+        return evaluation
+    
+    def _record_execution_error(self, state: ChatState, error_message: str, execution: Dict[str, Any]) -> None:
+        """Record meaningful execution errors for final LLM response."""
+        if "execution_errors" not in state:
+            state["execution_errors"] = []
+        
+        state["execution_errors"].append({
+            "step_index": execution.get("step_index", -1),
+            "function_name": execution.get("step", {}).get("function_name", "unknown"),
+            "error_message": error_message,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+        print(f"📝 Recorded execution error: {error_message}")
 
     def _evaluate_single_step_v1(self, execution: Dict[str, Any], state: ChatState) -> Dict[str, Any]:
         """Comprehensive step evaluation leveraging fixed storage format"""
@@ -1592,8 +2026,16 @@ Category:"""
         supplementary_steps = []
         evaluation_details = {}
         
+        # Get unavailable cell types to skip them
+        unavailable_cell_types = state.get("unavailable_cell_types", [])
+        
         # Step 2: For each mentioned cell type, ask LLM what analyses are needed
         for cell_type in mentioned_types:
+            # Skip cell types that were marked as unavailable during validation
+            if cell_type in unavailable_cell_types:
+                print(f"⏭️ Skipping post-execution evaluation for unavailable cell type: {cell_type}")
+                continue
+                
             print(f"🔍 Evaluating coverage for cell type: {cell_type}")
             
             # Step 2a: Get LLM recommendations for this specific cell type
@@ -1743,14 +2185,24 @@ Required analyses for {cell_type}:"""
         """Check what analyses were actually performed for a specific cell type"""
         
         performed_analyses = []
+        unavailable_cell_types = state.get("unavailable_cell_types", [])
+        
+        # If this cell type is known to be unavailable, don't try to generate steps for it
+        if cell_type in unavailable_cell_types:
+            print(f"🚫 Cell type '{cell_type}' is unavailable - not generating missing steps")
+            # Return dummy analysis to prevent post-execution from trying to add steps
+            return ["analysis_skipped_cell_type_unavailable"]
         
         for ex in state["execution_history"]:
-            if ex.get("success"):
+            # Check both successful executions AND skipped steps 
+            if ex.get("success") or ex.get("skipped"):
                 function_name = ex.get("step", {}).get("function_name")
                 params = ex.get("step", {}).get("parameters", {})
                 ex_cell_type = params.get("cell_type")
                 
                 if ex_cell_type == cell_type and function_name:
+                    if ex.get("skipped"):
+                        print(f"📋 Found skipped analysis for {cell_type}: {function_name}")
                     performed_analyses.append(function_name)
         
         # Remove duplicates while preserving order

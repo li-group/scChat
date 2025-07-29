@@ -226,19 +226,26 @@ class EvaluationMixin:
                         print(f"   ⏭️ Validation step already exists after process_cells({cell_type})")
                         continue
                     
+                    # Extract expected children from step if available
+                    expected_children = step.get("expected_children", [])
+                    
                     validation_step = {
                         "step_type": "validation",
                         "function_name": "validate_processing_results",
                         "parameters": {
                             "processed_parent": cell_type,
-                            "expected_children": []  # Will be populated during execution
+                            "expected_children": expected_children
                         },
                         "description": f"Validate that {cell_type} processing discovered expected cell types",
                         "expected_outcome": "Confirm expected cell types are available or handle gracefully",
                         "target_cell_type": None
                     }
                     steps_with_validation.append(validation_step)
-                    print(f"   ✅ Added validation step after process_cells({cell_type})")
+                    
+                    if expected_children:
+                        print(f"   ✅ Added validation step after process_cells({cell_type}) expecting: {expected_children}")
+                    else:
+                        print(f"   ✅ Added validation step after process_cells({cell_type}) - no specific children expected")
         
         # Update execution plan
         execution_plan["steps"] = steps_with_validation
