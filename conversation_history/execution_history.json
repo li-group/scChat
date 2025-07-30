@@ -1,56 +1,22 @@
 [
   {
-    "timestamp": "2025-07-29T10:52:08.241237",
+    "timestamp": "2025-07-29T21:28:42.998360",
     "function_name": "process_cells",
     "parameters": {
       "cell_type": "Immune cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell','1': 'T cell','2': 'T cell','3': 'B cell','4': 'Mononuclear phagocyte','5': 'T cell','6': 'Natural killer cell','7': 'Mast cell','8': 'Mononuclear phagocyte','9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD3E', 'ITM"
+    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell', '1': 'T cell', '2': 'T cell', '3': 'B cell', '4': 'Mononuclear phagocyte', '5': 'T cell', '6': 'Natural killer cell', '7': 'Mast cell', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD"
   },
   {
-    "timestamp": "2025-07-29T10:52:14.710602",
+    "timestamp": "2025-07-29T21:29:34.779925",
     "function_name": "process_cells",
     "parameters": {
       "cell_type": "T cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "Process cells failed: closing parenthesis '}' does not match opening parenthesis '[' (<unknown>, line 1)"
-  },
-  {
-    "timestamp": "2025-07-29T10:52:16.899616",
-    "function_name": "dea_split_by_condition",
-    "parameters": {
-      "cell_type": "Regulatory T cell"
-    },
-    "success": true,
-    "error": null,
-    "result_summary": "{'dea_results': [{'category': 'cataract', 'significant_genes': ['LEPROTL1', 'GZMK', 'CDC42SE2', 'IL32', 'CREM', 'SAMSN1', 'CXCR4', 'ARHGDIB', 'ENSG00000271204', 'GZMA', 'GSPT1', 'PTPRC', 'ENSG00000273319', 'TGFB1', 'SRGN', 'SLC38A1', 'SARAF', 'SYAP1', 'CD3D', 'ATP1B3', 'EML4', 'CST7', 'CYTOR', 'RUNX3', 'FYN', 'YWHAB', 'ITM2A', 'ITGB2', 'PPP2R5C', 'FOXP1', 'HLA-A', 'CYTIP', 'HLA-C', 'CD53', 'TENT5C', 'PDE4B', 'HLA-B', 'CD48', 'CD52', 'CD2', 'DUSP2', 'PDCD1', 'SYTL3', 'HMGB2', 'YPEL5', 'CXCR6', 'Z"
-  },
-  {
-    "timestamp": "2025-07-29T10:52:26.747435",
-    "function_name": "perform_enrichment_analyses",
-    "parameters": {
-      "cell_type": "Regulatory T cell",
-      "analyses": [
-        "gsea"
-      ],
-      "gene_set_library": "MSigDB_Hallmark_2020"
-    },
-    "success": true,
-    "error": null,
-    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for Regulatory T cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: gsea\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 98\\n\\n  \u2022 GSEA Results:\\n    1. Allograft Rejection (p-value: 1.724716032145347e-11)\\n       Genes: SRGN;TGFB1;FYB1;GZMA;ITGB2;HLA-A;CD3E;ETS1;CD3D;HLA-"
-  },
-  {
-    "timestamp": "2025-07-29T10:52:27.009650",
-    "function_name": "display_enrichment_visualization",
-    "parameters": {
-      "analysis": "gsea"
-    },
-    "success": true,
-    "error": null,
-    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"65743c28-0a12-4fd8-98be-1e6413d6f30a\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
+    "result_summary": "Annotation complete for T cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T-helper 1 cell', '1': 'NK T cell', '2': 'Memory T cell', '3': 'CD8-positive effector T cell', '4': 'CD8-positive effector memory T cell', '5': 'CD8-positive, alpha-beta T cell', '6': 'Effector T cell', '7': 'T-helper 17 cell'}.\n\u2022 Top-genes per cluster: {'0': ['FOSB', 'JUNB', 'ZFP36L2', 'DUSP2', 'GZMK', 'DUSP4', 'RUNX3', 'CRTAM', 'ARID5B', 'ANXA1', 'CD44', 'CD69', 'TNF', 'XCL2', 'FYN', 'IFNG', 'COTL1', 'CD"
   }
 ]

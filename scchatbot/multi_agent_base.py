@@ -66,6 +66,7 @@ class MultiAgentChatBot:
         # Initialize cell type extractor
         self.cell_type_extractor = None
         self._initialize_cell_type_extractor()
+        print("1")
         
         # Jury system removed - simplified workflow
         # Initialize workflow nodes
@@ -80,9 +81,11 @@ class MultiAgentChatBot:
             self.function_mapping,
             self.visualization_functions
         )
+        print("2")
+        
         # Create LangGraph workflow
         self.workflow = self._create_workflow()
-        
+        print("3")
         # Initialize session state management for conversation continuity
         self.session_states = {}  # Dict to store state for each session
         print("✅ Session state management initialized")
