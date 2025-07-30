@@ -1,22 +1,32 @@
 [
   {
-    "timestamp": "2025-07-29T21:28:42.998360",
+    "timestamp": "2025-07-30T16:08:09.894344",
     "function_name": "process_cells",
     "parameters": {
       "cell_type": "Immune cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell', '1': 'T cell', '2': 'T cell', '3': 'B cell', '4': 'Mononuclear phagocyte', '5': 'T cell', '6': 'Natural killer cell', '7': 'Mast cell', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD"
+    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell','1': 'T cell','2': 'T cell','3': 'B cell','4': 'Mononuclear phagocyte','5': 'T cell','6': 'Natural killer cell','7': 'Mast cell','8': 'Mononuclear phagocyte','9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD3E', 'ITM"
   },
   {
-    "timestamp": "2025-07-29T21:29:34.779925",
+    "timestamp": "2025-07-30T16:08:16.769640",
     "function_name": "process_cells",
     "parameters": {
       "cell_type": "T cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "Annotation complete for T cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T-helper 1 cell', '1': 'NK T cell', '2': 'Memory T cell', '3': 'CD8-positive effector T cell', '4': 'CD8-positive effector memory T cell', '5': 'CD8-positive, alpha-beta T cell', '6': 'Effector T cell', '7': 'T-helper 17 cell'}.\n\u2022 Top-genes per cluster: {'0': ['FOSB', 'JUNB', 'ZFP36L2', 'DUSP2', 'GZMK', 'DUSP4', 'RUNX3', 'CRTAM', 'ARID5B', 'ANXA1', 'CD44', 'CD69', 'TNF', 'XCL2', 'FYN', 'IFNG', 'COTL1', 'CD"
+    "result_summary": "Process cells failed: closing parenthesis '}' does not match opening parenthesis '[' (<unknown>, line 1)"
+  },
+  {
+    "timestamp": "2025-07-30T16:08:39.550229",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "gsea"
+    },
+    "success": false,
+    "error": "No gsea enrichment analysis results available to visualize",
+    "result_summary": null
   }
 ]

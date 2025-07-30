@@ -5,7 +5,7 @@ import plotly.figure_factory as ff
 import json
 from plotly.utils import PlotlyJSONEncoder
 import numpy as np
-from scchatbot.annotation import unified_cell_type_handler
+from scchatbot.cell_types.standardization import unified_cell_type_handler
 import plotly.io as pio
 import os
 import glob

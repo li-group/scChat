@@ -12,17 +12,16 @@ from datetime import datetime
 
 from ..cell_type_models import ChatState, ExecutionStep
 from langchain_core.messages import HumanMessage, AIMessage
-from ..shared import extract_cell_types_from_question, needs_cell_discovery
+from ..cell_types.validation import extract_cell_types_from_question, needs_cell_discovery
 
 # Import individual node implementations
 from .nodes import (
     InputProcessorNode,
     PlannerNode,
     ExecutorNode,
-    ValidationNode,
-    ResponseGeneratorNode
+    ResponseGeneratorNode,
+    EvaluatorNode
 )
-from .evaluation import EvaluationMixin
 
 # Import EnrichmentChecker with error handling
 try:
@@ -99,7 +98,7 @@ class CoreNodes:
         self.input_processor = InputProcessorNode(*common_args)
         self.planner = PlannerNode(*common_args)
         self.executor = ExecutorNode(*common_args)
-        self.validator = ValidationNode(*common_args)
+        self.evaluator = EvaluatorNode(*common_args)
         self.response_generator = ResponseGeneratorNode(*common_args)
         
         print("✅ All workflow nodes initialized successfully")
@@ -121,16 +120,21 @@ class CoreNodes:
         print("🔄 Orchestrator: Delegating to ExecutorNode")
         return self.executor.execute(state)
     
+    def evaluator_node(self, state: ChatState) -> ChatState:
+        """Evaluate execution results - delegates to EvaluatorNode."""
+        print("🔄 Orchestrator: Delegating to EvaluatorNode")
+        return self.evaluator.execute(state)
+    
     def unified_response_generator_node(self, state: ChatState) -> ChatState:
         """Generate response - delegates to ResponseGeneratorNode."""
         print("🔄 Orchestrator: Delegating to ResponseGeneratorNode")
         return self.response_generator.execute(state)
     
-    # Validation methods that delegate to ValidationNode
+    # Validation methods that delegate to EvaluatorNode
     
     def validate_processing_results(self, processed_parent: str, expected_children: List[str]) -> Dict[str, Any]:
-        """Validate processing results - delegates to ValidationNode."""
-        return self.validator.validate_processing_results(processed_parent, expected_children)
+        """Validate processing results - delegates to EvaluatorNode."""
+        return self.evaluator.validate_processing_results(processed_parent, expected_children)
     
     # Legacy compatibility methods - these ensure backward compatibility
     # with existing code that might call these methods directly
@@ -153,8 +157,8 @@ class CoreNodes:
         return self.executor._update_available_cell_types_from_result(state, result)
     
     def _update_remaining_steps_with_discovered_types(self, state: ChatState, validation_result: Dict[str, Any]) -> None:
-        """Legacy step update - delegates to ValidationNode."""
-        return self.validator.update_remaining_steps_with_discovered_types(state, validation_result)
+        """Legacy step update - delegates to EvaluatorNode."""
+        return self.evaluator.update_remaining_steps_with_discovered_types(state, validation_result)
     
     # Additional orchestrator utilities
     
@@ -164,7 +168,6 @@ class CoreNodes:
             "input_processor": "ready",
             "planner": "ready", 
             "executor": "ready",
-            "validator": "ready",
             "response_generator": "ready",
             "enrichment_checker": "available" if self.enrichment_checker_available else "unavailable"
         }

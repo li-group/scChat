@@ -14,7 +14,7 @@ import openai
 from langgraph.graph import StateGraph, END
 from langchain_core.runnables import RunnableConfig
 
-from .annotation import initial_cell_annotation
+from .cell_types.annotation_pipeline import initial_cell_annotation
 from .visualizations import (
     display_dotplot,
     display_cell_type_composition,
@@ -28,8 +28,8 @@ from .visualizations import (
 from .utils import clear_directory
 from .cell_type_models import ChatState
 from .function_history import FunctionHistoryManager
-from .cell_type_hierarchy import HierarchicalCellTypeManager, CellTypeExtractor
-from .analysis_wrapper import AnalysisFunctionWrapper
+from .cell_types.hierarchy_manager import HierarchicalCellTypeManager, CellTypeExtractor
+from .analysis.analysis_wrapper import AnalysisFunctionWrapper
 from .workflow import WorkflowNodes
 
 
@@ -400,10 +400,9 @@ class MultiAgentChatBot:
         workflow.add_node("input_processor", self.workflow_nodes.input_processor_node)
         workflow.add_node("planner", self.workflow_nodes.planner_node)
         workflow.add_node("executor", self.workflow_nodes.executor_node)
-        workflow.add_node("step_evaluator", self.workflow_nodes.step_evaluator_node)  # NEW
+        workflow.add_node("step_evaluator", self.workflow_nodes.evaluator_node)  # NEW
         workflow.add_node("final_evaluator", self.workflow_nodes.evaluator_node)
         workflow.add_node("response_generator", self.workflow_nodes.unified_response_generator_node)
-        workflow.add_node("plot_integration", self.workflow_nodes.add_plots_to_final_response)
         
         # Set entry point
         workflow.set_entry_point("input_processor")
@@ -442,11 +441,8 @@ class MultiAgentChatBot:
             }
         )
         
-        # Direct path: response generator goes directly to plot integration
-        workflow.add_edge("response_generator", "plot_integration")
-        
-        # Final response generation with plots
-        workflow.add_edge("plot_integration", END)
+        # Direct path: response generator goes directly to END
+        workflow.add_edge("response_generator", END)
         
         return workflow.compile()
 
@@ -685,11 +681,11 @@ class MultiAgentChatBot:
             except Exception as e:
                 print(f"❌ Hierarchical analysis failed: {e}")
                 # Fallback to direct function call
-                from .enrichment import perform_enrichment_analyses
+                from .analysis.enrichment_analysis import perform_enrichment_analyses
                 return perform_enrichment_analyses(self.adata, **kwargs)
         else:
             # Fallback to direct function call
-            from .enrichment import perform_enrichment_analyses
+            from .analysis.enrichment_analysis import perform_enrichment_analyses
             return perform_enrichment_analyses(self.adata, **kwargs)
 
     def _wrap_dea_analysis(self, **kwargs):
@@ -714,7 +710,7 @@ class MultiAgentChatBot:
     def _wrap_process_cells(self, **kwargs):
         """Process cells wrapper with hierarchy awareness"""
         try:
-            from .annotation import handle_process_cells_result
+            from .cell_types.annotation_pipeline import handle_process_cells_result
             cell_type = kwargs.get("cell_type", "unknown")
             resolution = kwargs.get("resolution", None)
             

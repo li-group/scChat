@@ -13,10 +13,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 
 from ...cell_type_models import ChatState
 from ..node_base import BaseWorkflowNode
-from ..evaluation import EvaluationMixin
-
-
-class PlannerNode(BaseWorkflowNode, EvaluationMixin):
+class PlannerNode(BaseWorkflowNode):
     """
     Planner node that creates intelligent execution plans.
     
@@ -248,14 +245,10 @@ class PlannerNode(BaseWorkflowNode, EvaluationMixin):
         if unavailable_cell_types:
             enhanced_plan = self._skip_unavailable_cell_steps(enhanced_plan, unavailable_cell_types)
         
-        # Apply plan processing (moved from evaluator)
-        # 1. Light consolidation - only remove exact consecutive duplicates
-        enhanced_plan = self._light_consolidate_process_cells(enhanced_plan)
-        
-        # 2. Light validation - only log warnings for missing cell types
-        self._log_missing_cell_type_warnings(enhanced_plan)
+        # Plan processing will be handled by EvaluatorNode
         
         return enhanced_plan
+    
     
     def _summarize_functions(self, functions: List[Dict]) -> str:
         """Summarize available functions for planning context"""
@@ -272,7 +265,7 @@ class PlannerNode(BaseWorkflowNode, EvaluationMixin):
     
     def _add_cell_discovery_to_plan(self, plan_data: Dict[str, Any], message: str, available_cell_types: List[str]) -> Dict[str, Any]:
         """Add cell discovery steps to plan if needed - Using original V2 implementation approach."""
-        from ...shared import extract_cell_types_from_question, needs_cell_discovery
+        from ...cell_types.validation import extract_cell_types_from_question, needs_cell_discovery
         
         if not plan_data or not self.hierarchy_manager:
             print("🔍 Cell discovery: No hierarchy manager available")
@@ -352,9 +345,31 @@ class PlannerNode(BaseWorkflowNode, EvaluationMixin):
             llm_analysis_steps, discoverable_types, available_cell_types
         )
         
-        # Step 7: Merge steps intelligently
+        # Step 7: Create interleaved discovery + validation sequence
+        # CRITICAL FIX: Validation should happen immediately after each process_cells step
         final_steps = []
-        final_steps.extend(discovery_steps)
+        
+        # Step 7a: Add discovery steps with immediate validation
+        validation_steps = self._create_validation_steps(discovery_steps)
+        
+        # Create mapping of process_cells to their validation steps
+        validation_map = {}
+        for val_step in validation_steps:
+            processed_parent = val_step.get("parameters", {}).get("processed_parent")
+            if processed_parent:
+                validation_map[processed_parent] = val_step
+        
+        # Step 7b: Interleave process_cells with validation steps
+        for disc_step in discovery_steps:
+            final_steps.append(disc_step)  # Add process_cells step
+            
+            # Immediately add corresponding validation step
+            cell_type = disc_step.get("parameters", {}).get("cell_type")
+            if cell_type in validation_map:
+                final_steps.append(validation_map[cell_type])
+                print(f"🔄 Interleaved: process_cells({cell_type}) → validation({cell_type})")
+        
+        # Step 8: Add analysis and other steps
         final_steps.extend(updated_analysis_steps)
         final_steps.extend(other_steps)
         
@@ -367,6 +382,7 @@ class PlannerNode(BaseWorkflowNode, EvaluationMixin):
         
         print(f"📋 Plan merge complete:")
         print(f"   - Discovery steps: {len(discovery_steps)}")
+        print(f"   - Validation steps: {len(validation_steps)}")
         print(f"   - Analysis steps: {len(updated_analysis_steps)}")
         print(f"   - Other steps: {len(other_steps)}")
         print(f"   - Filtered out: {len(llm_analysis_steps) - len(updated_analysis_steps)} steps for undiscoverable types")
@@ -807,6 +823,37 @@ class PlannerNode(BaseWorkflowNode, EvaluationMixin):
                 "target_cell_type": None
             }]
         }
+    
+    def _create_validation_steps(self, discovery_steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Create validation steps for discovery steps.
+        
+        These validation steps will check if expected cell types were discovered
+        and update remaining plan steps accordingly.
+        """
+        validation_steps = []
+        
+        for step in discovery_steps:
+            if step.get("function_name") == "process_cells":
+                cell_type = step.get("parameters", {}).get("cell_type")
+                expected_children = step.get("expected_children", [])
+                
+                if cell_type and expected_children:
+                    validation_step = {
+                        "step_type": "validation",
+                        "function_name": "validate_processing_results",
+                        "parameters": {
+                            "processed_parent": cell_type,
+                            "expected_children": expected_children
+                        },
+                        "description": f"Validate that {cell_type} processing discovered expected cell types: {', '.join(expected_children)}",
+                        "expected_outcome": f"Confirm {', '.join(expected_children)} are available and update remaining steps",
+                        "target_cell_type": None
+                    }
+                    validation_steps.append(validation_step)
+                    print(f"🔍 Created validation step for process_cells({cell_type}) expecting: {expected_children}")
+        
+        return validation_steps
     
     def _log_plan_statistics(self, plan: Dict[str, Any]):
         """Log statistics about the created plan."""

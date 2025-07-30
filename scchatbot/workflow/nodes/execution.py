@@ -19,7 +19,6 @@ class ExecutorNode(BaseWorkflowNode):
     Responsibilities:
     - Execute individual steps in the execution plan
     - Handle function calls with proper parameter management
-    - Manage validation steps and cell type discovery
     - Track execution history and results
     - Update available cell types based on processing results
     """
@@ -71,13 +70,13 @@ class ExecutorNode(BaseWorkflowNode):
         # Record execution
         self._record_execution(state, step_data, result, success, error_msg, original_function_name)
         
-        # Advance step if successful or if validation
-        should_advance = success or step.step_type == "validation"
-        if should_advance:
-            state["current_step_index"] += 1
+        # Simple error handling - always advance to prevent infinite retry loop
+        state["current_step_index"] += 1
+        if success:
             print(f"🔄 Advanced to step {state['current_step_index'] + 1}")
         else:
-            print(f"❌ Step failed, not advancing. Still on step {state['current_step_index'] + 1}")
+            print(f"❌ Step failed: {error_msg}")
+            print(f"📝 Recording error and advancing to step {state['current_step_index'] + 1} (no retries for deterministic operations)")
         
         self._log_node_complete("Executor", state)
         return state
@@ -102,12 +101,8 @@ class ExecutorNode(BaseWorkflowNode):
     
     def _execute_step(self, state: ChatState, step: ExecutionStep) -> tuple[bool, Any, str]:
         """Execute a single step and return success, result, error_msg."""
-        # Handle validation steps specially
-        if step.step_type == "validation":
-            return self._execute_validation_step(state, step)
-        
-        # Handle final question step differently
-        elif step.step_type == "final_question":
+        # Handle final question step
+        if step.step_type == "final_question":
             print("🎯 Executing final comprehensive question...")
             result = self._execute_final_question(state)
             return True, result, None
@@ -116,36 +111,6 @@ class ExecutorNode(BaseWorkflowNode):
             # Handle regular analysis/visualization steps
             return self._execute_regular_step(state, step)
     
-    def _execute_validation_step(self, state: ChatState, step: ExecutionStep) -> tuple[bool, Any, str]:
-        """Execute a validation step."""
-        print("🔍 Executing validation step...")
-        result = self.validate_processing_results(
-            step.parameters.get("processed_parent"),
-            step.parameters.get("expected_children", [])
-        )
-        
-        # Check validation result
-        if result["status"] == "success":
-            print(f"✅ Validation passed: {result['message']}")
-            # Update available cell types with discovered types
-            state["available_cell_types"] = result["available_types"]
-            return True, result, None
-            
-        elif result["status"] == "partial_success":
-            print(f"⚠️ Validation partial: {result['message']}")
-            # Update available cell types with what we actually found
-            state["available_cell_types"] = result["available_types"]
-            
-            # Track unavailable cell types
-            self._track_unavailable_cell_types(state, step, result)
-            return True, result, None
-        else:
-            error_msg = result["message"]
-            print(f"❌ Validation failed: {error_msg}")
-            
-            # Track all expected cell types as unavailable on complete failure
-            self._track_failed_validation(state, step)
-            return False, result, error_msg
     
     def _execute_regular_step(self, state: ChatState, step: ExecutionStep) -> tuple[bool, Any, str]:
         """Execute a regular analysis or visualization step."""
@@ -240,36 +205,18 @@ class ExecutorNode(BaseWorkflowNode):
         if step.function_name == "process_cells" and result:
             self._update_available_cell_types_from_result(state, result)
     
-    def _track_unavailable_cell_types(self, state: ChatState, step: ExecutionStep, result: Dict[str, Any]):
-        """Track cell types that couldn't be discovered."""
-        expected_types = step.parameters.get("expected_children", [])
-        available_types = result.get("available_types", [])
-        missing_types = [ct for ct in expected_types if ct not in available_types]
-        if missing_types:
-            current_unavailable = state.get("unavailable_cell_types", [])
-            state["unavailable_cell_types"] = list(set(current_unavailable + missing_types))
-            print(f"📋 Added to unavailable cell types: {missing_types}")
-    
-    def _track_failed_validation(self, state: ChatState, step: ExecutionStep):
-        """Track cell types from completely failed validation."""
-        expected_types = step.parameters.get("expected_children", [])
-        if expected_types:
-            current_unavailable = state.get("unavailable_cell_types", [])
-            state["unavailable_cell_types"] = list(set(current_unavailable + expected_types))
-            print(f"📋 Added to unavailable cell types (validation failed): {expected_types}")
     
     def _record_execution(self, state: ChatState, step_data: Dict[str, Any], result: Any, 
                          success: bool, error_msg: str, original_function_name: str):
         """Record execution in history and function tracking."""
-        # Record function execution in history (skip validation steps for history)
-        if step_data.get("step_type") != "validation":
-            self.history_manager.record_execution(
-                function_name=step_data.get("function_name"),
-                parameters=step_data.get("parameters", {}),
-                result=result,
-                success=success,
-                error=error_msg
-            )
+        # Record function execution in history
+        self.history_manager.record_execution(
+            function_name=step_data.get("function_name"),
+            parameters=step_data.get("parameters", {}),
+            result=result,
+            success=success,
+            error=error_msg
+        )
         
         # Record execution in state using structured storage approach
         result_storage = self._store_execution_result(step_data, result, success, original_function_name)
@@ -428,14 +375,6 @@ class ExecutorNode(BaseWorkflowNode):
         except Exception as e:
             print(f"⚠️ Error updating available cell types: {e}")
     
-    # Placeholder methods that would need full implementation
-    def validate_processing_results(self, processed_parent: str, expected_children: List[str]) -> Dict[str, Any]:
-        """Validate processing results - placeholder implementation."""
-        return {
-            "status": "success",
-            "message": "Validation passed",
-            "available_types": expected_children
-        }
     
     def _execute_final_question(self, state: ChatState) -> str:
         """Execute final question step - placeholder implementation."""

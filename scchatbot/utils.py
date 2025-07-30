@@ -399,7 +399,7 @@ def save_analysis_results(adata, prefix, leiden_key='leiden', save_umap=True,
         dot_plot_data.to_csv(f"{prefix}_dot_plot_data.csv", index=False)
 
 def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pval_threshold=0.05, save_csv=True):
-    from .annotation import unified_cell_type_handler
+    from .cell_types.standardization import unified_cell_type_handler
     cell_type = unified_cell_type_handler(cell_type)
     try:
         adata_modified = adata.copy()
@@ -446,7 +446,7 @@ def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pva
         return {}
 
 def compare_cell_count(adata, cell_type):
-    from .annotation import unified_cell_type_handler
+    from .cell_types.standardization import unified_cell_type_handler
     cell_type = unified_cell_type_handler(cell_type)
     
     # Get all unique sample categories

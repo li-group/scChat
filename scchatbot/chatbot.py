@@ -35,13 +35,13 @@ from .cell_type_models import (
     ExecutionPlan
 )
 
-from .cell_type_hierarchy import (
+from .cell_types.hierarchy_manager import (
     HierarchicalCellTypeManager,
     CellTypeExtractor
 )
 
 from .function_history import FunctionHistoryManager
-from .analysis_wrapper import AnalysisFunctionWrapper
+from .analysis.analysis_wrapper import AnalysisFunctionWrapper
 from .workflow import WorkflowNodes
 
 

@@ -8,13 +8,13 @@ for better modularity and maintainability.
 from .input_processing import InputProcessorNode
 from .planning import PlannerNode
 from .execution import ExecutorNode
-from .validation import ValidationNode
 from .response import ResponseGeneratorNode
+from .evaluation import EvaluatorNode
 
 __all__ = [
     'InputProcessorNode',
     'PlannerNode', 
     'ExecutorNode',
-    'ValidationNode',
-    'ResponseGeneratorNode'
+    'ResponseGeneratorNode',
+    'EvaluatorNode'
 ]

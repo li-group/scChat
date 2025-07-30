@@ -15,7 +15,7 @@ import openai
 from typing import Dict, Any, List
 
 from ..cell_type_models import ChatState
-from ..shared import extract_cell_types_from_question, needs_cell_discovery, create_cell_discovery_steps
+from ..cell_types.validation import extract_cell_types_from_question, needs_cell_discovery, create_cell_discovery_steps
 
 
 class UtilsMixin:
