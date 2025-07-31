@@ -1313,7 +1313,7 @@ def perform_enrichment_analyses(
     # ENRICHMENT VECTOR DATABASE INTEGRATION
     # Index enrichment results immediately for semantic search
     try:
-        from .function_history import FunctionHistoryManager
+        from ..function_history import FunctionHistoryManager
         history_manager = FunctionHistoryManager()
         if hasattr(history_manager, 'index_enrichment_results_from_dual_csvs'):
             history_manager.index_enrichment_results_from_dual_csvs(result_dict, cell_type)

@@ -402,15 +402,15 @@ class EvaluatorNode(BaseWorkflowNode):
         """Classify question type using a smaller LLM for efficiency"""
         
         classification_prompt = f"""Classify the following biology question into ONE category:
-Question: "{question}"
-Categories:
-1. canonical_markers - Questions about well-known, established cell type markers (e.g., "What are canonical markers for...", "differentiate X from Y using markers")
-2. pathway_analysis - Questions about biological pathways, processes, or functional enrichment (e.g., "What pathways are enriched...", "biological processes in...")
-3. gene_expression - Questions about specific gene expression changes (e.g., "Is gene X upregulated...", "expression of Y in condition Z")
-4. cell_abundance - Questions about cell type counts or proportions (e.g., "How many X cells...", "proportion of Y cells")
-5. general_comparison - General comparison questions not fitting above categories
-Return ONLY the category name, nothing else.
-Category:"""
+                            Question: "{question}"
+                            Categories:
+                            1. canonical_markers - Questions about well-known, established cell type markers (e.g., "What are canonical markers for...", "differentiate X from Y using markers")
+                            2. pathway_analysis - Questions about biological pathways, processes, or functional enrichment (e.g., "What pathways are enriched...", "biological processes in...")
+                            3. gene_expression - Questions about specific gene expression changes (e.g., "Is gene X upregulated...", "expression of Y in condition Z")
+                            4. cell_abundance - Questions about cell type counts or proportions (e.g., "How many X cells...", "proportion of Y cells")
+                            5. general_comparison - General comparison questions not fitting above categories
+                            Return ONLY the category name, nothing else.
+                            Category:"""
         
         try:
             # Use the LLM call method from base class
@@ -476,7 +476,7 @@ Category:"""
             
             # Step 2c: Find gaps and generate steps
             missing_steps = self._generate_missing_steps_for_cell_type(
-                cell_type, required_analyses, performed_analyses
+                cell_type, required_analyses, performed_analyses, state
             )
             
             supplementary_steps.extend(missing_steps)
@@ -500,6 +500,20 @@ Category:"""
         
         analysis_relevance = self._get_analysis_relevance_hints(question_type, all_performed_analyses)
         
+        # CRITICAL FIX: Actually add supplementary steps to execution plan
+        if supplementary_steps:
+            execution_plan = state.get("execution_plan", {})
+            if "steps" in execution_plan:
+                # Add supplementary steps to the execution plan
+                execution_plan["steps"].extend(supplementary_steps)
+                print(f"✅ Added {len(supplementary_steps)} supplementary steps to execution plan")
+                
+                # Mark conversation as incomplete so execution continues
+                state["conversation_complete"] = False
+                print(f"🔄 Marked conversation as incomplete to continue execution")
+            else:
+                print("⚠️ No execution plan found to add supplementary steps")
+        
         return {
             "mentioned_cell_types": mentioned_types,
             "evaluation_details": evaluation_details,
@@ -517,60 +531,60 @@ Category:"""
         
         analysis_prompt = f"""You are analyzing what bioinformatics analyses are needed for a specific cell type.
 
-User Question: "{original_question}"
-Cell Type: "{cell_type}"
-Question Type: {question_type}
+                                User Question: "{original_question}"
+                                Cell Type: "{cell_type}"
+                                Question Type: {question_type}
 
-Available analysis functions with detailed descriptions:
+                                Available analysis functions with detailed descriptions:
 
-CORE ANALYSIS FUNCTIONS:
-- perform_enrichment_analyses: Run enrichment analyses on DE genes for a cell type. Supports REACTOME (pathways), GO (gene ontology), KEGG (pathways), GSEA (gene set enrichment). Use for pathway analysis when user asks about biological processes, pathways, or gene function.
+                                CORE ANALYSIS FUNCTIONS:
+                                - perform_enrichment_analyses: Run enrichment analyses on DE genes for a cell type. Supports REACTOME (pathways), GO (gene ontology), KEGG (pathways), GSEA (gene set enrichment). Use for pathway analysis when user asks about biological processes, pathways, or gene function.
 
-- dea_split_by_condition: Perform differential expression analysis (DEA) split by condition. Use when comparing conditions or when user asks about gene expression differences between experimental groups.
+                                - dea_split_by_condition: Perform differential expression analysis (DEA) split by condition. Use when comparing conditions or when user asks about gene expression differences between experimental groups.
 
-- compare_cell_counts: Compare cell counts between experimental conditions for specific cell types. Use when analyzing how cell type abundance differs across conditions (e.g., pre vs post treatment, healthy vs disease).
+                                - compare_cell_counts: Compare cell counts between experimental conditions for specific cell types. Use when analyzing how cell type abundance differs across conditions (e.g., pre vs post treatment, healthy vs disease).
 
-VISUALIZATION FUNCTIONS:
-- display_enrichment_visualization: PREFERRED function for showing comprehensive enrichment visualization with both barplot and dotplot. Use after running enrichment analyses to visualize results.
+                                VISUALIZATION FUNCTIONS:
+                                - display_enrichment_visualization: PREFERRED function for showing comprehensive enrichment visualization with both barplot and dotplot. Use after running enrichment analyses to visualize results.
 
-- display_dotplot: Display dotplot for annotated results. Use when user wants to see gene expression patterns across cell types.
+                                - display_dotplot: Display dotplot for annotated results. Use when user wants to see gene expression patterns across cell types.
 
-- display_cell_type_composition: Display cell type composition graph. Use when user wants to see the proportion of different cell types.
+                                - display_cell_type_composition: Display cell type composition graph. Use when user wants to see the proportion of different cell types.
 
-- display_umap: Display basic UMAP without cell type annotations. Use for basic dimensionality reduction visualization.
+                                - display_umap: Display basic UMAP without cell type annotations. Use for basic dimensionality reduction visualization.
 
-- display_processed_umap: Display UMAP with cell type annotations. Use when user wants to see cell type annotations on UMAP.
+                                - display_processed_umap: Display UMAP with cell type annotations. Use when user wants to see cell type annotations on UMAP.
 
-SEARCH FUNCTIONS:
-- search_enrichment_semantic: Search all enrichment terms semantically to find specific pathways or biological processes. Use when user asks about specific pathways, terms, or biological processes that might not appear in standard top results.
+                                SEARCH FUNCTIONS:
+                                - search_enrichment_semantic: Search all enrichment terms semantically to find specific pathways or biological processes. Use when user asks about specific pathways, terms, or biological processes that might not appear in standard top results.
 
-- conversational_response: Provide conversational response without function calls. Use for greetings, clarifications, explanations, or when no analysis is needed.
+                                - conversational_response: Provide conversational response without function calls. Use for greetings, clarifications, explanations, or when no analysis is needed.
 
-Task: Determine which analyses are needed for {cell_type} to answer the user's question.
+                                Task: Determine which analyses are needed for {cell_type} to answer the user's question.
 
-IMPORTANT: The cell type "{cell_type}" already exists in the dataset. DO NOT suggest process_cells for this cell type.
+                                IMPORTANT: The cell type "{cell_type}" already exists in the dataset. DO NOT suggest process_cells for this cell type.
 
-Consider based on question type:
-1. Canonical markers questions (differentiate X from Y, markers of X) → Use dea_split_by_condition ONLY
-2. Gene expression questions → Use dea_split_by_condition
-3. Pathway/biological process questions → Use perform_enrichment_analyses + search_enrichment_semantic
-4. Cell abundance questions → Use compare_cell_counts
-5. Specific pathway search → Use search_enrichment_semantic
+                                Consider based on question type:
+                                1. Canonical markers questions (differentiate X from Y, markers of X) → Use dea_split_by_condition ONLY
+                                2. Gene expression questions → Use dea_split_by_condition
+                                3. Pathway/biological process questions → Use perform_enrichment_analyses + search_enrichment_semantic
+                                4. Cell abundance questions → Use compare_cell_counts
+                                5. Specific pathway search → Use search_enrichment_semantic
 
-CRITICAL GUIDELINES FOR CANONICAL MARKERS:
-- For canonical markers questions, ONLY use dea_split_by_condition
-- DO NOT include enrichment analyses for marker identification
-- DO NOT suggest process_cells for already-available cell types
-- Visualization is optional for canonical markers
+                                CRITICAL GUIDELINES FOR CANONICAL MARKERS:
+                                - For canonical markers questions, ONLY use dea_split_by_condition
+                                - DO NOT include enrichment analyses for marker identification
+                                - DO NOT suggest process_cells for already-available cell types
+                                - Visualization is optional for canonical markers
 
-GENERAL GUIDELINES:
-- Only include display_enrichment_visualization ONCE per cell type
-- Return ONLY a valid JSON array of function names, nothing else
+                                GENERAL GUIDELINES:
+                                - Only include display_enrichment_visualization ONCE per cell type
+                                - Return ONLY a valid JSON array of function names, nothing else
 
-Example response for pathway question: ["perform_enrichment_analyses", "search_enrichment_semantic", "display_enrichment_visualization"]
-Example response for all kinds of markers: ["dea_split_by_condition"]
+                                Example response for pathway question: ["perform_enrichment_analyses", "search_enrichment_semantic", "display_enrichment_visualization"]
+                                Example response for all kinds of markers: ["dea_split_by_condition"]
 
-Required analyses for {cell_type}:"""
+                                Required analyses for {cell_type}:"""
         
         try:
             response = self._call_llm(analysis_prompt)
@@ -649,7 +663,7 @@ Required analyses for {cell_type}:"""
         return unique_performed
 
     def _generate_missing_steps_for_cell_type(self, cell_type: str, required_analyses: List[str], 
-                                            performed_analyses: List[str]) -> List[Dict[str, Any]]:
+                                            performed_analyses: List[str], state: ChatState) -> List[Dict[str, Any]]:
         """Generate supplementary steps for missing analyses for a specific cell type"""
         
         missing_steps = []
@@ -668,12 +682,41 @@ Required analyses for {cell_type}:"""
                 
                 # Add specific parameters for visualization functions
                 if required_function == "display_enrichment_visualization":
-                    step["parameters"]["analysis"] = "gsea"  # Default analysis type
+                    # Detect what enrichment analysis was actually performed
+                    enrichment_type = self._detect_enrichment_type_for_cell(state, cell_type)
+                    step["parameters"]["analysis"] = enrichment_type
                 
                 missing_steps.append(step)
                 print(f"🔧 Generated missing step: {required_function}({cell_type})")
         
         return missing_steps
+    
+    def _detect_enrichment_type_for_cell(self, state: ChatState, cell_type: str) -> str:
+        """Detect what type of enrichment analysis was performed for a cell type"""
+        execution_history = state.get("execution_history", [])
+        
+        # Look for the most recent enrichment analysis for this cell type
+        for execution in reversed(execution_history):
+            step_data = execution.get("step", {})
+            if (step_data.get("function_name") == "perform_enrichment_analyses" and
+                step_data.get("parameters", {}).get("cell_type") == cell_type and
+                execution.get("success")):
+                
+                # Check what analyses were performed
+                result = execution.get("result", {})
+                if isinstance(result, dict):
+                    # Check which analysis types have results
+                    if "go" in result and result["go"].get("total_significant", 0) > 0:
+                        return "go"
+                    elif "kegg" in result and result["kegg"].get("total_significant", 0) > 0:
+                        return "kegg"
+                    elif "reactome" in result and result["reactome"].get("total_significant", 0) > 0:
+                        return "reactome"
+                    elif "gsea" in result and result["gsea"].get("total_significant", 0) > 0:
+                        return "gsea"
+        
+        # Default to gsea if nothing found
+        return "gsea"
     
     def _get_analysis_relevance_hints(self, question_type: str, performed_analyses: Dict[str, List[str]]) -> Dict[str, Any]:
         """Generate hints about which analyses are most relevant for the question type"""

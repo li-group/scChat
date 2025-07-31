@@ -31,52 +31,68 @@ class ExecutorNode(BaseWorkflowNode):
         """Execute the current step in the plan with hierarchy awareness and validation"""
         self._log_node_start("Executor", state)
         
-        if not state["execution_plan"] or state["current_step_index"] >= len(state["execution_plan"]["steps"]):
-            state["conversation_complete"] = True
-            return state
+        # Continue executing while there are steps, with special handling for supplementary steps
+        steps_executed = 0
+        continue_execution = True
+        
+        while continue_execution and state.get("current_step_index", 0) < len(state.get("execution_plan", {}).get("steps", [])):
+            if not state["execution_plan"] or state["current_step_index"] >= len(state["execution_plan"]["steps"]):
+                state["conversation_complete"] = True
+                break
+                
+            step_data = state["execution_plan"]["steps"][state["current_step_index"]]
             
-        step_data = state["execution_plan"]["steps"][state["current_step_index"]]
-        
-        # Check if this step should be skipped
-        if step_data.get("skip_reason"):
-            self._handle_skipped_step(state, step_data)
-            return state
-        
-        step = ExecutionStep(**step_data)
-        
-        print(f"🔄 Executing step {state['current_step_index'] + 1}: {step.description}")
-        
-        # DEBUG: Log the original function name to track mutations
-        original_function_name = step_data.get("function_name", "unknown")
-        print(f"🔍 STORAGE DEBUG: Original function_name from plan: '{original_function_name}'")
-        
-        success = False
-        result = None
-        error_msg = None
-        
-        try:
-            success, result, error_msg = self._execute_step(state, step)
+            # Check if this step should be skipped
+            if step_data.get("skip_reason"):
+                self._handle_skipped_step(state, step_data)
+                steps_executed += 1
+                state["current_step_index"] += 1
+                continue
+            
+            step = ExecutionStep(**step_data)
+            
+            print(f"🔄 Executing step {state['current_step_index'] + 1}: {step.description}")
+            
+            # DEBUG: Log the original function name to track mutations
+            original_function_name = step_data.get("function_name", "unknown")
+            print(f"🔍 STORAGE DEBUG: Original function_name from plan: '{original_function_name}'")
+            
+            success = False
+            result = None
+            error_msg = None
+            
+            try:
+                success, result, error_msg = self._execute_step(state, step)
+                
+                if success:
+                    print(f"✅ Step {state['current_step_index'] + 1} completed successfully")
+                    self._handle_successful_step(state, step, result)
+                
+            except Exception as e:
+                error_msg = str(e)
+                success = False
+                print(f"❌ Step {state['current_step_index'] + 1} failed: {error_msg}")
+                state["errors"].append(f"Step {state['current_step_index'] + 1} failed: {error_msg}")
+            
+            # Record execution
+            self._record_execution(state, step_data, result, success, error_msg, original_function_name)
+            
+            # Simple error handling - always advance to prevent infinite retry loop
+            state["current_step_index"] += 1
+            steps_executed += 1
             
             if success:
-                print(f"✅ Step {state['current_step_index'] + 1} completed successfully")
-                self._handle_successful_step(state, step, result)
+                print(f"🔄 Advanced to step {state['current_step_index'] + 1}")
+            else:
+                print(f"❌ Step failed: {error_msg}")
+                print(f"📝 Recording error and advancing to step {state['current_step_index'] + 1} (no retries for deterministic operations)")
             
-        except Exception as e:
-            error_msg = str(e)
-            success = False
-            print(f"❌ Step {state['current_step_index'] + 1} failed: {error_msg}")
-            state["errors"].append(f"Step {state['current_step_index'] + 1} failed: {error_msg}")
-        
-        # Record execution
-        self._record_execution(state, step_data, result, success, error_msg, original_function_name)
-        
-        # Simple error handling - always advance to prevent infinite retry loop
-        state["current_step_index"] += 1
-        if success:
-            print(f"🔄 Advanced to step {state['current_step_index'] + 1}")
-        else:
-            print(f"❌ Step failed: {error_msg}")
-            print(f"📝 Recording error and advancing to step {state['current_step_index'] + 1} (no retries for deterministic operations)")
+            # Check if we should continue executing (batch supplementary steps)
+            continue_execution = self._should_continue_execution(state, steps_executed)
+            
+            if not continue_execution:
+                print(f"🛑 Stopping execution after {steps_executed} steps")
+                break
         
         self._log_node_complete("Executor", state)
         return state
@@ -97,7 +113,7 @@ class ExecutorNode(BaseWorkflowNode):
             "skipped": True  # Flag to distinguish from failures
         })
         
-        state["current_step_index"] += 1
+        # Note: state["current_step_index"] is now incremented in the main loop
     
     def _execute_step(self, state: ChatState, step: ExecutionStep) -> tuple[bool, Any, str]:
         """Execute a single step and return success, result, error_msg."""
@@ -375,6 +391,53 @@ class ExecutorNode(BaseWorkflowNode):
         except Exception as e:
             print(f"⚠️ Error updating available cell types: {e}")
     
+    
+    def _should_continue_execution(self, state: ChatState, steps_executed: int) -> bool:
+        """Determine if execution should continue in the same executor run.
+        
+        This method implements intelligent batching to reduce evaluation rounds:
+        - Supplementary steps (added by evaluator) are executed together
+        - Visualization steps following analyses are executed together
+        - Stops after certain milestones to allow evaluation
+        """
+        # Check if we've reached the end of the plan
+        current_index = state.get("current_step_index", 0)
+        total_steps = len(state.get("execution_plan", {}).get("steps", []))
+        
+        if current_index >= total_steps:
+            return False
+        
+        # Get the next step if available
+        next_step = state["execution_plan"]["steps"][current_index]
+        
+        # Check if this is a supplementary step sequence
+        if "Post-evaluation:" in next_step.get("description", ""):
+            print(f"🚀 Continuing execution - next step is supplementary: {next_step.get('function_name')}")
+            return True
+        
+        # Check if next step is a visualization for the same cell type
+        if steps_executed > 0:
+            last_executed = state["execution_history"][-1]
+            last_step = last_executed.get("step", {})
+            last_cell_type = last_step.get("parameters", {}).get("cell_type")
+            next_cell_type = next_step.get("parameters", {}).get("cell_type")
+            
+            # Continue if it's a visualization for the same cell type
+            if (last_cell_type == next_cell_type and 
+                next_step.get("function_name", "").startswith("display_") and
+                not last_step.get("function_name", "").startswith("display_")):
+                print(f"🎨 Continuing execution - visualization for same cell type: {next_cell_type}")
+                return True
+        
+        # Check if we're in a search + visualization sequence
+        if (next_step.get("function_name") == "display_enrichment_visualization" and
+            steps_executed > 0 and 
+            state["execution_history"][-1].get("step", {}).get("function_name") == "search_enrichment_semantic"):
+            print(f"🔍➡️🎨 Continuing execution - visualization after search")
+            return True
+        
+        # Default: stop after each step for regular workflow steps
+        return False
     
     def _execute_final_question(self, state: ChatState) -> str:
         """Execute final question step - placeholder implementation."""

@@ -13,6 +13,12 @@ from langchain_core.messages import SystemMessage, HumanMessage
 
 from ...cell_type_models import ChatState
 from ..node_base import BaseWorkflowNode
+
+# Import EnrichmentChecker for method recognition
+try:
+    from ...enrichment_checker import EnrichmentChecker
+except ImportError:
+    EnrichmentChecker = None
 class PlannerNode(BaseWorkflowNode):
     """
     Planner node that creates intelligent execution plans.
@@ -139,19 +145,39 @@ class PlannerNode(BaseWorkflowNode):
         User question: "{message}"
         
         SEMANTIC DECISION FRAMEWORK:
-        🔬 USE ANALYSIS FUNCTIONS when the user wants to DISCOVER or ANALYZE data:
-        - Questions about relationships, abundance, pathways, cellular processes
-        - Requests to compare, find differences, or understand biological mechanisms  
-        - Examples: "What pathways are enriched?", "How do cell types differ?", "What is the relationship between X and Y?"
-        - → Use functions like: perform_enrichment_analyses, compare_cell_counts, dea_split_by_condition
+        🧬 GENE/MARKER ANALYSIS - Use DEA functions when the user asks about:
+        - Gene expression differences between conditions/cell types
+        - Marker genes, differentially expressed genes
+        - Gene-level comparisons and signatures
+        - Examples: "What genes are upregulated in T cells?", "Find marker genes for B cells", "Which genes differ between conditions?"
+        - → Use functions like: dea_split_by_condition, compare_cell_counts
         
-        💬 USE CONVERSATIONAL RESPONSE only when the user wants to INTERPRET existing results:
-        - Questions asking for explanation of already-computed results
-        - Requests to clarify meaning of specific terms or findings
-        - Examples: "What does this pathway mean?", "Explain these results I'm seeing"
+        🛤️ PATHWAY ANALYSIS - Use enrichment functions when the user asks about:
+        - Biological pathways, gene sets, functional categories
+        - Pathway enrichment, functional analysis
+        - Systems-level biological processes
+        - Examples: "What pathways are enriched?", "Find interferon pathways", "Analyze GO terms"
+        - → Use functions like: perform_enrichment_analyses
+        
+        🔢 CELL TYPE ANALYSIS - Use processing/counting functions when the user asks about:
+        - Cell type abundance, proportions, distributions
+        - Cell type identification and characterization
+        - Examples: "How many T cells are there?", "Compare cell type proportions"
+        - → Use functions like: process_cells, compare_cell_counts
+        
+        💬 CONVERSATIONAL RESPONSE - Use when the user wants to:
+        - Interpret or explain already-computed results
+        - Understand biological concepts without needing new data analysis
+        - Get general knowledge about terms, processes, or findings
+        - Examples: "What does this pathway mean?", "Explain apoptosis", "What are these results showing?"
         - → Use: conversational_response
         
-        🎯 DEFAULT: When in doubt, prefer analysis over conversation. It's better to provide data-driven insights.
+        🎯 ANALYSIS SELECTION GUIDE:
+        - Gene/marker questions → DEA analysis
+        - Pathway/functional questions → Enrichment analysis  
+        - Cell abundance/counting questions → Cell processing/counting
+        - Explanation/interpretation questions → Conversational response
+        - When unclear, consider what type of biological question is being asked
         
         Create a plan in this JSON format:
         {{
@@ -239,7 +265,7 @@ class PlannerNode(BaseWorkflowNode):
         enrichment_steps = [s for s in enhanced_plan.get("steps", []) if s.get("function_name") == "perform_enrichment_analyses"]
         print(f"🔍 ENRICHMENT DEBUG: Found {len(enrichment_steps)} enrichment steps")
         
-        enhanced_plan = self._enhance_all_enrichment_steps(enhanced_plan, message)
+        enhanced_plan = self._extract_pathway_keywords_from_enrichment_steps(enhanced_plan, message)
         
         # Skip steps for unavailable cell types
         if unavailable_cell_types:
@@ -547,16 +573,16 @@ class PlannerNode(BaseWorkflowNode):
         
         return updated_steps
     
-    def _enhance_all_enrichment_steps(self, plan_data: Dict[str, Any], message: str) -> Dict[str, Any]:
-        """Enhance all enrichment analysis steps in the plan using EnrichmentChecker."""
-        print(f"🧬 ENRICHMENT ENHANCER: Processing {len(plan_data.get('steps', []))} steps")
+    def _extract_pathway_keywords_from_enrichment_steps(self, plan_data: Dict[str, Any], message: str) -> Dict[str, Any]:
+        """Extract pathway keywords for enrichment analysis steps to trigger enrichment_checker."""
+        print(f"🔍 PATHWAY EXTRACTOR: Processing {len(plan_data.get('steps', []))} steps")
         enhanced_steps = []
         
         for i, step in enumerate(plan_data.get("steps", [])):
             if step.get("function_name") == "perform_enrichment_analyses":
-                print(f"🧬 ENRICHMENT ENHANCER: Enhancing step {i+1}: {step.get('parameters', {}).get('cell_type', 'unknown')}")
-                # Enhance this enrichment step
-                enhanced_step = self._enhance_enrichment_step(step, message)
+                print(f"🔍 PATHWAY EXTRACTOR: Extracting keywords for step {i+1}: {step.get('parameters', {}).get('cell_type', 'unknown')}")
+                # Extract pathway keywords for this enrichment step
+                enhanced_step = self._extract_pathway_keywords(step, message)
                 enhanced_steps.append(enhanced_step)
             else:
                 # Keep non-enrichment steps as-is
@@ -565,222 +591,115 @@ class PlannerNode(BaseWorkflowNode):
         plan_data["steps"] = enhanced_steps
         return plan_data
     
-    def _enhance_enrichment_step(self, step: Dict[str, Any], message: str) -> Dict[str, Any]:
+    def _extract_pathway_keywords(self, step: Dict[str, Any], message: str) -> Dict[str, Any]:
         """
-        Enhanced enrichment analysis step using combined LLM-based pathway extraction and optimization.
+        Extract pathway keywords and use enrichment_checker to enhance the step.
         
-        Uses GPT-4o-mini for efficient semantic pathway analysis, combining extraction and enhancement
-        in a single call to reduce token usage by ~40% while improving pathway detection.
+        This function extracts pathway keywords and calls enrichment_checker directly
+        to get the proper analyses and gene_set_library parameters.
         
         Args:
             step: Enrichment step from planner with minimal parameters
             message: Original user message for context
             
         Returns:
-            Enhanced step with optimal analyses and parameters
+            Step with proper analyses and gene_set_library parameters
         """
         try:
-            # Use combined LLM-based approach for pathway extraction and enhancement
-            enhanced_step = self._intelligent_pathway_enhancement(step, message)
+            # Extract pathway keywords using minimal LLM call
+            pathway_keywords = self._call_llm_for_pathway_extraction(message)
             
-            print(f"✅ Enhanced enrichment step: {enhanced_step['parameters']}")
-            return enhanced_step
-            
-        except Exception as e:
-            print(f"⚠️ Enrichment step enhancement failed: {e}")
-            return step  # Return original step on failure
-    
-    def _intelligent_pathway_enhancement(self, step: Dict[str, Any], message: str) -> Dict[str, Any]:
-        """
-        Combined pathway extraction and enrichment optimization using GPT-4o-mini.
-        
-        Replaces both keyword-based extraction and separate EnrichmentChecker calls
-        with a single LLM call for improved efficiency and semantic understanding.
-        
-        Args:
-            step: Original enrichment step with minimal parameters
-            message: User query for pathway context extraction
-            
-        Returns:
-            Enhanced step with optimized analyses and parameters
-        """
-        cell_type = step.get("parameters", {}).get("cell_type", "unknown")
-        
-        prompt = f"""
-                    Analyze this biological query for optimal enrichment analysis:
-
-                    User Query: "{message}"
-                    Target Cell Type: "{cell_type}"
-
-                    Extract pathway-related terms and recommend enrichment parameters. Consider:
-                    - Specific biological pathways mentioned or implied
-                    - Biological processes of interest
-                    - Optimal analysis methods for the context
-                    - Best gene set libraries for the pathway focus
-
-                    Return JSON format:
-                    {{
-                        "pathway_terms": ["extracted pathway keywords from query"],
-                        "pathway_focus": "main biological focus (e.g., some pathway names)",
-                        "analyses": ["recommended analysis methods"],
-                        "gene_set_library": "optimal gene set library or null",
-                        "reasoning": "brief explanation of recommendations"
-                    }}
-
-                    Analysis method options: ["gsea", "go", "kegg", "reactome"]
-
-                    IMPORTANT: 
-                    - gene_set_library parameter is ONLY valid when "gsea" is in analyses
-                    - GO, KEGG, Reactome analyses use their own built-in databases
-                    - Do not recommend gene_set_library unless GSEA is selected
-
-                    If no specific pathways detected, use general recommendations.
-                    """
-        
-        try:
-            # Use GPT-4o-mini for efficient semantic analysis
-            from langchain_openai import ChatOpenAI
-            from langchain_core.messages import SystemMessage, HumanMessage
-            
-            mini_model = ChatOpenAI(
-                model="gpt-4o",
-                temperature=0.1,
-                model_kwargs={"response_format": {"type": "json_object"}},
-                max_tokens=300
-            )
-            
-            messages = [
-                SystemMessage(content="You are a bioinformatics expert specializing in pathway analysis optimization."),
-                HumanMessage(content=prompt)
-            ]
-            
-            response = mini_model.invoke(messages)
-            enhancement_data = json.loads(response.content)
-            
-            print(f"🧬 LLM-based pathway analysis:")
-            print(f"   • Pathway focus: {enhancement_data.get('pathway_focus', 'general')}")
-            print(f"   • Extracted terms: {enhancement_data.get('pathway_terms', [])}")
-            print(f"   • Confidence: {enhancement_data.get('confidence', 0.0):.2f}")
-            
-            # STEP 2: Use Neo4j RAG with LLM-extracted pathway terms
             enhanced_step = step.copy()
             if "parameters" not in enhanced_step:
                 enhanced_step["parameters"] = {}
             
-            # Use EnrichmentChecker for Neo4j RAG database lookup
-            if self.enrichment_checker_available and self.enrichment_checker:
-                print("🔍 Using Neo4j RAG database for gene set selection...")
-                try:
-                    # First, prepare the step with LLM-extracted pathway terms for Neo4j lookup
-                    enhanced_step["pathway_terms"] = enhancement_data.get("pathway_terms", [])
-                    
-                    # Call EnrichmentChecker with the enhanced step (same as original method)
-                    neo4j_enhanced_plan = self.enrichment_checker.enhance_enrichment_plan(enhanced_step)
-                    print(f"✅ Neo4j RAG enhancement completed")
-                    enhanced_step = neo4j_enhanced_plan
-                    
-                    # Clean up the temporary pathway_terms field to avoid ExecutionStep errors
-                    enhanced_step.pop("pathway_terms", None)
-                    
-                except Exception as neo4j_error:
-                    print(f"⚠️ Neo4j RAG enhancement failed: {neo4j_error}")
-                    print("🔧 Continuing with LLM-only enhancement...")
-                    # Clean up on error too
-                    enhanced_step.pop("pathway_terms", None)
+            if pathway_keywords and self.enrichment_checker_available and self.enrichment_checker:
+                print(f"🔍 PlannerNode: Using enrichment_checker for pathway keywords: '{pathway_keywords}'")
+                
+                # Set pathway_include temporarily to trigger enrichment_checker
+                enhanced_step["parameters"]["pathway_include"] = pathway_keywords
+                
+                # Call enrichment_checker to get proper analyses and gene_set_library
+                enhanced_step = self.enrichment_checker.enhance_enrichment_plan(enhanced_step)
+                
+                # Log the enhancement
+                analyses = enhanced_step["parameters"].get("analyses", [])
+                gene_set_library = enhanced_step["parameters"].get("gene_set_library")
+                print(f"✅ EnrichmentChecker enhanced step:")
+                print(f"   • analyses: {analyses}")
+                if gene_set_library:
+                    print(f"   • gene_set_library: {gene_set_library}")
+                
+            elif pathway_keywords:
+                print(f"⚠️ Pathway keywords '{pathway_keywords}' extracted but enrichment_checker not available")
+                # Fallback to basic GSEA
+                enhanced_step["parameters"]["analyses"] = ["gsea"]
+                enhanced_step["parameters"]["gene_set_library"] = "MSigDB_Hallmark_2020"
             else:
-                print("⚠️ Neo4j RAG database not available - using LLM-only enhancement")
-            
-            # Apply validated parameters with proper analysis-specific logic
-            analyses = enhancement_data.get("analyses", ["gsea"])
-            enhanced_step["parameters"].update({
-                "analyses": analyses
-            })
-            
-            # CRITICAL FIX: Only add gene_set_library if GSEA is in analyses
-            if "gsea" in analyses and enhancement_data.get("gene_set_library"):
-                enhanced_step["parameters"]["gene_set_library"] = enhancement_data["gene_set_library"]
-                print(f"✅ Added gene_set_library for GSEA: {enhancement_data['gene_set_library']}")
-            elif enhancement_data.get("gene_set_library"):
-                print(f"⚠️ Skipped gene_set_library (only valid for GSEA): {enhancement_data['gene_set_library']}")
-            
-            # Log pathway context for debugging (don't store in step to avoid ExecutionStep errors)
-            if enhancement_data.get("pathway_terms"):
-                pathway_context = " ".join(enhancement_data["pathway_terms"])
-                print(f"📝 Pathway context (debug only): {pathway_context}")
-            
-            # Update description with enhancement info
-            reasoning = enhancement_data.get("reasoning", "")
-            if reasoning:
-                enhanced_step["description"] += f" (LLM-optimized: {reasoning})"
-            
-            # Log combined LLM + Neo4j enhancement statistics
-            final_gene_set_library = enhanced_step["parameters"].get("gene_set_library")
-            neo4j_used = self.enrichment_checker_available and self.enrichment_checker
-            enhancement_stats = {
-                "pathway_focus": enhancement_data.get("pathway_focus"),
-                "pathway_terms": enhancement_data.get("pathway_terms", []),
-                "recommended_analyses": enhanced_step["parameters"]["analyses"],
-                "gene_set_library": final_gene_set_library,
-                "gene_set_source": "neo4j_rag" if (neo4j_used and final_gene_set_library) else "llm_only",
-                "confidence": enhancement_data.get("confidence", 0.0),
-                "reasoning": reasoning,
-                "method": "llm_semantic_plus_neo4j_rag" if neo4j_used else "llm_semantic_only",
-                "neo4j_available": neo4j_used
-            }
-            self._log_pathway_enhancement_stats(enhancement_stats)
+                print("🔧 No pathway keywords extracted, using default analyses")
+                enhanced_step["parameters"]["analyses"] = ["reactome", "go", "kegg", "gsea"]
             
             return enhanced_step
             
         except Exception as e:
-            print(f"⚠️ LLM pathway enhancement failed: {e}")
-            # Fallback to basic enrichment
-            return self._basic_enrichment_fallback(step)
+            print(f"⚠️ Pathway keyword extraction and enhancement failed: {e}")
+            # Return step with default analyses
+            step["parameters"]["analyses"] = ["gsea"]
+            return step
     
-    def _basic_enrichment_fallback(self, step: Dict[str, Any]) -> Dict[str, Any]:
-        """Basic enrichment fallback when LLM enhancement fails."""
-        enhanced_step = step.copy()
-        if "parameters" not in enhanced_step:
-            enhanced_step["parameters"] = {}
+    def _call_llm_for_pathway_extraction(self, message: str) -> str:
+        """
+        Extract pathway keywords from user message using minimal LLM call.
         
-        # Apply basic defaults
-        enhanced_step["parameters"].update({
-            "analyses": ["gsea"]  # Safe default
-        })
+        Args:
+            message: User query to extract pathway terms from
+            
+        Returns:
+            String of pathway keywords for enrichment_checker
+        """
+        prompt = f"""
+                    Extract biological pathway-related keywords from this query:
+                    
+                    User Query: "{message}"
+                    
+                    Extract specific pathway terms, biological processes, or cellular functions mentioned.
+                    Return only the most relevant pathway keywords as a single string.
+                    
+                    Examples:
+                    - "interferon response" → "interferon response"
+                    - "T cell activation pathways" → "T cell activation"
+                    - "apoptosis in cancer cells" → "apoptosis"
+                    - "cell cycle regulation" → "cell cycle"
+                    
+                    If no specific pathways are mentioned, return an empty string.
+                    
+                    Pathway keywords:
+                  """
         
-        print("🔧 Using basic enrichment fallback (GSEA only)")
-        return enhanced_step
+        try:
+            from langchain_openai import ChatOpenAI
+            from langchain_core.messages import SystemMessage, HumanMessage
+            
+            model = ChatOpenAI(
+                model="gpt-4o-mini",
+                temperature=0.1,
+                max_tokens=50
+            )
+            
+            messages = [
+                SystemMessage(content="You are a pathway keyword extractor. Return only relevant biological pathway terms."),
+                HumanMessage(content=prompt)
+            ]
+            
+            response = model.invoke(messages)
+            pathway_keywords = response.content.strip()
+            
+            return pathway_keywords if pathway_keywords and pathway_keywords.lower() != "none" else ""
+            
+        except Exception as e:
+            print(f"⚠️ LLM pathway extraction failed: {e}")
+            return ""
     
-    def _log_pathway_enhancement_stats(self, enhancement_data: Dict[str, Any]) -> None:
-        """Log pathway enhancement statistics for monitoring."""
-        if not enhancement_data:
-            return
-        
-        method = enhancement_data.get("method", "unknown")
-        
-        print("📊 PATHWAY ENHANCEMENT STATS:")
-        print(f"   • Method: {method}")
-        print(f"   • Neo4j RAG available: {enhancement_data.get('neo4j_available', False)}")
-        print(f"   • Pathway focus: {enhancement_data.get('pathway_focus', 'general')}")
-        print(f"   • Extracted terms: {enhancement_data.get('pathway_terms', [])}")
-        print(f"   • Recommended analyses: {enhancement_data.get('recommended_analyses', [])}")
-        print(f"   • Confidence: {enhancement_data.get('confidence', 0.0):.2f}")
-        
-        # Show gene set library source  
-        gene_set_lib = enhancement_data.get('gene_set_library')
-        gene_set_source = enhancement_data.get('gene_set_source', 'unknown')
-        if gene_set_lib:
-            print(f"   • Gene set library: {gene_set_lib} (source: {gene_set_source})")
-        else:
-            print(f"   • Gene set library: Not applicable (GO/KEGG/Reactome use built-in databases)")
-        
-        if enhancement_data.get("reasoning"):
-            print(f"   • Reasoning: {enhancement_data['reasoning']}")
-        
-        # Legacy support for old format
-        validation_details = enhancement_data.get("validation_details", {})
-        if validation_details:
-            print(f"   • Total recommendations: {validation_details.get('total_recommendations', 0)}")
-            print(f"   • Pathway matches: {len(validation_details.get('pathway_matches', []))}")
     
     def _skip_unavailable_cell_steps(self, plan: Dict[str, Any], unavailable_cell_types: List[str]) -> Dict[str, Any]:
         """Skip steps that reference unavailable cell types."""

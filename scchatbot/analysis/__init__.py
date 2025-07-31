@@ -19,7 +19,7 @@ from .enrichment_analysis import (
 )
 
 from .analysis_wrapper import (
-    dea_split_by_condition_hierarchical
+    AnalysisFunctionWrapper
 )
 
 __all__ = [
@@ -32,6 +32,6 @@ __all__ = [
     'kegg_enrichment',
     'gsea_enrichment_analysis',
     
-    # DEA functions
-    'dea_split_by_condition_hierarchical'
+    # Analysis wrapper class
+    'AnalysisFunctionWrapper'
 ]

@@ -2087,60 +2087,60 @@ Category:"""
         
         analysis_prompt = f"""You are analyzing what bioinformatics analyses are needed for a specific cell type.
 
-User Question: "{original_question}"
-Cell Type: "{cell_type}"
-Question Type: {question_type}
+                                User Question: "{original_question}"
+                                Cell Type: "{cell_type}"
+                                Question Type: {question_type}
 
-Available analysis functions with detailed descriptions:
+                                Available analysis functions with detailed descriptions:
 
-CORE ANALYSIS FUNCTIONS:
-- perform_enrichment_analyses: Run enrichment analyses on DE genes for a cell type. Supports REACTOME (pathways), GO (gene ontology), KEGG (pathways), GSEA (gene set enrichment). Use for pathway analysis when user asks about biological processes, pathways, or gene function.
+                                CORE ANALYSIS FUNCTIONS:
+                                - perform_enrichment_analyses: Run enrichment analyses on DE genes for a cell type. Supports REACTOME (pathways), GO (gene ontology), KEGG (pathways), GSEA (gene set enrichment). Use for pathway analysis when user asks about biological processes, pathways, or gene function.
 
-- dea_split_by_condition: Perform differential expression analysis (DEA) split by condition. Use when comparing conditions or when user asks about gene expression differences between experimental groups.
+                                - dea_split_by_condition: Perform differential expression analysis (DEA) split by condition. Use when comparing conditions or when user asks about gene expression differences between experimental groups.
 
-- compare_cell_counts: Compare cell counts between experimental conditions for specific cell types. Use when analyzing how cell type abundance differs across conditions (e.g., pre vs post treatment, healthy vs disease).
+                                - compare_cell_counts: Compare cell counts between experimental conditions for specific cell types. Use when analyzing how cell type abundance differs across conditions (e.g., pre vs post treatment, healthy vs disease).
 
-VISUALIZATION FUNCTIONS:
-- display_enrichment_visualization: PREFERRED function for showing comprehensive enrichment visualization with both barplot and dotplot. Use after running enrichment analyses to visualize results.
+                                VISUALIZATION FUNCTIONS:
+                                - display_enrichment_visualization: PREFERRED function for showing comprehensive enrichment visualization with both barplot and dotplot. Use after running enrichment analyses to visualize results.
 
-- display_dotplot: Display dotplot for annotated results. Use when user wants to see gene expression patterns across cell types.
+                                - display_dotplot: Display dotplot for annotated results. Use when user wants to see gene expression patterns across cell types.
 
-- display_cell_type_composition: Display cell type composition graph. Use when user wants to see the proportion of different cell types.
+                                - display_cell_type_composition: Display cell type composition graph. Use when user wants to see the proportion of different cell types.
 
-- display_umap: Display basic UMAP without cell type annotations. Use for basic dimensionality reduction visualization.
+                                - display_umap: Display basic UMAP without cell type annotations. Use for basic dimensionality reduction visualization.
 
-- display_processed_umap: Display UMAP with cell type annotations. Use when user wants to see cell type annotations on UMAP.
+                                - display_processed_umap: Display UMAP with cell type annotations. Use when user wants to see cell type annotations on UMAP.
 
-SEARCH FUNCTIONS:
-- search_enrichment_semantic: Search all enrichment terms semantically to find specific pathways or biological processes. Use when user asks about specific pathways, terms, or biological processes that might not appear in standard top results.
+                                SEARCH FUNCTIONS:
+                                - search_enrichment_semantic: Search all enrichment terms semantically to find specific pathways or biological processes. Use when user asks about specific pathways, terms, or biological processes that might not appear in standard top results.
 
-- conversational_response: Provide conversational response without function calls. Use for greetings, clarifications, explanations, or when no analysis is needed.
+                                - conversational_response: Provide conversational response without function calls. Use for greetings, clarifications, explanations, or when no analysis is needed.
 
-Task: Determine which analyses are needed for {cell_type} to answer the user's question.
+                                Task: Determine which analyses are needed for {cell_type} to answer the user's question.
 
-IMPORTANT: The cell type "{cell_type}" already exists in the dataset. DO NOT suggest process_cells for this cell type.
+                                IMPORTANT: The cell type "{cell_type}" already exists in the dataset. DO NOT suggest process_cells for this cell type.
 
-Consider based on question type:
-1. Canonical markers questions (differentiate X from Y, markers of X) → Use dea_split_by_condition ONLY
-2. Gene expression questions → Use dea_split_by_condition
-3. Pathway/biological process questions → Use perform_enrichment_analyses + search_enrichment_semantic
-4. Cell abundance questions → Use compare_cell_counts
-5. Specific pathway search → Use search_enrichment_semantic
+                                Consider based on question type:
+                                1. Canonical markers questions (differentiate X from Y, markers of X) → Use dea_split_by_condition ONLY
+                                2. Gene expression questions → Use dea_split_by_condition
+                                3. Pathway/biological process questions → Use perform_enrichment_analyses + search_enrichment_semantic
+                                4. Cell abundance questions → Use compare_cell_counts
+                                5. Specific pathway search → Use search_enrichment_semantic
 
-CRITICAL GUIDELINES FOR CANONICAL MARKERS:
-- For canonical markers questions, ONLY use dea_split_by_condition
-- DO NOT include enrichment analyses for marker identification
-- DO NOT suggest process_cells for already-available cell types
-- Visualization is optional for canonical markers
+                                CRITICAL GUIDELINES FOR CANONICAL MARKERS:
+                                - For canonical markers questions, ONLY use dea_split_by_condition
+                                - DO NOT include enrichment analyses for marker identification
+                                - DO NOT suggest process_cells for already-available cell types
+                                - Visualization is optional for canonical markers
 
-GENERAL GUIDELINES:
-- Only include display_enrichment_visualization ONCE per cell type
-- Return ONLY a valid JSON array of function names, nothing else
+                                GENERAL GUIDELINES:
+                                - Only include display_enrichment_visualization ONCE per cell type
+                                - Return ONLY a valid JSON array of function names, nothing else
 
-Example response for pathway question: ["perform_enrichment_analyses", "search_enrichment_semantic", "display_enrichment_visualization"]
-Example response for all kinds of markers: ["dea_split_by_condition"]
+                                Example response for pathway question: ["perform_enrichment_analyses", "search_enrichment_semantic", "display_enrichment_visualization"]
+                                Example response for all kinds of markers: ["dea_split_by_condition"]
 
-Required analyses for {cell_type}:"""
+                                Required analyses for {cell_type}:"""
         
         try:
             response = self._call_llm(analysis_prompt)

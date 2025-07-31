@@ -673,6 +673,276 @@ class EvaluatorNode(BaseWorkflowNode):
 
 ---
 
-**Last Updated**: 2025-07-30  
-**Next Review**: After Phase 1.5 completion  
+## 🚨 PHASE 2.1: EnrichmentChecker Vector Search Integration
+
+**Status**: 🎯 **CRITICAL REBUILD REQUIRED**  
+**Created**: 2025-07-31  
+**Priority**: SYSTEM ARCHITECTURE OVERHAUL
+
+### Problem Analysis
+
+**Current Issue**: Dual enrichment systems causing Neo4j bypass and incorrect pathway intelligence.
+
+#### Current Broken Flow:
+```
+❌ CURRENT (BYPASSES NEO4J):
+planning.py LLM enhancement → explicit analyses + gene_set_library
+                           ↓
+              enrichment_checker.enhance_enrichment_plan() 
+                           ↓  
+                Takes explicit analysis path
+                           ↓
+              Never queries Neo4j (sophisticated pipeline wasted)
+```
+
+#### Root Cause:
+- **planning.py** has its own LLM-based enrichment that provides `analyses=["gsea", "go"]` and `gene_set_library="C7: Immunologic"`
+- **enrichment_checker.py** has sophisticated LLM + Neo4j pipeline but gets bypassed because explicit analyses are provided
+- Vector search capabilities at `/media/pathway_data.pkl` and `/media/pathway_index.faiss` are unused
+
+### 🎯 Proposed Solution: Vector Search + Neo4j Integration
+
+#### New Enhanced Flow:
+```
+✅ PROPOSED (USES FULL INTELLIGENCE):
+planning.py → extracts pathway keywords → pathway_include="interferon response"
+                                        ↓
+           enrichment_checker.py with vector search enhancement
+                                        ↓
+           vector_search(pathway_include, k=3) → 3 exact pathways
+                                        ↓
+           Neo4j validation of pathways → method recommendations
+                                        ↓
+           GO/KEGG/Reactome: add methods | GSEA: add method + gene_set_library
+```
+
+### 📋 Detailed Rebuild Plan
+
+#### **Phase 2.1A: Remove Incorrect Enhancement Logic from planning.py** 🔴 **CRITICAL**
+
+**Functions to COMPLETELY REMOVE:**
+```python
+# DELETE THESE FUNCTIONS ENTIRELY:
+planning.py:
+├── _enhance_enrichment_step()           # ❌ Wrong approach - bypasses Neo4j
+├── _enhance_all_enrichment_steps()      # ❌ Wrapper for wrong approach  
+├── _basic_enrichment_fallback()         # ❌ Hardcoded fallback
+└── _log_pathway_enhancement_stats()     # ❌ Misleading logging
+
+# DELETE THESE LLM PROMPTS:
+├── Enhanced pathway analysis prompt (~50 lines)
+├── Gene set library determination logic  
+├── "gene_set_source": "neo4j_rag" misleading attribution
+└── All hardcoded pathway-to-library mapping
+```
+
+**Logic to REMOVE:**
+```python
+# FROM planning.py _process_plan():
+❌ enhanced_plan = self._enhance_all_enrichment_steps(enhanced_plan, message)
+
+# FROM _enhance_enrichment_step():
+❌ All LLM-based pathway analysis (lines ~600-730)
+❌ Explicit analyses and gene_set_library assignment
+❌ "LLM-optimized:" description additions
+❌ Neo4j bypass logic
+```
+
+#### **Phase 2.1B: Add Vector Search Integration to enrichment_checker.py** 💎 **NEW FEATURE**
+
+**NEW Functions to ADD:**
+```python
+enrichment_checker.py:
+├── _load_vector_search_model()          # Load pathway_data.pkl + pathway_index.faiss
+├── _vector_search_pathways()            # Search pathways using vector similarity  
+├── _integrate_vector_with_neo4j()       # Combine vector results with Neo4j validation
+└── _cache_vector_model()                # Cache model for performance
+
+# Integration Points:
+├── Enhance _get_pathway_recommendations() to use vector search FIRST
+├── Keep existing _validate_recommendations_in_neo4j() for validation
+└── Keep existing recommendation building logic
+```
+
+**Vector Search Implementation:**
+```python
+def _vector_search_pathways(self, pathway_query: str, k: int = 3) -> List[Dict]:
+    """
+    Use pre-built vector model to find k most similar pathways
+    
+    Args:
+        pathway_query: User pathway query (e.g., "interferon response")
+        k: Number of top pathways to return
+        
+    Returns:
+        List of pathway matches with similarity scores
+    """
+    # Load from /media/pathway_data.pkl and /media/pathway_index.faiss
+    # Use sentence transformers as per USER_MANUAL.md
+    # Return top k pathways with metadata (database, gene_set_library)
+```
+
+#### **Phase 2.1C: Modify planning.py to Extract Keywords Only** 🔧 **SIMPLIFIED**
+
+**NEW Logic for planning.py:**
+```python
+# REPLACE _enhance_enrichment_step() with:
+def _extract_pathway_keywords(self, step: Dict[str, Any], message: str) -> Dict[str, Any]:
+    """Extract pathway keywords from user message for enrichment_checker"""
+    # Simple LLM call to extract pathway terms only
+    # Return step with pathway_include parameter
+    # NO explicit analyses or gene_set_library
+    
+    enhanced_step = step.copy()
+    
+    # Extract pathway keywords using minimal LLM call
+    pathway_keywords = self._call_llm_for_pathway_extraction(message)
+    
+    # Set pathway_include to trigger enrichment_checker's full pipeline
+    enhanced_step["parameters"]["pathway_include"] = pathway_keywords
+    
+    # Remove any explicit analyses to force Neo4j pipeline
+    enhanced_step["parameters"].pop("analyses", None)
+    enhanced_step["parameters"].pop("gene_set_library", None)
+    
+    return enhanced_step
+```
+
+#### **Phase 2.1D: Enhanced enrichment_checker.py Integration** ⚡ **UPGRADE**
+
+**ENHANCED Pipeline in _get_pathway_recommendations():**
+```python
+def _get_pathway_recommendations(self, pathway_query: str, top_k: int = 3) -> List[EnrichmentRecommendation]:
+    """Enhanced pipeline: Vector Search → Neo4j Validation → Recommendations"""
+    
+    # STEP 1: Vector-based semantic search (NEW)
+    vector_matches = self._vector_search_pathways(pathway_query, k=5)
+    print(f"🔍 Vector search found {len(vector_matches)} pathway matches")
+    
+    # STEP 2: Validate vector matches in Neo4j database  
+    validated_pathways = self._validate_vector_matches_in_neo4j(vector_matches)
+    
+    if validated_pathways:
+        return self._build_recommendations_from_validated_pathways(validated_pathways)
+    
+    # STEP 3: Fallback to existing LLM + Neo4j pipeline
+    print("🔄 Vector search insufficient, using LLM + Neo4j fallback")
+    return self._fallback_to_llm_neo4j_pipeline(pathway_query, top_k)
+```
+
+### 📁 File Structure Changes
+
+#### **Files to MODIFY:**
+
+**planning.py:**
+```diff
+# REMOVE (~150 lines):
+- _enhance_enrichment_step()
+- _enhance_all_enrichment_steps()  
+- _basic_enrichment_fallback()
+- _log_pathway_enhancement_stats()
+- All LLM pathway analysis prompts
+
+# ADD (~30 lines):
++ _extract_pathway_keywords()
++ _call_llm_for_pathway_extraction()
++ Simple keyword extraction logic
+
+# MODIFY:
+~ _process_plan() to call _extract_pathway_keywords() instead
+```
+
+**enrichment_checker.py:**
+```diff  
+# ADD (~200 lines):
++ _load_vector_search_model()
++ _vector_search_pathways()
++ _validate_vector_matches_in_neo4j()
++ _build_recommendations_from_validated_pathways()
++ _cache_vector_model()
+
+# ENHANCE (~50 lines):
+~ _get_pathway_recommendations() with vector search first
+~ __init__() to load vector model
+~ Error handling for vector model loading
+```
+
+#### **New Dependencies:**
+```python
+# Add to enrichment_checker.py:
+import pickle
+import faiss
+from sentence_transformers import SentenceTransformer
+import numpy as np
+```
+
+### 🧪 Integration Testing Plan
+
+#### **Test Cases:**
+1. **Vector Search Accuracy**: Test pathway_include="interferon response" → returns IFN pathways
+2. **Neo4j Validation**: Ensure vector results are validated against database
+3. **Method Mapping**: Verify GO/KEGG/Reactome methods vs GSEA+library assignments
+4. **Fallback Behavior**: Test when vector search fails
+5. **Performance**: Vector search should be <100ms per query
+
+#### **Success Criteria:**
+- [ ] No more explicit analyses in planning.py
+- [ ] enrichment_checker.py uses vector search for pathway discovery
+- [ ] Neo4j validation occurs for all pathway recommendations  
+- [ ] GSEA recommendations include proper gene_set_library
+- [ ] GO/KEGG/Reactome recommendations include correct methods
+- [ ] Fallback to LLM+Neo4j works when vector search insufficient
+
+### 🔧 Implementation Order
+
+#### **Priority 1: Remove Wrong Enhancement (Day 1)**
+1. Remove _enhance_enrichment_step() from planning.py
+2. Remove _enhance_all_enrichment_steps() wrapper
+3. Test that enrichment steps get pathway_include parameter
+
+#### **Priority 2: Add Vector Search (Day 2-3)**  
+1. Implement _load_vector_search_model() in enrichment_checker.py
+2. Implement _vector_search_pathways() with faiss integration
+3. Test vector search returns relevant pathways
+
+#### **Priority 3: Integration (Day 4)**
+1. Enhance _get_pathway_recommendations() with vector search
+2. Connect vector results to Neo4j validation
+3. End-to-end testing
+
+#### **Priority 4: Optimization (Day 5)**
+1. Cache vector model for performance
+2. Fine-tune similarity thresholds  
+3. Error handling and fallbacks
+
+### 📊 Expected Benefits
+
+#### **Technical Improvements:**
+- **Accuracy**: Vector search finds semantically similar pathways vs keyword matching
+- **Performance**: Pre-computed embeddings faster than LLM calls
+- **Coverage**: Access to 178,742 pathways vs limited keyword matches
+- **Validation**: All recommendations validated against actual database
+
+#### **Architecture Benefits:**
+- **Single Source of Truth**: All pathway intelligence in enrichment_checker.py
+- **Proper Separation**: planning.py does planning, enrichment_checker.py does pathway intelligence
+- **Extensibility**: Vector model can be updated independently
+- **Maintainability**: No duplicate enhancement systems
+
+### 🚨 Risk Mitigation
+
+#### **Technical Risks:**
+- **Vector Model Loading**: Ensure pathway_data.pkl and pathway_index.faiss exist
+- **Memory Usage**: ~300MB for vector model - ensure sufficient RAM
+- **Fallback Required**: LLM+Neo4j fallback if vector search fails
+
+#### **Rollback Plan:**
+- Keep backup of current planning.py enhancement logic
+- Feature flag for vector search vs fallback
+- Gradual rollout with A/B testing
+
+---
+
+**Last Updated**: 2025-07-31  
+**Next Review**: After Phase 2.1 completion  
 **Owner**: Development Team
