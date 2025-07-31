@@ -11,7 +11,6 @@ This module contains utility methods extracted from workflow_nodes.py:
 """
 
 import json
-import openai
 from typing import Dict, Any, List
 
 from ..cell_type_models import ChatState

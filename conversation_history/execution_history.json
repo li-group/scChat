@@ -1,50 +1,70 @@
 [
   {
-    "timestamp": "2025-07-31T10:15:03.463349",
+    "timestamp": "2025-07-31T13:01:06.137647",
     "function_name": "process_cells",
     "parameters": {
       "cell_type": "Stromal cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "Annotation complete for Stromal cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Beam cell','1': 'Fibroblast','2': 'Trabecular meshwork cell','3': 'Mural cell','4': 'Endothelial cell','5': 'Fibroblast','6': 'Fibroblast','7': 'Fibroblast','8': 'Fibroblast','9': 'Fibroblast','10': 'Myocyte'}.\n\u2022 Top-genes per cluster: {'0': ['PTGDS', 'MMP2', 'COL6A2', 'COL15A1', 'CTSK', 'DCN', 'CLEC11A', 'RAMP2', 'COL6A1', 'S100A4', 'FABP5', 'APOE', 'EDNRB', 'SERPINF1', 'MDK', 'CFD', 'APOD', 'CLU', "
+    "result_summary": "Annotation complete for Stromal cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Beam cell', '1': 'Fibroblast', '2': 'Trabecular meshwork cell', '3': 'Mural cell', '4': 'Endothelial cell', '5': 'Fibroblast', '6': 'Fibroblast', '7': 'Fibroblast', '8': 'Fibroblast', '9': 'Fibroblast', '10': 'Myocyte'}.\n\u2022 Top-genes per cluster: {'0': ['PTGDS', 'MMP2', 'COL6A2', 'COL15A1', 'CTSK', 'DCN', 'CLEC11A', 'RAMP2', 'COL6A1', 'S100A4', 'FABP5', 'APOE', 'EDNRB', 'SERPINF1', 'MDK', 'CFD', 'APOD"
   },
   {
-    "timestamp": "2025-07-31T10:15:27.432607",
-    "function_name": "perform_enrichment_analyses",
+    "timestamp": "2025-07-31T13:01:06.164134",
+    "function_name": "search_enrichment_semantic",
     "parameters": {
-      "cell_type": "Endothelial cell",
-      "analyses": [
-        "go"
-      ]
+      "query": "cell cycle regulation",
+      "cell_type": "Epithelial cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Endothelial cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 100\\n\\n  \u2022 GO Results:\\n    1. cell adhesion (p-value: 7.239053219693741e-11)\\n       Genes: \\n    2. blood vessel morphogenesis (p-value: 7.23905321969374"
+    "result_summary": "{'message': \"No enrichment terms found matching 'cell cycle regulation' in Epithelial cell\", 'query': 'cell cycle regulation', 'cell_type': 'Epithelial cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Epithelial cell'}"
   },
   {
-    "timestamp": "2025-07-31T10:15:31.124373",
+    "timestamp": "2025-07-31T13:01:09.712649",
     "function_name": "search_enrichment_semantic",
     "parameters": {
-      "query": "Cell cycle regulation",
+      "query": "cell cycle regulation",
+      "cell_type": "Glial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'cell cycle regulation' in Glial cell\", 'query': 'cell cycle regulation', 'cell_type': 'Glial cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Glial cell'}"
+  },
+  {
+    "timestamp": "2025-07-31T13:01:13.080157",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "cell cycle regulation",
+      "cell_type": "Immune cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'cell cycle regulation' in Immune cell\", 'query': 'cell cycle regulation', 'cell_type': 'Immune cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Immune cell'}"
+  },
+  {
+    "timestamp": "2025-07-31T13:01:17.243479",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "cell cycle regulation",
+      "cell_type": "Stromal cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'cell cycle regulation' in Stromal cell\", 'query': 'cell cycle regulation', 'cell_type': 'Stromal cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Stromal cell'}"
+  },
+  {
+    "timestamp": "2025-07-31T13:01:52.563131",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
       "cell_type": "Endothelial cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "{'message': \"No enrichment terms found matching 'Cell cycle regulation' in Endothelial cell\", 'query': 'Cell cycle regulation', 'cell_type': 'Endothelial cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Endothelial cell'}"
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Endothelial cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: reactome, go, kegg, gsea\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 100\\n\\n  \u2022 REACTOME Results:\\n    1. Hemostasis (p-value: 0.00016015690173405443)\\n       Genes: \\n    2. Cell surface interactions a"
   },
   {
-    "timestamp": "2025-07-31T10:15:31.124737",
-    "function_name": "display_enrichment_visualization",
-    "parameters": {
-      "analysis": "enrichment"
-    },
-    "success": false,
-    "error": "No enrichment enrichment analysis results available to visualize",
-    "result_summary": null
-  },
-  {
-    "timestamp": "2025-07-31T10:15:31.124926",
+    "timestamp": "2025-07-31T13:01:52.563781",
     "function_name": "search_enrichment_semantic",
     "parameters": {
       "cell_type": "Endothelial cell"
@@ -54,14 +74,76 @@
     "result_summary": "{'error': 'Search query is required', 'results': []}"
   },
   {
-    "timestamp": "2025-07-31T10:15:31.466136",
+    "timestamp": "2025-07-31T13:01:52.850369",
     "function_name": "display_enrichment_visualization",
     "parameters": {
       "cell_type": "Endothelial cell",
-      "analysis": "go"
+      "analysis": "gsea"
     },
     "success": true,
     "error": null,
-    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"1c289ee8-ceca-4dfd-a8b2-51d2959ded12\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
+    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"f5812978-b6a3-4268-9330-2e0b6468be47\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
+  },
+  {
+    "timestamp": "2025-07-31T13:02:25.924367",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Endothelial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Endothelial cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: reactome, go, kegg, gsea\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 100\\n\\n  \u2022 REACTOME Results:\\n    1. Hemostasis (p-value: 0.00016015690173405443)\\n       Genes: \\n    2. Cell surface interactions a"
+  },
+  {
+    "timestamp": "2025-07-31T13:02:25.925214",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "cell_type": "Endothelial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'error': 'Search query is required', 'results': []}"
+  },
+  {
+    "timestamp": "2025-07-31T13:02:25.960964",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "cell_type": "Endothelial cell",
+      "analysis": "gsea"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"9fab6aaa-cdc6-475b-a4d4-44f12248bfb5\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
+  },
+  {
+    "timestamp": "2025-07-31T13:02:58.684695",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Endothelial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Endothelial cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: reactome, go, kegg, gsea\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 100\\n\\n  \u2022 REACTOME Results:\\n    1. Hemostasis (p-value: 0.00016015690173405443)\\n       Genes: \\n    2. Cell surface interactions a"
+  },
+  {
+    "timestamp": "2025-07-31T13:02:58.685424",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "cell_type": "Endothelial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'error': 'Search query is required', 'results': []}"
+  },
+  {
+    "timestamp": "2025-07-31T13:02:58.716944",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "cell_type": "Endothelial cell",
+      "analysis": "gsea"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"8887ae7d-5677-4667-bd5e-2ed69458e620\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
   }
 ]

@@ -1,48 +1,15 @@
 import json
-from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
+from django.http import JsonResponse
 from django.core.files.storage import default_storage
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from nltk.tokenize import word_tokenize
 from .chatbot import ChatBot
-from .forms import MyForm, UploadFileForm
 
 # Create a global ChatBot instance
 chatbot_instance = ChatBot()
 
-def classify_intent(user_message: str) -> str:
-    """
-    Determines if the user message is a web search query.
-    """
-    search_keywords = {'search', 'find', 'lookup', 'google', 'web search'}
-    words = set(word_tokenize(user_message.lower()))
-    return 'web_search' if words & search_keywords else 'chat'
 
-def browse_web(query: str) -> str:
-    """
-    Placeholder for web search functionality.
-    """
-    return "Web search results for: " + query
-
-def web_search(query: str) -> str:
-    """
-    Placeholder for web search functionality.
-    """
-    return "Web search results for: " + query
-
-def file_upload(request):
-    """
-    Handles file uploads via a form.
-    """
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('success_url')  # Update as needed
-    else:
-        form = UploadFileForm()
-    return render(request, 'myapp/upload.html', {'form': form})
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -129,7 +96,7 @@ def chat_with_ai(request):
         
 from django.shortcuts import render
 # from .your_visualizations_module import display_umap_html  # Update the import path as needed
-from .visualizations import *
+from .visualizations import display_umap
 def show_umap(request, cell_type="Overall"):
     plot_html = display_umap(cell_type)
     return render(request, "scchatbot/umap_template.html", {"plot_html": plot_html})
@@ -139,7 +106,6 @@ def show_umap(request, cell_type="Overall"):
 @csrf_exempt
 @require_http_methods(["GET"])
 def get_umap_plot(request):
-    from .visualizations import display_umap  # Adjust as needed
     cell_type = request.GET.get("cell_type", "Overall")
     plot_html = display_umap(cell_type)
     return JsonResponse({"plot_html": plot_html})

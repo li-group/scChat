@@ -6,7 +6,6 @@ using intelligent LLM-based analysis and cell type discovery.
 """
 
 import json
-import re
 from typing import Dict, Any, List
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
@@ -260,11 +259,11 @@ class PlannerNode(BaseWorkflowNode):
         # 🧬 ENHANCED PLANNER: Add cell discovery if needed 
         enhanced_plan = self._add_cell_discovery_to_plan(plan_data, message, available_cell_types)
         
-        # Apply enrichment enhancement to all enrichment steps
-        print(f"🔍 ENRICHMENT DEBUG: Checking for enrichment steps in plan...")
-        enrichment_steps = [s for s in enhanced_plan.get("steps", []) if s.get("function_name") == "perform_enrichment_analyses"]
+        # Let enrichment_checker handle all pathway intelligence
+        enrichment_steps = [s for s in enhanced_plan.get('steps', []) if s.get('function_name') == 'perform_enrichment_analyses']
         print(f"🔍 ENRICHMENT DEBUG: Found {len(enrichment_steps)} enrichment steps")
         
+        # Extract pathway keywords and enhance enrichment steps 
         enhanced_plan = self._extract_pathway_keywords_from_enrichment_steps(enhanced_plan, message)
         
         # Skip steps for unavailable cell types
@@ -573,132 +572,6 @@ class PlannerNode(BaseWorkflowNode):
         
         return updated_steps
     
-    def _extract_pathway_keywords_from_enrichment_steps(self, plan_data: Dict[str, Any], message: str) -> Dict[str, Any]:
-        """Extract pathway keywords for enrichment analysis steps to trigger enrichment_checker."""
-        print(f"🔍 PATHWAY EXTRACTOR: Processing {len(plan_data.get('steps', []))} steps")
-        enhanced_steps = []
-        
-        for i, step in enumerate(plan_data.get("steps", [])):
-            if step.get("function_name") == "perform_enrichment_analyses":
-                print(f"🔍 PATHWAY EXTRACTOR: Extracting keywords for step {i+1}: {step.get('parameters', {}).get('cell_type', 'unknown')}")
-                # Extract pathway keywords for this enrichment step
-                enhanced_step = self._extract_pathway_keywords(step, message)
-                enhanced_steps.append(enhanced_step)
-            else:
-                # Keep non-enrichment steps as-is
-                enhanced_steps.append(step)
-        
-        plan_data["steps"] = enhanced_steps
-        return plan_data
-    
-    def _extract_pathway_keywords(self, step: Dict[str, Any], message: str) -> Dict[str, Any]:
-        """
-        Extract pathway keywords and use enrichment_checker to enhance the step.
-        
-        This function extracts pathway keywords and calls enrichment_checker directly
-        to get the proper analyses and gene_set_library parameters.
-        
-        Args:
-            step: Enrichment step from planner with minimal parameters
-            message: Original user message for context
-            
-        Returns:
-            Step with proper analyses and gene_set_library parameters
-        """
-        try:
-            # Extract pathway keywords using minimal LLM call
-            pathway_keywords = self._call_llm_for_pathway_extraction(message)
-            
-            enhanced_step = step.copy()
-            if "parameters" not in enhanced_step:
-                enhanced_step["parameters"] = {}
-            
-            if pathway_keywords and self.enrichment_checker_available and self.enrichment_checker:
-                print(f"🔍 PlannerNode: Using enrichment_checker for pathway keywords: '{pathway_keywords}'")
-                
-                # Set pathway_include temporarily to trigger enrichment_checker
-                enhanced_step["parameters"]["pathway_include"] = pathway_keywords
-                
-                # Call enrichment_checker to get proper analyses and gene_set_library
-                enhanced_step = self.enrichment_checker.enhance_enrichment_plan(enhanced_step)
-                
-                # Log the enhancement
-                analyses = enhanced_step["parameters"].get("analyses", [])
-                gene_set_library = enhanced_step["parameters"].get("gene_set_library")
-                print(f"✅ EnrichmentChecker enhanced step:")
-                print(f"   • analyses: {analyses}")
-                if gene_set_library:
-                    print(f"   • gene_set_library: {gene_set_library}")
-                
-            elif pathway_keywords:
-                print(f"⚠️ Pathway keywords '{pathway_keywords}' extracted but enrichment_checker not available")
-                # Fallback to basic GSEA
-                enhanced_step["parameters"]["analyses"] = ["gsea"]
-                enhanced_step["parameters"]["gene_set_library"] = "MSigDB_Hallmark_2020"
-            else:
-                print("🔧 No pathway keywords extracted, using default analyses")
-                enhanced_step["parameters"]["analyses"] = ["reactome", "go", "kegg", "gsea"]
-            
-            return enhanced_step
-            
-        except Exception as e:
-            print(f"⚠️ Pathway keyword extraction and enhancement failed: {e}")
-            # Return step with default analyses
-            step["parameters"]["analyses"] = ["gsea"]
-            return step
-    
-    def _call_llm_for_pathway_extraction(self, message: str) -> str:
-        """
-        Extract pathway keywords from user message using minimal LLM call.
-        
-        Args:
-            message: User query to extract pathway terms from
-            
-        Returns:
-            String of pathway keywords for enrichment_checker
-        """
-        prompt = f"""
-                    Extract biological pathway-related keywords from this query:
-                    
-                    User Query: "{message}"
-                    
-                    Extract specific pathway terms, biological processes, or cellular functions mentioned.
-                    Return only the most relevant pathway keywords as a single string.
-                    
-                    Examples:
-                    - "interferon response" → "interferon response"
-                    - "T cell activation pathways" → "T cell activation"
-                    - "apoptosis in cancer cells" → "apoptosis"
-                    - "cell cycle regulation" → "cell cycle"
-                    
-                    If no specific pathways are mentioned, return an empty string.
-                    
-                    Pathway keywords:
-                  """
-        
-        try:
-            from langchain_openai import ChatOpenAI
-            from langchain_core.messages import SystemMessage, HumanMessage
-            
-            model = ChatOpenAI(
-                model="gpt-4o-mini",
-                temperature=0.1,
-                max_tokens=50
-            )
-            
-            messages = [
-                SystemMessage(content="You are a pathway keyword extractor. Return only relevant biological pathway terms."),
-                HumanMessage(content=prompt)
-            ]
-            
-            response = model.invoke(messages)
-            pathway_keywords = response.content.strip()
-            
-            return pathway_keywords if pathway_keywords and pathway_keywords.lower() != "none" else ""
-            
-        except Exception as e:
-            print(f"⚠️ LLM pathway extraction failed: {e}")
-            return ""
     
     
     def _skip_unavailable_cell_steps(self, plan: Dict[str, Any], unavailable_cell_types: List[str]) -> Dict[str, Any]:
@@ -773,6 +646,133 @@ class PlannerNode(BaseWorkflowNode):
                     print(f"🔍 Created validation step for process_cells({cell_type}) expecting: {expected_children}")
         
         return validation_steps
+    
+    def _extract_pathway_keywords_from_enrichment_steps(self, plan_data: Dict[str, Any], message: str) -> Dict[str, Any]:
+        """Extract pathway keywords for enrichment analysis steps to trigger enrichment_checker."""
+        print(f"🔍 PATHWAY EXTRACTOR: Processing {len(plan_data.get('steps', []))} steps")
+        enhanced_steps = []
+        
+        for i, step in enumerate(plan_data.get("steps", [])):
+            if step.get("function_name") == "perform_enrichment_analyses":
+                print(f"🔍 PATHWAY EXTRACTOR: Extracting keywords for step {i+1}: {step.get('parameters', {}).get('cell_type', 'unknown')}")
+                # Extract pathway keywords for this enrichment step
+                enhanced_step = self._extract_pathway_keywords(step, message)
+                enhanced_steps.append(enhanced_step)
+            else:
+                # Keep non-enrichment steps as-is
+                enhanced_steps.append(step)
+        
+        plan_data["steps"] = enhanced_steps
+        return plan_data
+    
+    def _extract_pathway_keywords(self, step: Dict[str, Any], message: str) -> Dict[str, Any]:
+        """
+        Extract pathway keywords and use enrichment_checker to enhance the step.
+        
+        This function extracts pathway keywords and calls enrichment_checker directly
+        to get the proper analyses and gene_set_library parameters.
+        
+        Args:
+            step: Enrichment step from planner with minimal parameters
+            message: Original user message for context
+            
+        Returns:
+            Step with proper analyses and gene_set_library parameters
+        """
+        try:
+            # Extract pathway keywords using minimal LLM call
+            pathway_keywords = self._call_llm_for_pathway_extraction(message)
+            
+            enhanced_step = step.copy()
+            if "parameters" not in enhanced_step:
+                enhanced_step["parameters"] = {}
+            
+            if pathway_keywords and self.enrichment_checker_available and self.enrichment_checker:
+                print(f"🔍 PlannerNode: Using enrichment_checker for pathway keywords: '{pathway_keywords}'")
+                
+                # Set pathway_include temporarily to trigger enrichment_checker
+                enhanced_step["parameters"]["pathway_include"] = pathway_keywords
+                
+                # Call enrichment_checker to get proper analyses and gene_set_library
+                enhanced_step = self.enrichment_checker.enhance_enrichment_plan(enhanced_step)
+                
+                # Log the enhancement
+                analyses = enhanced_step["parameters"].get("analyses", [])
+                gene_set_library = enhanced_step["parameters"].get("gene_set_library")
+                print(f"✅ EnrichmentChecker enhanced step:")
+                print(f"   • analyses: {analyses}")
+                if gene_set_library:
+                    print(f"   • gene_set_library: {gene_set_library}")
+                
+            elif pathway_keywords:
+                print(f"⚠️ Pathway keywords '{pathway_keywords}' extracted but enrichment_checker not available")
+                # Fallback to basic GSEA
+                enhanced_step["parameters"]["analyses"] = ["gsea"]
+                enhanced_step["parameters"]["gene_set_library"] = "MSigDB_Hallmark_2020"
+            else:
+                print("🔧 No pathway keywords extracted, using default analyses")
+                enhanced_step["parameters"]["analyses"] = ["go"]
+            
+            return enhanced_step
+            
+        except Exception as e:
+            print(f"⚠️ Pathway keyword extraction and enhancement failed: {e}")
+            # Return step with default analyses
+            step["parameters"]["analyses"] = ["go"]
+            return step
+    
+    def _call_llm_for_pathway_extraction(self, message: str) -> str:
+        """
+        Extract pathway keywords from user message using minimal LLM call.
+        
+        Args:
+            message: User query to extract pathway terms from
+            
+        Returns:
+            String of pathway keywords for enrichment_checker
+        """
+        prompt = f"""
+                    Extract biological pathway-related keywords from this query:
+                    
+                    User Query: "{message}"
+                    
+                    Extract specific pathway terms, biological processes, or cellular functions mentioned.
+                    Return only the most relevant pathway keywords as a single string.
+                    
+                    Examples:
+                    - "interferon response" → "interferon response"
+                    - "T cell activation pathways" → "T cell activation"
+                    - "apoptosis in cancer cells" → "apoptosis"
+                    - "cell cycle regulation" → "cell cycle regulation"
+                    
+                    If no specific pathways are mentioned, return an empty string.
+                    
+                    Pathway keywords:
+                  """
+        
+        try:
+            from langchain_openai import ChatOpenAI
+            from langchain_core.messages import SystemMessage, HumanMessage
+            
+            model = ChatOpenAI(
+                model="gpt-4o-mini",
+                temperature=0.1,
+                max_tokens=50
+            )
+            
+            messages = [
+                SystemMessage(content="You are a pathway keyword extractor. Return only relevant biological pathway terms."),
+                HumanMessage(content=prompt)
+            ]
+            
+            response = model.invoke(messages)
+            pathway_keywords = response.content.strip()
+            
+            return pathway_keywords if pathway_keywords and pathway_keywords.lower() != "none" else ""
+            
+        except Exception as e:
+            print(f"⚠️ LLM pathway extraction failed: {e}")
+            return ""
     
     def _log_plan_statistics(self, plan: Dict[str, Any]):
         """Log statistics about the created plan."""
