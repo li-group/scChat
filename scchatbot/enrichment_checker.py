@@ -1,4 +1,5 @@
 import os
+import json
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 
@@ -51,14 +52,34 @@ class EnrichmentChecker:
     method selection based on user pathway queries.
     """
     
-    def __init__(self, neo4j_uri="bolt://localhost:7687", neo4j_user="neo4j", 
-                 neo4j_password="37754262", neo4j_database="pathways", 
-                 confidence_threshold=0.8):
+    def __init__(self, confidence_threshold=0.8, config_path=None):
         """Initialize enrichment checker with Neo4j connection and vector search."""
-        self.neo4j_uri = neo4j_uri
-        self.neo4j_user = neo4j_user
-        self.neo4j_password = neo4j_password
-        self.neo4j_database = neo4j_database
+        # Load configuration from specification_graph.json
+        if config_path is None:
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            project_root = os.path.dirname(current_dir)
+            config_path = os.path.join(project_root, "media", "specification_graph.json")
+        
+        try:
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+            
+            # Validate required configuration fields
+            required_fields = ["url", "username", "password", "pathway_rag"]
+            missing_fields = [field for field in required_fields if field not in config]
+            
+            if missing_fields:
+                raise ValueError(f"Missing required configuration fields: {missing_fields}")
+            
+            self.neo4j_uri = config["url"]
+            self.neo4j_user = config["username"]
+            self.neo4j_password = config["password"]
+            self.neo4j_database = config["pathway_rag"]
+            print(f"✅ EnrichmentChecker: Loaded config from {config_path}")
+        except Exception as e:
+            print(f"❌ EnrichmentChecker: Configuration error: {e}")
+            raise Exception(f"Failed to load Neo4j configuration from {config_path}: {e}")
+        
         self.confidence_threshold = confidence_threshold
         self.driver = None
         self.connection_status = "disconnected"
@@ -73,14 +94,14 @@ class EnrichmentChecker:
         if NEO4J_AVAILABLE:
             try:
                 self.driver = GraphDatabase.driver(
-                    neo4j_uri, 
-                    auth=(neo4j_user, neo4j_password)
+                    self.neo4j_uri, 
+                    auth=(self.neo4j_user, self.neo4j_password)
                 )
                 # Test connection
-                with self.driver.session(database=neo4j_database) as session:
+                with self.driver.session(database=self.neo4j_database) as session:
                     result = session.run("MATCH (p:Pathway) RETURN count(p) as count LIMIT 1")
                     count = result.single()
-                    print(f"   Neo4j test: Found {count['count'] if count else 0} pathways in '{neo4j_database}' database")
+                    print(f"   Neo4j test: Found {count['count'] if count else 0} pathways in '{self.neo4j_database}' database")
                 self.connection_status = "connected"
                 print("✅ EnrichmentChecker: Neo4j connection established")
             except Exception as e:

@@ -3,6 +3,7 @@
     "username": "neo4j",
     "password": "37754262",
     "database": "human",
+    "pathway_rag": "pathways",
     "system": "Nervous System",
     "organ": "Eye"
 }

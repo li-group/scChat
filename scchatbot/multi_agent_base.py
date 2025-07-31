@@ -68,7 +68,6 @@ class MultiAgentChatBot:
         self._initialize_cell_type_extractor()
         print("1")
         
-        # Jury system removed - simplified workflow
         # Initialize workflow nodes
         self.workflow_nodes = WorkflowNodes(
             self.initial_annotation_content,

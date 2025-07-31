@@ -37,8 +37,14 @@ class EvaluatorNode(BaseWorkflowNode):
                 # Handle validation step (moved from ExecutorNode)
                 return self._execute_validation_step(state, current_step)
         
-        # Otherwise handle post-execution evaluation (current logic)
-        return self.evaluator_node(state)
+        # CRITICAL FIX: Only run post-execution evaluation when ALL steps are complete
+        # Check if we've reached the end of ALL steps (including any supplementary ones)
+        if current_index >= len(steps):
+            print(f"🎯 All steps complete ({current_index}/{len(steps)}), running post-execution evaluation")
+            return self.evaluator_node(state)
+        else:
+            print(f"🔄 Steps still remaining ({current_index}/{len(steps)}), skipping post-execution evaluation")
+            return state
     
     def evaluator_node(self, state: ChatState) -> ChatState:
         """
@@ -632,8 +638,10 @@ class EvaluatorNode(BaseWorkflowNode):
         
         performed_analyses = []
         unavailable_cell_types = state.get("unavailable_cell_types", [])
+        execution_history = state.get("execution_history", [])
         
         print(f"🔧 DEBUG: Checking if '{cell_type}' is in unavailable list: {unavailable_cell_types}")
+        print(f"🔧 DEBUG: Checking execution history with {len(execution_history)} entries")
         
         # If this cell type is known to be unavailable, don't try to generate steps for it
         if cell_type in unavailable_cell_types:
@@ -641,17 +649,31 @@ class EvaluatorNode(BaseWorkflowNode):
             # Return dummy analysis to prevent post-execution from trying to add steps
             return ["analysis_skipped_cell_type_unavailable"]
         
-        for ex in state["execution_history"]:
-            # Check both successful executions AND skipped steps 
-            if ex.get("success") or ex.get("skipped"):
-                function_name = ex.get("step", {}).get("function_name")
-                params = ex.get("step", {}).get("parameters", {})
+        for i, ex in enumerate(execution_history):
+            # CRITICAL FIX: Check successful executions more thoroughly
+            success = ex.get("success", False)
+            skipped = ex.get("skipped", False)
+            
+            if success or skipped:
+                step_data = ex.get("step", {})
+                function_name = step_data.get("function_name")
+                params = step_data.get("parameters", {})
                 ex_cell_type = params.get("cell_type")
                 
+                # Debug logging for each matching execution
                 if ex_cell_type == cell_type and function_name:
-                    if ex.get("skipped"):
-                        print(f"📋 Found skipped analysis for {cell_type}: {function_name}")
+                    status = "skipped" if skipped else "successful"
+                    print(f"📋 Found {status} analysis for {cell_type}: {function_name} (execution {i+1})")
                     performed_analyses.append(function_name)
+                    
+                    # Additional debug for successful enrichment analyses
+                    if function_name == "perform_enrichment_analyses" and success:
+                        result = ex.get("result", {})
+                        if isinstance(result, dict):
+                            total_results = sum(result.get(key, {}).get("total_significant", 0) 
+                                              for key in ["go", "kegg", "reactome", "gsea"] 
+                                              if isinstance(result.get(key), dict))
+                            print(f"   → Enrichment analysis had {total_results} total significant results")
         
         # Remove duplicates while preserving order
         unique_performed = []
@@ -660,6 +682,23 @@ class EvaluatorNode(BaseWorkflowNode):
                 unique_performed.append(analysis)
         
         print(f"📊 Actually performed for {cell_type}: {unique_performed}")
+        
+        # CRITICAL FIX: If no analyses found but cell type is available, 
+        # check if there are any related executions with different parameter names
+        if not unique_performed and cell_type not in unavailable_cell_types:
+            print(f"🔍 No direct matches found for {cell_type}, checking for related executions...")
+            # Look for any executions that might be related to this cell type
+            for i, ex in enumerate(execution_history):
+                if ex.get("success", False):
+                    step_data = ex.get("step", {})
+                    function_name = step_data.get("function_name")
+                    params = step_data.get("parameters", {})
+                    
+                    # Check if cell type appears in any parameter values
+                    for param_key, param_value in params.items():
+                        if isinstance(param_value, str) and cell_type.lower() in param_value.lower():
+                            print(f"🔍 Found related execution: {function_name} with {param_key}='{param_value}'")
+        
         return unique_performed
 
     def _generate_missing_steps_for_cell_type(self, cell_type: str, required_analyses: List[str], 
@@ -679,6 +718,32 @@ class EvaluatorNode(BaseWorkflowNode):
                     "expected_outcome": f"Complete analysis coverage for {cell_type}",
                     "target_cell_type": cell_type
                 }
+                
+                # CRITICAL FIX: Add enrichment_checker enhancement for enrichment analyses
+                if required_function == "perform_enrichment_analyses":
+                    # Simple approach: add pathway_include with basic keywords to trigger enrichment_checker
+                    original_question = state.get("execution_plan", {}).get("original_question", "")
+                    
+                    # Extract simple pathway-related keywords from the question
+                    import re
+                    pathway_terms = []
+                    for term in ["pathway", "signaling", "process", "function", "regulation", "cycle", "response"]:
+                        if term in original_question.lower():
+                            # Get surrounding context for this term
+                            pattern = rf'\b\w*{term}\w*\b'
+                            matches = re.findall(pattern, original_question, re.IGNORECASE)
+                            pathway_terms.extend(matches)
+                    
+                    if pathway_terms:
+                        pathway_keywords = ", ".join(pathway_terms[:3])  # Top 3 terms
+                        step["parameters"]["pathway_include"] = pathway_keywords
+                        step["description"] += f" (with enrichment_checker)"
+                        print(f"🔧 Added enrichment_checker trigger with keywords: {pathway_keywords}")
+                    else:
+                        # Still add pathway_include to trigger enrichment_checker with general enhancement
+                        step["parameters"]["pathway_include"] = f"{cell_type} related pathways"
+                        step["description"] += " (with enrichment_checker)"
+                        print(f"🔧 Added enrichment_checker trigger for {cell_type}")
                 
                 # Add specific parameters for visualization functions
                 if required_function == "display_enrichment_visualization":

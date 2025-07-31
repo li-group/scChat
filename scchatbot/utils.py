@@ -476,10 +476,3 @@ def compare_cell_count(adata, cell_type):
     
     return result_list
 
-if __name__ == "__main__":
-    import pickle
-    with open('scchatbot/annotated_adata/Overall_annotated_adata.pkl', 'rb') as f:
-        adata = pickle.load(f)
-        
-    result = compare_cell_count(adata, "Immune cell")
-    print(result)
