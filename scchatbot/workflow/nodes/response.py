@@ -109,21 +109,60 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             print(f"❌ LLM synthesis failed: {e}")
             response_text = "I encountered an error generating the response. Please try again."
         
-        # 7. Store response WITHOUT plots (plots added separately)
-        # Format as JSON for compatibility with views.py
-        response_data = {
-            "response": response_text,
-            "response_type": "llm_synthesized_answer"
-        }
-        
-        # 8. Collect and add plots
+        # 7. Collect plots as individual objects
         try:
-            html_plots = self._extract_html_plots_from_execution(state)
-            if html_plots:
-                response_data["graph_html"] = html_plots
-                print(f"🎯 ResponseGeneratorNode: Including {len(html_plots)} chars of plot HTML")
+            plots = self._extract_html_plots_from_execution(state)  # Returns List[Dict]
+            print(f"🎯 ResponseGeneratorNode: Found {len(plots)} individual plots")
         except Exception as e:
             print(f"❌ Error extracting plots: {e}")
+            plots = []
+        
+        # 8. NEW: Create multiple messages structure for separate rendering
+        if plots and len(plots) > 0:
+            print(f"🎨 Creating multiple messages structure: 1 text + {len(plots)} plots")
+            
+            # Create comprehensive response with separate messages array
+            multiple_messages = []
+            
+            # Add text message as first entry
+            multiple_messages.append({
+                "message_type": "text",
+                "response": response_text,
+                "response_type": "llm_synthesized_answer"
+            })
+            
+            # Add each plot as separate message entry
+            for i, plot in enumerate(plots):
+                multiple_messages.append({
+                    "message_type": "plot",
+                    "response_type": "individual_plot",
+                    "plot_title": plot.get("title", f"Plot {i+1}"),
+                    "plot_description": plot.get("description", ""),
+                    "plots": [plot],  # Single plot in array
+                    "graph_html": f"<div class='plot-container'><h4>{plot.get('description', '')}</h4>{plot.get('html', '')}</div>"
+                })
+            
+            # Create response with multiple messages structure
+            response_data = {
+                "response": response_text,  # Main text response for backward compatibility
+                "response_type": "multiple_messages",
+                "plots_version": "3.0",  # New version for multiple messages
+                "messages": multiple_messages,
+                "total_messages": len(multiple_messages),
+                # Backward compatibility fields
+                "plots": plots,
+                "graph_html": self._combine_plots_for_legacy(plots)
+            }
+            
+            print(f"🎨 Created multiple messages structure with {len(multiple_messages)} total messages")
+            
+        else:
+            # No plots - single text response
+            response_data = {
+                "response": response_text,
+                "response_type": "llm_synthesized_answer",
+                "plots_version": "3.0"
+            }
         
         state["response"] = json.dumps(response_data)
         
@@ -146,19 +185,21 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             response_text = state.get("response", "")
             response_data = {"response": response_text}
         
-        # Extract actual HTML plots from execution history
-        html_plots = self._extract_html_plots_from_execution(state)
+        # Extract plots as individual objects
+        plots = self._extract_html_plots_from_execution(state)
         
-        if html_plots:
-            # Store plots separately - do NOT add to response text
-            response_data["graph_html"] = html_plots
+        if plots:
+            # Store individual plots and maintain backward compatibility
+            response_data["plots"] = plots
+            response_data["graph_html"] = self._combine_plots_for_legacy(plots)
             
             # Keep response text clean - only add a simple note about available plots
             # response_text remains unchanged to avoid HTML contamination
             
-            print("🎨 PLOT INTEGRATION: Successfully stored plots separately from response")
+            print(f"🎨 PLOT INTEGRATION: Successfully stored {len(plots)} individual plots separately from response")
         else:
             print("🎨 PLOT INTEGRATION: No plots found in execution history")
+            response_data["plots"] = []
         
         # Store back as JSON with size checking
         response_json = json.dumps(response_data)
@@ -172,6 +213,8 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             response_data_fallback = {
                 "response": response_data.get("response", ""),
                 "response_type": response_data.get("response_type", ""),
+                "plots_version": "2.0",
+                "plots": [],
                 "error": f"Plots removed due to size limit (original size: {response_size:,} chars)"
             }
             response_json = json.dumps(response_data_fallback)
@@ -384,17 +427,16 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             print(f"❌ OpenAI API error: {e}")
             return f"I encountered an error generating the response: {e}"
     
-    def _extract_html_plots_from_execution(self, state: ChatState) -> str:
-        """Extract actual HTML plots from execution history with deduplication and size limits."""
+    def _extract_html_plots_from_execution(self, state: ChatState) -> List[Dict[str, Any]]:
+        """Extract HTML plots as individual objects with metadata and deduplication."""
         plots = []
-        plot_descriptions = []
         seen_plots = set()  # Track unique plots to avoid duplicates
         
         execution_history = state.get("execution_history", [])
         print(f"🎨 PLOT EXTRACTION: Checking {len(execution_history)} execution steps")
         
-        MAX_PLOTS = 3  # Limit to 3 plots maximum
-        MAX_PLOT_SIZE = 10 * 1024 * 1024  # 10MB per plot maximum
+        MAX_PLOTS = 5  # Increased to allow more individual plots
+        MAX_PLOT_SIZE = 8 * 1024 * 1024  # 8MB per plot maximum (reduced from 10MB)
         
         for i, execution in enumerate(execution_history):
             if len(plots) >= MAX_PLOTS:
@@ -423,14 +465,53 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             
             print(f"🎨 PLOT EXTRACTION: Step {i+1}: {function_name}, success={success}, has_result={has_result}")
             
-            # Check for plots by function name OR by HTML content (fallback for storage bugs)
+            # Check for plots by function name OR by HTML content OR by multiple plots structure
             is_plot_function = function_name.startswith("display_")
             is_html_content = (isinstance(result, str) and 
                              ("<div" in result or "<html" in result) and 
                              len(result) > 1000)  # Likely a plot if it's large HTML
+            is_multiple_plots = isinstance(result, dict) and result.get("multiple_plots")
             
-            if (success and has_result and (is_plot_function or is_html_content)):
-                result_length = len(result)
+            if (success and has_result and (is_plot_function or is_html_content or is_multiple_plots)):
+                # Check if result is a multiple plots structure
+                if isinstance(result, dict) and result.get("multiple_plots"):
+                    print(f"🎨 PLOT EXTRACTION: Found multiple plots structure in {function_name}")
+                    # Handle multiple plots from single function call
+                    for plot_data in result.get("plots", []):
+                        if len(plots) >= MAX_PLOTS:
+                            print(f"🎨 PLOT EXTRACTION: Reached max plots limit ({MAX_PLOTS}), stopping")
+                            break
+                            
+                        plot_html = plot_data.get("html", "")
+                        plot_size = len(plot_html)
+                        
+                        # Check size limit for individual plot
+                        if plot_size > MAX_PLOT_SIZE:
+                            print(f"🎨 PLOT EXTRACTION: Skipping {plot_data.get('type', 'unknown')} plot - too large ({plot_size} chars > {MAX_PLOT_SIZE})")
+                            continue
+                        
+                        plot_id = f"plot_{len(plots) + 1}"
+                        plot_obj = {
+                            "id": plot_id,
+                            "title": plot_data.get("title", f"Plot {plot_id}"),
+                            "description": f"✅ Successfully generated {plot_data.get('type', 'visualization')} plot for {step_data.get('parameters', {}).get('cell_type', 'analysis')}",
+                            "html": plot_html,
+                            "function_name": function_name,
+                            "plot_type": plot_data.get("type", "unknown"),
+                            "size": plot_size,
+                            "parameters": step_data.get("parameters", {}) if "function_name" in step_data else execution.get("parameters", {})
+                        }
+                        
+                        plots.append(plot_obj)
+                        print(f"🎨 PLOT EXTRACTION: Added {plot_data.get('type')} plot {plot_id}: {plot_obj['title']} ({plot_size} chars)")
+                    
+                    continue  # Skip single plot processing for this result
+                
+                # Handle single plot result (existing logic)
+                if isinstance(result, str):
+                    result_length = len(result)
+                else:
+                    result_length = 0
                 
                 # Check size limit
                 if result_length > MAX_PLOT_SIZE:
@@ -447,37 +528,35 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                 
                 seen_plots.add(plot_fingerprint)
                 
-                # Get description using extracted function_name
-                if is_plot_function:
-                    description = self._generate_visualization_description(function_name, step_data if "function_name" in step_data else execution, result)
-                else:
-                    # Fallback description for HTML content without display_ function name
-                    description = "Generated visualization plot"
-                plot_descriptions.append(f"<h4>{description}</h4>")
-                plots.append(result)
+                # Generate plot metadata
+                plot_id = f"plot_{len(plots) + 1}"
+                title = self._extract_plot_title(function_name, step_data if "function_name" in step_data else execution)
+                description = self._generate_visualization_description(function_name, step_data if "function_name" in step_data else execution, result)
                 
-                print(f"🎨 PLOT EXTRACTION: Found unique plot ({result_length} chars)")
+                # Create plot object with metadata
+                plot_obj = {
+                    "id": plot_id,
+                    "title": title,
+                    "description": description,
+                    "html": result,
+                    "function_name": function_name,
+                    "size": result_length,
+                    "parameters": step_data.get("parameters", {}) if "function_name" in step_data else execution.get("parameters", {})
+                }
+                
+                plots.append(plot_obj)
+                print(f"🎨 PLOT EXTRACTION: Added plot {plot_id}: {title} ({result_length} chars)")
         
         if plots:
-            combined_plots = "".join([f"<div class='plot-container'>{desc}{plot}</div>" 
-                                     for desc, plot in zip(plot_descriptions, plots)])
-            total_size = len(combined_plots)
-            print(f"🎨 PLOT EXTRACTION: Successfully extracted {len(plots)} unique plots (total: {total_size:,} chars)")
+            total_size = sum(plot["size"] for plot in plots)
+            print(f"🎨 PLOT EXTRACTION: Successfully extracted {len(plots)} individual plots (total: {total_size:,} chars)")
             
-            # Final size check
-            MAX_TOTAL_SIZE = 20 * 1024 * 1024  # 20MB total maximum
-            if total_size > MAX_TOTAL_SIZE:
-                print(f"🎨 PLOT EXTRACTION: WARNING - Total plot size ({total_size:,}) exceeds limit ({MAX_TOTAL_SIZE:,})")
-                # Take only the first plot if still too large
-                if plots:
-                    first_plot = f"<div class='plot-container'>{plot_descriptions[0]}{plots[0]}</div>"
-                    print(f"🎨 PLOT EXTRACTION: Using only first plot ({len(first_plot):,} chars)")
-                    return first_plot
-            
-            return combined_plots
+            # Apply size validation
+            validated_plots = self._validate_plot_sizes(plots)
+            return validated_plots
         else:
             print("🎨 PLOT EXTRACTION: No valid plots found")
-            return ""
+            return []
     
     def _generate_visualization_description(self, function_name: str, execution: Dict, result: str) -> str:
         """Generate a descriptive summary for visualization functions"""
@@ -515,6 +594,105 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             status = "⚠️ Generated"
         
         return f"{status} {base_desc}{context}. The interactive plot is displayed below."
+    
+    def create_individual_plot_messages(self, state: ChatState) -> List[ChatState]:
+        """Create separate ChatState messages for each individual plot."""
+        plot_messages = []
+        plots = state.get("individual_plots", [])
+        
+        if not plots:
+            return plot_messages
+            
+        print(f"🎨 Creating {len(plots)} individual plot messages")
+        
+        for i, plot in enumerate(plots):
+            # Create a new state for this plot message
+            plot_state = state.copy()
+            
+            # Create response data with just this plot
+            plot_response_data = {
+                "response": "",  # No text, just the plot
+                "response_type": "individual_plot",
+                "plots_version": "2.0",
+                "plot_title": plot.get("title", f"Plot {i+1}"),
+                "plot_description": plot.get("description", ""),
+                "plots": [plot],  # Single plot in array
+                "graph_html": f"<div class='plot-container'><h4>{plot.get('description', '')}</h4>{plot.get('html', '')}</div>"
+            }
+            
+            plot_state["response"] = json.dumps(plot_response_data)
+            plot_messages.append(plot_state)
+            
+            print(f"🎨 Created plot message {i+1}: {plot.get('title', 'Untitled')}")
+        
+        return plot_messages
+    
+    def _extract_plot_title(self, function_name: str, execution: Dict) -> str:
+        """Extract a concise title for the plot."""
+        titles = {
+            "display_dotplot": "Gene Expression Dotplot",
+            "display_cell_type_composition": "Cell Type Composition", 
+            "display_gsea_dotplot": "GSEA Enrichment",
+            "display_umap": "UMAP Plot",
+            "display_processed_umap": "Annotated UMAP",
+            "display_enrichment_barplot": "Enrichment Analysis",
+            "display_enrichment_dotplot": "Enrichment Dotplot",
+            "display_enrichment_visualization": "Enrichment Visualization"
+        }
+        
+        base_title = titles.get(function_name, function_name.replace("display_", "").replace("_", " ").title())
+        
+        # Add context from parameters
+        parameters = execution.get("parameters", {})
+        if parameters.get("cell_type"):
+            base_title += f" - {parameters['cell_type']}"
+        if parameters.get("analysis"):
+            base_title += f" ({parameters['analysis'].upper()})"
+        
+        return base_title
+    
+    def _validate_plot_sizes(self, plots: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Validate and potentially reduce plot sizes with intelligent prioritization."""
+        MAX_TOTAL_SIZE = 30 * 1024 * 1024  # 30MB total limit
+        MAX_PLOTS = 5
+        
+        # Sort plots by importance (certain visualization functions get priority)
+        importance_order = ["display_umap", "display_processed_umap", "display_dotplot", "display_enrichment_visualization"]
+        
+        def plot_priority(plot):
+            func_name = plot.get("function_name", "")
+            if func_name in importance_order:
+                return importance_order.index(func_name)
+            return len(importance_order)
+        
+        plots_sorted = sorted(plots, key=plot_priority)
+        
+        # Take top plots within limits
+        validated_plots = []
+        total_size = 0
+        
+        for plot in plots_sorted[:MAX_PLOTS]:
+            if total_size + plot["size"] <= MAX_TOTAL_SIZE:
+                validated_plots.append(plot)
+                total_size += plot["size"]
+            else:
+                print(f"🎨 SIZE VALIDATION: Skipping {plot['id']} - would exceed total size limit")
+                break
+        
+        print(f"🎨 SIZE VALIDATION: Validated {len(validated_plots)} plots, total size: {total_size:,} bytes")
+        return validated_plots
+    
+    def _combine_plots_for_legacy(self, plots: List[Dict[str, Any]]) -> str:
+        """Create combined HTML string for backward compatibility."""
+        if not plots:
+            return ""
+        
+        combined_parts = []
+        for plot in plots:
+            plot_html = f"<div class='plot-container'><h4>{plot['description']}</h4>{plot['html']}</div>"
+            combined_parts.append(plot_html)
+        
+        return "\n".join(combined_parts)
     
     def generate_response(self, state: ChatState) -> ChatState:
         """

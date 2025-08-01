@@ -9,7 +9,6 @@ function embedVisualization(htmlContent) {
     // When the iframe loads, write the HTML into it
     iframe.onload = function() {
         const doc = iframe.contentDocument || iframe.contentWindow.document;
-        console.log("Iframe onload: writing visualization HTML.");
         doc.open();
         doc.write(htmlContent);
         doc.close();
@@ -456,32 +455,90 @@ document.addEventListener("DOMContentLoaded", function() {
                     });
         
                     const data = await response.json();
-                    console.log("Server response keys:", Object.keys(data));
-                    console.log("Server response (truncated):", JSON.stringify(data).substring(0,300) + "...");
         
-                    // If there is a simple text response, display it.
-                    if (data.response && data.response.trim() !== "") {
-                        console.log("Adding text response:", data.response);
+                    // NEW: Handle multiple messages structure (version 3.0)
+                    if (data.response_type === "multiple_messages" && data.messages && Array.isArray(data.messages)) {
+                        
+                        // Render each message separately
+                        data.messages.forEach((message, index) => {
+                            if (message.message_type === "text") {
+                                addChatMessage(message.response, false);
+                            } else if (message.message_type === "plot") {
+                                
+                                // Create separate bot message container for this plot
+                                const plotContainer = document.createElement('div');
+                                plotContainer.classList.add('system-message', 'plot-section');
+                                plotContainer.id = `plot-message-${index}`;
+                                
+                                // Add plot title/description header
+                                const plotHeader = document.createElement('div');
+                                plotHeader.classList.add('plot-header');
+                                plotHeader.innerHTML = `<h4>${message.plot_title}</h4><p class="plot-description">${message.plot_description}</p>`;
+                                plotContainer.appendChild(plotHeader);
+                                
+                                // Create iframe for this plot
+                                const iframe = embedVisualization(message.graph_html);
+                                iframe.id = `iframe-plot-${index}`;
+                                iframe.style.height = '650px';
+                                
+                                plotContainer.appendChild(iframe);
+                                messagesContainer.appendChild(plotContainer);
+                            }
+                        });
+                        
+                        scrollToBottom();
+                        
+                    } 
+                    // FALLBACK: Handle legacy individual plots structure (version 2.0)
+                    else if (data.plots && Array.isArray(data.plots) && data.plots.length > 0) {
+                        
+                        // If there is a simple text response, display it first
+                        if (data.response && data.response.trim() !== "") {
+                            addChatMessage(data.response, false);
+                        }
+                        
+                        // Render each plot in its own section
+                        data.plots.forEach((plot, index) => {
+                            
+                            // Create container for this specific plot
+                            const plotContainer = document.createElement('div');
+                            plotContainer.classList.add('system-message', 'plot-section');
+                            plotContainer.id = `plot-section-${plot.id}`;
+                            
+                            // Add plot title/description header
+                            const plotHeader = document.createElement('div');
+                            plotHeader.classList.add('plot-header');
+                            plotHeader.innerHTML = `<h4>${plot.title}</h4><p class="plot-description">${plot.description}</p>`;
+                            plotContainer.appendChild(plotHeader);
+                            
+                            // Create iframe for this specific plot
+                            const iframe = embedVisualization(plot.html);
+                            iframe.id = `iframe-${plot.id}`;
+                            iframe.style.height = '650px'; // Slightly larger for individual plots
+                            
+                            plotContainer.appendChild(iframe);
+                            messagesContainer.appendChild(plotContainer);
+                        });
+                        
+                        scrollToBottom();
+                        
+                    } 
+                    // Handle single text response (no plots)
+                    else if (data.response && data.response.trim() !== "") {
                         addChatMessage(data.response, false);
                     }
-                    
-                    // If the backend returned visualization HTML in "graph_html",
-                    // embed it using an iframe.
-                    if (data.graph_html) {
-                        console.log("Embedding graph_html visualization using iframe...");
+                    // FALLBACK: Handle legacy combined plots (version 1.0)
+                    else if (data.graph_html) {
+                        // Fallback to legacy combined plots for backward compatibility
                         const iframe = embedVisualization(data.graph_html);
-                        console.log("Created iframe:", iframe);
                         
                         const container = document.createElement('div');
-                        container.classList.add('system-message'); // Ensure this matches your assistant styling.
+                        container.classList.add('system-message');
                         container.appendChild(iframe);
                         messagesContainer.appendChild(container);
                         
-                        // Extra debug: check if container was appended
-                        console.log("Appended visualization container to messagesContainer");
                         scrollToBottom();
                     } else if (data.graph_json) {
-                        console.log("Rendering graph_json visualization...");
                         const graphJson = JSON.parse(data.graph_json);
                         const graphDiv = document.createElement('div');
                         messagesContainer.appendChild(graphDiv);

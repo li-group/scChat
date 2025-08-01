@@ -163,11 +163,30 @@ def display_enrichment_visualization(
             plots_html.append(dot_html)
             print(f"✅ Dot plot HTML generated: {len(dot_html)} characters")
         
-        # Combine plots if both requested
+        # Handle multiple plots if both requested
         if plot_type == "both":
-            print(f"🔗 Combining {len(plots_html)} plots")
+            print(f"🔗 Creating separate plot objects for {len(plots_html)} plots")
             print(f"📊 Bar plot size: {len(plots_html[0])} chars")
             print(f"🔴 Dot plot size: {len(plots_html[1])} chars") 
+            
+            # Return multiple plots structure for backend processing
+            multiple_plots_result = {
+                "multiple_plots": True,
+                "plots": [
+                    {
+                        "type": "bar",
+                        "title": f"Top {top_n} {analysis.upper()} Terms - Bar Plot ({cell_type})",
+                        "html": plots_html[0]
+                    },
+                    {
+                        "type": "dot", 
+                        "title": f"Top {top_n} {analysis.upper()} Terms - Dot Plot ({cell_type})",
+                        "html": plots_html[1]
+                    }
+                ]
+            }
+            
+            # Add legacy combined HTML for backward compatibility
             combined_html = f"""
             <div style="margin-bottom: 30px;">
                 <h3>Bar Plot</h3>
@@ -178,8 +197,10 @@ def display_enrichment_visualization(
                 {plots_html[1]}
             </div>
             """
-            print(f"🎯 Combined HTML size: {len(combined_html)} characters")
-            return combined_html
+            multiple_plots_result["legacy_combined_html"] = combined_html
+            
+            print(f"🎯 Created multiple plots structure with {len(multiple_plots_result['plots'])} individual plots")
+            return multiple_plots_result
         else:
             return plots_html[0]
             

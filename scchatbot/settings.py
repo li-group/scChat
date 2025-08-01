@@ -29,10 +29,28 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 DEBUG = True
 
+# Disable caching in development
+if DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
+    
+    # Add custom middleware to disable browser caching for static files
+    MIDDLEWARE.append('scchatbot.middleware.DisableBrowserCacheMiddleware')
+    
+    # Cache settings
+    CACHE_MIDDLEWARE_SECONDS = 0  # Don't cache anything
+    CACHE_MIDDLEWARE_KEY_PREFIX = ''
+
 from pathlib import Path
 ROOT_URLCONF = "scchatbot.urls"
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = "/static/"
+
+# For production: Use ManifestStaticFilesStorage for automatic cache busting
+# STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",

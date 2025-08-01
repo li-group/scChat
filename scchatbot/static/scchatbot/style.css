@@ -241,6 +241,39 @@ header h1 {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Individual plot section styling */
+.plot-section {
+  margin: 20px 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #fafafa;
+}
+
+.plot-header h4 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.plot-description {
+  margin: 0 0 12px 0;
+  color: #666;
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+/* Ensure each iframe has proper sizing */
+.plot-section iframe {
+  width: 100%;
+  max-width: 1200px;
+  height: 650px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
 /* Responsive plot styling */
 @media (max-width: 768px) {
   .plot-container iframe {
@@ -251,5 +284,10 @@ header h1 {
   .system-message iframe {
     width: 100% !important;
     height: 600px !important;
+  }
+  
+  .plot-section iframe {
+    width: 100% !important;
+    height: 500px !important;
   }
 }
