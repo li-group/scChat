@@ -49,32 +49,32 @@ def extract_cell_types_from_question(question: str, hierarchy_manager=None) -> L
     
     # Use LLM to identify which valid cell types are mentioned in the question
     llm_prompt = f"""
-    You are a cell biology expert. Analyze this user question and identify which specific cell types are mentioned.
-    
-    USER QUESTION: "{question}"
-    
-    VALID CELL TYPES FROM DATABASE:
-    {', '.join(valid_cell_types)}
-    
-    Your task:
-    1. Identify any cell types mentioned in the question (handle synonyms, abbreviations, variations)
-    2. Match them to the exact names from the valid cell types list
-    3. Only return cell types that exist in the valid list
-    
-    Examples of matching:
-    - "Regulatory T cells" → "T regulatory cell" (if that's the database name)
-    - "Tregs" → "T regulatory cell" 
-    - "NK cells" → "Natural killer cell"
-    - "CD4+ T cells" → "CD4-positive T cell"
-    
-    Respond in JSON format:
-    {{
-        "identified_cell_types": ["exact database name 1", "exact database name 2"],
-        "reasoning": "Brief explanation of matches found"
-    }}
-    
-    If no valid cell types are mentioned, return empty list.
-    """
+                    You are a cell biology expert. Analyze this user question and identify which specific cell types are mentioned.
+                    
+                    USER QUESTION: "{question}"
+                    
+                    VALID CELL TYPES FROM DATABASE:
+                    {', '.join(valid_cell_types)}
+                    
+                    Your task:
+                    1. Identify any cell types mentioned in the question (handle synonyms, abbreviations, variations)
+                    2. Match them to the exact names from the valid cell types list
+                    3. Only return cell types that exist in the valid list
+                    
+                    Examples of matching:
+                    - "Regulatory T cells" → "T regulatory cell" (if that's the database name)
+                    - "Tregs" → "T regulatory cell" 
+                    - "NK cells" → "Natural killer cell"
+                    - "CD4+ T cells" → "CD4-positive T cell"
+                    
+                    Respond in JSON format:
+                    {{
+                        "identified_cell_types": ["exact database name 1", "exact database name 2"],
+                        "reasoning": "Brief explanation of matches found"
+                    }}
+                    
+                    If no valid cell types are mentioned, return empty list.
+                    """
     
     try:
         from langchain_openai import ChatOpenAI

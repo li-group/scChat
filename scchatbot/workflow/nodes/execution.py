@@ -202,6 +202,7 @@ class ExecutorNode(BaseWorkflowNode):
         
         # Update hierarchy manager for process_cells steps
         if step.function_name == "process_cells" and self.hierarchy_manager:
+            print(f"🔍 EXECUTION NODE: About to call CellTypeExtractor.extract_from_annotation_result() for process_cells step")
             new_cell_types = self.cell_type_extractor.extract_from_annotation_result(result)
             if new_cell_types:
                 print(f"🧬 Updating hierarchy manager with new cell types: {new_cell_types}")
