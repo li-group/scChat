@@ -1038,6 +1038,111 @@ def _get_pathway_recommendations(self, pathway_query: str, top_k: int = 3) -> Li
 
 ---
 
-**Last Updated**: 2025-07-31  
-**Next Review**: After Phase 3 completion  
+## 🚨 PHASE 3.5: Conversational Response System Cleanup
+
+**Status**: 🎯 **IN PROGRESS**  
+**Created**: 2025-08-01  
+**Priority**: HIGH - ARCHITECTURAL REDUNDANCY
+
+### Problem Identified
+
+The conversational response system is completely redundant. ResponseGeneratorNode's LLM synthesis handles all response generation, making the entire conversational_response infrastructure dead code.
+
+#### Evidence of Redundancy:
+```
+User "Hi" → conversational_response returns "I'm ready to help..." 
+           → ResponseGeneratorNode ignores this
+           → GPT-4o generates actual response
+```
+
+### Dead Code to Remove
+
+#### **1. multi_agent_base.py**
+- [ ] **Lines 334-345**: Complete `conversational_response` function definition
+  - Remove from function_descriptions array
+  - Currently defines unused response types
+- [ ] **Line 389**: Remove function mapping entry
+  - `"conversational_response": self._wrap_conversational_response,`
+- [ ] **Lines 767-789**: Remove `_wrap_conversational_response` method entirely
+  - Returns hardcoded strings that get overridden
+- [ ] **Lines 792-828**: Remove `_generate_analysis_summary` method
+  - Only called by unused "analysis_summary" response type
+- [ ] **Already removed**: 
+  - ✅ `_generate_analysis_interpretation` (lines 791-824)
+  - ✅ `_generate_general_interpretation` (lines 864-899)
+  - ✅ `_format_cell_type_interpretation` (lines 901-953)
+  - ✅ `_get_available_cell_types` (lines 955-981)
+
+#### **2. workflow/unified_result_accessor.py**
+- [ ] **Lines 571-599**: Remove entire `ConversationalResponseAccessor` class
+- [ ] **Line 671**: Remove ConversationalResponseAccessor instantiation
+- [ ] **Line 687**: Remove `"conversational_results": {},` initialization
+- [ ] **Lines 746-747**: Remove ConversationalResponseAccessor handling
+- [ ] **Lines 830-835**: Remove conversational results formatting
+
+#### **3. workflow/nodes/planning.py**
+- [ ] **Lines 605-617**: Modify `_create_fallback_plan` method
+  - Instead of creating conversational_response plan, go directly to response generation
+  - Or create empty plan that triggers immediate response generation
+- [ ] **Line 172**: Update documentation to remove conversational_response reference
+
+#### **4. workflow/node_base.py**
+- [ ] **Lines 189-190**: Remove conversational response description logic
+
+#### **5. workflow/nodes/evaluation.py**
+- [ ] **Line 567**: Update documentation to remove conversational_response reference
+
+### Implementation Strategy
+
+#### **Step 1: Remove Core Functions** (High Priority)
+```python
+# multi_agent_base.py changes:
+# 1. Remove from function_descriptions (lines 334-345)
+# 2. Remove from function_mapping (line 389)
+# 3. Delete _wrap_conversational_response (lines 767-789)
+# 4. Delete _generate_analysis_summary (lines 792-828)
+```
+
+#### **Step 2: Clean Result Accessor** (High Priority)
+```python
+# unified_result_accessor.py changes:
+# 1. Delete ConversationalResponseAccessor class
+# 2. Remove all references and handling
+# 3. Clean up unified_results structure
+```
+
+#### **Step 3: Update Planning** (Medium Priority)
+```python
+# planning.py changes:
+def _create_fallback_plan(self) -> Dict[str, Any]:
+    """Create fallback plan that goes directly to response generation"""
+    return {
+        "plan_summary": "Direct response generation",
+        "visualization_only": False,
+        "steps": []  # Empty steps trigger immediate response generation
+    }
+```
+
+#### **Step 4: Documentation Cleanup** (Low Priority)
+- Update all documentation references
+- Clean up execution history if needed
+
+### Expected Benefits
+
+1. **Code Reduction**: ~150+ lines of dead code removed
+2. **Simplification**: Single response generation path (LLM synthesis only)
+3. **Performance**: Skip unnecessary function execution for simple queries
+4. **Clarity**: No more confusion about which system generates responses
+
+### Success Criteria
+
+- [ ] All conversational_response references removed
+- [ ] System still handles "Hi" and simple queries properly
+- [ ] ResponseGeneratorNode remains the sole response generation system
+- [ ] No regression in functionality
+
+---
+
+**Last Updated**: 2025-08-01  
+**Next Review**: After Phase 3.5 completion  
 **Owner**: Development Team

@@ -568,38 +568,6 @@ class VisualizationResultAccessor(ResultAccessorBase):
         return "\n".join(lines)
 
 
-class ConversationalResponseAccessor(ResultAccessorBase):
-    """Accessor for conversational response results"""
-    
-    def can_handle(self, function_name: str) -> bool:
-        return function_name == "conversational_response"
-    
-    def get_results(self, execution_step: Dict[str, Any]) -> Dict[str, Any]:
-        """Get conversational response results from execution step"""
-        try:
-            result = execution_step.get("result")
-            step_data = execution_step.get("step", {})
-            parameters = step_data.get("parameters", {})
-            
-            return {
-                "response_result": result,
-                "parameters": parameters,
-                "source": "execution_result"
-            }
-                
-        except Exception as e:
-            print(f"❌ ConversationalResponseAccessor error: {e}")
-            return {"error": str(e)}
-    
-    def format_for_synthesis(self, results: Dict[str, Any], cell_type: str) -> str:
-        """Format conversational response results"""
-        if "error" in results:
-            return f"  Conversational response error: {results['error']}"
-        
-        # Conversational responses are typically not important for synthesis
-        return f"  Conversational synthesis completed"
-
-
 class ProcessCellsResultAccessor(ResultAccessorBase):
     """Accessor for process_cells results"""
     
@@ -667,8 +635,7 @@ class UnifiedResultAccessor:
             ProcessCellsResultAccessor(),
             SemanticSearchResultAccessor(),
             ValidationResultAccessor(),
-            VisualizationResultAccessor(),
-            ConversationalResponseAccessor()
+            VisualizationResultAccessor()
         ]
     
     def get_analysis_results(self, execution_history: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -684,7 +651,6 @@ class UnifiedResultAccessor:
             "semantic_search_results": {},
             "validation_results": {},
             "visualization_results": {},
-            "conversational_results": {},
             "total_successful_steps": 0,
             "total_failed_steps": 0
         }
@@ -743,8 +709,6 @@ class UnifiedResultAccessor:
                             function_name = results.get("function_name", "unknown_display")
                             viz_key = f"{function_name}_{cell_type}"
                             unified_results["visualization_results"][viz_key] = results
-                        elif isinstance(accessor, ConversationalResponseAccessor):
-                            unified_results["conversational_results"][cell_type] = results
                         
                         handled = True
                         break
@@ -827,12 +791,6 @@ class UnifiedResultAccessor:
                     sections.append(formatted)
                     sections.append("")
             
-            elif isinstance(accessor, ConversationalResponseAccessor):
-                conversational_data = unified_results.get("conversational_results", {})
-                for cell_type, results in conversational_data.items():
-                    formatted = accessor.format_for_synthesis(results, cell_type)
-                    sections.append(formatted)
-                    sections.append("")
         
         result = "\n".join(sections).strip()
         print(f"🎯 UNIFIED FORMATTER: Generated {len(result)} characters for synthesis")

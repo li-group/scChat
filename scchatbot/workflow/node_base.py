@@ -186,8 +186,6 @@ class ProcessingNodeMixin:
                     elif function_name == "search_enrichment_semantic":
                         query = params.get("query", "")
                         desc = f"Searched for '{query}' in {cell_type} results"
-                    elif function_name == "conversational_response":
-                        desc = "Provided response based on current data"
                     else:
                         desc = f"{function_name.replace('_', ' ').title()}"
                         if cell_type:

@@ -410,11 +410,10 @@ class EvaluatorNode(BaseWorkflowNode):
         classification_prompt = f"""Classify the following biology question into ONE category:
                             Question: "{question}"
                             Categories:
-                            1. canonical_markers - Questions about well-known, established cell type markers (e.g., "What are canonical markers for...", "differentiate X from Y using markers")
+                            1. gene_markers - Questions about genes, markers, or gene expression (e.g., "What are canonical markers for...", "differentiate X from Y using markers", "Is gene X upregulated...", "expression of Y in condition Z")
                             2. pathway_analysis - Questions about biological pathways, processes, or functional enrichment (e.g., "What pathways are enriched...", "biological processes in...")
-                            3. gene_expression - Questions about specific gene expression changes (e.g., "Is gene X upregulated...", "expression of Y in condition Z")
-                            4. cell_abundance - Questions about cell type counts or proportions (e.g., "How many X cells...", "proportion of Y cells")
-                            5. general_comparison - General comparison questions not fitting above categories
+                            3. cell_abundance - Questions about cell type counts or proportions (e.g., "How many X cells...", "proportion of Y cells")
+                            4. general_comparison - General comparison questions not fitting above categories
                             Return ONLY the category name, nothing else.
                             Category:"""
         
@@ -424,7 +423,7 @@ class EvaluatorNode(BaseWorkflowNode):
             category = response.strip().lower()
             
             # Validate category
-            valid_categories = ["canonical_markers", "pathway_analysis", "gene_expression", 
+            valid_categories = ["gene_markers", "pathway_analysis", 
                               "cell_abundance", "general_comparison"]
             
             if category not in valid_categories:
@@ -564,24 +563,21 @@ class EvaluatorNode(BaseWorkflowNode):
                                 SEARCH FUNCTIONS:
                                 - search_enrichment_semantic: Search all enrichment terms semantically to find specific pathways or biological processes. Use when user asks about specific pathways, terms, or biological processes that might not appear in standard top results.
 
-                                - conversational_response: Provide conversational response without function calls. Use for greetings, clarifications, explanations, or when no analysis is needed.
-
                                 Task: Determine which analyses are needed for {cell_type} to answer the user's question.
 
                                 IMPORTANT: The cell type "{cell_type}" already exists in the dataset. DO NOT suggest process_cells for this cell type.
 
                                 Consider based on question type:
-                                1. Canonical markers questions (differentiate X from Y, markers of X) → Use dea_split_by_condition ONLY
-                                2. Gene expression questions → Use dea_split_by_condition
-                                3. Pathway/biological process questions → Use perform_enrichment_analyses + search_enrichment_semantic
-                                4. Cell abundance questions → Use compare_cell_counts
-                                5. Specific pathway search → Use search_enrichment_semantic
+                                1. Gene/marker questions (differentiate X from Y, markers of X, gene expression) → Use dea_split_by_condition ONLY
+                                2. Pathway/biological process questions → Use perform_enrichment_analyses + search_enrichment_semantic
+                                3. Cell abundance questions → Use compare_cell_counts
+                                4. Specific pathway search → Use search_enrichment_semantic
 
-                                CRITICAL GUIDELINES FOR CANONICAL MARKERS:
-                                - For canonical markers questions, ONLY use dea_split_by_condition
+                                CRITICAL GUIDELINES FOR GENE/MARKER QUESTIONS:
+                                - For gene/marker questions, ONLY use dea_split_by_condition
                                 - DO NOT include enrichment analyses for marker identification
                                 - DO NOT suggest process_cells for already-available cell types
-                                - Visualization is optional for canonical markers
+                                - Visualization is optional for gene/marker questions
 
                                 GENERAL GUIDELINES:
                                 - Only include display_enrichment_visualization ONCE per cell type
@@ -780,24 +776,20 @@ class EvaluatorNode(BaseWorkflowNode):
                     elif "gsea" in result and result["gsea"].get("total_significant", 0) > 0:
                         return "gsea"
         
-        # Default to gsea if nothing found
-        return "gsea"
+        # Default to go if nothing found
+        return "go"
     
     def _get_analysis_relevance_hints(self, question_type: str, performed_analyses: Dict[str, List[str]]) -> Dict[str, Any]:
         """Generate hints about which analyses are most relevant for the question type"""
         
         relevance_map = {
-            "canonical_markers": {
+            "gene_markers": {
                 "primary": ["dea_split_by_condition"],
                 "secondary": ["display_dotplot"]
             },
             "pathway_analysis": {
                 "primary": ["perform_enrichment_analyses", "search_enrichment_semantic"],
                 "secondary": ["display_enrichment_visualization"]
-            },
-            "gene_expression": {
-                "primary": ["dea_split_by_condition"],
-                "secondary": ["display_dotplot"]
             },
             "cell_abundance": {
                 "primary": ["compare_cell_counts"],
@@ -825,9 +817,8 @@ class EvaluatorNode(BaseWorkflowNode):
         """Get specific guidance for response generation based on question type"""
         
         guidance_map = {
-            "canonical_markers": "Focus on well-established markers from literature. Prioritize DEA results showing marker genes. Avoid emphasizing enrichment analysis unless directly relevant to marker function.",
+            "gene_markers": "Focus on gene expression, markers, and differential expression analysis. Prioritize DEA results showing specific genes, fold changes, and statistical significance. For marker questions, emphasize well-established markers from literature.",
             "pathway_analysis": "Emphasize enrichment analysis results, biological processes, and pathway information. DEA results support pathway findings.",
-            "gene_expression": "Focus on specific gene expression values and fold changes from DEA. Show specific gene names and statistical significance.",  
             "cell_abundance": "Prioritize cell count comparisons and composition visualizations. Focus on quantitative differences between conditions.",
             "general_comparison": "Balance all available analyses based on what best answers the specific question."
         }
