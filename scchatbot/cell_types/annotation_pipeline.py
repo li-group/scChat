@@ -28,7 +28,7 @@ import os
 import ast
 from langchain.schema import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
-from ..utils import get_rag, get_subtypes, save_analysis_results, explain_gene, get_mapping, filter_existing_genes, extract_genes, get_h5ad
+from .utils import get_rag, get_subtypes, save_analysis_results, explain_gene, get_mapping, filter_existing_genes, extract_genes, get_h5ad
 import re
 import scvi
 from .standardization import unified_cell_type_handler, standardize_cell_type

@@ -8,7 +8,7 @@ hierarchy-aware, enabling automatic cell type resolution and aggregation.
 from typing import Dict, Any
 
 from .enrichment_analysis import perform_enrichment_analyses
-from ..utils import dea_split_by_condition, compare_cell_count
+from ..cell_types.utils import dea_split_by_condition, compare_cell_count
 
 
 class AnalysisFunctionWrapper:

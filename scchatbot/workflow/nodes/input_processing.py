@@ -9,7 +9,7 @@ import json
 from typing import Dict, Any, List
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
-from ...cell_type_models import ChatState
+from ...cell_types.models import ChatState
 from ..node_base import BaseWorkflowNode, ProcessingNodeMixin
 
 

@@ -10,12 +10,12 @@ from typing import Dict, Any, List
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
-from ...cell_type_models import ChatState
+from ...cell_types.models import ChatState
 from ..node_base import BaseWorkflowNode
 
 # Import EnrichmentChecker for method recognition
 try:
-    from ...enrichment_checker import EnrichmentChecker
+    from ...analysis.enrichment_checker import EnrichmentChecker
 except ImportError:
     EnrichmentChecker = None
 class PlannerNode(BaseWorkflowNode):

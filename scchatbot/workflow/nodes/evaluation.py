@@ -8,7 +8,7 @@ plan consolidation, and validation logic.
 from typing import Dict, Any, List
 import json
 import re
-from ...cell_type_models import ChatState
+from ...cell_types.models import ChatState
 from ..node_base import BaseWorkflowNode
 
 

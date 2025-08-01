@@ -15,7 +15,7 @@ from typing import Dict, Any, List, Optional, Tuple, Set
 
 import pandas as pd
 
-from ..cell_type_models import CellTypeRelation, CellTypeLineage
+from .models import CellTypeRelation, CellTypeLineage
 
 
 class HierarchicalCellTypeManager:

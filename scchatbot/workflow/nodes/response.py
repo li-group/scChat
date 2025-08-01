@@ -10,7 +10,7 @@ import json
 from langchain_core.messages import AIMessage, SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 
-from ...cell_type_models import ChatState
+from ...cell_types.models import ChatState
 from ..node_base import BaseWorkflowNode
 from ..unified_result_accessor import get_unified_results_for_synthesis
 

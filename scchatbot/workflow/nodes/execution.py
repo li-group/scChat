@@ -8,7 +8,7 @@ manages function calls, and handles validation steps.
 import copy
 from typing import Dict, Any, List
 
-from ...cell_type_models import ChatState, ExecutionStep
+from ...cell_types.models import ChatState, ExecutionStep
 from ..node_base import BaseWorkflowNode
 
 

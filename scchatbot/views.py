@@ -96,7 +96,7 @@ def chat_with_ai(request):
         
 from django.shortcuts import render
 # from .your_visualizations_module import display_umap_html  # Update the import path as needed
-from .visualizations import display_umap
+from .analysis.visualizations import display_umap
 def show_umap(request, cell_type="Overall"):
     plot_html = display_umap(cell_type)
     return render(request, "scchatbot/umap_template.html", {"plot_html": plot_html})

@@ -8,7 +8,7 @@ from gprofiler import GProfiler
 from typing import List, Dict, Any
 import gseapy as gp
 import re
-from scchatbot.utils import dea_split_by_condition
+from scchatbot.cell_types.utils import dea_split_by_condition
 
 def dea(adata, cell_type):
     try:
@@ -1313,8 +1313,8 @@ def perform_enrichment_analyses(
     # ENRICHMENT VECTOR DATABASE INTEGRATION
     # Index enrichment results immediately for semantic search
     try:
-        from ..function_history import FunctionHistoryManager
-        history_manager = FunctionHistoryManager()
+        from ..workflow.function_history import FunctionHistoryManager
+        history_manager = FunctionHistoryManager("conversation_history")
         if hasattr(history_manager, 'index_enrichment_results_from_dual_csvs'):
             history_manager.index_enrichment_results_from_dual_csvs(result_dict, cell_type)
             print(f"✅ Enrichment vector database indexed: {cell_type}")

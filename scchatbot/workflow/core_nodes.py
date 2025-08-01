@@ -7,7 +7,7 @@ workflow nodes for better modularity and maintainability.
 
 from typing import Dict, Any, List
 
-from ..cell_type_models import ChatState, ExecutionStep
+from ..cell_types.models import ChatState, ExecutionStep
 
 # Import individual node implementations
 from .nodes import (
@@ -20,7 +20,7 @@ from .nodes import (
 
 # Import EnrichmentChecker with error handling
 try:
-    from ..enrichment_checker import EnrichmentChecker
+    from ..analysis.enrichment_checker import EnrichmentChecker
     ENRICHMENT_CHECKER_AVAILABLE = True
 except ImportError as e:
     print(f"⚠️ EnrichmentChecker not available: {e}")

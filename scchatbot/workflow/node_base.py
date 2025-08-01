@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
-from ..cell_type_models import ChatState
+from ..cell_types.models import ChatState
 
 
 class BaseWorkflowNode(ABC):

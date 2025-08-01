@@ -27,7 +27,7 @@ class ChatBot(MultiAgentChatBot):
 
 
 # Re-export key classes for backward compatibility
-from .cell_type_models import (
+from .cell_types.models import (
     CellTypeRelation,
     CellTypeLineage,
     ChatState,
@@ -39,7 +39,7 @@ from .cell_types.hierarchy_manager import (
     CellTypeExtractor
 )
 
-from .function_history import FunctionHistoryManager
+from .workflow.function_history import FunctionHistoryManager
 from .analysis.analysis_wrapper import AnalysisFunctionWrapper
 from .workflow import WorkflowNodes
 

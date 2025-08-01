@@ -15,7 +15,7 @@ from langgraph.graph import StateGraph, END
 from langchain_core.runnables import RunnableConfig
 
 from .cell_types.annotation_pipeline import initial_cell_annotation
-from .visualizations import (
+from .analysis.visualizations import (
     display_dotplot,
     display_cell_type_composition,
     display_gsea_dotplot,
@@ -25,9 +25,9 @@ from .visualizations import (
     display_enrichment_dotplot,
     display_enrichment_visualization
 )
-from .utils import clear_directory
-from .cell_type_models import ChatState
-from .function_history import FunctionHistoryManager
+from .cell_types.utils import clear_directory
+from .cell_types.models import ChatState
+from .workflow.function_history import FunctionHistoryManager
 from .cell_types.hierarchy_manager import HierarchicalCellTypeManager, CellTypeExtractor
 from .analysis.analysis_wrapper import AnalysisFunctionWrapper
 from .workflow import WorkflowNodes
@@ -561,7 +561,7 @@ class MultiAgentChatBot:
             
         # Clear analysis result directories
         directories_to_clear = [
-            'scchatbot/enrichment', 'scchatbot/deg_res', 'function_history',
+            'scchatbot/enrichment', 'scchatbot/deg_res',
             'figures', 'umaps/annotated'
         ]
         
@@ -574,7 +574,7 @@ class MultiAgentChatBot:
                 print(f"⚠️ Failed to clear {directory}: {e}")
         
         # Remove execution history file
-        execution_history_file = "function_history/execution_history.json"
+        execution_history_file = "conversation_history/execution_history.json"
         if os.path.exists(execution_history_file):
             try:
                 os.remove(execution_history_file)
@@ -685,11 +685,11 @@ class MultiAgentChatBot:
             except Exception as e:
                 print(f"❌ Hierarchical DEA failed: {e}")
                 # Fallback to direct function call
-                from .utils import dea_split_by_condition
+                from .cell_types.utils import dea_split_by_condition
                 return dea_split_by_condition(self.adata, **kwargs)
         else:
             # Fallback to direct function call
-            from .utils import dea_split_by_condition
+            from .cell_types.utils import dea_split_by_condition
             return dea_split_by_condition(self.adata, **kwargs)
 
     def _wrap_process_cells(self, **kwargs):
@@ -747,7 +747,7 @@ class MultiAgentChatBot:
             return self.analysis_wrapper.compare_cell_count_hierarchical(cell_type, **filtered_kwargs)
         else:
             # Fallback to direct function call
-            from .utils import compare_cell_count
+            from .cell_types.utils import compare_cell_count
             return compare_cell_count(self.adata, cell_type)
 
     def _wrap_validate_processing_results(self, **kwargs):
@@ -788,7 +788,7 @@ class MultiAgentChatBot:
                     if self.analysis_wrapper:
                         result = self.analysis_wrapper.compare_cell_count_hierarchical(ct, **filtered_kwargs)
                     else:
-                        from .utils import compare_cell_count
+                        from .cell_types.utils import compare_cell_count
                         result = compare_cell_count(self.adata, ct)
                     
                     results.append(f"\\n=== {ct} ===\\n{result}")
