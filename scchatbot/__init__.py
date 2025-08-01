@@ -22,7 +22,6 @@ def _get_models():
         CellTypeLineage,
         ChatState,
         ExecutionStep,
-        ExecutionPlan,
         HierarchicalCellTypeManager,
         CellTypeExtractor,
         FunctionHistoryManager,
@@ -34,7 +33,6 @@ def _get_models():
         'CellTypeLineage': CellTypeLineage,
         'ChatState': ChatState,
         'ExecutionStep': ExecutionStep,
-        'ExecutionPlan': ExecutionPlan,
         'HierarchicalCellTypeManager': HierarchicalCellTypeManager,
         'CellTypeExtractor': CellTypeExtractor,
         'FunctionHistoryManager': FunctionHistoryManager,
@@ -47,7 +45,7 @@ def __getattr__(name):
     if name == 'ChatBot':
         return _get_chatbot()
     elif name in ['CellTypeRelation', 'CellTypeLineage', 'ChatState', 'ExecutionStep', 
-                  'ExecutionPlan', 'HierarchicalCellTypeManager', 'CellTypeExtractor',
+                  'HierarchicalCellTypeManager', 'CellTypeExtractor',
                   'FunctionHistoryManager', 'AnalysisFunctionWrapper', 'WorkflowNodes']:
         return _get_models()[name]
     raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
@@ -59,7 +57,6 @@ __all__ = [
     'CellTypeLineage',
     'ChatState',
     'ExecutionStep',
-    'ExecutionPlan',
     'HierarchicalCellTypeManager',
     'CellTypeExtractor',
     'FunctionHistoryManager',

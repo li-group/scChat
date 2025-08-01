@@ -9,11 +9,9 @@ Classes moved from cell_type_hierarchy.py:
 - CellTypeExtractor: Multi-strategy cell type extraction
 """
 
-import os
 import json
 import re
 from typing import Dict, Any, List, Optional, Tuple, Set
-from datetime import datetime
 
 import pandas as pd
 
@@ -487,40 +485,13 @@ class CellTypeExtractor:
         self.hierarchy_manager = hierarchy_manager
         self.adata = adata
         
-        # Common cell type patterns for validation
-        self.valid_cell_type_patterns = [
-            r'\b(T cell)s?\b',
-            r'\b(B cell)s?\b', 
-            r'\b(Natural killer cell)s?\b',
-            r'\b(NK cell)s?\b',
-            r'\b(Mononuclear phagocyte)s?\b',
-            r'\b(Plasmacytoid dendritic cell)s?\b',
-            r'\b(Dendritic cell)s?\b',
-            r'\b(Macrophage)s?\b',
-            r'\b(Monocyte)s?\b',
-            r'\b([A-Z][a-z]+\s+cell)s?\b',  # Generic pattern for "Xyz cell"
-        ]
-        
         # Common separators for multi-cell-type strings
         self.cell_type_separators = [',', ' and ', ' & ', ';', ' vs ', ' versus ', ' or ']
-        
-        # Invalid patterns to filter out
-        self.invalid_patterns = [
-            r'^\d+$',        # Pure numbers
-            r'^[a-z]+$',     # All lowercase
-            r'^[A-Z]$',      # Single capital letter
-            r'cluster',      # Contains 'cluster'
-            r'sample',       # Contains 'sample'  
-            r'condition',    # Contains 'condition'
-            r'group',        # Contains 'group'
-            r'^type$',       # Just 'type'
-            r'analysis',     # Contains 'analysis'
-        ]
     
     def extract_from_annotation_result(self, result: Any) -> List[str]:
         """
-        🎯 STRATEGY 1: Extract cell types from annotation results
-        Handles dictionary format, markdown headers, and text patterns
+        🎯 Extract cell types from annotation results in dictionary format
+        Expected format: group_to_cell_type = {'0': 'Cell Type 1', '1': 'Cell Type 2', ...}
         """
         print(f"🔍 CellTypeExtractor.extract_from_annotation_result() called with result type: {type(result)}")
         
@@ -528,76 +499,21 @@ class CellTypeExtractor:
             print(f"⚠️ CellTypeExtractor: Result is not string, returning empty list")
             return []
         
-        cell_types = []
         text = str(result)
         
-        # PRIORITY 1: Extract from dictionary format (most reliable)
-        dict_pattern = r"group_to_cell_type\s*=\s*\{([^}]+)\}"
-        dict_match = re.search(dict_pattern, text)
-        if dict_match:
-            dict_content = dict_match.group(1)
-            # Extract values from the dictionary (cell types are the values)
-            value_pattern = r"'[^']*':\s*'([^']+)'"
-            values = re.findall(value_pattern, dict_content)
-            cell_types.extend(values)
-            print(f"✅ CellTypeExtractor: Extracted {len(values)} cell types from dictionary format: {values}")
-            
-            # If we found cell types in dictionary format, return them (most reliable)
-            if values:
-                cleaned_result = self._clean_and_deduplicate(values)
-                print(f"🎯 CellTypeExtractor.extract_from_annotation_result() returning (dictionary): {cleaned_result}")
-                return cleaned_result
+        # Extract cell types from dictionary format: 'key': 'cell_type'
+        # Find all values between single quotes after a colon
+        value_pattern = r"'[^']*':\s*'([^']+)'"
+        cell_types = re.findall(value_pattern, text)
         
-        # PRIORITY 2: Extract from markdown headers
-        header_matches = re.findall(r"###\s*Cluster\s*\d+:\s*([^:\n]+)", text)
-        cell_types.extend([match.strip() for match in header_matches])
-        
-        # PRIORITY 3: Use specific known patterns if above methods fail
-        if not cell_types:
-            for pattern in self.valid_cell_type_patterns:
-                matches = re.findall(pattern, text, re.IGNORECASE)
-                cell_types.extend(matches)
-        
-        final_result = self._clean_and_deduplicate(cell_types)
-        print(f"🎯 CellTypeExtractor.extract_from_annotation_result() returning (patterns): {final_result}")
-        return final_result
-    
-    def extract_from_analysis_description(self, analysis_description: str) -> Optional[str]:
-        """
-        🎯 STRATEGY 2: Extract single cell type from analysis description
-        Uses multiple regex patterns to find cell types in text
-        """
-        print(f"🔍 CellTypeExtractor.extract_from_analysis_description() called with: '{analysis_description}'")
-        
-        if not analysis_description:
-            print(f"⚠️ CellTypeExtractor: Empty analysis description, returning None")
-            return None
-        
-        # Common patterns for cell type extraction from analysis descriptions
-        patterns = [
-            r'analyze\s+([A-Z][a-z]*\s+cell)',
-            r'for\s+([A-Z][a-z]*\s+cell)', 
-            r'of\s+([A-Z][a-z]*\s+cell)',
-            r'([A-Z][a-z]*\s+cell)\s+analysis',
-            r'([A-Z][a-z]*\s+cell)\s+enrichment',
-            r'([A-Z][a-z]*\s+cell)\s+comparison',
-            r'([A-Z][a-z]*\s+cell)\s+dea',
-            r'([A-Z][a-z]*\s+cell)\s+markers'
-        ]
-        
-        for pattern in patterns:
-            match = re.search(pattern, analysis_description, re.IGNORECASE)
-            if match:
-                cell_type = match.group(1).strip()
-                print(f"📋 CellTypeExtractor: Found potential cell type '{cell_type}' with pattern '{pattern}'")
-                if self._is_valid_cell_type(cell_type):
-                    print(f"🎯 CellTypeExtractor.extract_from_analysis_description() returning: '{cell_type}'")
-                    return cell_type
-                else:
-                    print(f"❌ CellTypeExtractor: '{cell_type}' failed validation")
-        
-        print(f"🎯 CellTypeExtractor.extract_from_analysis_description() returning: None")
-        return None
+        if cell_types:
+            print(f"✅ CellTypeExtractor: Extracted {len(cell_types)} cell types: {cell_types}")
+            cleaned_result = self._clean_and_deduplicate(cell_types)
+            print(f"🎯 CellTypeExtractor.extract_from_annotation_result() returning: {cleaned_result}")
+            return cleaned_result
+        else:
+            print(f"⚠️ CellTypeExtractor: No cell types found in expected dictionary format")
+            return []
     
     def parse_multi_cell_type_string(self, cell_type_string: str) -> List[str]:
         """
@@ -627,167 +543,34 @@ class CellTypeExtractor:
         print(f"🎯 CellTypeExtractor.parse_multi_cell_type_string() returning: {final_result}")
         return final_result
     
-    def extract_from_execution_state(self, state: dict) -> List[str]:
-        """
-        🎯 STRATEGY 4: Extract all cell types from execution state
-        Combines execution plan, history, and critic feedback
-        """
-        print(f"🔍 CellTypeExtractor.extract_from_execution_state() called")
-        cell_types = set()
-        
-        # From execution plan
-        if state.get("execution_plan") and state["execution_plan"].get("steps"):
-            for step in state["execution_plan"]["steps"]:
-                # Check parameters
-                cell_type = step.get("parameters", {}).get("cell_type")
-                if cell_type and cell_type != "overall":
-                    cell_types.update(self.parse_multi_cell_type_string(cell_type))
-                
-                # Check target_cell_type
-                target_cell_type = step.get("target_cell_type")
-                if target_cell_type and target_cell_type != "overall":
-                    cell_types.update(self.parse_multi_cell_type_string(target_cell_type))
-        
-        # From execution history
-        if state.get("execution_history"):
-            for execution in state["execution_history"]:
-                if execution.get("success") and execution.get("step"):
-                    step = execution["step"]
-                    cell_type = step.get("parameters", {}).get("cell_type")
-                    if cell_type and cell_type != "overall":
-                        cell_types.update(self.parse_multi_cell_type_string(cell_type))
-        
-        # From critic feedback
-        for feedback in state.get("critic_feedback_history", []):
-            for missing in feedback.get("missing_analyses", []):
-                cell_type = self.extract_from_analysis_description(missing)
-                if cell_type:
-                    cell_types.add(cell_type)
-        
-        final_result = list(cell_types)
-        print(f"🎯 CellTypeExtractor.extract_from_execution_state() returning: {final_result}")
-        return final_result
-    
-    def extract_from_execution_context(self, state: dict, include_history: bool = True) -> List[str]:
-        """
-        🎯 STRATEGY 5: Smart context-based extraction for cache and analysis
-        Prioritizes current execution context over historical data
-        """
-        print(f"🔍 CellTypeExtractor.extract_from_execution_context() called with include_history={include_history}")
-        relevant_cell_types = set()
-        
-        print("🔍 CellTypeExtractor: Extracting cell types from execution context...")
-        
-        # 1. PRIORITY: Current execution plan (LLM already identified these!)
-        if state.get("execution_plan") and state["execution_plan"].get("steps"):
-            for step in state["execution_plan"]["steps"]:
-                cell_type = step.get("parameters", {}).get("cell_type")
-                if cell_type and cell_type != "overall":
-                    parsed_types = self.parse_multi_cell_type_string(cell_type)
-                    relevant_cell_types.update(parsed_types)
-                    for ct in parsed_types:
-                        print(f"   📋 From execution plan: {ct}")
-                
-                target_cell_type = step.get("target_cell_type")
-                if target_cell_type and target_cell_type != "overall":
-                    parsed_types = self.parse_multi_cell_type_string(target_cell_type)
-                    relevant_cell_types.update(parsed_types)
-                    for ct in parsed_types:
-                        print(f"   🎯 From target cell type: {ct}")
-        
-        # 2. Current execution history (what was actually analyzed)
-        if state.get("execution_history"):
-            for execution in state["execution_history"]:
-                if execution.get("success") and execution.get("step"):
-                    step = execution["step"]
-                    cell_type = step.get("parameters", {}).get("cell_type")
-                    if cell_type and cell_type != "overall":
-                        parsed_types = self.parse_multi_cell_type_string(cell_type)
-                        relevant_cell_types.update(parsed_types)
-                        for ct in parsed_types:
-                            print(f"   ✅ From execution history: {ct}")
-        
-        # 3. Include historical data if requested
-        if include_history and hasattr(self, '_get_historical_cell_types'):
-            historical_types = self._get_historical_cell_types()
-            relevant_cell_types.update(historical_types)
-            for ct in historical_types:
-                print(f"   📜 From function history: {ct}")
-        
-        # 4. Fallbacks
-        if not relevant_cell_types:
-            fallback_types = self._get_fallback_cell_types(state)
-            relevant_cell_types.update(fallback_types)
-            print(f"   🔄 Using fallback cell types: {fallback_types}")
-        
-        result = list(relevant_cell_types)
-        print(f"🎯 CellTypeExtractor.extract_from_execution_context() returning: {result}")
-        return result
-    
     def _clean_and_deduplicate(self, cell_types: List[str]) -> List[str]:
-        """Clean, validate, and deduplicate cell type list"""
+        """Clean and deduplicate cell type list - simplified since cell types come from Neo4j"""
         print(f"🧹 CellTypeExtractor._clean_and_deduplicate() called with: {cell_types}")
         cleaned_types = []
         
         for cell_type in cell_types:
             cleaned = cell_type.strip()
             
-            # Basic validation
-            if (len(cleaned) > 2 and 
-                cleaned not in cleaned_types and
-                self._is_valid_cell_type(cleaned)):
-                cleaned_types.append(cleaned)
-                print(f"✅ CellTypeExtractor: Accepted cell type: '{cleaned}'")
+            # Simple validation: non-empty, minimum length, not duplicate
+            if len(cleaned) > 2 and cleaned not in cleaned_types:
+                # Trust hierarchy manager validation if available, otherwise accept
+                if self.hierarchy_manager:
+                    if self.hierarchy_manager.is_valid_cell_type(cleaned):
+                        cleaned_types.append(cleaned)
+                        print(f"✅ CellTypeExtractor: Accepted cell type: '{cleaned}' (validated by hierarchy manager)")
+                    else:
+                        print(f"❌ CellTypeExtractor: Rejected cell type: '{cleaned}' (not in Neo4j database)")
+                else:
+                    # No hierarchy manager - accept all reasonable cell types
+                    cleaned_types.append(cleaned)
+                    print(f"✅ CellTypeExtractor: Accepted cell type: '{cleaned}' (no hierarchy manager)")
             else:
-                print(f"❌ CellTypeExtractor: Rejected cell type: '{cleaned}' (len={len(cleaned)}, duplicate={cleaned in cleaned_types}, valid={self._is_valid_cell_type(cleaned)})")
+                if len(cleaned) <= 2:
+                    print(f"❌ CellTypeExtractor: Rejected cell type: '{cleaned}' (too short)")
+                elif cleaned in cleaned_types:
+                    print(f"❌ CellTypeExtractor: Rejected cell type: '{cleaned}' (duplicate)")
         
         print(f"🧹 CellTypeExtractor._clean_and_deduplicate() returning: {cleaned_types}")
         return cleaned_types
     
-    def _is_valid_cell_type(self, cell_type: str) -> bool:
-        """Enhanced validation for cell types"""
-        if not cell_type:
-            return False
-        
-        cell_type_lower = cell_type.lower()
-        
-        # Check against invalid patterns
-        for pattern in self.invalid_patterns:
-            if re.search(pattern, cell_type_lower):
-                print(f"❌ CellTypeExtractor: '{cell_type}' matches invalid pattern: {pattern}")
-                return False
-        
-        # If we have a hierarchy manager, use it for validation
-        if self.hierarchy_manager:
-            is_valid = self.hierarchy_manager.is_valid_cell_type(cell_type)
-            print(f"🔍 CellTypeExtractor: Hierarchy manager validation for '{cell_type}': {is_valid}")
-            return is_valid
-        
-        # Basic validation: should contain "cell" or be a known cell type
-        if "cell" in cell_type_lower:
-            return True
-        
-        # Check against known patterns
-        for pattern in self.valid_cell_type_patterns:
-            if re.search(pattern, cell_type, re.IGNORECASE):
-                return True
-        
-        return False
     
-    def _get_fallback_cell_types(self, state: dict) -> List[str]:
-        """Get fallback cell types when no extraction succeeds"""
-        # Try available cell types from state
-        if state.get("available_cell_types"):
-            return state["available_cell_types"]
-        
-        # Try extracting from adata if available
-        if self.adata and hasattr(self.adata, 'obs') and 'cell_type' in self.adata.obs.columns:
-            return list(self.adata.obs["cell_type"].unique())
-        
-        return []
-    
-    def _get_historical_cell_types(self) -> List[str]:
-        """Get cell types from historical function executions"""
-        # This would be implemented to get historical data
-        # For now, return empty list as placeholder
-        return []

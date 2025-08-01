@@ -73,14 +73,3 @@ class ExecutionStep:
     expected_outcome: Optional[str] = None
     target_cell_type: Optional[str] = None
     expected_children: Optional[List[str]] = None
-
-
-@dataclass
-class ExecutionPlan:
-    """Represents the complete execution plan"""
-    steps: List[ExecutionStep]
-    original_question: str
-    plan_summary: str
-    estimated_steps: int
-
-

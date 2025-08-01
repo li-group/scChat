@@ -31,8 +31,7 @@ from .cell_type_models import (
     CellTypeRelation,
     CellTypeLineage,
     ChatState,
-    ExecutionStep,
-    ExecutionPlan
+    ExecutionStep
 )
 
 from .cell_types.hierarchy_manager import (
@@ -52,7 +51,6 @@ __all__ = [
     'CellTypeLineage', 
     'ChatState',
     'ExecutionStep',
-    'ExecutionPlan',
     'HierarchicalCellTypeManager',
     'CellTypeExtractor',
     'FunctionHistoryManager',

@@ -1,0 +1,47 @@
+[
+  {
+    "timestamp": "2025-07-31T22:10:37.840950",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Stromal cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Stromal cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Beam cell', '1': 'Fibroblast', '2': 'Trabecular meshwork cell', '3': 'Mural cell', '4': 'Endothelial cell', '5': 'Fibroblast', '6': 'Fibroblast', '7': 'Beam cell', '8': 'Fibroblast', '9': 'Fibroblast', '10': 'Endothelial cell'}.\n\u2022 Top-genes per cluster: {'0': ['PTGDS', 'MMP2', 'COL6A2', 'COL15A1', 'CTSK', 'DCN', 'CLEC11A', 'RAMP2', 'COL6A1', 'S100A4', 'FABP5', 'APOE', 'EDNRB', 'SERPINF1', 'MDK', 'CFD"
+  },
+  {
+    "timestamp": "2025-07-31T22:11:00.781420",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "Endothelial cell",
+      "analyses": [
+        "go"
+      ]
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for Endothelial cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 99\\n\\n  \u2022 GO Results:\\n    1. blood vessel morphogenesis (p-value: 6.093081391019584e-12)\\n       Genes: \\n    2. blood vessel development (p-value: 6.1260"
+  },
+  {
+    "timestamp": "2025-07-31T22:11:00.793522",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "query": "Cell cycle regulation",
+      "cell_type": "Endothelial cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'message': \"No enrichment terms found matching 'Cell cycle regulation' in Endothelial cell\", 'query': 'Cell cycle regulation', 'cell_type': 'Endothelial cell', 'total_matches': 0, 'suggestions': 'Try broader terms or check if enrichment analysis was performed for Endothelial cell'}"
+  },
+  {
+    "timestamp": "2025-07-31T22:11:06.093716",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "cell_type": "Endothelial cell",
+      "analysis": "go"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "\n            <div style=\"margin-bottom: 30px;\">\n                <h3>Bar Plot</h3>\n                <div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"f057abc1-fd95-4f4e-8065-f9a54e760103\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">                          "
+  }
+]
