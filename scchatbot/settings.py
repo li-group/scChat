@@ -12,6 +12,15 @@ INSTALLED_APPS = [
     # ...
 ]
 
+# Conditionally add channels if installed
+try:
+    import channels
+    INSTALLED_APPS.append('channels')
+    CHANNELS_AVAILABLE = True
+except ImportError:
+    CHANNELS_AVAILABLE = False
+    print("⚠️ Django Channels not installed. WebSocket features will be disabled.")
+
 MIDDLEWARE = [
     # ...
     'django.middleware.security.SecurityMiddleware',
@@ -48,6 +57,45 @@ from pathlib import Path
 ROOT_URLCONF = "scchatbot.urls"
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = "/static/"
+
+# Database configuration
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# Required Django settings
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Channels configuration (only if channels is available)
+if CHANNELS_AVAILABLE:
+    ASGI_APPLICATION = "scchatbot.asgi.application"
+    
+    # Use in-memory channel layer by default (no Redis required)
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer"
+        }
+    }
+    
+    # Uncomment below to use Redis if available
+    # try:
+    #     import channels_redis
+    #     CHANNEL_LAYERS = {
+    #         'default': {
+    #             'BACKEND': 'channels_redis.core.RedisChannelLayer',
+    #             'CONFIG': {
+    #                 "hosts": [('127.0.0.1', 6379)],
+    #             },
+    #         },
+    #     }
+    # except ImportError:
+    #     pass
 
 # For production: Use ManifestStaticFilesStorage for automatic cache busting
 # STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'

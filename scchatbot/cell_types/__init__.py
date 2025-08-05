@@ -15,9 +15,11 @@ well-organized cell type management system.
 from .standardization import (
     unified_cell_type_handler,
     standardize_cell_type,
-    get_possible_cell_types,
-    get_subtypes
+    get_possible_cell_types
 )
+
+# Import get_subtypes from utils where it's actually used
+from .utils import get_subtypes
 
 # Import hierarchy management classes
 from .hierarchy_manager import (

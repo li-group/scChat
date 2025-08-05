@@ -1,0 +1,7 @@
+# WebSocket support for real-time updates
+channels==4.0.0
+channels-redis==4.1.0
+daphne==4.0.0
+
+# Optional: For development without Redis
+# You can comment out channels-redis if using InMemoryChannelLayer

@@ -481,10 +481,14 @@ class EnrichmentChecker:
                 debug_count = debug_result.single()
                 print(f"   DEBUG: Total pathways in database: {debug_count['total'] if debug_count else 0}")
                 
-                # Look up: Pathway -> Database (simplified without GeneSetLibrary)
+                # Look up: Pathway -> Database (handle both direct and through GeneSetLibrary)
                 query = """
-                MATCH (p:Pathway)-[:FOUND_IN]->(d:Database)
+                MATCH (p:Pathway)
                 WHERE toLower(p.name) = toLower($pathway_name)
+                WITH p
+                MATCH (d:Database)
+                WHERE (p)-[:FOUND_IN]->(d) 
+                   OR (p)<-[:CONTAINS_PATHWAY]-(:GeneSetLibrary)<-[:CONTAINS_LIBRARY]-(d)
                 RETURN d.name as database, p.name as exact_name
                 LIMIT 1
                 """
@@ -512,14 +516,13 @@ class EnrichmentChecker:
                     
                     # For GSEA database, we need to find the gene_set_library
                     if database_name == 'Gsea':
-                        # Query for gene_set_library
+                        # Query for gene_set_library (simplified since we already have the pathway)
                         lib_query = """
-                        MATCH (p:Pathway)<-[:CONTAINS_PATHWAY]-(lib:GeneSetLibrary)<-[:CONTAINS_LIBRARY]-(d:Database {name: "Gsea"})
-                        WHERE toLower(p.name) = toLower($pathway_name)
+                        MATCH (p:Pathway {name: $exact_name})<-[:CONTAINS_PATHWAY]-(lib:GeneSetLibrary)
                         RETURN lib.name as gene_set_library
                         LIMIT 1
                         """
-                        lib_result = session.run(lib_query, pathway_name=pathway_name)
+                        lib_result = session.run(lib_query, exact_name=exact_name)
                         lib_record = lib_result.single()
                         
                         if lib_record:

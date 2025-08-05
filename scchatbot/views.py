@@ -55,7 +55,14 @@ def chat_with_ai(request):
     print("chat_with_ai: Received a request with method", request.method)
     if request.method == "GET":
         print("chat_with_ai: Handling GET request - rendering index.html")
-        return render(request, "scchatbot/index.html")
+        # Get or create session room for WebSocket
+        room_name = request.session.get('chat_room', 'default')
+        if 'chat_room' not in request.session:
+            import uuid
+            room_name = str(uuid.uuid4())[:8]
+            request.session['chat_room'] = room_name
+            request.session.save()
+        return render(request, "scchatbot/index.html", {'room_name': room_name})
     elif request.method == "POST":
         try:
             body = request.body.decode("utf-8")
@@ -71,7 +78,17 @@ def chat_with_ai(request):
             #     print("chat_with_ai: Web search response (first 300 chars):", response_text[:300])
             #     return JsonResponse({"response": response_text})
             
-            response_text = chatbot_instance.send_message(user_message)
+            # Get or create session room for WebSocket
+            room_name = request.session.get('chat_room', 'default')
+            if 'chat_room' not in request.session:
+                # Generate unique room name for this session
+                import uuid
+                room_name = str(uuid.uuid4())[:8]
+                request.session['chat_room'] = room_name
+                request.session.save()
+            
+            # Pass room name to chatbot for progress updates
+            response_text = chatbot_instance.send_message(user_message, session_id=room_name)
             print("chat_with_ai: Chatbot response (first 300 chars):", response_text[:300])
             
             try:

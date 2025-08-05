@@ -9,7 +9,6 @@ Functions:
 - unified_cell_type_handler(): Primary standardization function (used everywhere)
 - standardize_cell_type(): Base form normalization helper
 - get_possible_cell_types(): Generate name variations for matching
-- get_subtypes(): Neo4j-based subtype lookup
 """
 
 import re
@@ -153,50 +152,3 @@ def get_possible_cell_types(cell_type):
         else:
             possible_types.append(f"{words[0]}s")
     return list(dict.fromkeys(possible_types))
-
-
-def get_subtypes(cell_type):
-    """Get subtypes of a given cell type using Neo4j."""
-    from neo4j import GraphDatabase
-    
-    uri = "bolt://localhost:7687"
-    driver = GraphDatabase.driver(uri, auth=("neo4j", "37754262"))
-    specification = None
-    file_path = "media/specification_graph.json"
-    if os.path.exists(file_path):
-        with open(file_path, 'r') as file:
-            specification = json.load(file)
-    else:
-        print("specification not found")
-        return {}
-    
-    database = specification['database']
-    organ = specification['organ']  # ✅ ADDED: Extract organ from specification
-        
-    subtypes_data = {}
-    try:
-        with driver.session(database=database) as session:
-            query = """
-            MATCH (parent:CellType {name: $parent_cell, organ: $organ})-[:DEVELOPS_TO {organ: $organ}]->(child:CellType)
-            WHERE child.organ = $organ
-            RETURN child.name as cell_name, child.markers as marker_list
-            """
-            # ✅ FIXED: Added missing organ parameter
-            result = session.run(query, parent_cell=cell_type, organ=organ)
-            
-            for record in result:
-                subtype_name = record["cell_name"]  # ✅ Now matches query alias
-                marker_genes = record["marker_list"] or []  # ✅ Now matches query alias, handle null
-                
-                if subtype_name not in subtypes_data:
-                    subtypes_data[subtype_name] = {"markers": []}
-                
-                # ✅ FIXED: Markers are already a list, don't iterate through them
-                subtypes_data[subtype_name]["markers"] = marker_genes
-                
-    except Exception as e:
-        print(f"Error accessing Neo4j: {e}")
-        return {}
-    finally:
-        driver.close()
-    return subtypes_data

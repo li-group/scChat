@@ -475,4 +475,3 @@ def compare_cell_count(adata, cell_type):
         })
     
     return result_list
-

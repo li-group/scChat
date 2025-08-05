@@ -291,3 +291,41 @@ header h1 {
     height: 500px !important;
   }
 }
+
+/* Loading spinner styles */
+.loading-message {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--clr-secondary);
+  border-top: 3px solid var(--clr-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: var(--clr-accent);
+  font-size: 0.95em;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}

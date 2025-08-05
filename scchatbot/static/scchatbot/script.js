@@ -21,6 +21,70 @@ document.addEventListener("DOMContentLoaded", function() {
     const messagesContainer = document.getElementById('messages');
     const form = document.getElementById("chat-form");
     const fileInput = document.getElementById("file-upload");
+    
+    // WebSocket setup (optional - only if backend supports it)
+    let chatSocket = null;
+    let wsEnabled = false;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 3;
+    // Use roomName from template, fallback to 'default' if not defined
+    const wsRoomName = typeof roomName !== 'undefined' ? roomName : 'default';
+    
+    function connectWebSocket() {
+        // Don't keep trying if we've failed too many times
+        if (reconnectAttempts >= maxReconnectAttempts) {
+            console.log('WebSocket disabled after max reconnection attempts');
+            return;
+        }
+        
+        try {
+            const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+            chatSocket = new WebSocket(
+                wsScheme + '://' + window.location.host + '/ws/chat/' + wsRoomName + '/'
+            );
+            
+            chatSocket.onopen = function(e) {
+                console.log('WebSocket connected successfully');
+                wsEnabled = true;
+                reconnectAttempts = 0;
+            };
+            
+            chatSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                
+                if (data.type === 'progress') {
+                    updateLoadingMessage(data.message, data.progress, data.stage);
+                } else {
+                    // Handle regular chat messages if needed
+                    console.log('Received message:', data);
+                }
+            };
+            
+            chatSocket.onclose = function(e) {
+                wsEnabled = false;
+                reconnectAttempts++;
+                
+                if (reconnectAttempts < maxReconnectAttempts) {
+                    console.log(`WebSocket closed. Reconnect attempt ${reconnectAttempts}/${maxReconnectAttempts} in 3 seconds...`);
+                    setTimeout(() => {
+                        connectWebSocket();
+                    }, 3000);
+                } else {
+                    console.log('WebSocket support not available. Using basic loading spinner only.');
+                }
+            };
+            
+            chatSocket.onerror = function(e) {
+                console.log('WebSocket connection failed. The server may not have WebSocket support enabled.');
+            };
+        } catch (error) {
+            console.log('WebSocket not supported or not available:', error);
+            wsEnabled = false;
+        }
+    }
+    
+    // Try to connect to WebSocket when page loads
+    connectWebSocket();
 
     // Export chat as PDF without page breaks
     document.getElementById('export-pdf').addEventListener('click', function() {
@@ -364,6 +428,39 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         messagesContainer.appendChild(messageElement);
     }
+    
+    let currentLoadingMessage = null;
+    
+    function addLoadingMessage() {
+        const loadingElement = document.createElement('div');
+        loadingElement.classList.add('system-message', 'loading-message');
+        loadingElement.innerHTML = `
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <span class="loading-text">Processing your request...</span>
+            </div>
+        `;
+        messagesContainer.appendChild(loadingElement);
+        scrollToBottom();
+        currentLoadingMessage = loadingElement;
+        return loadingElement;
+    }
+    
+    function updateLoadingMessage(message, progress, stage) {
+        if (currentLoadingMessage) {
+            const loadingText = currentLoadingMessage.querySelector('.loading-text');
+            if (loadingText) {
+                let updateText = message;
+                if (stage) {
+                    updateText = `[${stage}] ${message}`;
+                }
+                if (progress !== null && progress !== undefined) {
+                    updateText += ` (${Math.round(progress)}%)`;
+                }
+                loadingText.textContent = updateText;
+            }
+        }
+    }
 
     function isTextMessage(message) {
         return typeof message === 'string';
@@ -443,6 +540,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 messageInput.value = '';
                 addChatMessage(message, true);
                 scrollToBottom();
+                
+                // Add loading indicator
+                const loadingMessage = addLoadingMessage();
         
                 try {
                     const response = await fetch(chatUrl, {
@@ -455,6 +555,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     });
         
                     const data = await response.json();
+                    
+                    // Remove loading message
+                    if (loadingMessage && loadingMessage.parentNode) {
+                        loadingMessage.remove();
+                    }
         
                     // NEW: Handle multiple messages structure (version 3.0)
                     if (data.response_type === "multiple_messages" && data.messages && Array.isArray(data.messages)) {
@@ -548,6 +653,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     
                 } catch (error) {
                     console.error('Error:', error);
+                    // Remove loading message on error
+                    if (loadingMessage && loadingMessage.parentNode) {
+                        loadingMessage.remove();
+                    }
                     addChatMessage("Failed to send message.", false);
                     scrollToBottom();
                 }

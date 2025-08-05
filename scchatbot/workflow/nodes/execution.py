@@ -10,6 +10,7 @@ from typing import Dict, Any, List
 
 from ...cell_types.models import ChatState, ExecutionStep
 from ..node_base import BaseWorkflowNode
+from ..progress_manager import ProgressManager
 
 
 class ExecutorNode(BaseWorkflowNode):
@@ -31,6 +32,15 @@ class ExecutorNode(BaseWorkflowNode):
         """Execute the current step in the plan with hierarchy awareness and validation"""
         self._log_node_start("Executor", state)
         
+        # Initialize progress manager
+        session_id = state.get("session_id", "default")
+        progress_manager = ProgressManager(session_id)
+        
+        # Set total steps for progress tracking
+        total_steps = len(state.get("execution_plan", {}).get("steps", []))
+        progress_manager.set_total_steps(total_steps)
+        progress_manager.update_stage("execution", "Starting analysis execution...")
+        
         # Continue executing while there are steps, with special handling for supplementary steps
         steps_executed = 0
         continue_execution = True
@@ -43,18 +53,22 @@ class ExecutorNode(BaseWorkflowNode):
             step_data = state["execution_plan"]["steps"][state["current_step_index"]]
             
             # Check if this step should be skipped
-            if step_data.get("skip_reason"):
+            if hasattr(step_data, 'skip_reason') and step_data.skip_reason:
                 self._handle_skipped_step(state, step_data)
                 steps_executed += 1
                 state["current_step_index"] += 1
                 continue
             
-            step = ExecutionStep(**step_data)
+            # Convert to ExecutionStep if not already
+            if isinstance(step_data, ExecutionStep):
+                step = step_data
+            else:
+                step = ExecutionStep(**step_data)
             
             print(f"🔄 Executing step {state['current_step_index'] + 1}: {step.description}")
             
             # DEBUG: Log the original function name to track mutations
-            original_function_name = step_data.get("function_name", "unknown")
+            original_function_name = getattr(step_data, 'function_name', 'unknown') if hasattr(step_data, 'function_name') else step_data.get("function_name", "unknown")
             print(f"🔍 STORAGE DEBUG: Original function_name from plan: '{original_function_name}'")
             
             success = False
@@ -62,11 +76,19 @@ class ExecutorNode(BaseWorkflowNode):
             error_msg = None
             
             try:
+                # Send progress update for current step
+                step_num = state['current_step_index'] + 1
+                progress_manager.send_custom_update(
+                    f"Executing step {step_num}: {step.description}"
+                )
+                
                 success, result, error_msg = self._execute_step(state, step)
                 
                 if success:
                     print(f"✅ Step {state['current_step_index'] + 1} completed successfully")
                     self._handle_successful_step(state, step, result)
+                    # Update progress after successful step
+                    progress_manager.increment_step(f"Completed: {step.description}")
                 
             except Exception as e:
                 error_msg = str(e)
@@ -97,19 +119,28 @@ class ExecutorNode(BaseWorkflowNode):
         self._log_node_complete("Executor", state)
         return state
     
-    def _handle_skipped_step(self, state: ChatState, step_data: Dict[str, Any]):
+    def _handle_skipped_step(self, state: ChatState, step_data: Any):
         """Handle a step that should be skipped."""
-        print(f"⏭️ Skipping step {state['current_step_index'] + 1}: {step_data.get('skip_reason')}")
+        skip_reason = getattr(step_data, 'skip_reason', None) if hasattr(step_data, 'skip_reason') else step_data.get('skip_reason')
+        print(f"⏭️ Skipping step {state['current_step_index'] + 1}: {skip_reason}")
         
         # Record skipped step in execution history for post-execution awareness
+        # Convert step_data to dict if it's an ExecutionStep object
+        if hasattr(step_data, '__dict__'):
+            step_dict = {k: v for k, v in step_data.__dict__.items()}
+        elif isinstance(step_data, dict):
+            step_dict = step_data.copy()
+        else:
+            step_dict = step_data
+            
         state["execution_history"].append({
             "step_index": state["current_step_index"],
-            "step": step_data.copy(),
+            "step": step_dict,
             "success": False,
             "result": None,
             "result_type": "skipped",
-            "result_summary": f"Skipped - {step_data.get('skip_reason')}",
-            "error": step_data.get('skip_reason'),
+            "result_summary": f"Skipped - {skip_reason}",
+            "error": skip_reason,
             "skipped": True  # Flag to distinguish from failures
         })
         

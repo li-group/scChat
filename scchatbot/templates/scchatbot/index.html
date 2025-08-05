@@ -11,6 +11,7 @@
     <script>
       const chatUrl = "{% url 'chat_with_ai' %}";
       const csrfToken = "{{ csrf_token }}";
+      const roomName = "{{ room_name|default:'default' }}";
     </script>
     <!-- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
     <script src="https://cdn.plot.ly/plotly-2.34.0.min.js"></script>

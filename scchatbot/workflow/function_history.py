@@ -665,9 +665,9 @@ class FunctionHistoryManager:
         # Check if condition-specific results exist
         conditions = enrichment_results.get("conditions", {})
         if conditions and isinstance(conditions, dict):
-            for condition_key in conditions.keys():
-                if condition_key != "cell_type":
-                    conditions_to_index.append(condition_key)
+            available_conditions = conditions.get("available_conditions", [])
+            if available_conditions:
+                conditions_to_index.extend(available_conditions)
         
         total_indexed = 0
         

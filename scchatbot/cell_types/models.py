@@ -73,3 +73,4 @@ class ExecutionStep:
     expected_outcome: Optional[str] = None
     target_cell_type: Optional[str] = None
     expected_children: Optional[List[str]] = None
+    skip_reason: Optional[str] = None  # Added for skipped steps
