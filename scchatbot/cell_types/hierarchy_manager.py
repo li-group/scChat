@@ -213,6 +213,18 @@ class HierarchicalCellTypeManager:
         best_parent = None
         shortest_length = float('inf')
         
+        # First check if target_type is a parent of any available types
+        # (i.e., can we use an available subtype to represent the parent?)
+        for available_type in available_types:
+            # Check if available_type is a descendant of target_type
+            reverse_path = self.get_path_to_target(target_type, available_type)
+            if reverse_path:
+                # Available type IS a subtype of target - target is already discoverable!
+                print(f"✅ '{target_type}' is a parent of available '{available_type}'")
+                # Return the available type as the "parent" to use for this target
+                return (available_type, [available_type])
+        
+        # Original logic: find path FROM available TO target for discovery
         for available_type in available_types:
             path = self.get_path_to_target(available_type, target_type)
             if path and len(path) < shortest_length:

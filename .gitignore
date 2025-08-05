@@ -33,3 +33,5 @@ env/
 /scchatbot/chatbot_original_backup.py
 /scchatbot/instruction.md
 /removed_files_backup/
+/scchatbot/glioblastoma_test_v2.json
+/scchatbot/all_questions_glioblastoma.json
