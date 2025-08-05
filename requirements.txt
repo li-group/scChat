@@ -1,3 +1,4 @@
+# Core Dependencies
 absl-py==2.1.0
 aiohappyeyeballs==2.4.0
 aiohttp==3.10.5
@@ -156,3 +157,31 @@ urllib3==2.2.2
 xlrd==2.0.1
 yarl==1.9.4
 zipp==3.20.0
+
+# WebSocket support (Optional - for real-time progress updates)
+channels==4.0.0
+channels-redis==4.1.0
+daphne==4.0.0
+
+# Vector Database & Enhanced Search (Optional - for conversation history)
+langchain-huggingface>=0.0.3
+langchain-chroma>=0.1.0
+chromadb>=0.4.22
+sentence-transformers>=2.2.2
+transformers>=4.36.0
+
+# Neo4j Database (Required for cell type hierarchy and pathway lookup)
+neo4j==5.24.0
+
+# FAISS Vector Search (Required for enrichment pathway search)
+faiss-cpu==1.7.4
+
+# OpenAI API (Required for LLM functionality)
+langchain-openai==0.1.23
+
+# LangGraph (Required for workflow orchestration)
+langgraph==0.2.19
+
+# Additional utility packages
+bioservices==1.11.2  # For BioMart queries
+redis==5.0.8  # Optional: For WebSocket Redis support
