@@ -455,22 +455,6 @@ class PlannerNode(BaseWorkflowNode):
         
         return fixed_steps
     
-    def _find_correct_cell_type_name(self, original_name: str, needed_cell_types: List[str]) -> str:
-        """Find the correct cell type name from needed types."""
-        # Direct match
-        if original_name in needed_cell_types:
-            return original_name
-        
-        # Fuzzy matching for common variations
-        original_lower = original_name.lower()
-        for needed_type in needed_cell_types:
-            needed_lower = needed_type.lower()
-            if (original_lower in needed_lower or needed_lower in original_lower or
-                original_lower.replace(" ", "") == needed_lower.replace(" ", "")):
-                return needed_type
-        
-        return original_name
-    
     def _create_discovery_steps_only(self, needed_cell_types: List[str], available_cell_types: List[str]) -> List[Dict[str, Any]]:
         """Create ONLY discovery steps, matching original V2 implementation."""
         discovery_steps = []
