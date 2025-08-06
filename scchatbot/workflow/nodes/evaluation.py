@@ -580,8 +580,6 @@ class EvaluatorNode(BaseWorkflowNode):
 
                                 - display_cell_type_composition: Display cell type composition graph. Use when user wants to see the proportion of different cell types.
 
-                                - display_umap: Display basic UMAP without cell type annotations. Use for basic dimensionality reduction visualization.
-
                                 - display_processed_umap: Display UMAP with cell type annotations. Use when user wants to see cell type annotations on UMAP.
 
                                 SEARCH FUNCTIONS:

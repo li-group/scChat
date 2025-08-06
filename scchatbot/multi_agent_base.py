@@ -19,7 +19,6 @@ from .analysis.visualizations import (
     display_dotplot,
     display_cell_type_composition,
     display_gsea_dotplot,
-    display_umap,
     display_processed_umap,
     display_enrichment_barplot,
     display_enrichment_dotplot,
@@ -185,7 +184,7 @@ class MultiAgentChatBot:
         """Setup function descriptions and mappings"""
         self.visualization_functions = {
             "display_dotplot", "display_cell_type_composition", "display_gsea_dotplot",
-            "display_umap", "display_processed_umap", "display_enrichment_barplot", 
+            "display_processed_umap", "display_enrichment_barplot", 
             "display_enrichment_dotplot", "display_enrichment_visualization"
         }
 
@@ -217,15 +216,6 @@ class MultiAgentChatBot:
                         "top_n": {"type": "integer", "default": 20, "description": "Number of top terms to display"}
                     },
                     "required": []
-                },
-            },
-            {
-                "name": "display_umap",
-                "description": "Display UMAP that is NOT annotated with cell types. Use when user wants basic dimensionality reduction visualization.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {"cell_type": {"type": "string", "description": "The cell type to focus on, or 'overall' for all cells"}},
-                    "required": ["cell_type"],
                 },
             },
             {
@@ -364,7 +354,6 @@ class MultiAgentChatBot:
             "display_dotplot": self._wrap_visualization(display_dotplot),
             "display_cell_type_composition": self._wrap_visualization(display_cell_type_composition),
             "display_gsea_dotplot": self._wrap_visualization(display_gsea_dotplot),
-            "display_umap": self._wrap_visualization(display_umap),
             "display_processed_umap": self._wrap_visualization(display_processed_umap),
             "display_enrichment_barplot": self._wrap_visualization(display_enrichment_barplot),
             "display_enrichment_dotplot": self._wrap_visualization(display_enrichment_dotplot),
@@ -610,7 +599,7 @@ class MultiAgentChatBot:
                     condition = kwargs.get('condition', None)
                     top_n = kwargs.get('top_n', 20)
                     return func(cell_type=cell_type, condition=condition, top_n=top_n)
-                elif func_name in ['display_umap', 'display_processed_umap']:
+                elif func_name == 'display_processed_umap':
                     # Takes cell_type as positional argument
                     cell_type = kwargs.get('cell_type', 'overall')
                     return func(cell_type)

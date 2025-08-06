@@ -548,7 +548,6 @@ class VisualizationResultAccessor(ResultAccessorBase):
             "display_dotplot": "gene expression dotplot",
             "display_cell_type_composition": "cell type composition analysis",
             "display_gsea_dotplot": "GSEA enrichment dotplot",
-            "display_umap": "UMAP dimensionality reduction plot",
             "display_processed_umap": "annotated UMAP with cell types",
             "display_enrichment_barplot": "enrichment barplot",
             "display_enrichment_dotplot": "enrichment dotplot"

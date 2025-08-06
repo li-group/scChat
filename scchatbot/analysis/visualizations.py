@@ -322,36 +322,6 @@ def display_dotplot(cell_type: str = "Overall cells") -> str:
     except Exception as e:
         return f"Error generating dot plot: {e}"
 
-def display_umap(cell_type: str) -> str:
-    cell_type_formatted = unified_cell_type_handler(cell_type)
-    umap_data = pd.read_csv(f'scchatbot/runtime_data/process_cell_data/{cell_type_formatted}_umap_data.csv')
-    if cell_type_formatted != "Overall cells":
-        umap_data['original_cell_type'] = umap_data['cell_type']
-        umap_data['cell_type'] = 'Unknown'
-    fig = px.scatter(
-        umap_data,
-        x="UMAP_1",
-        y="UMAP_2",
-        color="leiden",
-        symbol="patient_name",
-        title="T Cells UMAP Plot",
-        labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
-    )
-    fig.update_traces(marker=dict(size=5, opacity=0.8))
-    fig.update_layout(width=1200, height=800, autosize=True, showlegend=False)
-    custom_legend = go.Scatter(
-        x=[None], y=[None],
-        mode='markers',
-        marker=dict(size=10, color='rgba(0,0,0,0)'),
-        legendgroup="Unknown",
-        showlegend=True,
-        name="Unknown"
-    )
-    fig.add_trace(custom_legend)
-    # Generate HTML snippet of the interactive plot using Plotly's to_html
-    plot_html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
-    return plot_html
-
 
 def display_processed_umap(cell_type: str) -> str:
     import os

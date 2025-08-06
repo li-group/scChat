@@ -567,7 +567,6 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             "display_dotplot": "gene expression dotplot",
             "display_cell_type_composition": "cell type composition dendrogram", 
             "display_gsea_dotplot": "GSEA enrichment dotplot",
-            "display_umap": "UMAP dimensionality reduction plot",
             "display_processed_umap": "annotated UMAP plot with cell types",
             "display_enrichment_barplot": "enrichment analysis barplot",
             "display_enrichment_dotplot": "enrichment analysis dotplot",
@@ -633,7 +632,6 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             "display_dotplot": "Gene Expression Dotplot",
             "display_cell_type_composition": "Cell Type Composition", 
             "display_gsea_dotplot": "GSEA Enrichment",
-            "display_umap": "UMAP Plot",
             "display_processed_umap": "Annotated UMAP",
             "display_enrichment_barplot": "Enrichment Analysis",
             "display_enrichment_dotplot": "Enrichment Dotplot",
@@ -657,7 +655,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         MAX_PLOTS = 5
         
         # Sort plots by importance (certain visualization functions get priority)
-        importance_order = ["display_umap", "display_processed_umap", "display_dotplot", "display_enrichment_visualization"]
+        importance_order = ["display_processed_umap", "display_dotplot", "display_enrichment_visualization"]
         
         def plot_priority(plot):
             func_name = plot.get("function_name", "")
