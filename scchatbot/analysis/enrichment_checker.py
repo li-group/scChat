@@ -361,12 +361,9 @@ class EnrichmentChecker:
             recommendations = self._get_pathway_recommendations(pathway_query)
             
             if recommendations:
-                # Select multiple high-confidence recommendations
-                selected_recommendations = self._select_high_confidence_recommendations(
-                    recommendations, confidence_threshold=self.confidence_threshold
-                )
+                # Use all matched recommendations directly without confidence filtering
                 enhanced_step = self._build_enhanced_step_from_recommendations(
-                    plan_step, cell_type, pathway_query, selected_recommendations
+                    plan_step, cell_type, pathway_query, recommendations
                 )
                 print(f"✅ EnrichmentChecker: Enhanced pathway semantic plan for '{pathway_query}' in {cell_type}")
                 return enhanced_step
@@ -649,9 +646,18 @@ class EnrichmentChecker:
                 pathway_name = rec.reasoning.split("'")[1] if "'" in rec.reasoning else "pathway"
                 pathway_descriptions.append(f"{rec.analyses[0].upper()}: {pathway_name}")
         
+        # Deduplicate analyses while preserving order
+        unique_analyses = []
+        for analysis in all_analyses:
+            if analysis not in unique_analyses:
+                unique_analyses.append(analysis)
+        
+        print(f"🔍 EnrichmentChecker: Collected analyses from {len(recommendations)} recommendations: {all_analyses}")
+        print(f"🔍 EnrichmentChecker: Deduplicated to unique analyses: {unique_analyses}")
+        
         # Update parameters
         enhanced_step["parameters"].update({
-            "analyses": all_analyses
+            "analyses": unique_analyses
         })
         
         if gene_set_library:
@@ -683,7 +689,7 @@ class EnrichmentChecker:
             reasoning_details.append(f"- {rec.reasoning}")
         
         print(f"🔍 EnrichmentChecker: Enhanced step with {len(recommendations)} recommendations:")
-        print(f"   • Analyses selected: {all_analyses}")
+        print(f"   • Analyses selected: {unique_analyses}")
         print(f"   • Pathway matches: {pathway_descriptions}")
         for detail in reasoning_details:
             print(f"   {detail}")

@@ -108,6 +108,16 @@ class ExecutorNode(BaseWorkflowNode):
             else:
                 print(f"❌ Step failed: {error_msg}")
                 print(f"📝 Recording error and advancing to step {state['current_step_index'] + 1} (no retries for deterministic operations)")
+                
+                # Track failed supplementary steps to prevent infinite retry loops
+                step_description = step.description if hasattr(step, 'description') else step_data.get("description", "")
+                if "Post-evaluation:" in step_description:
+                    step_signature = f"{step.function_name}_{step.parameters.get('cell_type', '') if hasattr(step, 'parameters') else step_data.get('parameters', {}).get('cell_type', '')}"
+                    previously_failed = state.get("previously_failed_supplementary_steps", [])
+                    if step_signature not in previously_failed:
+                        previously_failed.append(step_signature)
+                        state["previously_failed_supplementary_steps"] = previously_failed
+                        print(f"🚫 Recorded failed supplementary step: {step_signature}")
             
             # Check if we should continue executing (batch supplementary steps)
             continue_execution = self._should_continue_execution(state, steps_executed)

@@ -505,19 +505,43 @@ class EvaluatorNode(BaseWorkflowNode):
         
         analysis_relevance = self._get_analysis_relevance_hints(question_type, all_performed_analyses)
         
-        # CRITICAL FIX: Actually add supplementary steps to execution plan
-        if supplementary_steps:
+        # Track post-execution attempts to prevent infinite loops
+        post_execution_attempts = state.get("post_execution_attempts", 0)
+        previously_failed_steps = state.get("previously_failed_supplementary_steps", [])
+        
+        # Check if we're suggesting the same failed steps again
+        new_unique_steps = []
+        for step in supplementary_steps:
+            step_signature = f"{step.get('function_name')}_{step.get('parameters', {}).get('cell_type', '')}"
+            if step_signature not in previously_failed_steps:
+                new_unique_steps.append(step)
+            else:
+                print(f"⚠️ Skipping previously failed supplementary step: {step_signature}")
+        
+        # CRITICAL FIX: Add retry limit for post-execution supplementary steps
+        MAX_POST_EXECUTION_ATTEMPTS = 2
+        
+        if new_unique_steps and post_execution_attempts < MAX_POST_EXECUTION_ATTEMPTS:
             execution_plan = state.get("execution_plan", {})
             if "steps" in execution_plan:
                 # Add supplementary steps to the execution plan
-                execution_plan["steps"].extend(supplementary_steps)
-                print(f"✅ Added {len(supplementary_steps)} supplementary steps to execution plan")
+                execution_plan["steps"].extend(new_unique_steps)
+                print(f"✅ Added {len(new_unique_steps)} supplementary steps to execution plan (attempt {post_execution_attempts + 1}/{MAX_POST_EXECUTION_ATTEMPTS})")
+                
+                # Increment attempt counter
+                state["post_execution_attempts"] = post_execution_attempts + 1
                 
                 # Mark conversation as incomplete so execution continues
                 state["conversation_complete"] = False
                 print(f"🔄 Marked conversation as incomplete to continue execution")
             else:
                 print("⚠️ No execution plan found to add supplementary steps")
+        elif post_execution_attempts >= MAX_POST_EXECUTION_ATTEMPTS:
+            print(f"⚠️ Reached maximum post-execution attempts ({MAX_POST_EXECUTION_ATTEMPTS}), stopping supplementary step generation")
+            state["conversation_complete"] = True
+        elif not new_unique_steps and supplementary_steps:
+            print(f"⚠️ All {len(supplementary_steps)} supplementary steps have been tried before and failed, stopping")
+            state["conversation_complete"] = True
         
         return {
             "mentioned_cell_types": mentioned_types,
