@@ -1,174 +1,76 @@
 [
   {
-    "timestamp": "2025-08-06T12:31:52.184571",
+    "timestamp": "2025-08-06T17:06:50.154092",
     "function_name": "process_cells",
     "parameters": {
       "cell_type": "Immune cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Mononuclear phagocyte', '1': 'T cell', '2': 'T cell', '3': 'T cell', '4': 'Mononuclear phagocyte', '5': 'Mononuclear phagocyte', '6': 'Mononuclear phagocyte', '7': 'Mononuclear phagocyte', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte', '10': 'Mononuclear phagocyte', '11': 'Natural killer cell', '12': 'Mononuclear phagocyte', '13': 'B cell', '14': 'Plasmacytoid dendritic cell', '15': 'Mono"
+    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Mononuclear phagocyte', '1': 'T cell', '10': 'Mononuclear phagocyte', '11': 'Mononuclear phagocyte', '12': 'Mononuclear phagocyte', '13': 'Mononuclear phagocyte', '14': 'Natural killer cell', '15': 'B cell', '16': 'T cell', '17': 'Mononuclear phagocyte', '18': 'B cell', '19': 'T cell', '2': 'T cell', '20': 'Mononuclear phagocyte', '3': 'T cell', '4': 'Mononuclear phagocyte', '5': 'Mononuclear phagocyt"
   },
   {
-    "timestamp": "2025-08-06T12:32:43.853637",
+    "timestamp": "2025-08-06T17:07:52.843449",
     "function_name": "process_cells",
     "parameters": {
-      "cell_type": "T cell"
+      "cell_type": "Mononuclear phagocyte"
     },
     "success": true,
     "error": null,
-    "result_summary": "Annotation complete for T cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T-helper 17 cell', '1': 'CD8-positive effector T cell', '2': 'CD8-positive effector memory T cell', '3': 'CD4-positive naive T cell', '4': 'CD4-positive effector T cell', '5': 'CD4-positive naive T cell', '6': 'Regulatory T cell', '7': 'NK T cell', '8': 'Regulatory T cell', '9': 'Gamma delta T cell', '10': 'Mucosal-associated invariant T cell', '11': 'CD8-positive effector T cell'}.\n\u2022 Top-genes per cluster"
+    "result_summary": "Annotation complete for Mononuclear phagocyte.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'Microglial cell','1': 'Microglial cell','2': 'Monocyte','3': 'Macrophage','4': 'Macrophage','5': 'Conventional dendritic cell','6': 'Microglial cell','7': 'Monocyte','8': 'Macrophage','9': 'Conventional dendritic cell','10': 'Monocyte','11': 'Macrophage','12': 'Conventional dendritic cell','13': 'Conventional dendritic cell','14': 'Microglial cell','15': 'Conventional dendritic cell','16': '"
   },
   {
-    "timestamp": "2025-08-06T12:32:43.855697",
-    "function_name": "display_processed_umap",
-    "parameters": {},
-    "success": false,
-    "error": "No gsea enrichment analysis results available to visualize",
-    "result_summary": null
-  },
-  {
-    "timestamp": "2025-08-06T12:32:47.988320",
-    "function_name": "display_processed_umap",
+    "timestamp": "2025-08-06T17:08:05.074756",
+    "function_name": "dea_split_by_condition",
     "parameters": {
-      "cell_type": "T cell"
+      "cell_type": "Microglial cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"75bd525b-3869-40d6-b7e8-e4650bc1832a\" class=\"plotly-graph-div\" style=\"height:800px; width:1200px;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (docume"
+    "result_summary": "{'dea_results': [{'category': 'bulk', 'significant_genes': ['SPP1', 'C1QC', 'C1QB', 'APOE', 'C1QA', 'FTL', 'CD74', 'APOC1', 'C3', 'FTH1', 'HLA-DRA', 'TYROBP', 'HLA-DPA1', 'CCL3', 'FCER1G', 'NPC2', 'APOC2', 'HLA-DRB1', 'CST3', 'FCGR3A', 'SGK1', 'ITM2B', 'PSAP', 'AIF1', 'HLA-DPB1', 'FOS', 'MARCKS', 'RGS1', 'CD14', 'TREM2', 'HLA-DRB5', 'CCL4L2', 'S100A11', 'IFI6', 'LAPTM5', 'RNASET2', 'RHOB', 'CD68', 'CEBPD', 'CYBB', 'IFI30', 'SAT1', 'FCGBP', 'IFITM3', 'GLUL', 'A2M', 'HLA-DQB1', 'CTSB', 'MAFB', 'CD"
   },
   {
-    "timestamp": "2025-08-06T14:33:51.091599",
+    "timestamp": "2025-08-06T17:15:06.059897",
     "function_name": "perform_enrichment_analyses",
     "parameters": {
-      "cell_type": "T cell",
-      "analyses": [
-        "gsea"
-      ],
-      "gene_set_library": "Tabula_Sapiens"
-    },
-    "success": true,
-    "error": null,
-    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for T cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: gsea\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 94\\n\\n  \u2022 GSEA Results:\\n    1. Bone Marrow-cd8-positive, Alpha-Beta T Cell (p-value: 1.3602216266676999e-12)\\n       Genes: IL32;DUSP2;PTPRC;BTG1;TSC22D3;GZMA;CCL"
-  },
-  {
-    "timestamp": "2025-08-06T14:33:51.144231",
-    "function_name": "display_enrichment_visualization",
-    "parameters": {
-      "analysis": "gsea"
-    },
-    "success": true,
-    "error": null,
-    "result_summary": "{'multiple_plots': True, 'plots': [{'type': 'bar', 'title': 'Top 10 GSEA Terms - Bar Plot (T cell)', 'html': '<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: \\'local\\'};</script>\\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"b695f0e3-2226-4aa6-97ca-9b292ef8a350\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">           "
-  },
-  {
-    "timestamp": "2025-08-06T14:33:54.478627",
-    "function_name": "search_enrichment_semantic",
-    "parameters": {
-      "cell_type": "T cell"
-    },
-    "success": true,
-    "error": null,
-    "result_summary": "{'error': 'Search query is required', 'results': []}"
-  },
-  {
-    "timestamp": "2025-08-06T14:33:54.534949",
-    "function_name": "display_enrichment_visualization",
-    "parameters": {
-      "cell_type": "T cell",
-      "analysis": "gsea"
-    },
-    "success": true,
-    "error": null,
-    "result_summary": "{'multiple_plots': True, 'plots': [{'type': 'bar', 'title': 'Top 10 GSEA Terms - Bar Plot (T cell)', 'html': '<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: \\'local\\'};</script>\\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"9bce3b9a-72d7-417d-a81b-66a467ea6fea\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">           "
-  },
-  {
-    "timestamp": "2025-08-06T14:35:41.245174",
-    "function_name": "perform_enrichment_analyses",
-    "parameters": {
-      "cell_type": "T cell",
-      "analyses": [
-        "gsea"
-      ],
-      "gene_set_library": "Tabula_Sapiens"
-    },
-    "success": true,
-    "error": null,
-    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for T cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: gsea\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 94\\n\\n  \u2022 GSEA Results:\\n    1. Bone Marrow-cd8-positive, Alpha-Beta T Cell (p-value: 1.3602216266676999e-12)\\n       Genes: IL32;DUSP2;PTPRC;BTG1;TSC22D3;GZMA;CCL"
-  },
-  {
-    "timestamp": "2025-08-06T14:35:41.247156",
-    "function_name": "display_enrichment_visualization",
-    "parameters": {
-      "analysis": "go"
-    },
-    "success": false,
-    "error": "No go enrichment analysis results available to visualize",
-    "result_summary": null
-  },
-  {
-    "timestamp": "2025-08-06T14:35:44.671049",
-    "function_name": "search_enrichment_semantic",
-    "parameters": {
-      "cell_type": "T cell"
-    },
-    "success": true,
-    "error": null,
-    "result_summary": "{'error': 'Search query is required', 'results': []}"
-  },
-  {
-    "timestamp": "2025-08-06T14:35:44.717212",
-    "function_name": "display_enrichment_visualization",
-    "parameters": {
-      "cell_type": "T cell",
-      "analysis": "gsea"
-    },
-    "success": true,
-    "error": null,
-    "result_summary": "{'multiple_plots': True, 'plots': [{'type': 'bar', 'title': 'Top 10 GSEA Terms - Bar Plot (T cell)', 'html': '<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: \\'local\\'};</script>\\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"1dc5ee04-d4a8-4ee8-8c3a-b5b076dd240d\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">           "
-  },
-  {
-    "timestamp": "2025-08-06T14:37:27.128902",
-    "function_name": "perform_enrichment_analyses",
-    "parameters": {
-      "cell_type": "T cell",
+      "cell_type": "Microglial cell",
       "analyses": [
         "go"
       ]
     },
     "success": true,
     "error": null,
-    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for T cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 94\\n\\n  \u2022 GO Results:\\n    1. lymphocyte activation (p-value: 3.9881886619100264e-23)\\n       Genes: \\n    2. leukocyte activation (p-value: 6.532774189545551e-22)\\n"
+    "result_summary": "{'formatted_summary': '\ud83d\udd2c Enrichment Analysis Results for Microglial cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: go\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 89\\n\\n  \u2022 GO Results:\\n    1. immune system process (p-value: 8.2659832351694995e-22)\\n       Genes: \\n    2. defense response (p-value: 3.222779853210409e-"
   },
   {
-    "timestamp": "2025-08-06T14:37:27.159868",
+    "timestamp": "2025-08-06T17:15:06.368791",
     "function_name": "display_enrichment_visualization",
     "parameters": {
       "analysis": "go"
     },
     "success": true,
     "error": null,
-    "result_summary": "{'multiple_plots': True, 'plots': [{'type': 'bar', 'title': 'Top 10 GO_BP Terms - Bar Plot (T cell)', 'html': '<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: \\'local\\'};</script>\\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"8e411892-abac-4a6a-85a5-722d7b3830cd\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">          "
+    "result_summary": "{'multiple_plots': True, 'plots': [{'type': 'bar', 'title': 'Top 10 GO_BP Terms - Bar Plot (Microglial cell)', 'html': '<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: \\'local\\'};</script>\\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"e9025c92-8840-47c5-b528-6cbb7f6adca7\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\"> "
   },
   {
-    "timestamp": "2025-08-06T14:37:31.282863",
+    "timestamp": "2025-08-06T17:15:08.777737",
     "function_name": "search_enrichment_semantic",
     "parameters": {
-      "cell_type": "T cell"
+      "cell_type": "Microglial cell"
     },
     "success": true,
     "error": null,
     "result_summary": "{'error': 'Search query is required', 'results': []}"
   },
   {
-    "timestamp": "2025-08-06T14:37:31.314258",
+    "timestamp": "2025-08-06T17:15:08.892627",
     "function_name": "display_enrichment_visualization",
     "parameters": {
-      "cell_type": "T cell",
+      "cell_type": "Microglial cell",
       "analysis": "go"
     },
     "success": true,
     "error": null,
-    "result_summary": "{'multiple_plots': True, 'plots': [{'type': 'bar', 'title': 'Top 10 GO_BP Terms - Bar Plot (T cell)', 'html': '<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: \\'local\\'};</script>\\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"07120807-980e-4c95-8568-0db4bb8f1056\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\">          "
+    "result_summary": "{'multiple_plots': True, 'plots': [{'type': 'bar', 'title': 'Top 10 GO_BP Terms - Bar Plot (Microglial cell)', 'html': '<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: \\'local\\'};</script>\\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-2.34.0.min.js\"></script>                <div id=\"a4e01e5e-a510-49c9-ac2e-333888ba4750\" class=\"plotly-graph-div\" style=\"height:600px; width:100%;\"></div>            <script type=\"text/javascript\"> "
   }
 ]

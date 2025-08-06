@@ -36,7 +36,16 @@ class HierarchicalCellTypeManager:
         
         # Database configuration
         self.db_name = self.config.get("database")
-        self.organ = self.config.get("organ")
+        
+        # Support both single and multiple sources
+        if 'sources' in self.config:
+            # Multiple sources
+            self.sources = self.config['sources']
+            self.organ = self.sources[0]['organ'] if self.sources else None  # Default to first organ for backward compatibility
+        else:
+            # Single source (backward compatibility)
+            self.organ = self.config.get("organ")
+            self.sources = [{'system': self.config.get('system'), 'organ': self.organ}] if self.organ else []
         
         # Initialize Neo4j connection
         self._initialize_neo4j_connection()
@@ -93,18 +102,27 @@ class HierarchicalCellTypeManager:
             self.valid_cell_types = []
     
     def _load_valid_cell_types(self):
-        """Load all valid cell types from Neo4j"""
+        """Load all valid cell types from Neo4j for all configured sources"""
         if not self.driver: 
             return []
+        
+        all_cell_types = set()
         try:
             with self.driver.session(database=self.db_name) as session:
-                cypher = """
-                MATCH (o:Organ {name: $organ})-[:HAS_CELL]->(root:CellType)
-                MATCH (root)-[:DEVELOPS_TO*0..]->(c:CellType)
-                RETURN collect(DISTINCT c.name) AS cell_names
-                """
-                record = session.run(cypher, {"organ": self.organ}).single()
-                return record["cell_names"] if record else []
+                # Query each source
+                for source in self.sources:
+                    organ = source['organ']
+                    cypher = """
+                    MATCH (o:Organ {name: $organ})-[:HAS_CELL]->(root:CellType)
+                    MATCH (root)-[:DEVELOPS_TO*0..]->(c:CellType)
+                    RETURN collect(DISTINCT c.name) AS cell_names
+                    """
+                    record = session.run(cypher, {"organ": organ}).single()
+                    if record and record["cell_names"]:
+                        all_cell_types.update(record["cell_names"])
+                        print(f"  📍 Loaded {len(record['cell_names'])} cell types from {organ}")
+                
+                return list(all_cell_types)
         except Exception as e:
             print(f"⚠️ Error loading cell types from Neo4j: {e}")
             return []
@@ -125,42 +143,45 @@ class HierarchicalCellTypeManager:
             )
     
     def _build_hierarchy_cache(self):
-        """Build comprehensive hierarchy cache from Neo4j"""
+        """Build comprehensive hierarchy cache from Neo4j for all sources"""
         if not self.driver:
             print("⚠️ No Neo4j connection, hierarchy features limited")
             return
             
         try:
             with self.driver.session(database=self.db_name) as session:
-                # Get full hierarchy for the organ
-                query = """
-                MATCH (o:Organ {name: $organ})-[:HAS_CELL]->(root:CellType)
-                MATCH path = (root)-[:DEVELOPS_TO*0..]->(descendant:CellType)
-                WITH root, descendant, [node in nodes(path) | node.name] as lineage_path
-                RETURN root.name as root_type, 
-                       collect(DISTINCT descendant.name) as all_descendants,
-                       collect(DISTINCT lineage_path) as all_paths
-                """
-                
-                result = session.run(query, organ=self.organ)
-                
-                for record in result:
-                    root_type = record["root_type"]
-                    descendants = set(record["all_descendants"])
+                # Build hierarchy cache for all sources
+                for source in self.sources:
+                    organ = source['organ']
+                    # Get full hierarchy for each organ
+                    query = """
+                    MATCH (o:Organ {name: $organ})-[:HAS_CELL]->(root:CellType)
+                    MATCH path = (root)-[:DEVELOPS_TO*0..]->(descendant:CellType)
+                    WITH root, descendant, [node in nodes(path) | node.name] as lineage_path
+                    RETURN root.name as root_type, 
+                           collect(DISTINCT descendant.name) as all_descendants,
+                           collect(DISTINCT lineage_path) as all_paths
+                    """
                     
-                    # Build ancestor-descendant mappings for each cell type
-                    for desc in descendants:
-                        if desc not in self.ancestor_descendant_map:
-                            self.ancestor_descendant_map[desc] = set()
-                        # Each cell type maps to all its descendants
-                        descendant_query = """
-                        MATCH path = (start:CellType {name: $cell_type})-[:DEVELOPS_TO*0..]->(desc:CellType)
-                        RETURN collect(DISTINCT desc.name) as descendants
-                        """
-                        desc_result = session.run(descendant_query, cell_type=desc)
-                        desc_record = desc_result.single()
-                        if desc_record:
-                            self.ancestor_descendant_map[desc] = set(desc_record["descendants"])
+                    result = session.run(query, organ=organ)
+                    
+                    for record in result:
+                        root_type = record["root_type"]
+                        descendants = set(record["all_descendants"])
+                        
+                        # Build ancestor-descendant mappings for each cell type
+                        for desc in descendants:
+                            if desc not in self.ancestor_descendant_map:
+                                self.ancestor_descendant_map[desc] = set()
+                            # Each cell type maps to all its descendants
+                            descendant_query = """
+                            MATCH path = (start:CellType {name: $cell_type})-[:DEVELOPS_TO*0..]->(desc:CellType)
+                            RETURN collect(DISTINCT desc.name) as descendants
+                            """
+                            desc_result = session.run(descendant_query, cell_type=desc)
+                            desc_record = desc_result.single()
+                            if desc_record:
+                                self.ancestor_descendant_map[desc] = set(desc_record["descendants"])
                 
                 # Cache hierarchy info for each type
                 for cell_type in self.valid_cell_types:

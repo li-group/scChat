@@ -623,13 +623,46 @@ class MultiAgentChatBot:
                     if cell_type == 'overall':
                         print(f"⚠️ WARNING: cell_type defaulted to 'overall' - this may indicate planner issue")
                     
-                    # Handle GO domain - default to BP if not specified
-                    if analysis.lower() == 'go' and 'domain' not in kwargs:
-                        kwargs['domain'] = 'BP'
-                    
-                    print(f"🎨 Visualization call: {func_name}(analysis='{analysis}', cell_type='{cell_type}', plot_type='{plot_type}', kwargs={kwargs})")
+                    # Handle GO analysis - create visualizations for all three domains
+                    if analysis.lower() == 'go':
+                        # For GO, we should create plots for all three domains
+                        all_plots = []
+                        domains = ['BP', 'MF', 'CC']
                         
-                    return func(analysis, cell_type, plot_type, **kwargs)
+                        for domain in domains:
+                            kwargs_copy = kwargs.copy()
+                            kwargs_copy['domain'] = domain
+                            
+                            print(f"🎨 GO Visualization call: {func_name}(analysis='go', cell_type='{cell_type}', plot_type='{plot_type}', domain='{domain}')")
+                            
+                            result = func(analysis, cell_type, plot_type, **kwargs_copy)
+                            
+                            # Handle the result based on its structure
+                            if isinstance(result, dict) and result.get("multiple_plots"):
+                                # If it's already a multiple plots structure, add domain to titles
+                                for plot in result["plots"]:
+                                    plot["title"] = plot["title"].replace("GO Terms", f"GO_{domain} Terms")
+                                all_plots.extend(result["plots"])
+                            elif isinstance(result, str) and not result.startswith("Error"):
+                                # Single plot HTML
+                                all_plots.append({
+                                    "type": plot_type,
+                                    "title": f"GO_{domain} Enrichment - {cell_type}",
+                                    "html": result
+                                })
+                        
+                        # Return combined structure for all GO domains
+                        if all_plots:
+                            return {
+                                "multiple_plots": True,
+                                "plots": all_plots
+                            }
+                        else:
+                            return "Error: No GO enrichment data available"
+                    else:
+                        # For non-GO analyses (KEGG, Reactome, GSEA), proceed normally
+                        print(f"🎨 Visualization call: {func_name}(analysis='{analysis}', cell_type='{cell_type}', plot_type='{plot_type}', kwargs={kwargs})")
+                        return func(analysis, cell_type, plot_type, **kwargs)
                 else:
                     # Default behavior
                     return func(**kwargs)

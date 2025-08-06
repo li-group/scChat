@@ -191,6 +191,12 @@ class ExecutorNode(BaseWorkflowNode):
         enhanced_params.pop("_should_fail", None)
         enhanced_params.pop("_fail_reason", None)
         
+        # CRITICAL FIX: Update step parameters with enhanced params for visualization functions
+        # This ensures the execution history records the actual parameters used
+        if step.function_name in self.visualization_functions and enhanced_params != step.parameters:
+            print(f"📝 Updating step parameters with enhanced params for execution history tracking")
+            step.parameters = enhanced_params.copy()
+        
         func = self.function_mapping[step.function_name]
         result = func(**enhanced_params)
         

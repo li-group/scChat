@@ -119,19 +119,12 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         
         # 8. NEW: Create multiple messages structure for separate rendering
         if plots and len(plots) > 0:
-            print(f"🎨 Creating multiple messages structure: 1 text + {len(plots)} plots")
+            print(f"🎨 Creating multiple messages structure: {len(plots)} plots + 1 text (plots first)")
             
             # Create comprehensive response with separate messages array
             multiple_messages = []
             
-            # Add text message as first entry
-            multiple_messages.append({
-                "message_type": "text",
-                "response": response_text,
-                "response_type": "llm_synthesized_answer"
-            })
-            
-            # Add each plot as separate message entry
+            # Add each plot as separate message entry FIRST
             for i, plot in enumerate(plots):
                 multiple_messages.append({
                     "message_type": "plot",
@@ -141,6 +134,13 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                     "plots": [plot],  # Single plot in array
                     "graph_html": f"<div class='plot-container'><h4>{plot.get('description', '')}</h4>{plot.get('html', '')}</div>"
                 })
+            
+            # Add text message as LAST entry
+            multiple_messages.append({
+                "message_type": "text",
+                "response": response_text,
+                "response_type": "llm_synthesized_answer"
+            })
             
             # Create response with multiple messages structure
             response_data = {
@@ -154,7 +154,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                 "graph_html": self._combine_plots_for_legacy(plots)
             }
             
-            print(f"🎨 Created multiple messages structure with {len(multiple_messages)} total messages")
+            print(f"🎨 Created multiple messages structure with {len(multiple_messages)} total messages (plots first, then text)")
             
         else:
             # No plots - single text response
@@ -435,7 +435,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         execution_history = state.get("execution_history", [])
         print(f"🎨 PLOT EXTRACTION: Checking {len(execution_history)} execution steps")
         
-        MAX_PLOTS = 5  # Increased to allow more individual plots
+        MAX_PLOTS = 6  # Limited to 6 plots for frontend display
         MAX_PLOT_SIZE = 8 * 1024 * 1024  # 8MB per plot maximum (reduced from 10MB)
         
         for i, execution in enumerate(execution_history):
@@ -652,7 +652,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
     def _validate_plot_sizes(self, plots: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Validate and potentially reduce plot sizes with intelligent prioritization."""
         MAX_TOTAL_SIZE = 30 * 1024 * 1024  # 30MB total limit
-        MAX_PLOTS = 5
+        MAX_PLOTS = 6  # Limited to 6 plots for frontend display
         
         # Sort plots by importance (certain visualization functions get priority)
         importance_order = ["display_processed_umap", "display_dotplot", "display_enrichment_visualization"]

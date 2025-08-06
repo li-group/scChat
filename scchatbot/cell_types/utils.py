@@ -156,7 +156,7 @@ def extract_genes(data):
     return genes
 
 def get_rag():
-    """Retrieve marker genes using Neo4j graph database."""
+    """Retrieve marker genes using Neo4j graph database, supporting multiple sources."""
     from neo4j import GraphDatabase
     import json
     import os
@@ -173,29 +173,51 @@ def get_rag():
         return {}
     
     database = specification['database']
-    system = specification['system']
-    organ = specification['organ']
     
-    print(f"🔍 Querying Level 1 markers for organ: {organ}")
+    # Check if we have multiple sources or single source (backward compatibility)
+    if 'sources' in specification:
+        # Multiple sources
+        sources = specification['sources']
+        print(f"🔍 Querying markers from {len(sources)} sources")
+    else:
+        # Single source (backward compatibility)
+        sources = [{'system': specification['system'], 'organ': specification['organ']}]
+        print(f"🔍 Querying Level 1 markers for organ: {specification['organ']}")
     
     combined_data = {}
     try:
         with driver.session(database=database) as session:
-            query = """
-            MATCH (s:System {name: $system})-[:HAS_ORGAN]->(o:Organ {name: $organ})-[:HAS_CELL]->(c:CellType)
-            WHERE c.level = 1 AND c.organ = $organ
-            RETURN c.name as cell_name, c.markers as marker_list
-            """
-            result = session.run(query, system=system, organ=organ)
-            
-            for record in result:
-                cell_name = record["cell_name"]  # ✅ Now matches query alias
-                marker_genes = record["marker_list"] or []  # ✅ Now matches query alias, handle null
+            # Loop through each source
+            for source in sources:
+                system = source['system']
+                organ = source['organ']
+                print(f"  📍 Querying {system} - {organ}")
                 
-                if cell_name not in combined_data:
-                    combined_data[cell_name] = {"markers": []}
+                query = """
+                MATCH (s:System {name: $system})-[:HAS_ORGAN]->(o:Organ {name: $organ})-[:HAS_CELL]->(c:CellType)
+                WHERE c.level = 1 AND c.organ = $organ
+                RETURN c.name as cell_name, c.markers as marker_list
+                """
+                result = session.run(query, system=system, organ=organ)
+                
+                for record in result:
+                    cell_name = record["cell_name"]
+                    marker_genes = record["marker_list"] or []
+                    
+                    if cell_name not in combined_data:
+                        # New cell type
+                        combined_data[cell_name] = {"markers": marker_genes}
+                    else:
+                        # Cell type exists - merge markers (union)
+                        existing_markers = combined_data[cell_name]["markers"]
+                        # Take union of markers, removing duplicates
+                        merged_markers = list(set(existing_markers + marker_genes))
+                        combined_data[cell_name]["markers"] = merged_markers
             
-                combined_data[cell_name]["markers"] = marker_genes   
+            # Print summary
+            total_cell_types = len(combined_data)
+            print(f"✅ Retrieved {total_cell_types} unique cell types from {len(sources)} source(s)")
+            
     except Exception as e:
         print(f"Error accessing Neo4j: {e}")
         return {}
@@ -204,7 +226,7 @@ def get_rag():
     return combined_data
 
 def get_subtypes(cell_type):
-    """Get subtypes of a given cell type using Neo4j."""
+    """Get subtypes of a given cell type using Neo4j, supporting multiple sources."""
     from neo4j import GraphDatabase
     import json
     import os
@@ -221,28 +243,41 @@ def get_subtypes(cell_type):
         return {}
     
     database = specification['database']
-    organ = specification['organ']  # ✅ ADDED: Extract organ from specification
+    
+    # Check if we have multiple sources or single source
+    if 'sources' in specification:
+        # Multiple sources
+        sources = specification['sources']
+    else:
+        # Single source (backward compatibility)
+        sources = [{'system': specification['system'], 'organ': specification['organ']}]
         
     subtypes_data = {}
     try:
         with driver.session(database=database) as session:
-            query = """
-            MATCH (parent:CellType {name: $parent_cell, organ: $organ})-[:DEVELOPS_TO {organ: $organ}]->(child:CellType)
-            WHERE child.organ = $organ
-            RETURN child.name as cell_name, child.markers as marker_list
-            """
-            # ✅ FIXED: Added missing organ parameter
-            result = session.run(query, parent_cell=cell_type, organ=organ)
-            
-            for record in result:
-                subtype_name = record["cell_name"]  # ✅ Now matches query alias
-                marker_genes = record["marker_list"] or []  # ✅ Now matches query alias, handle null
+            # Loop through each source
+            for source in sources:
+                organ = source['organ']
                 
-                if subtype_name not in subtypes_data:
-                    subtypes_data[subtype_name] = {"markers": []}
+                query = """
+                MATCH (parent:CellType {name: $parent_cell, organ: $organ})-[:DEVELOPS_TO {organ: $organ}]->(child:CellType)
+                WHERE child.organ = $organ
+                RETURN child.name as cell_name, child.markers as marker_list
+                """
+                result = session.run(query, parent_cell=cell_type, organ=organ)
                 
-                # ✅ FIXED: Markers are already a list, don't iterate through them
-                subtypes_data[subtype_name]["markers"] = marker_genes
+                for record in result:
+                    subtype_name = record["cell_name"]
+                    marker_genes = record["marker_list"] or []
+                    
+                    if subtype_name not in subtypes_data:
+                        # New subtype
+                        subtypes_data[subtype_name] = {"markers": marker_genes}
+                    else:
+                        # Subtype exists - merge markers (union)
+                        existing_markers = subtypes_data[subtype_name]["markers"]
+                        merged_markers = list(set(existing_markers + marker_genes))
+                        subtypes_data[subtype_name]["markers"] = merged_markers
                 
     except Exception as e:
         print(f"Error accessing Neo4j: {e}")
