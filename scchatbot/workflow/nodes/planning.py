@@ -414,23 +414,42 @@ class PlannerNode(BaseWorkflowNode):
         return plan_data
     
     def _fix_cell_type_names_in_steps(self, steps: List[Dict], needed_cell_types: List[str], message: str) -> List[Dict]:
-        """Fix cell type names in steps using hierarchy manager."""
-        if not self.hierarchy_manager or not steps:
+        """Fix cell type names in steps using the correctly identified cell types from RAG."""
+        if not steps or not needed_cell_types:
             return steps
         
         fixed_steps = []
+        # Track which needed cell types have been used
+        used_cell_types = set()
+        
         for step in steps:
             fixed_step = step.copy()
             params = fixed_step.get("parameters", {})
             
             if "cell_type" in params:
                 original_name = params["cell_type"]
-                # Try to map to a needed cell type
-                corrected_name = self._find_correct_cell_type_name(original_name, needed_cell_types)
+                
+                # Check if it's already a valid needed cell type
+                if original_name in needed_cell_types:
+                    corrected_name = original_name
+                    used_cell_types.add(corrected_name)
+                else:
+                    # Find the next unused needed cell type
+                    corrected_name = None
+                    for needed_type in needed_cell_types:
+                        if needed_type not in used_cell_types:
+                            corrected_name = needed_type
+                            used_cell_types.add(corrected_name)
+                            break
+                    
+                    # If all needed types are used or no match, keep original
+                    if corrected_name is None:
+                        corrected_name = original_name
+                
                 if corrected_name != original_name:
                     fixed_step["parameters"] = params.copy()
                     fixed_step["parameters"]["cell_type"] = corrected_name
-                    print(f"🔧 Fixed cell type name: '{original_name}' → '{corrected_name}'")
+                    print(f"🔧 Fixed cell type name using RAG-validated type: '{original_name}' → '{corrected_name}'")
             
             fixed_steps.append(fixed_step)
         

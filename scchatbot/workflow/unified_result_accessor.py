@@ -236,7 +236,11 @@ class DEAResultAccessor(ResultAccessorBase):
             return f"  No DEA results found for {cell_type}"
         
         for condition, data in conditions.items():
-            condition_name = condition.replace("_", " ").title()
+            # Special handling for bulk analysis
+            if condition == "bulk":
+                condition_name = "Bulk Analysis (All Conditions Combined)"
+            else:
+                condition_name = condition.replace("_", " ").title()
             lines.append(f"  {condition_name}:")
             
             # Format upregulated genes - provide ALL extracted genes for complete LLM analysis
@@ -306,13 +310,15 @@ class DEAResultAccessor(ResultAccessorBase):
                 # Get conditions from Sample categories or Sample description
                 conditions = []
                 if "Sample categories" in mapping_data:
-                    conditions.extend(mapping_data["Sample categories"].keys())
+                    conditions.extend(mapping_data["Sample categories"].values())
                 elif "Sample description" in mapping_data:
                     conditions.extend(mapping_data["Sample description"].keys())
                 
+                # Add "bulk" to handle bulk analysis results
+                conditions.append("bulk")
+                
                 # Keep original format as DEA function saves with spaces, not underscores
-                # From logs: "basal laminar drusen condition Pericyte marker results saved"
-                conditions = list(conditions)
+                conditions = list(set(conditions))  # Remove duplicates
                 
                 print(f"🔍 DEA: Loaded {len(conditions)} conditions from mapping file: {conditions}")
                 return conditions

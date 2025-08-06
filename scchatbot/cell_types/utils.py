@@ -405,31 +405,117 @@ def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pva
         adata_modified = adata.copy()
         categories = adata_modified.obs["Exp_sample_category"].unique()
         result_list = []
+        
+        # PART 1: Bulk DEA across all conditions
+        print(f"\n📊 Performing bulk DEA for {cell_type} across all conditions...")
+        adata_bulk = adata_modified.copy()
+        adata_bulk.obs["cell_type_group"] = "Other"
+        cell_type_mask_bulk = adata_bulk.obs["cell_type"] == str(cell_type)
+        adata_bulk.obs.loc[cell_type_mask_bulk, "cell_type_group"] = str(cell_type)
+        
+        if sum(cell_type_mask_bulk) > 0:
+            key_name_bulk = f"{cell_type}_markers_bulk"
+            try:
+                sc.tl.rank_genes_groups(adata_bulk, groupby="cell_type_group", 
+                                        groups=[str(cell_type)], reference="Other",
+                                        method="wilcoxon", n_genes=n_genes, 
+                                        key_added=key_name_bulk, use_raw_=False)
+                data_bulk = sc.get.rank_genes_groups_df(adata_bulk, group=str(cell_type), key=key_name_bulk)
+                
+                significant_genes_bulk = list(data_bulk.loc[(data_bulk['pvals_adj'] < pval_threshold) & 
+                                                            (abs(data_bulk['logfoldchanges']) > logfc_threshold), 'names'])
+                if save_csv:
+                    file_name_bulk = f"{cell_type}_markers_bulk.csv"
+                    os.makedirs('scchatbot/deg_res', exist_ok=True)
+                    data_bulk.to_csv(f'scchatbot/deg_res/{file_name_bulk}', index=False)
+                    print(f"✅ Bulk {cell_type} marker results saved ({len(significant_genes_bulk)} significant genes)")
+                
+                # Add bulk results first
+                result_list.append({
+                    "category": "bulk",
+                    "significant_genes": significant_genes_bulk,
+                    "description": f"Combined analysis across all conditions (n={sum(cell_type_mask_bulk)} cells)"
+                })
+            except Exception as bulk_error:
+                print(f"⚠️ Bulk DEA failed: {bulk_error}")
+                # Try t-test as fallback for bulk
+                try:
+                    sc.tl.rank_genes_groups(adata_bulk, groupby="cell_type_group", 
+                                            groups=[str(cell_type)], reference="Other",
+                                            method="t-test", n_genes=n_genes, 
+                                            key_added=key_name_bulk, use_raw_=False)
+                    data_bulk = sc.get.rank_genes_groups_df(adata_bulk, group=str(cell_type), key=key_name_bulk)
+                    significant_genes_bulk = list(data_bulk.loc[(data_bulk['pvals_adj'] < pval_threshold) & 
+                                                                (abs(data_bulk['logfoldchanges']) > logfc_threshold), 'names'])
+                    if save_csv:
+                        file_name_bulk = f"{cell_type}_markers_bulk.csv"
+                        data_bulk.to_csv(f'scchatbot/deg_res/{file_name_bulk}', index=False)
+                        print(f"✅ Bulk {cell_type} marker results saved using t-test fallback")
+                    result_list.append({
+                        "category": "bulk",
+                        "significant_genes": significant_genes_bulk,
+                        "description": f"Combined analysis across all conditions using t-test (n={sum(cell_type_mask_bulk)} cells)"
+                    })
+                except:
+                    print(f"❌ Both statistical methods failed for bulk analysis")
+        
+        # PART 2: Condition-specific DEA
+        print(f"\n📊 Performing condition-specific DEA for {cell_type}...")
+        conditions_with_cells = []
+        
         for cat in categories:
             mask = adata_modified.obs["Exp_sample_category"] == cat
             adata_cat = adata_modified[mask].copy()
             if len(adata_cat) == 0:
-                print(f"Error: No cells for category {cat}.")
+                print(f"  Skip: No cells for category {cat}.")
                 continue
             adata_cat.obs["cell_type_group"] = "Other"
             cell_type_mask = adata_cat.obs["cell_type"] == str(cell_type)
             adata_cat.obs.loc[cell_type_mask, "cell_type_group"] = str(cell_type)
-            if sum(cell_type_mask) == 0:
-                print(f"Error: No {cell_type} found in {cat} condition.")
+            
+            n_target_cells = sum(cell_type_mask)
+            n_other_cells = sum(~cell_type_mask)
+            
+            if n_target_cells == 0:
+                print(f"  Skip: No {cell_type} found in {cat} condition.")
                 continue
+            
+            # Check if we have enough cells for meaningful comparison
+            if n_target_cells < 3 or n_other_cells < 3:
+                print(f"  Skip: Too few cells in {cat} ({n_target_cells} {cell_type}, {n_other_cells} others)")
+                continue
+                
+            conditions_with_cells.append(cat)
             key_name = f"{cell_type}_markers_{cat}"
-            sc.tl.rank_genes_groups(adata_cat, groupby="cell_type_group", 
-                                    groups=[str(cell_type)], reference="Other",
-                                    method="wilcoxon", n_genes=n_genes, 
-                                    key_added=key_name, use_raw_=False)
-            data = sc.get.rank_genes_groups_df(adata_cat, group=str(cell_type), key=key_name)
+            
+            try:
+                sc.tl.rank_genes_groups(adata_cat, groupby="cell_type_group", 
+                                        groups=[str(cell_type)], reference="Other",
+                                        method="wilcoxon", n_genes=n_genes, 
+                                        key_added=key_name, use_raw_=False)
+                data = sc.get.rank_genes_groups_df(adata_cat, group=str(cell_type), key=key_name)
+                print(f"  ✅ {cat}: Wilcoxon test succeeded")
+            except Exception as wilcox_error:
+                # Try t-test as fallback
+                try:
+                    sc.tl.rank_genes_groups(adata_cat, groupby="cell_type_group", 
+                                            groups=[str(cell_type)], reference="Other",
+                                            method="t-test", n_genes=n_genes, 
+                                            key_added=key_name, use_raw_=False)
+                    data = sc.get.rank_genes_groups_df(adata_cat, group=str(cell_type), key=key_name)
+                    print(f"  ✅ {cat}: t-test fallback succeeded")
+                except:
+                    print(f"  ❌ {cat}: Both statistical methods failed, skipping")
+                    continue
+            
             significant_genes = list(data.loc[(data['pvals_adj'] < pval_threshold) & 
                                               (abs(data['logfoldchanges']) > logfc_threshold), 'names'])
             if save_csv:
                 file_name = f"{cell_type}_markers_{cat}.csv"
                 os.makedirs('scchatbot/deg_res', exist_ok=True)
                 data.to_csv(f'scchatbot/deg_res/{file_name}', index=False)
-                print(f"{cat} condition {cell_type} marker results saved to {file_name}")
+                print(f"  💾 {cat}: Saved {len(significant_genes)} significant genes")
+            
             # Get description directly from JSON file
             description = None
             sample_mapping = get_mapping("media")
@@ -440,6 +526,8 @@ def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pva
                 "significant_genes": significant_genes,
                 "description": description
             })
+        
+        print(f"\n✅ DEA complete: Bulk + {len(conditions_with_cells)} condition(s) analyzed")
         return result_list
     except Exception as e:
         print(f"Error in analysis: {e}")
