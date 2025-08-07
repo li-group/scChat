@@ -282,26 +282,194 @@ def display_processed_umap(cell_type: str) -> str:
 
     # standardize your cell type into the form used by process_cells
     std = unified_cell_type_handler(cell_type)  # e.g. "Monocytes"
-    umap_path = f'umaps/annotated/{std}_umap_data.csv'
-    if not os.path.exists(umap_path):
-        print(f"Warning: could not find an annotated UMAP file for '{cell_type}' at {umap_path}")
-        return ""
+    
+    # Use hierarchical UMAP file lookup strategy
+    umap_path, filter_for_descendants = _find_hierarchical_umap_file(std)
+    
+    if not umap_path:
+        print(f"Warning: could not find any UMAP file for '{cell_type}' (standardized: '{std}')")
+        return f"UMAP data not available for {cell_type}. Please ensure the cell type has been processed or its parent cell type has been analyzed."
 
-    # load and plot
-    umap_data = pd.read_csv(umap_path)
-    fig = px.scatter(
-        umap_data,
-        x="UMAP_1",
-        y="UMAP_2",
-        color="cell_type",
-        title=f"{std} (annotated) UMAP Plot",
-        labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
+    print(f"📊 Loading UMAP data from: {umap_path} (filter_for_descendants: {filter_for_descendants})")
+
+    try:
+        # load UMAP data
+        umap_data = pd.read_csv(umap_path)
+        
+        # Apply filtering if we're using a parent file
+        if filter_for_descendants:
+            filtered_data = _filter_umap_for_descendants(umap_data, std)
+            title_suffix = f"{std} and Subtypes"
+        else:
+            # Use data as-is (direct file match)
+            filtered_data = umap_data
+            title_suffix = f"{std} (annotated)"
+        
+        if filtered_data.empty:
+            return f"No {cell_type} cells found in the UMAP data."
+        
+        print(f"📊 Plotting {len(filtered_data)} cells for {title_suffix}")
+        
+        # create scatter plot
+        fig = px.scatter(
+            filtered_data,
+            x="UMAP_1",
+            y="UMAP_2",
+            color="cell_type",
+            title=f"{title_suffix} UMAP Plot",
+            labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2"}
+        )
+        fig.update_traces(marker=dict(size=5, opacity=0.8))
+        fig.update_layout(
+            width=800, 
+            height=600, 
+            autosize=False, 
+            showlegend=True,
+            margin=dict(l=50, r=50, t=80, b=50)
+        )
+
+        # return html snippet
+        return pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
+        
+    except Exception as e:
+        print(f"Error loading UMAP data from {umap_path}: {e}")
+        return f"Error generating UMAP plot for {cell_type}: {e}"
+
+
+def _find_hierarchical_umap_file(cell_type: str) -> tuple:
+    """
+    Find the appropriate UMAP file using hierarchical lookup strategy with Neo4j integration.
+    
+    Returns:
+        (file_path, filter_for_descendants): 
+        - file_path: path to the UMAP CSV file to use
+        - filter_for_descendants: whether to filter for descendants of the cell type
+    """
+    import os
+    from ..cell_types.utils import get_subtypes
+    
+    # Strategy 1: Try exact match first (cell type was directly processed)
+    exact_path = f'umaps/annotated/{cell_type}_umap_data.csv'
+    if os.path.exists(exact_path):
+        print(f"🎯 Found exact UMAP file for {cell_type}")
+        return exact_path, True  # Still filter to show descendants
+    
+    # Strategy 2: Check if this is a root cell type by querying Neo4j
+    try:
+        subtypes = get_subtypes(cell_type)
+        if subtypes and len(subtypes) > 0:
+            # This cell type has subtypes in Neo4j, so it could be a root
+            # Use "Overall cells" file for root cell types
+            overall_path = 'umaps/annotated/Overall cells_umap_data.csv'
+            if os.path.exists(overall_path):
+                print(f"🌟 Using Overall cells file for root cell type: {cell_type}")
+                return overall_path, True
+    except Exception as e:
+        print(f"⚠️ Error querying subtypes for {cell_type}: {e}")
+    
+    # Strategy 3: Find parent cell type that was processed and contains this cell type
+    # Use hierarchy system to find the ancestor that was actually processed
+    parent_path = _find_parent_umap_file(cell_type)
+    if parent_path:
+        return parent_path, True
+    
+    # Strategy 4: Fallback to "Overall cells" if it exists
+    overall_path = 'umaps/annotated/Overall cells_umap_data.csv'
+    if os.path.exists(overall_path):
+        print(f"🔄 Fallback to Overall cells file for {cell_type}")
+        return overall_path, True
+    
+    return None, False
+
+
+def _find_parent_umap_file(target_cell_type: str) -> str:
+    """
+    Find a parent UMAP file that contains the target cell type using the hierarchy system.
+    """
+    import os
+    import glob
+    import pandas as pd
+    
+    # Search all available UMAP files
+    umap_files = glob.glob('umaps/annotated/*_umap_data.csv')
+    
+    # Check each file to see if it contains the target cell type
+    for umap_file in umap_files:
+        try:
+            # Skip if it's the exact match (already tried)
+            parent_type = os.path.basename(umap_file).replace('_umap_data.csv', '')
+            if parent_type == target_cell_type:
+                continue
+                
+            # Check if this file contains the target cell type
+            if _file_contains_cell_type(umap_file, target_cell_type):
+                print(f"🔍 Found {target_cell_type} in parent file: {parent_type}")
+                return umap_file
+                
+        except Exception as e:
+            print(f"⚠️ Error checking file {umap_file}: {e}")
+            continue
+    
+    return None
+
+
+def _file_contains_cell_type(file_path: str, target_cell_type: str) -> bool:
+    """Check if a UMAP file contains the target cell type."""
+    try:
+        import pandas as pd
+        df = pd.read_csv(file_path)
+        if 'cell_type' not in df.columns:
+            return False
+        
+        # Check for exact matches and partial matches
+        cell_types = df['cell_type'].unique()
+        target_lower = target_cell_type.lower()
+        
+        for ct in cell_types:
+            ct_lower = str(ct).lower()
+            # Check if target is contained in this cell type or vice versa
+            if target_lower in ct_lower or ct_lower in target_lower:
+                return True
+        return False
+    except Exception:
+        return False
+
+
+def _filter_umap_for_descendants(umap_data, target_cell_type: str):
+    """Filter UMAP data to show target cell type and its descendants."""
+    if 'cell_type' not in umap_data.columns:
+        return umap_data
+    
+    # Get all cell types that contain the target cell type name
+    # This will include the target type and its subtypes
+    target_lower = target_cell_type.lower()
+    
+    # Create masks for different matching strategies
+    contains_mask = umap_data['cell_type'].str.lower().str.contains(target_lower, na=False)
+    exact_mask = umap_data['cell_type'].str.lower() == target_lower
+    
+    # Also check for cells where target is a substring (e.g., "T cell" matches "CD4+ T cell")
+    substring_mask = umap_data['cell_type'].str.lower().str.contains(
+        target_lower.split()[0] if ' ' in target_lower else target_lower, na=False
     )
-    fig.update_traces(marker=dict(size=5, opacity=0.8))
-    fig.update_layout(width=1200, height=800, autosize=True, showlegend=True)
-
-    # return html snippet
-    return pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
+    
+    # Combine all masks
+    combined_mask = contains_mask | exact_mask | substring_mask
+    
+    filtered_data = umap_data[combined_mask]
+    
+    if filtered_data.empty:
+        # If no matches, try a broader search by splitting the cell type name
+        print(f"🔍 No direct matches for '{target_cell_type}', trying broader search...")
+        words = target_cell_type.split()
+        for word in words:
+            if len(word) > 2:  # Avoid very short words
+                word_mask = umap_data['cell_type'].str.contains(word, case=False, na=False)
+                if word_mask.any():
+                    filtered_data = umap_data[word_mask]
+                    break
+    
+    return filtered_data
 
 
 
