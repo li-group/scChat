@@ -546,11 +546,7 @@ class VisualizationResultAccessor(ResultAccessorBase):
         viz_descriptions = {
             "display_enrichment_visualization": "enrichment analysis visualization",
             "display_dotplot": "gene expression dotplot",
-            "display_cell_type_composition": "cell type composition analysis",
-            "display_gsea_dotplot": "GSEA enrichment dotplot",
-            "display_processed_umap": "annotated UMAP with cell types",
-            "display_enrichment_barplot": "enrichment barplot",
-            "display_enrichment_dotplot": "enrichment dotplot"
+            "display_processed_umap": "annotated UMAP with cell types"
         }
         
         viz_type = viz_descriptions.get(function_name, function_name.replace("display_", "").replace("_", " "))

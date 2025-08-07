@@ -525,11 +525,22 @@ class CellTypeExtractor:
         """
         🎯 Extract cell types from annotation results in dictionary format
         Expected format: group_to_cell_type = {'0': 'Cell Type 1', '1': 'Cell Type 2', ...}
+        Also handles status dictionaries from process_cells when cell type is a leaf node
         """
         print(f"🔍 CellTypeExtractor.extract_from_annotation_result() called with result type: {type(result)}")
         
+        # Handle status dictionary from process_cells (leaf node, no cells found, etc.)
+        if isinstance(result, dict):
+            if "status" in result:
+                print(f"📊 CellTypeExtractor: process_cells returned status '{result['status']}'")
+                if result.get("cell_type"):
+                    # Even if it's a leaf node, still consider it as available
+                    print(f"🔍 CellTypeExtractor: Including cell type from status result: {result['cell_type']}")
+                    return [result["cell_type"]]
+                return []
+        
         if not isinstance(result, str):
-            print(f"⚠️ CellTypeExtractor: Result is not string, returning empty list")
+            print(f"⚠️ CellTypeExtractor: Result is not string or dict, returning empty list")
             return []
         
         text = str(result)

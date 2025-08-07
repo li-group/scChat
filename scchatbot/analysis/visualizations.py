@@ -1,9 +1,6 @@
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import plotly.figure_factory as ff
-import json
-from plotly.utils import PlotlyJSONEncoder
 import numpy as np
 from ..cell_types.standardization import unified_cell_type_handler
 import plotly.io as pio
@@ -208,54 +205,8 @@ def display_enrichment_visualization(
         return f"Error generating {analysis} {plot_type} plot: {e}"
 
 
-def display_enrichment_barplot(
-    analysis: str,
-    cell_type: str,
-    top_n: int = 10,
-    domain: str = None,
-    condition: str = None
-) -> str:
-    """
-    Generic barplot of top_n enriched terms for a given analysis and cell type.
-    This is now a wrapper function that calls the unified visualization function.
-    
-    analysis: "reactome", "kegg", "gsea", or "go"
-    domain: required if analysis=="go" (one of "BP","MF","CC")
-    condition: optional specific condition folder (e.g., "kegg_p1_post")
-    """
-    return display_enrichment_visualization(
-        analysis=analysis,
-        cell_type=cell_type,
-        plot_type="bar",
-        top_n=top_n,
-        domain=domain,
-        condition=condition
-    )
 
 
-def display_enrichment_dotplot(
-    analysis: str,
-    cell_type: str,
-    top_n: int = 10,
-    domain: str = None,
-    condition: str = None
-) -> str:
-    """
-    Generic dotplot of avg_log2fc vs. top enriched terms for a given analysis.
-    This is now a wrapper function that calls the unified visualization function.
-    
-    analysis: "reactome", "kegg", "gsea", or "go"
-    domain: required if analysis=="go" (one of "BP","MF","CC")
-    condition: optional specific condition folder (e.g., "kegg_p1_post")
-    """
-    return display_enrichment_visualization(
-        analysis=analysis,
-        cell_type=cell_type,
-        plot_type="dot",
-        top_n=top_n,
-        domain=domain,
-        condition=condition
-    )
 
 
 def display_dotplot(cell_type: str = "Overall cells") -> str:
@@ -352,77 +303,5 @@ def display_processed_umap(cell_type: str) -> str:
     # return html snippet
     return pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
 
-def display_gsea_dotplot(cell_type: str = "overall", condition: str = None, top_n: int = 20) -> str:
-    """
-    Creates a GSEA dot plot using the unified enrichment visualization function.
-    This is now a wrapper function that calls the unified visualization function.
-    """
-    return display_enrichment_visualization(
-        analysis="gsea",
-        cell_type=cell_type,
-        plot_type="dot",
-        top_n=top_n,
-        domain=None,
-        condition=condition
-    )
 
-def display_cell_type_composition() -> str:
-    """
-    Generates a dendrogram of cell type composition using dynamic file discovery.
-    """
-    # Try multiple possible locations for dendrogram data
-    possible_paths = [
-        "scchatbot/runtime_data/basic_data/dendrogram_data.csv",
-        "basic_data/dendrogram_data.csv",
-        "scchatbot/runtime_data/basic_data/Overall cells_dendrogram_data.csv"
-    ]
-    
-    # Use glob patterns to find any dendrogram data files
-    search_patterns = [
-        "scchatbot/runtime_data/basic_data/*dendrogram_data.csv",
-        "basic_data/*dendrogram_data.csv"
-    ]
-    
-    dendrogram_file = None
-    
-    # First try specific paths
-    for path in possible_paths:
-        if os.path.exists(path):
-            dendrogram_file = path
-            break
-    
-    # If not found, use glob patterns
-    if not dendrogram_file:
-        for pattern in search_patterns:
-            found_files = glob.glob(pattern)
-            if found_files:
-                dendrogram_file = found_files[0]  # Use first found file
-                print(f"📁 Using dendrogram file: {dendrogram_file}")
-                break
-    
-    if not dendrogram_file:
-        return "Cell type composition data is not available. Please ensure the analysis has been run and data files are generated."
-    
-    try:
-        dendrogram_data = pd.read_csv(dendrogram_file)
-        fig = ff.create_dendrogram(dendrogram_data.values, orientation='left')
-        fig.update_layout(title='Dendrogram', xaxis_title='Distance', yaxis_title='Clusters',
-                          width=1200, height=800, autosize=True)
-        return fig.to_json()
-    except Exception as e:
-        return f"Error generating cell type composition plot: {e}"
 
-def generate_umap_plot(data: pd.DataFrame) -> str:
-    """
-    Generates a UMAP projection scatter plot from the provided data and returns the JSON representation.
-    """
-    fig = px.scatter(
-        data,
-        x='umap1',
-        y='umap2',
-        hover_data={'label': True},
-        title='UMAP Projection'
-    )
-    fig.update_layout(hovermode='closest', xaxis_title='Component 1', yaxis_title='Component 2')
-    graph_json = json.dumps(fig, cls=PlotlyJSONEncoder)
-    return graph_json

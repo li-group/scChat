@@ -207,36 +207,68 @@ class ExecutorNode(BaseWorkflowNode):
         enhanced_params = step.parameters.copy()
         
         if step.function_name in self.visualization_functions and "cell_type" not in enhanced_params:
-            # CRITICAL: Don't fallback to unrelated cell types for visualization
-            # Check if we have ANY successful enrichment analysis for this visualization type
-            execution_history = state.get("execution_history", [])
-            viz_analysis_type = enhanced_params.get("analysis", "gsea")  # What type of viz is requested
-            
-            found_matching_analysis = False
-            for recent_execution in reversed(execution_history[-10:]):  # Check more history
-                step_data = recent_execution.get("step", {})
+            # Handle different types of visualizations
+            if step.function_name in ["display_processed_umap", "display_dotplot"]:
+                # These visualizations don't need enrichment analysis - they work with processed cell data
+                # Try to find any successful process_cells execution
+                execution_history = state.get("execution_history", [])
                 
-                # Only consider successful enrichment analyses
-                if (recent_execution.get("success") and 
-                    step_data.get("function_name") == "perform_enrichment_analyses"):
+                found_cell_type = False
+                for recent_execution in reversed(execution_history[-10:]):
+                    step_data = recent_execution.get("step", {})
                     
-                    step_params = step_data.get("parameters", {})
-                    analyses_performed = step_params.get("analyses", [])
-                    cell_type = step_params.get("cell_type")
-                    
-                    # Check if this analysis matches what the viz needs
-                    if viz_analysis_type in analyses_performed and cell_type:
-                        enhanced_params["cell_type"] = cell_type
-                        print(f"✅ Found matching {viz_analysis_type} analysis for visualization: {cell_type}")
-                        found_matching_analysis = True
-                        break
+                    # Look for any successful cell processing or analysis
+                    if (recent_execution.get("success") and 
+                        step_data.get("function_name") in ["process_cells", "perform_enrichment_analyses", "dea_split_by_condition"]):
+                        
+                        step_params = step_data.get("parameters", {})
+                        cell_type = step_params.get("cell_type")
+                        
+                        if cell_type and cell_type != "unknown":
+                            enhanced_params["cell_type"] = cell_type
+                            print(f"✅ Found cell type for {step.function_name}: {cell_type}")
+                            found_cell_type = True
+                            break
+                
+                if not found_cell_type:
+                    # For UMAP and other basic visualizations, try default cell types
+                    available_cell_types = state.get("available_cell_types", [])
+                    if available_cell_types and "Overall cells" in available_cell_types:
+                        enhanced_params["cell_type"] = "Overall cells"
+                        print(f"✅ Using default cell type 'Overall cells' for {step.function_name}")
+                    else:
+                        print(f"❌ No suitable cell type found for {step.function_name}")
+                        enhanced_params["_should_fail"] = True
+                        enhanced_params["_fail_reason"] = f"No processed cell data available for {step.function_name}"
             
-            if not found_matching_analysis:
-                # NO FALLBACK - Return error instead
-                print(f"❌ No successful {viz_analysis_type} enrichment analysis found to visualize")
-                # Mark this step to fail with clear error
-                enhanced_params["_should_fail"] = True
-                enhanced_params["_fail_reason"] = f"No {viz_analysis_type} enrichment analysis results available to visualize"
+            else:
+                # Enrichment-based visualizations (display_enrichment_*)
+                execution_history = state.get("execution_history", [])
+                viz_analysis_type = enhanced_params.get("analysis", "gsea")  # What type of viz is requested
+                
+                found_matching_analysis = False
+                for recent_execution in reversed(execution_history[-10:]):
+                    step_data = recent_execution.get("step", {})
+                    
+                    # Only consider successful enrichment analyses
+                    if (recent_execution.get("success") and 
+                        step_data.get("function_name") == "perform_enrichment_analyses"):
+                        
+                        step_params = step_data.get("parameters", {})
+                        analyses_performed = step_params.get("analyses", [])
+                        cell_type = step_params.get("cell_type")
+                        
+                        # Check if this analysis matches what the viz needs
+                        if viz_analysis_type in analyses_performed and cell_type:
+                            enhanced_params["cell_type"] = cell_type
+                            print(f"✅ Found matching {viz_analysis_type} analysis for visualization: {cell_type}")
+                            found_matching_analysis = True
+                            break
+                
+                if not found_matching_analysis:
+                    print(f"❌ No successful {viz_analysis_type} enrichment analysis found to visualize")
+                    enhanced_params["_should_fail"] = True
+                    enhanced_params["_fail_reason"] = f"No {viz_analysis_type} enrichment analysis results available to visualize"
         
         return enhanced_params
     

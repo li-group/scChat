@@ -226,14 +226,15 @@ class PlannerNode(BaseWorkflowNode):
                 * "Analyze immune pathways" → {{"cell_type": "Immune cell"}} (EnrichmentChecker handles targeting)
                 
                 VISUALIZATION GUIDELINES:
-                - For enrichment visualization, ALWAYS prefer "display_enrichment_visualization":
+                - For enrichment visualization, ALWAYS use "display_enrichment_visualization":
                 * Use "display_enrichment_visualization" for ALL enrichment plots (shows both bar + dot by default)
-                * Only use "display_enrichment_barplot" or "display_enrichment_dotplot" if user specifically asks for ONLY one type
                 * ALWAYS specify the "analysis" parameter to match what was performed
+                * Use "plot_type" parameter to control visualization: "both" (default), "bar", or "dot"
                 * Examples:
                     - "show GO plots" → use "display_enrichment_visualization" with "analysis": "go"
                     - "visualize GSEA results" → use "display_enrichment_visualization" with "analysis": "gsea"  
-                    - "show ONLY barplot" → use "display_enrichment_barplot"
+                    - "show ONLY barplot" → use "display_enrichment_visualization" with "plot_type": "bar"
+                    - "show ONLY dotplot" → use "display_enrichment_visualization" with "plot_type": "dot"
                     - "display both plots" → use "display_enrichment_visualization" (default plot_type="both")
                     
                 SEMANTIC SEARCH GUIDELINES:

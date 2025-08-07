@@ -233,6 +233,21 @@ header h1 {
   overflow: hidden;
 }
 
+/* Plotly container styling for direct embedding (PDF-compatible) */
+.plotly-container {
+  margin: 10px 0;
+  border: 1px solid var(--clr-secondary);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+  overflow: visible !important;
+}
+
+.plotly-container .plotly {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 /* Enhanced system message styling for plots */
 .system-message iframe {
   margin: 10px 0;

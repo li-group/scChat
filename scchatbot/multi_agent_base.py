@@ -17,11 +17,7 @@ from langchain_core.runnables import RunnableConfig
 from .cell_types.annotation_pipeline import initial_cell_annotation
 from .analysis.visualizations import (
     display_dotplot,
-    display_cell_type_composition,
-    display_gsea_dotplot,
     display_processed_umap,
-    display_enrichment_barplot,
-    display_enrichment_dotplot,
     display_enrichment_visualization
 )
 from .cell_types.utils import clear_directory
@@ -183,9 +179,7 @@ class MultiAgentChatBot:
     def setup_functions(self):
         """Setup function descriptions and mappings"""
         self.visualization_functions = {
-            "display_dotplot", "display_cell_type_composition", "display_gsea_dotplot",
-            "display_processed_umap", "display_enrichment_barplot", 
-            "display_enrichment_dotplot", "display_enrichment_visualization"
+            "display_dotplot", "display_processed_umap", "display_enrichment_visualization"
         }
 
         self.function_descriptions = [
@@ -196,24 +190,6 @@ class MultiAgentChatBot:
                     "type": "object",
                     "properties": {
                         "cell_type": {"type": "string", "description": "The cell type to focus on, or 'Overall cells' for all cells"}
-                    },
-                    "required": []
-                },
-            },
-            {
-                "name": "display_cell_type_composition", 
-                "description": "Display cell type composition graph. Use when user wants to see the proportion of different cell types.",
-                "parameters": {"type": "object", "properties": {}, "required": []},
-            },
-            {
-                "name": "display_gsea_dotplot",
-                "description": "Display GSEA dot plot. Use when user wants to see gene set enrichment analysis results.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "cell_type": {"type": "string", "description": "The cell type to analyze, or 'overall' for all cells"},
-                        "condition": {"type": "string", "description": "Optional specific condition folder"},
-                        "top_n": {"type": "integer", "default": 20, "description": "Number of top terms to display"}
                     },
                     "required": []
                 },
@@ -254,36 +230,6 @@ class MultiAgentChatBot:
                     "type": "object",
                     "properties": {"cell_type": {"type": "string", "description": "The cell type to process for subtype discovery."}},
                     "required": ["cell_type"]
-                }
-            },
-            {
-                "name": "display_enrichment_barplot",
-                "description": "Show ONLY barplot of enriched terms. DEPRECATED: Use display_enrichment_visualization instead for better results. For GO analysis, domain defaults to BP if not specified.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "analysis": {"type": "string", "enum": ["reactome","go","kegg","gsea"], "description": "Type of enrichment analysis to visualize"},
-                        "cell_type": {"type": "string"},
-                        "top_n": {"type": "integer", "default": 10},
-                        "domain": {"type": "string", "enum": ["BP","MF","CC"], "description": "Required for GO analysis. BP=Biological Process, MF=Molecular Function, CC=Cellular Component"},
-                        "condition": {"type": "string"}
-                    },
-                    "required": ["analysis","cell_type"]
-                }
-            },
-            {
-                "name": "display_enrichment_dotplot", 
-                "description": "Show ONLY dotplot of enriched terms. DEPRECATED: Use display_enrichment_visualization instead for better results. For GO analysis, domain defaults to BP if not specified.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "analysis": {"type": "string", "enum": ["reactome","go","kegg","gsea"], "description": "Type of enrichment analysis to visualize"},
-                        "cell_type": {"type": "string"},
-                        "top_n": {"type": "integer", "default": 10}, 
-                        "domain": {"type": "string", "enum": ["BP","MF","CC"], "description": "Required for GO analysis. BP=Biological Process, MF=Molecular Function, CC=Cellular Component"},
-                        "condition": {"type": "string"}
-                    },
-                    "required": ["analysis","cell_type"]
                 }
             },
             {
@@ -352,11 +298,7 @@ class MultiAgentChatBot:
         # Function mappings
         self.function_mapping = {
             "display_dotplot": self._wrap_visualization(display_dotplot),
-            "display_cell_type_composition": self._wrap_visualization(display_cell_type_composition),
-            "display_gsea_dotplot": self._wrap_visualization(display_gsea_dotplot),
             "display_processed_umap": self._wrap_visualization(display_processed_umap),
-            "display_enrichment_barplot": self._wrap_visualization(display_enrichment_barplot),
-            "display_enrichment_dotplot": self._wrap_visualization(display_enrichment_dotplot),
             "display_enrichment_visualization": self._wrap_visualization(display_enrichment_visualization),
             "perform_enrichment_analyses": self._wrap_enrichment_analysis,
             "process_cells": self._wrap_process_cells,
@@ -590,29 +532,10 @@ class MultiAgentChatBot:
                     # Now takes cell_type parameter
                     cell_type = kwargs.get('cell_type', 'Overall cells')
                     return func(cell_type)
-                elif func_name == 'display_cell_type_composition':
-                    # Takes no parameters  
-                    return func()
-                elif func_name == 'display_gsea_dotplot':
-                    # Takes cell_type and other optional parameters
-                    cell_type = kwargs.get('cell_type', 'overall')
-                    condition = kwargs.get('condition', None)
-                    top_n = kwargs.get('top_n', 20)
-                    return func(cell_type=cell_type, condition=condition, top_n=top_n)
                 elif func_name == 'display_processed_umap':
                     # Takes cell_type as positional argument
                     cell_type = kwargs.get('cell_type', 'overall')
                     return func(cell_type)
-                elif func_name in ['display_enrichment_barplot', 'display_enrichment_dotplot']:
-                    # Takes analysis and cell_type as positional arguments, other args as kwargs
-                    analysis = kwargs.pop('analysis', 'go')  # Default to go if not provided
-                    cell_type = kwargs.pop('cell_type', 'overall')  # Default if not provided
-                    
-                    # Handle GO domain - default to BP if not specified
-                    if analysis.lower() == 'go' and 'domain' not in kwargs:
-                        kwargs['domain'] = 'BP'
-                        
-                    return func(analysis, cell_type, **kwargs)
                 elif func_name == 'display_enrichment_visualization':
                     # Takes analysis, cell_type and other keyword arguments
                     analysis = kwargs.pop('analysis', 'go')

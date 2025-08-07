@@ -1,19 +1,56 @@
 function embedVisualization(htmlContent) {
-    // Create an iframe element
-    const iframe = document.createElement('iframe');
-    // Set its dimensions to match your Plotly plot
-    iframe.style.border = 'none';
-    iframe.style.width = '1200px';
-    iframe.style.height = '800px';
-    iframe.scrolling = 'no';
-    // When the iframe loads, write the HTML into it
-    iframe.onload = function() {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        doc.open();
-        doc.write(htmlContent);
-        doc.close();
-    };
-    return iframe;
+    // Create a div container instead of iframe for better PDF compatibility
+    const container = document.createElement('div');
+    container.style.border = 'none';
+    container.style.width = '1200px';
+    container.style.height = '800px';
+    container.style.overflow = 'hidden';
+    container.classList.add('plotly-container');
+    
+    // Create a temporary div to parse the HTML content
+    const temp = document.createElement('div');
+    temp.innerHTML = htmlContent;
+    
+    // Extract the plot div and scripts
+    const plotDiv = temp.querySelector('div[id*="plotly"]') || temp.querySelector('div');
+    const scripts = temp.querySelectorAll('script');
+    
+    if (plotDiv) {
+        // Clone the plot div and add it to our container
+        const clonedPlotDiv = plotDiv.cloneNode(true);
+        container.appendChild(clonedPlotDiv);
+        
+        // Execute the scripts to render the plot
+        scripts.forEach(script => {
+            if (script.innerHTML && script.innerHTML.includes('Plotly')) {
+                try {
+                    // Create a new script element and execute it
+                    const newScript = document.createElement('script');
+                    newScript.innerHTML = script.innerHTML;
+                    container.appendChild(newScript);
+                } catch (error) {
+                    console.error('Error executing Plotly script:', error);
+                }
+            }
+        });
+    } else {
+        // Fallback: insert all content directly
+        container.innerHTML = htmlContent;
+        
+        // Try to execute any scripts manually
+        const allScripts = container.querySelectorAll('script');
+        allScripts.forEach(script => {
+            if (script.innerHTML) {
+                try {
+                    eval(script.innerHTML);
+                } catch (error) {
+                    console.error('Error executing script:', error);
+                }
+            }
+        });
+    }
+    
+    return container;
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -87,16 +124,28 @@ document.addEventListener("DOMContentLoaded", function() {
     connectWebSocket();
 
     // Export chat as PDF without page breaks
-    document.getElementById('export-pdf').addEventListener('click', function() {
+    document.getElementById('export-pdf').addEventListener('click', async function() {
         const element = document.getElementById('messages-container');
+        
+        // Enhanced options for better plot capture
         const opt = {
-            margin: [0, 0, 0, 0],
+            margin: [10, 10, 10, 10],
             filename: 'chat_history.pdf',
-            image: { type: 'jpeg', quality: 1.0 },
+            image: { type: 'jpeg', quality: 0.98 },
             html2canvas: {
                 scale: 2,
+                useCORS: true,
+                allowTaint: true,
                 windowWidth: element.scrollWidth,
                 windowHeight: element.scrollHeight,
+                onclone: function(clonedDoc) {
+                    // Ensure all Plotly plots are visible in the clone
+                    const plotlyContainers = clonedDoc.querySelectorAll('.plotly-container');
+                    plotlyContainers.forEach(container => {
+                        container.style.visibility = 'visible';
+                        container.style.display = 'block';
+                    });
+                }
             },
             jsPDF: {
                 unit: 'px',
@@ -104,7 +153,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 orientation: 'portrait',
             }
         };
-        html2pdf().set(opt).from(element).save();
+        
+        try {
+            await html2pdf().set(opt).from(element).save();
+        } catch (error) {
+            console.error('PDF export failed:', error);
+            alert('PDF export failed. Please try again.');
+        }
     });
 
     // Export chat as text file

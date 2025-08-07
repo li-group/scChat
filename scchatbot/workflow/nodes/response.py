@@ -565,11 +565,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         # Create user-friendly descriptions for different visualization types
         descriptions = {
             "display_dotplot": "gene expression dotplot",
-            "display_cell_type_composition": "cell type composition dendrogram", 
-            "display_gsea_dotplot": "GSEA enrichment dotplot",
             "display_processed_umap": "annotated UMAP plot with cell types",
-            "display_enrichment_barplot": "enrichment analysis barplot",
-            "display_enrichment_dotplot": "enrichment analysis dotplot",
             "display_enrichment_visualization": "comprehensive enrichment visualization"
         }
         
@@ -630,11 +626,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         """Extract a concise title for the plot."""
         titles = {
             "display_dotplot": "Gene Expression Dotplot",
-            "display_cell_type_composition": "Cell Type Composition", 
-            "display_gsea_dotplot": "GSEA Enrichment",
             "display_processed_umap": "Annotated UMAP",
-            "display_enrichment_barplot": "Enrichment Analysis",
-            "display_enrichment_dotplot": "Enrichment Dotplot",
             "display_enrichment_visualization": "Enrichment Visualization"
         }
         
