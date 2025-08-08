@@ -161,9 +161,6 @@ def get_rag():
     import json
     import os
     
-    uri = "bolt://localhost:7687"
-    driver = GraphDatabase.driver(uri, auth=("neo4j", "37754262"))
-    specification = None
     file_path = "media/specification_graph.json"
     if os.path.exists(file_path):
         with open(file_path, 'r') as file:
@@ -171,6 +168,19 @@ def get_rag():
     else:
         print("specification not found")
         return {}
+    
+    # Load Neo4j credentials from configuration
+    required_keys = ["url", "username", "password"]
+    missing_keys = [key for key in required_keys if key not in specification or not specification[key]]
+    
+    if missing_keys:
+        print(f"Missing required configuration keys: {missing_keys}")
+        return {}
+    
+    uri = specification["url"]
+    username = specification["username"]
+    password = specification["password"]
+    driver = GraphDatabase.driver(uri, auth=(username, password))
     
     database = specification['database']
     
@@ -231,9 +241,6 @@ def get_subtypes(cell_type):
     import json
     import os
     
-    uri = "bolt://localhost:7687"
-    driver = GraphDatabase.driver(uri, auth=("neo4j", "37754262"))
-    specification = None
     file_path = "media/specification_graph.json"
     if os.path.exists(file_path):
         with open(file_path, 'r') as file:
@@ -241,6 +248,19 @@ def get_subtypes(cell_type):
     else:
         print("specification not found")
         return {}
+    
+    # Load Neo4j credentials from configuration
+    required_keys = ["url", "username", "password"]
+    missing_keys = [key for key in required_keys if key not in specification or not specification[key]]
+    
+    if missing_keys:
+        print(f"Missing required configuration keys: {missing_keys}")
+        return {}
+    
+    uri = specification["url"]
+    username = specification["username"]
+    password = specification["password"]
+    driver = GraphDatabase.driver(uri, auth=(username, password))
     
     database = specification['database']
     

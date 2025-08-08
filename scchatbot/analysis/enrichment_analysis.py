@@ -4,7 +4,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
-from gprofiler import GProfiler
+from gprofiler.gprofiler import GProfiler
 from typing import List, Dict, Any
 import gseapy as gp
 import re
