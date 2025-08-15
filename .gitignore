@@ -35,3 +35,20 @@ env/
 /removed_files_backup/
 /scchatbot/glioblastoma_test_v2.json
 /scchatbot/all_questions_glioblastoma.json
+# Virtual environment
+scchat2/
+
+# Large data files
+media/
+umaps/
+
+# DBs
+db.sqlite3
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# OS
+.DS_Store
+
