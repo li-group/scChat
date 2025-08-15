@@ -2,7 +2,7 @@ import google.generativeai as genai
 import re
 
 def browse_web(query):
-    API_KEY = 'AIzaSyAf7YK__ebupQvWjrI-3gq7wP41qBcpUEU'
+    API_KEY = ''
 
     genai.configure(api_key = API_KEY)
     model = genai.GenerativeModel('gemini-pro')
