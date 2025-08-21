@@ -39,7 +39,6 @@ class ExecutorNode(BaseWorkflowNode):
     def executor_node(self, state: ChatState) -> ChatState:
         """Execute the current step in the plan with hierarchy awareness and validation"""
         self._log_node_start("Executor", state)
-        logger.info ("CHAT STATE AT EXECUTOR :", str(ChatState))
         # Initialize progress manager
         session_id = state.get("session_id", "default")
         progress_manager = ProgressManager(session_id)
