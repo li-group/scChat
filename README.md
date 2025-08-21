@@ -53,8 +53,8 @@ Follow these steps to utilize the application effectively:
 
   
 ### Step 2: Download Neo4j Desktop 2
-- Download Neo4j Desktop 2
-- Download required dump files
+- Download Neo4j Desktop 2 (https://neo4j.com/download/)
+- Download required dump files (https://drive.google.com/drive/folders/17UCKv95G3tFqeyce1oQAo3ss2vS7uZQE)
 - Create database on Neo4j and import the dump files
 - start the database
 
