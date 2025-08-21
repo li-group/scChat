@@ -1,4 +1,6 @@
 # settings.py
+
+
 SECRET_KEY = 'vGC7Ma3yatftileSw4kw44aCdL04FSUtoqoKux_X4ws0TtLumScxvI8QAjWwLMWkJK8'
 INSTALLED_APPS = [
     # ...

@@ -26,6 +26,8 @@ from .workflow.function_history import FunctionHistoryManager
 from .cell_types.hierarchy_manager import HierarchicalCellTypeManager, CellTypeExtractor
 from .analysis.analysis_wrapper import AnalysisFunctionWrapper
 from .workflow import WorkflowNodes
+import logging
+logger = logging.getLogger(__name__)
 
 
 class MultiAgentChatBot:
@@ -61,7 +63,7 @@ class MultiAgentChatBot:
         # Initialize cell type extractor
         self.cell_type_extractor = None
         self._initialize_cell_type_extractor()
-        print("1")
+        logger.info("1")
         
         # Initialize workflow nodes
         self.workflow_nodes = WorkflowNodes(
@@ -75,14 +77,14 @@ class MultiAgentChatBot:
             self.function_mapping,
             self.visualization_functions
         )
-        print("2")
+        logger.info("2")
         
         # Create LangGraph workflow
         self.workflow = self._create_workflow()
-        print("3")
+        logger.info("3")
         # Initialize session state management for conversation continuity
         self.session_states = {}  # Dict to store state for each session
-        print("✅ Session state management initialized")
+        logger.info("✅ Session state management initialized")
         
     def _initialize_directories(self):
         """Clean all directories at initialization"""
@@ -98,7 +100,7 @@ class MultiAgentChatBot:
         execution_history_file = "conversation_history/execution_history.json"
         if os.path.exists(execution_history_file):
             os.remove(execution_history_file)
-            print(f"🧹 Cleared execution history: {execution_history_file}")
+            logger.info(f"🧹 Cleared execution history: {execution_history_file}")
 
     def _initialize_annotation(self):
         """Initialize or load annotation data"""
@@ -106,7 +108,7 @@ class MultiAgentChatBot:
         
         # Handle case where h5ad file is not provided
         if adata is None:
-            print(f"⚠️ Warning: {explanation}")
+            logger.info(f"⚠️ Warning: {explanation}")
             # Set defaults for missing data
             self.adata = None
             self.initial_cell_types = []
@@ -127,9 +129,9 @@ class MultiAgentChatBot:
         if self.adata is not None:
             self.hierarchy_manager = HierarchicalCellTypeManager(self.adata)
             self.analysis_wrapper = AnalysisFunctionWrapper(self.hierarchy_manager)
-            print("✅ Unified hierarchical cell type management initialized")
+            logger.info("✅ Unified hierarchical cell type management initialized")
         else:
-            print("⚠️ Cannot initialize hierarchical management without adata")
+            logger.info("⚠️ Cannot initialize hierarchical management without adata")
     
     def _initialize_cell_type_extractor(self):
         """Initialize centralized cell type extractor"""
@@ -140,9 +142,9 @@ class MultiAgentChatBot:
             )
             # Add historical function access
             self.cell_type_extractor._get_historical_cell_types = self._get_historical_cell_types_for_extractor
-            print("✅ Unified cell type extractor initialized")
+            logger.info("✅ Unified cell type extractor initialized")
         else:
-            print("⚠️ Cannot initialize cell type extractor without adata")
+            logger.info("⚠️ Cannot initialize cell type extractor without adata")
     
     def _get_historical_cell_types_for_extractor(self) -> List[str]:
         """Get cell types from historical function executions for the extractor"""
@@ -393,10 +395,10 @@ class MultiAgentChatBot:
         
         # If conversation_complete is False, it means supplementary steps were added
         if not state.get("conversation_complete", True):
-            print("🔄 Routing: Post-execution evaluation added supplementary steps, continuing execution")
+            logger.info("🔄 Routing: Post-execution evaluation added supplementary steps, continuing execution")
             return "continue_execution"
         else:
-            print("🔄 Routing: Post-execution evaluation complete, generating response")
+            logger.info("🔄 Routing: Post-execution evaluation complete, generating response")
             return "generate_response"
 
     def send_message(self, message: str, session_id: str = "default") -> str:
@@ -410,7 +412,7 @@ class MultiAgentChatBot:
                 initial_state["response"] = ""
                 initial_state["conversation_complete"] = False
                 initial_state["errors"] = []
-                print(f"🔄 Reusing session state for '{session_id}' with {len(initial_state.get('available_cell_types', []))} available cell types")
+                logger.info(f"🔄 Reusing session state for '{session_id}' with {len(initial_state.get('available_cell_types', []))} available cell types")
             else:
                 # Create new initial state for new session
                 initial_state: ChatState = {
@@ -432,7 +434,7 @@ class MultiAgentChatBot:
                     "errors": [],
                     "session_id": session_id  # Add session tracking
                 }
-                print(f"🆕 Creating new session state for '{session_id}'")
+                logger.info(f"🆕 Creating new session state for '{session_id}'")
             
             # Invoke the workflow with recursion limit
             config = RunnableConfig(recursion_limit=100)
@@ -467,24 +469,24 @@ class MultiAgentChatBot:
                         session_id=session_id,
                         analysis_context=analysis_context
                     )
-                    print("✅ Conversation recorded in vector database")
+                    logger.info("✅ Conversation recorded in vector database")
                     
                 except Exception as e:
-                    print(f"⚠️ Failed to record conversation in vector database: {e}")
+                    logger.info(f"⚠️ Failed to record conversation in vector database: {e}")
             
             # Save the final state for this session to preserve discovered cell types
             self.session_states[session_id] = final_state
-            print(f"💾 Session state saved for '{session_id}' with {len(final_state.get('available_cell_types', []))} available cell types")
+            logger.info(f"💾 Session state saved for '{session_id}' with {len(final_state.get('available_cell_types', []))} available cell types")
             
             return response
                 
         except Exception as e:
-            print(f"❌ Error in workflow execution: {e}")
+            logger.info(f"❌ Error in workflow execution: {e}")
             return f"I encountered an error: {e}"
 
     def cleanup(self):
         """Cleanup resources and clear analysis results"""
-        print("🧹 Starting cleanup...")
+        logger.info("🧹 Starting cleanup...")
         
         # Close hierarchy manager connection
         if self.hierarchy_manager:
@@ -500,20 +502,20 @@ class MultiAgentChatBot:
             try:
                 if os.path.exists(directory):
                     clear_directory(directory)
-                    print(f"🧹 Cleared directory: {directory}")
+                    logger.info(f"🧹 Cleared directory: {directory}")
             except Exception as e:
-                print(f"⚠️ Failed to clear {directory}: {e}")
+                logger.info(f"⚠️ Failed to clear {directory}: {e}")
         
         # Remove execution history file
         execution_history_file = "conversation_history/execution_history.json"
         if os.path.exists(execution_history_file):
             try:
                 os.remove(execution_history_file)
-                print(f"🧹 Removed execution history: {execution_history_file}")
+                logger.info(f"🧹 Removed execution history: {execution_history_file}")
             except Exception as e:
-                print(f"⚠️ Failed to remove execution history: {e}")
+                logger.info(f"⚠️ Failed to remove execution history: {e}")
                 
-        print("✅ Cleanup completed")
+        logger.info("✅ Cleanup completed")
             
 
     # ========== Function Wrappers ==========
@@ -525,7 +527,7 @@ class MultiAgentChatBot:
                 func_name = func.__name__
                 
                 # DEBUG: Log all parameters passed to visualization wrapper
-                print(f"🔍 VIZ WRAPPER DEBUG: {func_name} called with kwargs: {kwargs}")
+                logger.info(f"🔍 VIZ WRAPPER DEBUG: {func_name} called with kwargs: {kwargs}")
                 
                 # Handle different function signatures properly
                 if func_name == 'display_dotplot':
@@ -544,7 +546,7 @@ class MultiAgentChatBot:
                     
                     # CRITICAL FIX: Don't default to 'overall' if we have a more specific cell type
                     if cell_type == 'overall':
-                        print(f"⚠️ WARNING: cell_type defaulted to 'overall' - this may indicate planner issue")
+                        logger.info(f"⚠️ WARNING: cell_type defaulted to 'overall' - this may indicate planner issue")
                     
                     # Handle GO analysis - create visualizations for all three domains
                     if analysis.lower() == 'go':
@@ -556,7 +558,7 @@ class MultiAgentChatBot:
                             kwargs_copy = kwargs.copy()
                             kwargs_copy['domain'] = domain
                             
-                            print(f"🎨 GO Visualization call: {func_name}(analysis='go', cell_type='{cell_type}', plot_type='{plot_type}', domain='{domain}')")
+                            logger.info(f"🎨 GO Visualization call: {func_name}(analysis='go', cell_type='{cell_type}', plot_type='{plot_type}', domain='{domain}')")
                             
                             result = func(analysis, cell_type, plot_type, **kwargs_copy)
                             
@@ -584,13 +586,13 @@ class MultiAgentChatBot:
                             return "Error: No GO enrichment data available"
                     else:
                         # For non-GO analyses (KEGG, Reactome, GSEA), proceed normally
-                        print(f"🎨 Visualization call: {func_name}(analysis='{analysis}', cell_type='{cell_type}', plot_type='{plot_type}', kwargs={kwargs})")
+                        logger.info(f"🎨 Visualization call: {func_name}(analysis='{analysis}', cell_type='{cell_type}', plot_type='{plot_type}', kwargs={kwargs})")
                         return func(analysis, cell_type, plot_type, **kwargs)
                 else:
                     # Default behavior
                     return func(**kwargs)
             except Exception as e:
-                print(f"❌ Visualization error: {e}")
+                logger.info(f"❌ Visualization error: {e}")
                 return f"Visualization failed: {e}"
         return wrapper
 
@@ -603,13 +605,13 @@ class MultiAgentChatBot:
         # Set default analyses if not specified
         if "analyses" not in kwargs or not kwargs["analyses"]:
             kwargs["analyses"] = ["reactome", "go", "kegg", "gsea"]
-            print(f"🧬 No specific analyses requested, using default: {kwargs['analyses']}")
+            logger.info(f"🧬 No specific analyses requested, using default: {kwargs['analyses']}")
         
         if self.analysis_wrapper:
             try:
                 return self.analysis_wrapper.perform_enrichment_analyses_hierarchical(**kwargs)
             except Exception as e:
-                print(f"❌ Hierarchical analysis failed: {e}")
+                logger.info(f"❌ Hierarchical analysis failed: {e}")
                 # Fallback to direct function call
                 from .analysis.enrichment_analysis import perform_enrichment_analyses
                 return perform_enrichment_analyses(self.adata, **kwargs)
@@ -628,7 +630,7 @@ class MultiAgentChatBot:
             try:
                 return self.analysis_wrapper.dea_split_by_condition_hierarchical(**kwargs)
             except Exception as e:
-                print(f"❌ Hierarchical DEA failed: {e}")
+                logger.info(f"❌ Hierarchical DEA failed: {e}")
                 # Fallback to direct function call
                 from .cell_types.utils import dea_split_by_condition
                 return dea_split_by_condition(self.adata, **kwargs)
@@ -660,7 +662,7 @@ class MultiAgentChatBot:
             return result
             
         except Exception as e:
-            print(f"❌ Process cells error: {e}")
+            logger.info(f"❌ Process cells error: {e}")
             return f"Process cells failed: {e}"
 
     def _wrap_compare_cells(self, **kwargs):
@@ -668,7 +670,7 @@ class MultiAgentChatBot:
         cell_type = kwargs.get("cell_type")
         
         # Debug: Print what we received
-        print(f"🔍 compare_cell_counts called with cell_type='{cell_type}', kwargs={kwargs}")
+        logger.info(f"🔍 compare_cell_counts called with cell_type='{cell_type}', kwargs={kwargs}")
         
         # If no cell_type provided, this might be a generic comparison request
         if not cell_type:
@@ -676,14 +678,14 @@ class MultiAgentChatBot:
         
         # Handle multi-cell-type comparisons (e.g., "B cell vs T cell")
         if self._is_multi_cell_type_comparison(cell_type):
-            print(f"🎯 Detected multi-cell-type comparison: {cell_type}")
+            logger.info(f"🎯 Detected multi-cell-type comparison: {cell_type}")
             return self._handle_multi_cell_type_comparison(cell_type, **kwargs)
         
         # Validate single cell type exists
         if cell_type == "overall":
             return "Error: 'overall' is not a valid cell type for comparison. Please specify a specific cell type like 'T cell' or 'B cell'."
         
-        print(f"🔄 Processing single cell type comparison: {cell_type}")
+        logger.info(f"🔄 Processing single cell type comparison: {cell_type}")
         
         # Remove cell_type from kwargs to avoid "multiple values" error
         filtered_kwargs = {k: v for k, v in kwargs.items() if k != "cell_type"}
@@ -787,7 +789,7 @@ class MultiAgentChatBot:
         
         # Option C: Infer missing cell_type from conversation context
         if not cell_type or cell_type == "unknown" or cell_type == "overall":
-            print(f"🔄 Cell type missing or generic ('{cell_type}'), inferring from context...")
+            logger.info(f"🔄 Cell type missing or generic ('{cell_type}'), inferring from context...")
             
             # Try to get cell_type from recent enrichment analyses
             recent_analyses = self.history_manager.get_recent_executions("perform_enrichment_analyses", limit=3)
@@ -795,7 +797,7 @@ class MultiAgentChatBot:
                 inferred_cell_type = recent_analyses[-1]["parameters"].get("cell_type", "")
                 if inferred_cell_type and inferred_cell_type != "unknown":
                     cell_type = inferred_cell_type
-                    print(f"✅ Inferred cell_type from recent analysis: '{cell_type}'")
+                    logger.info(f"✅ Inferred cell_type from recent analysis: '{cell_type}'")
             
             # Fallback: try to get from recent process_cells operations
             if not cell_type or cell_type == "unknown":
@@ -811,7 +813,7 @@ class MultiAgentChatBot:
                                 discoveries = re.findall(r"Discovered new cell type: ([^\\n]+)", result_str)
                                 if discoveries:
                                     cell_type = discoveries[-1].strip()  # Use the last discovered type
-                                    print(f"✅ Inferred cell_type from process_cells result: '{cell_type}'")
+                                    logger.info(f"✅ Inferred cell_type from process_cells result: '{cell_type}'")
                                     break
         
         # Validate that we have required parameters
@@ -825,7 +827,7 @@ class MultiAgentChatBot:
                 "results": []
             }
         
-        print(f"🔍 Semantic search: '{query}' in '{cell_type}' (k={k})")
+        logger.info(f"🔍 Semantic search: '{query}' in '{cell_type}' (k={k})")
         
         try:
             # Call the vector database search
@@ -856,7 +858,7 @@ class MultiAgentChatBot:
                 }
         
         except Exception as e:
-            print(f"❌ Semantic search failed: {e}")
+            logger.info(f"❌ Semantic search failed: {e}")
             return {
                 "error": f"Semantic search failed: {e}",
                 "query": query,

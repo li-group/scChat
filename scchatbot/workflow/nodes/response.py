@@ -13,6 +13,8 @@ from langchain_openai import ChatOpenAI
 from ...cell_types.models import ChatState
 from ..node_base import BaseWorkflowNode
 from ..unified_result_accessor import get_unified_results_for_synthesis
+import logging
+logger = logging.getLogger(__name__)
 
 class ResponseGeneratorNode(BaseWorkflowNode):
     """
@@ -35,7 +37,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         Generate response using LLM synthesis of all analysis results.
         This method replaces the complex template-based response logic.
         """
-        print("🎯 UNIFIED: Generating LLM-synthesized response with conversation awareness...")
+        logger.info("🎯 UNIFIED: Generating LLM-synthesized response with conversation awareness...")
         
         try:
             # 1. Extract relevant results using unified result accessor (NEW SYSTEM)
@@ -45,23 +47,23 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             
             # Use new unified accessor that handles mixed storage patterns
             formatted_findings = get_unified_results_for_synthesis(execution_history)
-            print("✅ Unified results extracted and formatted successfully")
+            logger.info("✅ Unified results extracted and formatted successfully")
             
             # No legacy fallback - unified accessor is the only method
             if not formatted_findings or len(formatted_findings.strip()) < 50:
-                print("⚠️ Unified accessor returned minimal results")
+                logger.info("⚠️ Unified accessor returned minimal results")
                 formatted_findings = "No analysis results available for synthesis"
             
         except Exception as e:
-            print(f"❌ Error in unified result accessor: {e}")
+            logger.info(f"❌ Error in unified result accessor: {e}")
             formatted_findings = f"Error extracting analysis results: {e}"
         
         try:
             # 3. Get failed analyses for transparency
             failed_analyses = self._get_failed_analyses(state)
-            print("✅ Failed analyses retrieved")
+            logger.info("✅ Failed analyses retrieved")
         except Exception as e:
-            print(f"❌ Error getting failed analyses: {e}")
+            logger.info(f"❌ Error getting failed analyses: {e}")
             failed_analyses = []
         
         try:
@@ -74,12 +76,12 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                 if isinstance(msg, AIMessage) and any(prefix in msg.content for prefix in 
                     ["CURRENT_SESSION_STATE:", "CONVERSATION_HISTORY:", "CONVERSATION_CONTEXT:"]):
                     conversation_context = msg.content
-                    print(f"🎯 UNIFIED: Found context message ({len(conversation_context)} chars)")
+                    logger.info(f"🎯 UNIFIED: Found context message ({len(conversation_context)} chars)")
                     break
             
-            print("✅ Conversation context processed")
+            logger.info("✅ Conversation context processed")
         except Exception as e:
-            print(f"❌ Error processing conversation context: {e}")
+            logger.info(f"❌ Error processing conversation context: {e}")
             conversation_context = None
         
         try:
@@ -97,29 +99,29 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                 question_type=question_type,
                 analysis_relevance=analysis_relevance
             )
-            print("✅ Synthesis prompt created with relevance hints")
+            logger.info("✅ Synthesis prompt created with relevance hints")
         except Exception as e:
-            print(f"❌ Error creating synthesis prompt: {e}")
+            logger.info(f"❌ Error creating synthesis prompt: {e}")
             synthesis_prompt = f"Please answer the user's question: {state.get('current_message', '')}"
         
         # 6. Get LLM response (text only, no plots yet)
         try:
             response_text = self._call_llm_for_synthesis(synthesis_prompt)
         except Exception as e:
-            print(f"❌ LLM synthesis failed: {e}")
+            logger.info(f"❌ LLM synthesis failed: {e}")
             response_text = "I encountered an error generating the response. Please try again."
         
         # 7. Collect plots as individual objects
         try:
             plots = self._extract_html_plots_from_execution(state)  # Returns List[Dict]
-            print(f"🎯 ResponseGeneratorNode: Found {len(plots)} individual plots")
+            logger.info(f"🎯 ResponseGeneratorNode: Found {len(plots)} individual plots")
         except Exception as e:
-            print(f"❌ Error extracting plots: {e}")
+            logger.info(f"❌ Error extracting plots: {e}")
             plots = []
         
         # 8. NEW: Create multiple messages structure for separate rendering
         if plots and len(plots) > 0:
-            print(f"🎨 Creating multiple messages structure: {len(plots)} plots + 1 text (plots first)")
+            logger.info(f"🎨 Creating multiple messages structure: {len(plots)} plots + 1 text (plots first)")
             
             # Create comprehensive response with separate messages array
             multiple_messages = []
@@ -154,7 +156,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                 "graph_html": self._combine_plots_for_legacy(plots)
             }
             
-            print(f"🎨 Created multiple messages structure with {len(multiple_messages)} total messages (plots first, then text)")
+            logger.info(f"🎨 Created multiple messages structure with {len(multiple_messages)} total messages (plots first, then text)")
             
         else:
             # No plots - single text response
@@ -166,7 +168,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         
         state["response"] = json.dumps(response_data)
         
-        print(f"🎯 UNIFIED: Generated response ({len(response_text)} chars)")
+        logger.info(f"🎯 UNIFIED: Generated response ({len(response_text)} chars)")
         return state
     
     def add_plots_to_final_response(self, state: ChatState) -> ChatState:
@@ -174,7 +176,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         
         # This method is only called when workflow routes to plot_integration,
         # which means the response has been approved (either normally or by iteration limit)
-        print("🎨 PLOT INTEGRATION: Adding plots to final response...")
+        logger.info("🎨 PLOT INTEGRATION: Adding plots to final response...")
         
         # Parse the JSON response
         try:
@@ -196,9 +198,9 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             # Keep response text clean - only add a simple note about available plots
             # response_text remains unchanged to avoid HTML contamination
             
-            print(f"🎨 PLOT INTEGRATION: Successfully stored {len(plots)} individual plots separately from response")
+            logger.info(f"🎨 PLOT INTEGRATION: Successfully stored {len(plots)} individual plots separately from response")
         else:
-            print("🎨 PLOT INTEGRATION: No plots found in execution history")
+            logger.info("🎨 PLOT INTEGRATION: No plots found in execution history")
             response_data["plots"] = []
         
         # Store back as JSON with size checking
@@ -208,7 +210,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         # Check final response size
         MAX_RESPONSE_SIZE = 50 * 1024 * 1024  # 50MB maximum
         if response_size > MAX_RESPONSE_SIZE:
-            print(f"🎨 PLOT INTEGRATION: WARNING - Response too large ({response_size:,} chars > {MAX_RESPONSE_SIZE:,})")
+            logger.info(f"🎨 PLOT INTEGRATION: WARNING - Response too large ({response_size:,} chars > {MAX_RESPONSE_SIZE:,})")
             # Remove plots if response is too large
             response_data_fallback = {
                 "response": response_data.get("response", ""),
@@ -218,7 +220,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                 "error": f"Plots removed due to size limit (original size: {response_size:,} chars)"
             }
             response_json = json.dumps(response_data_fallback)
-            print(f"🎨 PLOT INTEGRATION: Fallback response size: {len(response_json):,} chars")
+            logger.info(f"🎨 PLOT INTEGRATION: Fallback response size: {len(response_json):,} chars")
         
         state["response"] = response_json
         
@@ -227,24 +229,24 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             from langchain_core.messages import AIMessage
             state["messages"].append(AIMessage(content=response_text))
         except Exception as e:
-            print(f"⚠️ Could not add response to message history: {e}")
+            logger.info(f"⚠️ Could not add response to message history: {e}")
         
         return state
     
     def _generate_execution_summary_with_plots(self, state: ChatState):
         """Generate a summary of multi-step execution with collected plots"""
-        print(f"🔍 Plot collection: Total execution history entries: {len(state.get('execution_history', []))}")
+        logger.info(f"🔍 Plot collection: Total execution history entries: {len(state.get('execution_history', []))}")
         
         successful_steps = [h for h in state["execution_history"] if h["success"]]
         
         # Debug: Show all function names in execution history
         all_function_names = [h["step"]["function_name"] for h in successful_steps]
-        print(f"🔍 Plot collection: Function names in execution history: {all_function_names}")
-        print(f"🔍 Plot collection: Visualization functions set: {self.visualization_functions}")
+        logger.info(f"🔍 Plot collection: Function names in execution history: {all_function_names}")
+        logger.info(f"🔍 Plot collection: Visualization functions set: {self.visualization_functions}")
         
         visualization_steps = [h for h in successful_steps if h["step"]["function_name"] in self.visualization_functions]
         
-        print(f"🔍 Plot collection: {len(successful_steps)} successful steps, {len(visualization_steps)} visualization steps")
+        logger.info(f"🔍 Plot collection: {len(successful_steps)} successful steps, {len(visualization_steps)} visualization steps")
         
         if not successful_steps:
             return "I encountered issues executing your request.", ""
@@ -267,10 +269,10 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                 summary += f"{i}. {plot_info}\n"
                 
                 # Debug: Check what we have in result
-                print(f"🔍 Plot collection debug - Function: {function_name}")
-                print(f"🔍 Result type: {type(result)}, length: {len(str(result)) if result else 0}")
-                print(f"🔍 Has HTML markers: <div={bool('<div' in str(result))}, <html={bool('<html' in str(result))}")
-                print(f"🔍 Result preview: {str(result)[:200]}...")
+                logger.info(f"🔍 Plot collection debug - Function: {function_name}")
+                logger.info(f"🔍 Result type: {type(result)}, length: {len(str(result)) if result else 0}")
+                logger.info(f"🔍 Has HTML markers: <div={bool('<div' in str(result))}, <html={bool('<html' in str(result))}")
+                logger.info(f"🔍 Result preview: {str(result)[:200]}...")
                 
                 # Collect the HTML plot if it's valid HTML
                 if result and isinstance(result, str) and ("<div" in result or "<html" in result):
@@ -278,11 +280,11 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                     if step_desc not in plot_descriptions:
                         collected_plots.append(f"<div class='plot-container'><h4>{step_desc}</h4>{result}</div>")
                         plot_descriptions.append(step_desc)
-                        print(f"✅ Plot collected: {step_desc}")
+                        logger.info(f"✅ Plot collected: {step_desc}")
                     else:
-                        print(f"⚠️ Duplicate plot detected, skipping: {step_desc}")
+                        logger.info(f"⚠️ Duplicate plot detected, skipping: {step_desc}")
                 else:
-                    print(f"❌ Plot NOT collected for {step_desc} - invalid HTML or empty result")
+                    logger.info(f"❌ Plot NOT collected for {step_desc} - invalid HTML or empty result")
             else:
                 # Regular analysis step
                 summary += f"{i}. {step_desc}\n"
@@ -298,9 +300,9 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         # Combine all plots into a single HTML string
         combined_plots = "\n".join(collected_plots) if collected_plots else ""
         
-        print(f"🔍 Plot collection summary: Collected {len(collected_plots)} plots, total HTML length: {len(combined_plots)}")
+        logger.info(f"🔍 Plot collection summary: Collected {len(collected_plots)} plots, total HTML length: {len(combined_plots)}")
         if collected_plots:
-            print(f"🔍 First plot preview: {collected_plots[0][:100]}...")
+            logger.info(f"🔍 First plot preview: {collected_plots[0][:100]}...")
         
         return summary, combined_plots
     
@@ -424,7 +426,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             return response.content.strip()
             
         except Exception as e:
-            print(f"❌ OpenAI API error: {e}")
+            logger.info(f"❌ OpenAI API error: {e}")
             return f"I encountered an error generating the response: {e}"
     
     def _extract_html_plots_from_execution(self, state: ChatState) -> List[Dict[str, Any]]:
@@ -433,14 +435,14 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         seen_plots = set()  # Track unique plots to avoid duplicates
         
         execution_history = state.get("execution_history", [])
-        print(f"🎨 PLOT EXTRACTION: Checking {len(execution_history)} execution steps")
+        logger.info(f"🎨 PLOT EXTRACTION: Checking {len(execution_history)} execution steps")
         
         MAX_PLOTS = 6  # Limited to 6 plots for frontend display
         MAX_PLOT_SIZE = 8 * 1024 * 1024  # 8MB per plot maximum (reduced from 10MB)
         
         for i, execution in enumerate(execution_history):
             if len(plots) >= MAX_PLOTS:
-                print(f"🎨 PLOT EXTRACTION: Reached max plots limit ({MAX_PLOTS}), stopping")
+                logger.info(f"🎨 PLOT EXTRACTION: Reached max plots limit ({MAX_PLOTS}), stopping")
                 break
                 
             # Handle both nested and flat execution history structures
@@ -463,7 +465,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             
             has_result = result is not None
             
-            print(f"🎨 PLOT EXTRACTION: Step {i+1}: {function_name}, success={success}, has_result={has_result}")
+            logger.info(f"🎨 PLOT EXTRACTION: Step {i+1}: {function_name}, success={success}, has_result={has_result}")
             
             # Check for plots by function name OR by HTML content OR by multiple plots structure
             is_plot_function = function_name.startswith("display_")
@@ -475,11 +477,11 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             if (success and has_result and (is_plot_function or is_html_content or is_multiple_plots)):
                 # Check if result is a multiple plots structure
                 if isinstance(result, dict) and result.get("multiple_plots"):
-                    print(f"🎨 PLOT EXTRACTION: Found multiple plots structure in {function_name}")
+                    logger.info(f"🎨 PLOT EXTRACTION: Found multiple plots structure in {function_name}")
                     # Handle multiple plots from single function call
                     for plot_data in result.get("plots", []):
                         if len(plots) >= MAX_PLOTS:
-                            print(f"🎨 PLOT EXTRACTION: Reached max plots limit ({MAX_PLOTS}), stopping")
+                            logger.info(f"🎨 PLOT EXTRACTION: Reached max plots limit ({MAX_PLOTS}), stopping")
                             break
                             
                         plot_html = plot_data.get("html", "")
@@ -487,7 +489,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                         
                         # Check size limit for individual plot
                         if plot_size > MAX_PLOT_SIZE:
-                            print(f"🎨 PLOT EXTRACTION: Skipping {plot_data.get('type', 'unknown')} plot - too large ({plot_size} chars > {MAX_PLOT_SIZE})")
+                            logger.info(f"🎨 PLOT EXTRACTION: Skipping {plot_data.get('type', 'unknown')} plot - too large ({plot_size} chars > {MAX_PLOT_SIZE})")
                             continue
                         
                         plot_id = f"plot_{len(plots) + 1}"
@@ -503,7 +505,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                         }
                         
                         plots.append(plot_obj)
-                        print(f"🎨 PLOT EXTRACTION: Added {plot_data.get('type')} plot {plot_id}: {plot_obj['title']} ({plot_size} chars)")
+                        logger.info(f"🎨 PLOT EXTRACTION: Added {plot_data.get('type')} plot {plot_id}: {plot_obj['title']} ({plot_size} chars)")
                     
                     continue  # Skip single plot processing for this result
                 
@@ -515,7 +517,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                 
                 # Check size limit
                 if result_length > MAX_PLOT_SIZE:
-                    print(f"🎨 PLOT EXTRACTION: Skipping {function_name} - too large ({result_length} chars > {MAX_PLOT_SIZE})")
+                    logger.info(f"🎨 PLOT EXTRACTION: Skipping {function_name} - too large ({result_length} chars > {MAX_PLOT_SIZE})")
                     continue
                 
                 # Create a unique identifier for this plot (first 100 chars as fingerprint)
@@ -523,7 +525,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                 
                 # Check for duplicates
                 if plot_fingerprint in seen_plots:
-                    print(f"🎨 PLOT EXTRACTION: Skipping {function_name} - duplicate plot detected")
+                    logger.info(f"🎨 PLOT EXTRACTION: Skipping {function_name} - duplicate plot detected")
                     continue
                 
                 seen_plots.add(plot_fingerprint)
@@ -545,17 +547,17 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                 }
                 
                 plots.append(plot_obj)
-                print(f"🎨 PLOT EXTRACTION: Added plot {plot_id}: {title} ({result_length} chars)")
+                logger.info(f"🎨 PLOT EXTRACTION: Added plot {plot_id}: {title} ({result_length} chars)")
         
         if plots:
             total_size = sum(plot["size"] for plot in plots)
-            print(f"🎨 PLOT EXTRACTION: Successfully extracted {len(plots)} individual plots (total: {total_size:,} chars)")
+            logger.info(f"🎨 PLOT EXTRACTION: Successfully extracted {len(plots)} individual plots (total: {total_size:,} chars)")
             
             # Apply size validation
             validated_plots = self._validate_plot_sizes(plots)
             return validated_plots
         else:
-            print("🎨 PLOT EXTRACTION: No valid plots found")
+            logger.info("🎨 PLOT EXTRACTION: No valid plots found")
             return []
     
     def _generate_visualization_description(self, function_name: str, execution: Dict, result: str) -> str:
@@ -598,7 +600,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         if not plots:
             return plot_messages
             
-        print(f"🎨 Creating {len(plots)} individual plot messages")
+        logger.info(f"🎨 Creating {len(plots)} individual plot messages")
         
         for i, plot in enumerate(plots):
             # Create a new state for this plot message
@@ -618,7 +620,7 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             plot_state["response"] = json.dumps(plot_response_data)
             plot_messages.append(plot_state)
             
-            print(f"🎨 Created plot message {i+1}: {plot.get('title', 'Untitled')}")
+            logger.info(f"🎨 Created plot message {i+1}: {plot.get('title', 'Untitled')}")
         
         return plot_messages
     
@@ -666,10 +668,10 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                 validated_plots.append(plot)
                 total_size += plot["size"]
             else:
-                print(f"🎨 SIZE VALIDATION: Skipping {plot['id']} - would exceed total size limit")
+                logger.info(f"🎨 SIZE VALIDATION: Skipping {plot['id']} - would exceed total size limit")
                 break
         
-        print(f"🎨 SIZE VALIDATION: Validated {len(validated_plots)} plots, total size: {total_size:,} bytes")
+        logger.info(f"🎨 SIZE VALIDATION: Validated {len(validated_plots)} plots, total size: {total_size:,} bytes")
         return validated_plots
     
     def _combine_plots_for_legacy(self, plots: List[Dict[str, Any]]) -> str:

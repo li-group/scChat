@@ -6,6 +6,9 @@ real-time updates via WebSocket to the frontend.
 """
 
 from typing import Optional
+import logging
+logger = logging.getLogger(__name__)
+
 
 try:
     from ..consumers import send_progress_update
@@ -13,7 +16,7 @@ try:
 except Exception as e:
     # If WebSocket is not available, create a dummy function
     def send_progress_update(room_name, message, progress=None, stage=None):
-        print(f"Progress [{room_name}]: {message} - {progress}% ({stage})")
+        logger.info(f"Progress [{room_name}]: {message} - {progress}% ({stage})")
     WEBSOCKET_AVAILABLE = False
 
 

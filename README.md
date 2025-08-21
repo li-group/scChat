@@ -52,10 +52,21 @@ Follow these steps to utilize the application effectively:
 - type and enter export OPENAI_API_KEY='your_openai_api_key' in your terminal
 
   
-### Step 2: Initialize the Application
+### Step 2: Download Neo4j Desktop 2
+- Download Neo4j Desktop 2
+- Download required dump files
+- Create database on Neo4j and import the dump files
+- start the database
+
+### Step 3: Update  media/specification_graph.json
+- update specification_graph.json with your Neo4j username and password
+- update system and organ relevant to the database you are using
+
+  
+### Step 4: Initialize the Application
 - run python3 manage.py runserver
 
-### Step 3: Access the Application
+### Step 5: Access the Application
 - Open your web browser and navigate to:
   `http://127.0.0.1:8000/schatbot`
   

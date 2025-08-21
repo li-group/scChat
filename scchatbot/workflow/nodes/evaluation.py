@@ -10,6 +10,9 @@ import json
 import re
 from ...cell_types.models import ChatState
 from ..node_base import BaseWorkflowNode
+import logging
+logger = logging.getLogger(__name__)
+
 
 
 class EvaluatorNode(BaseWorkflowNode):
@@ -37,7 +40,7 @@ class EvaluatorNode(BaseWorkflowNode):
         # (a) truly empty plan, or (b) all steps lack a function_name
         has_callable = any((s.get("function_name") or "").strip() for s in steps)
         if not steps or not has_callable:
-            print("ℹ️ Evaluator: no callable steps in plan; skipping post-execution evaluation.")
+            logger.info("ℹ️ Evaluator: no callable steps in plan; skipping post-execution evaluation.")
             # Provide a stub so downstream never sees None
             state["post_execution_evaluation"] = {
                 "mentioned_cell_types": [],
@@ -59,10 +62,10 @@ class EvaluatorNode(BaseWorkflowNode):
         # CRITICAL FIX: Only run post-execution evaluation when ALL steps are complete
         # Check if we've reached the end of ALL steps (including any supplementary ones)
         if current_index >= len(steps):
-            print(f"🎯 All steps complete ({current_index}/{len(steps)}), running post-execution evaluation")
+            logger.info(f"🎯 All steps complete ({current_index}/{len(steps)}), running post-execution evaluation")
             return self.evaluator_node(state)
         else:
-            print(f"🔄 Steps still remaining ({current_index}/{len(steps)}), skipping post-execution evaluation")
+            logger.info(f"🔄 Steps still remaining ({current_index}/{len(steps)}), skipping post-execution evaluation")
             return state
     
     def evaluator_node(self, state: ChatState) -> ChatState:
@@ -83,11 +86,11 @@ class EvaluatorNode(BaseWorkflowNode):
             Updated state with post-execution evaluation results
         """
         
-        print("🏁 Evaluator: Starting sophisticated post-execution evaluation...")
+        logger.info("🏁 Evaluator: Starting sophisticated post-execution evaluation...")
         
         # Defensive check: ensure execution_plan exists
         if not state.get("execution_plan"):
-            print("⚠️ Evaluator: No execution plan found")
+            logger.info("⚠️ Evaluator: No execution plan found")
             state["conversation_complete"] = True
             return state
         
@@ -102,27 +105,27 @@ class EvaluatorNode(BaseWorkflowNode):
         successful_steps = [h for h in execution_history if h.get("success", False)]
         failed_steps = [h for h in execution_history if not h.get("success", False)]
         
-        print(f"✅ Execution Summary:")
-        print(f"   • Total steps executed: {len(execution_history)}")
-        print(f"   • Successful: {len(successful_steps)}")
-        print(f"   • Failed: {len(failed_steps)}")
-        print(f"   • Supplementary steps generated: {len(evaluation_result['supplementary_steps'])}")
+        logger.info(f"✅ Execution Summary:")
+        logger.info(f"   • Total steps executed: {len(execution_history)}")
+        logger.info(f"   • Successful: {len(successful_steps)}")
+        logger.info(f"   • Failed: {len(failed_steps)}")
+        logger.info(f"   • Supplementary steps generated: {len(evaluation_result['supplementary_steps'])}")
         
         # Review available results if history manager exists
         if self.history_manager:
             available_results = self.history_manager.get_available_results()
             if available_results:
-                print("📊 Available analysis results:")
+                logger.info("📊 Available analysis results:")
                 if "enrichment_analyses" in available_results:
-                    print(f"   • Enrichment analyses: {list(available_results['enrichment_analyses'].keys())}")
+                    logger.info(f"   • Enrichment analyses: {list(available_results['enrichment_analyses'].keys())}")
                 if "deg_analyses" in available_results:
-                    print(f"   • DEG analyses: {list(available_results['deg_analyses'].keys())}")
+                    logger.info(f"   • DEG analyses: {list(available_results['deg_analyses'].keys())}")
                 if "cell_annotations" in available_results:
-                    print(f"   • Cell annotations: {list(available_results['cell_annotations'].keys())}")
+                    logger.info(f"   • Cell annotations: {list(available_results['cell_annotations'].keys())}")
         
         # Mark conversation as complete for response generation
         state["conversation_complete"] = True
-        print("🎯 Evaluator: Post-execution evaluation complete, ready for response generation")
+        logger.info("🎯 Evaluator: Post-execution evaluation complete, ready for response generation")
         
         return state
     
@@ -141,17 +144,17 @@ class EvaluatorNode(BaseWorkflowNode):
             # Check exact match first
             if expected_child in current_cell_types:
                 found_children.append(expected_child)
-                print(f"✅ Exact match found: '{expected_child}'")
+                logger.info(f"✅ Exact match found: '{expected_child}'")
             else:
                 # Check if any discovered types are subtypes of the expected type using hierarchy
                 subtypes_found = self._find_subtypes_in_available(expected_child, current_cell_types)
                 
                 if subtypes_found:
                     found_children.extend(subtypes_found)
-                    print(f"✅ Subtype validation: '{expected_child}' satisfied by subtypes: {subtypes_found}")
+                    logger.info(f"✅ Subtype validation: '{expected_child}' satisfied by subtypes: {subtypes_found}")
                 else:
                     missing_children.append(expected_child)
-                    print(f"❌ Missing expected cell type: '{expected_child}' (no exact match or valid subtypes)")
+                    logger.info(f"❌ Missing expected cell type: '{expected_child}' (no exact match or valid subtypes)")
         
         # Generate result based on findings
         result = self._generate_validation_result(
@@ -178,8 +181,8 @@ class EvaluatorNode(BaseWorkflowNode):
                                    missing_children: List[str], current_cell_types: set) -> Dict[str, Any]:
         """Generate comprehensive validation result."""
         if missing_children:
-            print(f"⚠️ Validation Warning: Expected children not found: {missing_children}")
-            print(f"   Available cell types: {sorted(current_cell_types)}")
+            logger.info(f"⚠️ Validation Warning: Expected children not found: {missing_children}")
+            logger.info(f"   Available cell types: {sorted(current_cell_types)}")
             
             # Try to suggest alternatives
             suggestions = self._generate_suggestions(missing_children, current_cell_types)
@@ -231,16 +234,16 @@ class EvaluatorNode(BaseWorkflowNode):
         found_children = validation_result.get("found_children", [])
         missing_children = validation_result.get("missing_children", [])
         
-        print(f"🔄 Updating remaining steps: expected={expected_children}, found={found_children}, missing={missing_children}")
-        print(f"🔧 DEBUG: Validation result full structure: {validation_result}")
+        logger.info(f"🔄 Updating remaining steps: expected={expected_children}, found={found_children}, missing={missing_children}")
+        logger.info(f"🔧 DEBUG: Validation result full structure: {validation_result}")
         
         # No replacement mapping - we should skip steps for missing cell types entirely
         # This avoids creating duplicate steps when some expected children are found
-        print(f"🔧 DEBUG: Will skip steps for missing cell types: {missing_children}")
+        logger.info(f"🔧 DEBUG: Will skip steps for missing cell types: {missing_children}")
         
         # Update remaining steps
         skipped_count = 0
-        print(f"🔍 DEBUG: Scanning {len(steps) - current_step_index - 1} remaining steps...")
+        logger.info(f"🔍 DEBUG: Scanning {len(steps) - current_step_index - 1} remaining steps...")
         
         for i in range(current_step_index + 1, len(steps)):
             step = steps[i]
@@ -257,27 +260,27 @@ class EvaluatorNode(BaseWorkflowNode):
                     param_str = f"analysis='{params.get('analysis')}'"
                 else:
                     param_str = f"params={params}"
-                print(f"🔍 DEBUG: Step {i+1}: {function_name}({param_str})")
+                logger.info(f"🔍 DEBUG: Step {i+1}: {function_name}({param_str})")
             else:
-                print(f"🔍 DEBUG: Step {i+1}: {function_name}(cell_type='{step_cell_type}')")
+                logger.info(f"🔍 DEBUG: Step {i+1}: {function_name}(cell_type='{step_cell_type}')")
             
             if step_cell_type in missing_children:
-                print(f"🔍 DEBUG: Step {i+1} references missing cell type '{step_cell_type}'")
+                logger.info(f"🔍 DEBUG: Step {i+1} references missing cell type '{step_cell_type}'")
                 # Mark this step to be skipped (cell type unavailable)
                 steps[i]["skip_reason"] = f"Cell type '{step_cell_type}' not discovered"
-                print(f"⏭️ Marked step {i+1} for skipping: {function_name}({step_cell_type})")
-                print(f"🔧 DEBUG: Step {i+1} now has skip_reason: {steps[i].get('skip_reason')}")
+                logger.info(f"⏭️ Marked step {i+1} for skipping: {function_name}({step_cell_type})")
+                logger.info(f"🔧 DEBUG: Step {i+1} now has skip_reason: {steps[i].get('skip_reason')}")
                 skipped_count += 1
             else:
-                print(f"🔍 DEBUG: Step {i+1} cell type '{step_cell_type}' not in missing list {missing_children}")
+                logger.info(f"🔍 DEBUG: Step {i+1} cell type '{step_cell_type}' not in missing list {missing_children}")
         
         if skipped_count > 0:
-            print(f"✅ Step update complete: {skipped_count} marked for skipping")
+            logger.info(f"✅ Step update complete: {skipped_count} marked for skipping")
     
     
     def _execute_validation_step(self, state: ChatState, step_data) -> ChatState:
         """Handle validation step execution (moved from ExecutorNode, matches backup lines 617-656)"""
-        print("🔍 Executing validation step...")
+        logger.info("🔍 Executing validation step...")
         
         # Extract parameters from step_data
         processed_parent = step_data.get("parameters", {}).get("processed_parent")
@@ -292,13 +295,13 @@ class EvaluatorNode(BaseWorkflowNode):
         # Process validation result exactly like backup
         if result["status"] == "success":
             success = True
-            print(f"✅ Validation passed: {result['message']}")
+            logger.info(f"✅ Validation passed: {result['message']}")
             # Update available cell types with discovered types
             state["available_cell_types"] = result["available_types"]
             
         elif result["status"] == "partial_success":
             success = True  # Continue but with warnings
-            print(f"⚠️ Validation partial: {result['message']}")
+            logger.info(f"⚠️ Validation partial: {result['message']}")
             # Update available cell types with what we actually found
             state["available_cell_types"] = result["available_types"]
             
@@ -309,24 +312,24 @@ class EvaluatorNode(BaseWorkflowNode):
             if missing_types:
                 current_unavailable = state.get("unavailable_cell_types", [])
                 state["unavailable_cell_types"] = list(set(current_unavailable + missing_types))
-                print(f"📋 Added to unavailable cell types: {missing_types}")
+                logger.info(f"📋 Added to unavailable cell types: {missing_types}")
             
         else:
             success = False
             error_msg = result["message"]
-            print(f"❌ Validation failed: {error_msg}")
+            logger.info(f"❌ Validation failed: {error_msg}")
             
             # Track all expected cell types as unavailable on complete failure
             expected_types = step_data.get("parameters", {}).get("expected_children", [])
             if expected_types:
                 current_unavailable = state.get("unavailable_cell_types", [])
                 state["unavailable_cell_types"] = list(set(current_unavailable + expected_types))
-                print(f"📋 Added to unavailable cell types (validation failed): {expected_types}")
+                logger.info(f"📋 Added to unavailable cell types (validation failed): {expected_types}")
                 
         # CRITICAL FIX: Update subsequent analysis steps based on validation results
         # This MUST run for ANY validation (success, partial, or complete failure)
         # to skip steps for missing cell types or update steps for discovered types
-        print(f"🔧 CALLING update_remaining_steps_with_discovered_types with result status: {result.get('status')}")
+        logger.info(f"🔧 CALLING update_remaining_steps_with_discovered_types with result status: {result.get('status')}")
         self.update_remaining_steps_with_discovered_types(state, result)
         
         # Record execution in state history with proper structure (matches backup lines 762-770)
@@ -350,9 +353,9 @@ class EvaluatorNode(BaseWorkflowNode):
         state["current_step_index"] = current_step_index + 1
         
         if success:
-            print(f"🔄 Advanced to step {current_step_index + 2}")
+            logger.info(f"🔄 Advanced to step {current_step_index + 2}")
         else:
-            print(f"🔄 Advanced to step {current_step_index + 2} (validation failure, but continuing)")
+            logger.info(f"🔄 Advanced to step {current_step_index + 2} (validation failure, but continuing)")
         
         return state
     
@@ -369,7 +372,7 @@ class EvaluatorNode(BaseWorkflowNode):
             Plan with consecutive duplicates removed
         """
         steps = execution_plan.get("steps", [])
-        print(f"🔄 Light consolidation of {len(steps)} steps...")
+        logger.info(f"🔄 Light consolidation of {len(steps)} steps...")
         
         if len(steps) <= 1:
             return execution_plan
@@ -387,12 +390,12 @@ class EvaluatorNode(BaseWorkflowNode):
                 previous_step.get("parameters", {}).get("cell_type")):
                 
                 cell_type = current_step.get("parameters", {}).get("cell_type", "unknown")
-                print(f"   🗑️ Removing consecutive duplicate process_cells({cell_type})")
+                logger.info(f"   🗑️ Removing consecutive duplicate process_cells({cell_type})")
             else:
                 consolidated_steps.append(current_step)
         
         execution_plan["steps"] = consolidated_steps
-        print(f"✅ Light consolidation: {len(steps)} → {len(consolidated_steps)} steps")
+        logger.info(f"✅ Light consolidation: {len(steps)} → {len(consolidated_steps)} steps")
         
         return execution_plan
 
@@ -410,16 +413,16 @@ class EvaluatorNode(BaseWorkflowNode):
         discovery_steps = [s for s in steps if s.get("function_name") == "process_cells"]
         analysis_steps = [s for s in steps if s.get("function_name") in ["dea_split_by_condition", "perform_enrichment_analyses"]]
         
-        print(f"📋 Plan validation summary:")
-        print(f"   • {len(discovery_steps)} discovery steps")
-        print(f"   • {len(analysis_steps)} analysis steps")
+        logger.info(f"📋 Plan validation summary:")
+        logger.info(f"   • {len(discovery_steps)} discovery steps")
+        logger.info(f"   • {len(analysis_steps)} analysis steps")
         
         if discovery_steps:
-            print(f"🔄 Discovery sequence:")
+            logger.info(f"🔄 Discovery sequence:")
             for step in discovery_steps:
                 parent = step.get("parameters", {}).get("cell_type")
                 target = step.get("target_cell_type", "unknown targets")
-                print(f"   → process_cells({parent}) → {target}")
+                logger.info(f"   → process_cells({parent}) → {target}")
         
         # Skip expensive hierarchy resolution - planner already handled this
     
@@ -446,21 +449,21 @@ class EvaluatorNode(BaseWorkflowNode):
                               "cell_abundance", "general_comparison"]
             
             if category not in valid_categories:
-                print(f"⚠️ Invalid category '{category}', defaulting to general_comparison")
+                logger.info(f"⚠️ Invalid category '{category}', defaulting to general_comparison")
                 return "general_comparison"
             
-            print(f"📊 Question classified as: {category}")
+            logger.info(f"📊 Question classified as: {category}")
             return category
             
         except Exception as e:
-            print(f"⚠️ Question classification failed: {e}")
+            logger.info(f"⚠️ Question classification failed: {e}")
             return "general_comparison"
     
     def _post_execution_evaluation(self, state: ChatState) -> Dict[str, Any]:
         """
         Cell-type specific LLM-powered gap analysis - FINAL APPROACH
         """
-        print("🔍 Starting post-execution evaluation...")
+        logger.info("🔍 Starting post-execution evaluation...")
         
         original_question = state["execution_plan"]["original_question"]
         
@@ -474,7 +477,7 @@ class EvaluatorNode(BaseWorkflowNode):
         question_type = self._classify_question_type(original_question)
         
         if not mentioned_types:
-            print("📋 No specific cell types mentioned, skipping post-execution evaluation")
+            logger.info("📋 No specific cell types mentioned, skipping post-execution evaluation")
             return {"mentioned_cell_types": [], "supplementary_steps": [], "evaluation_complete": True}
         
         supplementary_steps = []
@@ -487,10 +490,10 @@ class EvaluatorNode(BaseWorkflowNode):
         for cell_type in mentioned_types:
             # Skip cell types that were marked as unavailable during validation
             if cell_type in unavailable_cell_types:
-                print(f"⏭️ Skipping post-execution evaluation for unavailable cell type: {cell_type}")
+                logger.info(f"⏭️ Skipping post-execution evaluation for unavailable cell type: {cell_type}")
                 continue
                 
-            print(f"🔍 Evaluating coverage for cell type: {cell_type}")
+            logger.info(f"🔍 Evaluating coverage for cell type: {cell_type}")
             
             # Step 2a: Get LLM recommendations for this specific cell type
             required_analyses = self._get_llm_analysis_requirements(original_question, cell_type)
@@ -511,11 +514,11 @@ class EvaluatorNode(BaseWorkflowNode):
             }
             
             if missing_steps:
-                print(f"📋 Found {len(missing_steps)} missing steps for {cell_type}")
+                logger.info(f"📋 Found {len(missing_steps)} missing steps for {cell_type}")
             else:
-                print(f"✅ Complete coverage for {cell_type}")
+                logger.info(f"✅ Complete coverage for {cell_type}")
         
-        print(f"🔍 Post-execution evaluation complete: {len(supplementary_steps)} total supplementary steps")
+        logger.info(f"🔍 Post-execution evaluation complete: {len(supplementary_steps)} total supplementary steps")
         
         # Add analysis relevance hints based on question type
         all_performed_analyses = {}
@@ -535,7 +538,7 @@ class EvaluatorNode(BaseWorkflowNode):
             if step_signature not in previously_failed_steps:
                 new_unique_steps.append(step)
             else:
-                print(f"⚠️ Skipping previously failed supplementary step: {step_signature}")
+                logger.info(f"⚠️ Skipping previously failed supplementary step: {step_signature}")
         
         # CRITICAL FIX: Add retry limit for post-execution supplementary steps
         MAX_POST_EXECUTION_ATTEMPTS = 2
@@ -545,21 +548,21 @@ class EvaluatorNode(BaseWorkflowNode):
             if "steps" in execution_plan:
                 # Add supplementary steps to the execution plan
                 execution_plan["steps"].extend(new_unique_steps)
-                print(f"✅ Added {len(new_unique_steps)} supplementary steps to execution plan (attempt {post_execution_attempts + 1}/{MAX_POST_EXECUTION_ATTEMPTS})")
+                logger.info(f"✅ Added {len(new_unique_steps)} supplementary steps to execution plan (attempt {post_execution_attempts + 1}/{MAX_POST_EXECUTION_ATTEMPTS})")
                 
                 # Increment attempt counter
                 state["post_execution_attempts"] = post_execution_attempts + 1
                 
                 # Mark conversation as incomplete so execution continues
                 state["conversation_complete"] = False
-                print(f"🔄 Marked conversation as incomplete to continue execution")
+                logger.info(f"🔄 Marked conversation as incomplete to continue execution")
             else:
-                print("⚠️ No execution plan found to add supplementary steps")
+                logger.info("⚠️ No execution plan found to add supplementary steps")
         elif post_execution_attempts >= MAX_POST_EXECUTION_ATTEMPTS:
-            print(f"⚠️ Reached maximum post-execution attempts ({MAX_POST_EXECUTION_ATTEMPTS}), stopping supplementary step generation")
+            logger.info(f"⚠️ Reached maximum post-execution attempts ({MAX_POST_EXECUTION_ATTEMPTS}), stopping supplementary step generation")
             state["conversation_complete"] = True
         elif not new_unique_steps and supplementary_steps:
-            print(f"⚠️ All {len(supplementary_steps)} supplementary steps have been tried before and failed, stopping")
+            logger.info(f"⚠️ All {len(supplementary_steps)} supplementary steps have been tried before and failed, stopping")
             state["conversation_complete"] = True
         
         return {
@@ -629,10 +632,10 @@ class EvaluatorNode(BaseWorkflowNode):
         
         try:
             response = self._call_llm(analysis_prompt)
-            print(f"🔍 LLM raw response for {cell_type}: '{response}' (length: {len(response)})")
+            logger.info(f"🔍 LLM raw response for {cell_type}: '{response}' (length: {len(response)})")
             
             if not response or response.strip() == "":
-                print(f"⚠️ Empty LLM response for {cell_type}, using fallback")
+                logger.info(f"⚠️ Empty LLM response for {cell_type}, using fallback")
                 return ["perform_enrichment_analyses"]
             
             # Try to extract JSON from response (handle cases with markdown code blocks)
@@ -655,17 +658,17 @@ class EvaluatorNode(BaseWorkflowNode):
             
             # Ensure we got a list
             if not isinstance(required_analyses, list):
-                print(f"⚠️ LLM returned {type(required_analyses)} instead of list for {cell_type}")
+                logger.info(f"⚠️ LLM returned {type(required_analyses)} instead of list for {cell_type}")
                 return ["perform_enrichment_analyses"]
             
-            print(f"🧠 LLM recommends for {cell_type}: {required_analyses}")
+            logger.info(f"🧠 LLM recommends for {cell_type}: {required_analyses}")
             return required_analyses
         except json.JSONDecodeError as e:
-            print(f"⚠️ JSON parsing failed for {cell_type}: {e}")
-            print(f"⚠️ Raw response was: '{response}'")
+            logger.info(f"⚠️ JSON parsing failed for {cell_type}: {e}")
+            logger.info(f"⚠️ Raw response was: '{response}'")
             return ["perform_enrichment_analyses"]  # Safe fallback
         except Exception as e:
-            print(f"⚠️ LLM analysis requirement failed for {cell_type}: {e}")
+            logger.info(f"⚠️ LLM analysis requirement failed for {cell_type}: {e}")
             return ["perform_enrichment_analyses"]  # Safe fallback
 
     def _get_performed_analyses_for_cell_type(self, state: ChatState, cell_type: str) -> List[str]:
@@ -675,12 +678,12 @@ class EvaluatorNode(BaseWorkflowNode):
         unavailable_cell_types = state.get("unavailable_cell_types", [])
         execution_history = state.get("execution_history", [])
         
-        print(f"🔧 DEBUG: Checking if '{cell_type}' is in unavailable list: {unavailable_cell_types}")
-        print(f"🔧 DEBUG: Checking execution history with {len(execution_history)} entries")
+        logger.info(f"🔧 DEBUG: Checking if '{cell_type}' is in unavailable list: {unavailable_cell_types}")
+        logger.info(f"🔧 DEBUG: Checking execution history with {len(execution_history)} entries")
         
         # If this cell type is known to be unavailable, don't try to generate steps for it
         if cell_type in unavailable_cell_types:
-            print(f"🚫 Cell type '{cell_type}' is unavailable - not generating missing steps")
+            logger.info(f"🚫 Cell type '{cell_type}' is unavailable - not generating missing steps")
             # Return dummy analysis to prevent post-execution from trying to add steps
             return ["analysis_skipped_cell_type_unavailable"]
         
@@ -698,7 +701,7 @@ class EvaluatorNode(BaseWorkflowNode):
                 # Debug logging for each matching execution
                 if ex_cell_type == cell_type and function_name:
                     status = "skipped" if skipped else "successful"
-                    print(f"📋 Found {status} analysis for {cell_type}: {function_name} (execution {i+1})")
+                    logger.info(f"📋 Found {status} analysis for {cell_type}: {function_name} (execution {i+1})")
                     performed_analyses.append(function_name)
                     
                     # Additional debug for successful enrichment analyses
@@ -708,7 +711,7 @@ class EvaluatorNode(BaseWorkflowNode):
                             total_results = sum(result.get(key, {}).get("total_significant", 0) 
                                               for key in ["go", "kegg", "reactome", "gsea"] 
                                               if isinstance(result.get(key), dict))
-                            print(f"   → Enrichment analysis had {total_results} total significant results")
+                            logger.info(f"   → Enrichment analysis had {total_results} total significant results")
         
         # Remove duplicates while preserving order
         unique_performed = []
@@ -716,12 +719,12 @@ class EvaluatorNode(BaseWorkflowNode):
             if analysis not in unique_performed:
                 unique_performed.append(analysis)
         
-        print(f"📊 Actually performed for {cell_type}: {unique_performed}")
+        logger.info(f"📊 Actually performed for {cell_type}: {unique_performed}")
         
         # CRITICAL FIX: If no analyses found but cell type is available, 
         # check if there are any related executions with different parameter names
         if not unique_performed and cell_type not in unavailable_cell_types:
-            print(f"🔍 No direct matches found for {cell_type}, checking for related executions...")
+            logger.info(f"🔍 No direct matches found for {cell_type}, checking for related executions...")
             # Look for any executions that might be related to this cell type
             for i, ex in enumerate(execution_history):
                 if ex.get("success", False):
@@ -732,7 +735,7 @@ class EvaluatorNode(BaseWorkflowNode):
                     # Check if cell type appears in any parameter values
                     for param_key, param_value in params.items():
                         if isinstance(param_value, str) and cell_type.lower() in param_value.lower():
-                            print(f"🔍 Found related execution: {function_name} with {param_key}='{param_value}'")
+                            logger.info(f"🔍 Found related execution: {function_name} with {param_key}='{param_value}'")
         
         return unique_performed
 
@@ -773,12 +776,12 @@ class EvaluatorNode(BaseWorkflowNode):
                         pathway_keywords = ", ".join(pathway_terms[:3])  # Top 3 terms
                         step["parameters"]["pathway_include"] = pathway_keywords
                         step["description"] += f" (with enrichment_checker)"
-                        print(f"🔧 Added enrichment_checker trigger with keywords: {pathway_keywords}")
+                        logger.info(f"🔧 Added enrichment_checker trigger with keywords: {pathway_keywords}")
                     else:
                         # Still add pathway_include to trigger enrichment_checker with general enhancement
                         step["parameters"]["pathway_include"] = f"{cell_type} related pathways"
                         step["description"] += " (with enrichment_checker)"
-                        print(f"🔧 Added enrichment_checker trigger for {cell_type}")
+                        logger.info(f"🔧 Added enrichment_checker trigger for {cell_type}")
                 
                 # Add specific parameters for visualization functions
                 if required_function == "display_enrichment_visualization":
@@ -787,7 +790,7 @@ class EvaluatorNode(BaseWorkflowNode):
                     step["parameters"]["analysis"] = enrichment_type
                 
                 missing_steps.append(step)
-                print(f"🔧 Generated missing step: {required_function}({cell_type})")
+                logger.info(f"🔧 Generated missing step: {required_function}({cell_type})")
         
         return missing_steps
     
@@ -849,7 +852,7 @@ class EvaluatorNode(BaseWorkflowNode):
             "guidance": self._get_response_guidance(question_type)
         }
         
-        print(f"📝 Generated relevance hints for {question_type} question")
+        logger.info(f"📝 Generated relevance hints for {question_type} question")
         return hints
     
     def _get_response_guidance(self, question_type: str) -> str:

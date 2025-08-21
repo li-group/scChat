@@ -12,6 +12,9 @@ from langchain_core.messages import SystemMessage, HumanMessage
 
 from ...cell_types.models import ChatState
 from ..node_base import BaseWorkflowNode
+import logging
+logger = logging.getLogger(__name__)
+
 
 # Import EnrichmentChecker for method recognition
 try:
@@ -49,25 +52,25 @@ class PlannerNode(BaseWorkflowNode):
         current_count = len(available_cell_types)
         discovered_count = current_count - initial_count
         
-        print(f"🧬 PLANNER: Cell type status for planning:")
-        print(f"   • Initial types: {initial_count}")
-        print(f"   • Currently available: {current_count}")
-        print(f"   • Discovered this session: {discovered_count}")
+        logger.info(f"🧬 PLANNER: Cell type status for planning:")
+        logger.info(f"   • Initial types: {initial_count}")
+        logger.info(f"   • Currently available: {current_count}")
+        logger.info(f"   • Discovered this session: {discovered_count}")
         if unavailable_cell_types:
-            print(f"   • Failed discoveries: {len(unavailable_cell_types)} - {', '.join(unavailable_cell_types)}")
+            logger.info(f"   • Failed discoveries: {len(unavailable_cell_types)} - {', '.join(unavailable_cell_types)}")
         
         # Show discovered types if any
         if discovered_count > 0:
             discovered_types = set(available_cell_types) - set(self.initial_cell_types)
-            print(f"   • New types discovered: {', '.join(sorted(discovered_types))}")
+            logger.info(f"   • New types discovered: {', '.join(sorted(discovered_types))}")
         
-        print(f"🧬 Planning for question: '{message}'")
+        logger.info(f"🧬 Planning for question: '{message}'")
         
         # Enhanced LLM-based planning without artificial query type constraints
         plan_result = self._create_enhanced_plan(state, message, available_functions, available_cell_types, function_history, unavailable_cell_types)
         
         self._log_node_complete("Planner", state)
-        print ("FINAL PLAN : ", plan_result)
+        logger.info ("FINAL PLAN : ", plan_result)
         return plan_result
     
     def _create_enhanced_plan(self, state: ChatState, message: str, available_functions: List, available_cell_types: List[str], function_history: Dict, unavailable_cell_types: List[str]) -> ChatState:
@@ -117,7 +120,7 @@ class PlannerNode(BaseWorkflowNode):
             self._log_plan_statistics(enhanced_plan)
             
         except Exception as e:
-            print(f"Planning error: {e}")
+            logger.info(f"Planning error: {e}")
             # Fallback: create a simple conversational response plan
             state["execution_plan"] = self._create_fallback_plan()
             
@@ -262,7 +265,7 @@ class PlannerNode(BaseWorkflowNode):
         
         # Let enrichment_checker handle all pathway intelligence
         enrichment_steps = [s for s in enhanced_plan.get('steps', []) if s.get('function_name') == 'perform_enrichment_analyses']
-        print(f"🔍 ENRICHMENT DEBUG: Found {len(enrichment_steps)} enrichment steps")
+        logger.info(f"🔍 ENRICHMENT DEBUG: Found {len(enrichment_steps)} enrichment steps")
         
         # Extract pathway keywords and enhance enrichment steps 
         enhanced_plan = self._extract_pathway_keywords_from_enrichment_steps(enhanced_plan, message)
@@ -294,18 +297,18 @@ class PlannerNode(BaseWorkflowNode):
         from ...cell_types.validation import extract_cell_types_from_question, needs_cell_discovery
         
         if not plan_data or not self.hierarchy_manager:
-            print("🔍 Cell discovery: No hierarchy manager available")
+            logger.info("🔍 Cell discovery: No hierarchy manager available")
             return plan_data
         
         # Extract cell types mentioned in the user's question
         needed_cell_types = extract_cell_types_from_question(message, self.hierarchy_manager)
         
         if not needed_cell_types:
-            print("🔍 No specific cell types identified in question")
+            logger.info("🔍 No specific cell types identified in question")
             return plan_data
         
-        print(f"🧬 Planner identified needed cell types: {needed_cell_types}")
-        print(f"🧬 Available cell types: {available_cell_types}")
+        logger.info(f"🧬 Planner identified needed cell types: {needed_cell_types}")
+        logger.info(f"🧬 Available cell types: {available_cell_types}")
         
         # Step 1: Extract and categorize original steps
         original_steps = plan_data.get("steps", [])
@@ -318,7 +321,7 @@ class PlannerNode(BaseWorkflowNode):
             if func_name in ["perform_enrichment_analyses", "dea_split_by_condition", 
                            "compare_cell_counts", "analyze_cell_interaction"]:
                 llm_analysis_steps.append(step)
-                print(f"📋 Preserving LLM analysis step: {func_name}({step.get('parameters', {}).get('cell_type', 'unknown')})")
+                logger.info(f"📋 Preserving LLM analysis step: {func_name}({step.get('parameters', {}).get('cell_type', 'unknown')})")
             else:
                 other_steps.append(step)
         
@@ -333,7 +336,7 @@ class PlannerNode(BaseWorkflowNode):
         for needed_type in needed_cell_types:
             if needed_type in available_cell_types:
                 discoverable_types.append(needed_type)
-                print(f"✅ '{needed_type}' already available")
+                logger.info(f"✅ '{needed_type}' already available")
             else:
                 # Check if this type can be discovered from available types
                 can_discover = False
@@ -346,24 +349,24 @@ class PlannerNode(BaseWorkflowNode):
                 
                 if not can_discover:
                     undiscoverable_types.append(needed_type)
-                    print(f"❌ '{needed_type}' cannot be discovered from available cell types")
+                    logger.info(f"❌ '{needed_type}' cannot be discovered from available cell types")
         
         # Step 4: Remove analysis steps for undiscoverable cell types
         if undiscoverable_types:
-            print(f"🚫 Filtering out analysis steps for undiscoverable types: {undiscoverable_types}")
+            logger.info(f"🚫 Filtering out analysis steps for undiscoverable types: {undiscoverable_types}")
             filtered_analysis_steps = []
             for step in llm_analysis_steps:
                 step_cell_type = step.get("parameters", {}).get("cell_type")
                 if step_cell_type not in undiscoverable_types:
                     filtered_analysis_steps.append(step)
                 else:
-                    print(f"🚫 Removed step: {step.get('function_name')}({step_cell_type})")
+                    logger.info(f"🚫 Removed step: {step.get('function_name')}({step_cell_type})")
             llm_analysis_steps = filtered_analysis_steps
         
         # Step 5: Create discovery steps ONLY for discoverable types
         discovery_steps = []
         if needs_cell_discovery(discoverable_types, available_cell_types):
-            print("🧬 Creating discovery steps only...")
+            logger.info("🧬 Creating discovery steps only...")
             discovery_steps = self._create_discovery_steps_only(discoverable_types, available_cell_types)
         
         # Step 6: Update analysis steps to use discovered cell types
@@ -393,7 +396,7 @@ class PlannerNode(BaseWorkflowNode):
             cell_type = disc_step.get("parameters", {}).get("cell_type")
             if cell_type in validation_map:
                 final_steps.append(validation_map[cell_type])
-                print(f"🔄 Interleaved: process_cells({cell_type}) → validation({cell_type})")
+                logger.info(f"🔄 Interleaved: process_cells({cell_type}) → validation({cell_type})")
         
         # Step 8: Add analysis and other steps
         final_steps.extend(updated_analysis_steps)
@@ -406,12 +409,12 @@ class PlannerNode(BaseWorkflowNode):
             original_summary = plan_data.get("plan_summary", "")
             plan_data["plan_summary"] = f"Discover needed cell types then {original_summary.lower()}"
         
-        print(f"📋 Plan merge complete:")
-        print(f"   - Discovery steps: {len(discovery_steps)}")
-        print(f"   - Validation steps: {len(validation_steps)}")
-        print(f"   - Analysis steps: {len(updated_analysis_steps)}")
-        print(f"   - Other steps: {len(other_steps)}")
-        print(f"   - Filtered out: {len(llm_analysis_steps) - len(updated_analysis_steps)} steps for undiscoverable types")
+        logger.info(f"📋 Plan merge complete:")
+        logger.info(f"   - Discovery steps: {len(discovery_steps)}")
+        logger.info(f"   - Validation steps: {len(validation_steps)}")
+        logger.info(f"   - Analysis steps: {len(updated_analysis_steps)}")
+        logger.info(f"   - Other steps: {len(other_steps)}")
+        logger.info(f"   - Filtered out: {len(llm_analysis_steps) - len(updated_analysis_steps)} steps for undiscoverable types")
         
         return plan_data
     
@@ -451,7 +454,7 @@ class PlannerNode(BaseWorkflowNode):
                 if corrected_name != original_name:
                     fixed_step["parameters"] = params.copy()
                     fixed_step["parameters"]["cell_type"] = corrected_name
-                    print(f"🔧 Fixed cell type name using RAG-validated type: '{original_name}' → '{corrected_name}'")
+                    logger.info(f"🔧 Fixed cell type name using RAG-validated type: '{original_name}' → '{corrected_name}'")
             
             fixed_steps.append(fixed_step)
         
@@ -465,7 +468,7 @@ class PlannerNode(BaseWorkflowNode):
         # Step 1: Build parent → children mapping from all paths
         for needed_type in needed_cell_types:
             if needed_type in available_cell_types:
-                print(f"✅ '{needed_type}' already available, no discovery needed")
+                logger.info(f"✅ '{needed_type}' already available, no discovery needed")
                 continue
             
             # Find processing path using hierarchy manager
@@ -476,7 +479,7 @@ class PlannerNode(BaseWorkflowNode):
                 path_result = self.hierarchy_manager.find_parent_path(needed_type, [available_type])
                 if path_result:
                     best_parent, processing_path = path_result
-                    print(f"🔄 Found path from '{best_parent}' to '{needed_type}': {' → '.join(processing_path)}")
+                    logger.info(f"🔄 Found path from '{best_parent}' to '{needed_type}': {' → '.join(processing_path)}")
                     break
             
             if processing_path and len(processing_path) > 1:
@@ -491,7 +494,7 @@ class PlannerNode(BaseWorkflowNode):
                     if child_type not in parent_to_children[parent_type]:
                         parent_to_children[parent_type].append(child_type)
             else:
-                print(f"⚠️ No processing path found for '{needed_type}'")
+                logger.info(f"⚠️ No processing path found for '{needed_type}'")
         
         # Step 2: Create process_cells steps with expected_children metadata
         for parent_type, expected_children in parent_to_children.items():
@@ -511,7 +514,7 @@ class PlannerNode(BaseWorkflowNode):
                     "expected_outcome": f"Discover {', '.join(expected_children)} cell type(s)",
                     "expected_children": expected_children
                 })
-                print(f"🧬 Added process_cells({parent_type}) to discover {expected_children}")
+                logger.info(f"🧬 Added process_cells({parent_type}) to discover {expected_children}")
         
         return discovery_steps
     
@@ -562,7 +565,7 @@ class PlannerNode(BaseWorkflowNode):
                         updated_step["description"] = updated_desc
                         
                         updated_steps.append(updated_step)
-                        print(f"🔄 Updated analysis step: {step.get('function_name')}({step_cell_type}) → {step.get('function_name')}({discovered_type})")
+                        logger.info(f"🔄 Updated analysis step: {step.get('function_name')}({step_cell_type}) → {step.get('function_name')}({discovered_type})")
                 else:
                     # No discovery needed, keep original step
                     if "step_type" not in step:
@@ -598,7 +601,7 @@ class PlannerNode(BaseWorkflowNode):
                     break
             
             if should_skip:
-                print(f"⏭️ Skipping step for unavailable cell type: {step.get('description', 'Unknown step')}")
+                logger.info(f"⏭️ Skipping step for unavailable cell type: {step.get('description', 'Unknown step')}")
             else:
                 filtered_steps.append(step)
         
@@ -640,18 +643,18 @@ class PlannerNode(BaseWorkflowNode):
                         "target_cell_type": None
                     }
                     validation_steps.append(validation_step)
-                    print(f"🔍 Created validation step for process_cells({cell_type}) expecting: {expected_children}")
+                    logger.info(f"🔍 Created validation step for process_cells({cell_type}) expecting: {expected_children}")
         
         return validation_steps
     
     def _extract_pathway_keywords_from_enrichment_steps(self, plan_data: Dict[str, Any], message: str) -> Dict[str, Any]:
         """Extract pathway keywords for enrichment analysis steps to trigger enrichment_checker."""
-        print(f"🔍 PATHWAY EXTRACTOR: Processing {len(plan_data.get('steps', []))} steps")
+        logger.info(f"🔍 PATHWAY EXTRACTOR: Processing {len(plan_data.get('steps', []))} steps")
         enhanced_steps = []
         
         for i, step in enumerate(plan_data.get("steps", [])):
             if step.get("function_name") == "perform_enrichment_analyses":
-                print(f"🔍 PATHWAY EXTRACTOR: Extracting keywords for step {i+1}: {step.get('parameters', {}).get('cell_type', 'unknown')}")
+                logger.info(f"🔍 PATHWAY EXTRACTOR: Extracting keywords for step {i+1}: {step.get('parameters', {}).get('cell_type', 'unknown')}")
                 # Extract pathway keywords for this enrichment step
                 enhanced_step = self._extract_pathway_keywords(step, message)
                 enhanced_steps.append(enhanced_step)
@@ -685,7 +688,7 @@ class PlannerNode(BaseWorkflowNode):
                 enhanced_step["parameters"] = {}
             
             if pathway_keywords and self.enrichment_checker_available and self.enrichment_checker:
-                print(f"🔍 PlannerNode: Using enrichment_checker for pathway keywords: '{pathway_keywords}'")
+                logger.info(f"🔍 PlannerNode: Using enrichment_checker for pathway keywords: '{pathway_keywords}'")
                 
                 # Set pathway_include temporarily to trigger enrichment_checker
                 enhanced_step["parameters"]["pathway_include"] = pathway_keywords
@@ -696,24 +699,24 @@ class PlannerNode(BaseWorkflowNode):
                 # Log the enhancement
                 analyses = enhanced_step["parameters"].get("analyses", [])
                 gene_set_library = enhanced_step["parameters"].get("gene_set_library")
-                print(f"✅ EnrichmentChecker enhanced step:")
-                print(f"   • analyses: {analyses}")
+                logger.info(f"✅ EnrichmentChecker enhanced step:")
+                logger.info(f"   • analyses: {analyses}")
                 if gene_set_library:
-                    print(f"   • gene_set_library: {gene_set_library}")
+                    logger.info(f"   • gene_set_library: {gene_set_library}")
                 
             elif pathway_keywords:
-                print(f"⚠️ Pathway keywords '{pathway_keywords}' extracted but enrichment_checker not available")
+                logger.info(f"⚠️ Pathway keywords '{pathway_keywords}' extracted but enrichment_checker not available")
                 # Fallback to basic GSEA
                 enhanced_step["parameters"]["analyses"] = ["gsea"]
                 enhanced_step["parameters"]["gene_set_library"] = "MSigDB_Hallmark_2020"
             else:
-                print("🔧 No pathway keywords extracted, using default analyses")
+                logger.info("🔧 No pathway keywords extracted, using default analyses")
                 enhanced_step["parameters"]["analyses"] = ["go"]
             
             return enhanced_step
             
         except Exception as e:
-            print(f"⚠️ Pathway keyword extraction and enhancement failed: {e}")
+            logger.info(f"⚠️ Pathway keyword extraction and enhancement failed: {e}")
             # Return step with default analyses
             step["parameters"]["analyses"] = ["go"]
             return step
@@ -768,13 +771,13 @@ class PlannerNode(BaseWorkflowNode):
             return pathway_keywords if pathway_keywords and pathway_keywords.lower() != "none" else ""
             
         except Exception as e:
-            print(f"⚠️ LLM pathway extraction failed: {e}")
+            logger.info(f"⚠️ LLM pathway extraction failed: {e}")
             return ""
     
     def _log_plan_statistics(self, plan: Dict[str, Any]):
         """Log statistics about the created plan."""
         steps = plan.get("steps", [])
-        print(f"✅ Planner created execution plan with {len(steps)} steps")
-        print(f"   • {len([s for s in steps if s.get('function_name') == 'process_cells'])} process_cells steps")
-        print(f"   • {len([s for s in steps if s.get('step_type') == 'validation'])} validation steps")
-        print(f"   • {len([s for s in steps if s.get('step_type') == 'analysis'])} analysis steps")
+        logger.info(f"✅ Planner created execution plan with {len(steps)} steps")
+        logger.info(f"   • {len([s for s in steps if s.get('function_name') == 'process_cells'])} process_cells steps")
+        logger.info(f"   • {len([s for s in steps if s.get('step_type') == 'validation'])} validation steps")
+        logger.info(f"   • {len([s for s in steps if s.get('step_type') == 'analysis'])} analysis steps")

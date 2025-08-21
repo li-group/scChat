@@ -12,6 +12,8 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
 from ..cell_types.models import ChatState
+import logging
+logger = logging.getLogger(__name__)
 
 
 class BaseWorkflowNode(ABC):
@@ -78,7 +80,7 @@ class BaseWorkflowNode(ABC):
             response = self.llm.invoke(messages)
             return response.content
         except Exception as e:
-            print(f"⚠️ LLM call failed: {e}")
+            logger.info(f"⚠️ LLM call failed: {e}")
             return ""
     
     def _validate_state(self, state: ChatState, required_keys: List[str]) -> bool:
@@ -94,7 +96,7 @@ class BaseWorkflowNode(ABC):
         """
         missing_keys = [key for key in required_keys if key not in state]
         if missing_keys:
-            print(f"⚠️ State validation failed. Missing keys: {missing_keys}")
+            logger.info(f"⚠️ State validation failed. Missing keys: {missing_keys}")
             return False
         return True
     
@@ -130,19 +132,19 @@ class BaseWorkflowNode(ABC):
                 
             return json.loads(clean_json)
         except json.JSONDecodeError as e:
-            print(f"⚠️ JSON parsing failed: {e}")
-            print(f"⚠️ Raw input: '{json_string}'")
+            logger.info(f"⚠️ JSON parsing failed: {e}")
+            logger.info(f"⚠️ Raw input: '{json_string}'")
             return None
     
     def _log_node_start(self, node_name: str, state: ChatState):
         """Log node execution start with context."""
-        print(f"🔄 {node_name}: Starting execution")
+        logger.info(f"🔄 {node_name}: Starting execution")
         if "current_message" in state:
-            print(f"   Current message: {state['current_message'][:100]}...")
+            logger.info(f"   Current message: {state['current_message'][:100]}...")
     
     def _log_node_complete(self, node_name: str, state: ChatState):
         """Log node execution completion with context."""
-        print(f"✅ {node_name}: Execution complete")
+        logger.info(f"✅ {node_name}: Execution complete")
 
 
 class ProcessingNodeMixin:
@@ -152,12 +154,12 @@ class ProcessingNodeMixin:
     
     def _build_session_state_context(self, state: ChatState) -> str:
         """Build context from current session state and recent execution results"""
-        print(f"🔍 CONTEXT BUILDER: Building session context...")
+        logger.info(f"🔍 CONTEXT BUILDER: Building session context...")
         context_parts = []
         
         # Available cell types with better formatting
         available_cell_types = list(state.get("available_cell_types", []))
-        print(f"🔍 CONTEXT BUILDER: Found {len(available_cell_types)} cell types: {available_cell_types}")
+        logger.info(f"🔍 CONTEXT BUILDER: Found {len(available_cell_types)} cell types: {available_cell_types}")
         
         if available_cell_types:
             context_parts.append(f"Cell types currently available in the dataset:")
@@ -195,5 +197,5 @@ class ProcessingNodeMixin:
                 context_parts.append("")  # Add spacing
         
         result = "\n".join(context_parts) if context_parts else "No current session data available"
-        print(f"🔍 CONTEXT BUILDER: Generated {len(result)} chars, starts with: '{result[:50]}...'")
+        logger.info(f"🔍 CONTEXT BUILDER: Generated {len(result)} chars, starts with: '{result[:50]}...'")
         return result

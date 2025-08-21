@@ -52,3 +52,12 @@ __pycache__/
 # OS
 .DS_Store
 
+
+
+# Ignore big files inside annotated_adata but allow small docs
+scchatbot/annotated_adata/*
+!scchatbot/annotated_adata/*.md
+!scchatbot/annotated_adata/*.txt
+
+db.sqlite3
+.DS_Store

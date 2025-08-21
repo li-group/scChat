@@ -16,6 +16,8 @@ from typing import Dict, Any, List, Optional
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.messages import AIMessage, HumanMessage
+import logging
+logger = logging.getLogger(__name__)
 
 
 class FunctionHistoryManager:
@@ -61,7 +63,7 @@ class FunctionHistoryManager:
                 with open(self.history_file, 'r') as f:
                     return json.load(f)
         except Exception as e:
-            print(f"⚠️ Could not load function history: {e}")
+            logger.info(f"⚠️ Could not load function history: {e}")
         return []
     
     def _save_history(self):
@@ -70,7 +72,7 @@ class FunctionHistoryManager:
             with open(self.history_file, 'w') as f:
                 json.dump(self.history, f, indent=2, default=str)
         except Exception as e:
-            print(f"⚠️ Could not save function history: {e}")
+            logger.info(f"⚠️ Could not save function history: {e}")
     
     def record_execution(self, function_name: str, parameters: Dict[str, Any], 
                         result: Any, success: bool, error: Optional[str] = None):
@@ -160,19 +162,19 @@ class FunctionHistoryManager:
                 embedding_function=self.embedder,
                 persist_directory=self.vector_db_dir
             )
-            print(f"✅ Vector database initialized at {self.vector_db_dir}")
+            logger.info(f"✅ Vector database initialized at {self.vector_db_dir}")
             
         except ImportError as e:
-            print(f"⚠️ Vector DB dependencies not available: {e}")
-            print("   Install with: pip install langchain-huggingface langchain-chroma sentence-transformers")
+            logger.info(f"⚠️ Vector DB dependencies not available: {e}")
+            logger.info("   Install with: pip install langchain-huggingface langchain-chroma sentence-transformers")
             
         except Exception as e:
-            print(f"⚠️ Failed to initialize vector database: {e}")
-            print("   Falling back to simple conversation storage")
+            logger.info(f"⚠️ Failed to initialize vector database: {e}")
+            logger.info("   Falling back to simple conversation storage")
             
         # Always ensure these are set
         if self.conversation_vector_db is None:
-            print("📝 Using fallback: conversations will be stored in JSON only")
+            logger.info("📝 Using fallback: conversations will be stored in JSON only")
             self.vector_db_available = False
         else:
             self.vector_db_available = True
@@ -184,7 +186,7 @@ class FunctionHistoryManager:
                 with open(self.conversation_file, 'r') as f:
                     return json.load(f)
         except Exception as e:
-            print(f"⚠️ Could not load conversation history: {e}")
+            logger.info(f"⚠️ Could not load conversation history: {e}")
         return []
     
     def _save_conversation_history(self):
@@ -193,7 +195,7 @@ class FunctionHistoryManager:
             with open(self.conversation_file, 'w') as f:
                 json.dump(self.conversation_history, f, indent=2, default=str)
         except Exception as e:
-            print(f"⚠️ Could not save conversation history: {e}")
+            logger.info(f"⚠️ Could not save conversation history: {e}")
     
     def record_conversation_with_vector(self, user_message: str, bot_response: str, 
                                        session_id: str = "default", 
@@ -214,7 +216,7 @@ class FunctionHistoryManager:
             try:
                 self._store_conversation_vectors(user_message, bot_response, conversation_entry)
             except Exception as e:
-                print(f"⚠️ Failed to store in vector database: {e}")
+                logger.info(f"⚠️ Failed to store in vector database: {e}")
         
         # 3. Traditional storage
         self.conversation_history.append(conversation_entry)
@@ -262,7 +264,7 @@ class FunctionHistoryManager:
         """Retrieve semantically relevant conversation history"""
         
         if not self.conversation_vector_db or not self.embedder:
-            print("⚠️ Vector database not available, falling back to recent history")
+            logger.info("⚠️ Vector database not available, falling back to recent history")
             return self._get_recent_conversation_fallback(top_k)
         
         # Build search filters
@@ -284,7 +286,7 @@ class FunctionHistoryManager:
             return relevant_context
             
         except Exception as e:
-            print(f"⚠️ Vector search failed: {e}")
+            logger.info(f"⚠️ Vector search failed: {e}")
             return self._get_recent_conversation_fallback(top_k)
     
     
@@ -341,10 +343,10 @@ class FunctionHistoryManager:
             try:
                 return self.conversation_vector_db.similarity_search(query, k=k)
             except Exception as e:
-                print(f"⚠️ Vector search failed: {e}")
+                logger.info(f"⚠️ Vector search failed: {e}")
         
         # Fallback: return recent conversations as simple objects
-        print("🔄 Using fallback: searching recent conversations")
+        logger.info("🔄 Using fallback: searching recent conversations")
         recent_conversations = self.conversation_history[-min(k*2, len(self.conversation_history)):]
         
         # Create simple result objects that mimic vector search results
@@ -428,13 +430,13 @@ class FunctionHistoryManager:
                     persist_directory=enrichment_db_dir
                 )
                 self.enrichment_db_available = True
-                print(f"✅ Enrichment vector database initialized at {enrichment_db_dir}")
+                logger.info(f"✅ Enrichment vector database initialized at {enrichment_db_dir}")
             else:
-                print("⚠️ Cannot initialize enrichment vector DB without embedder")
+                logger.info("⚠️ Cannot initialize enrichment vector DB without embedder")
                 
         except Exception as e:
-            print(f"⚠️ Failed to initialize enrichment vector database: {e}")
-            print("   Enrichment semantic search will not be available")
+            logger.info(f"⚠️ Failed to initialize enrichment vector database: {e}")
+            logger.info("   Enrichment semantic search will not be available")
             self.enrichment_db_available = False
     
     def _create_standard_embedding(self, summary_row: Dict, raw_row: Optional[Dict], 
@@ -611,29 +613,29 @@ class FunctionHistoryManager:
         try:
             if os.path.exists(summary_file):
                 summary_df = pd.read_csv(summary_file)
-                print(f"📊 Read summary CSV: {summary_file} ({len(summary_df)} terms)")
+                logger.info(f"📊 Read summary CSV: {summary_file} ({len(summary_df)} terms)")
             else:
-                print(f"⚠️ Summary CSV not found: {summary_file}")
+                logger.info(f"⚠️ Summary CSV not found: {summary_file}")
                 # Try to find any matching files in the expected folder
                 if 'folder' in locals() and os.path.exists(folder):
                     files = os.listdir(folder)
                     matching_files = [f for f in files if 'summary' in f and cell_type in f]
                     if matching_files:
-                        print(f"   💡 Found alternative files: {matching_files}")
+                        logger.info(f"   💡 Found alternative files: {matching_files}")
                 return None, None
         except Exception as e:
-            print(f"❌ Error reading summary CSV {summary_file}: {e}")
+            logger.info(f"❌ Error reading summary CSV {summary_file}: {e}")
             return None, None
         
         # Read raw CSV (optional for descriptions)
         try:
             if os.path.exists(raw_file):
                 raw_df = pd.read_csv(raw_file)
-                print(f"📋 Read raw CSV: {raw_file} ({len(raw_df)} terms)")
+                logger.info(f"📋 Read raw CSV: {raw_file} ({len(raw_df)} terms)")
             else:
-                print(f"⚠️ Raw CSV not found: {raw_file} (descriptions will be empty)")
+                logger.info(f"⚠️ Raw CSV not found: {raw_file} (descriptions will be empty)")
         except Exception as e:
-            print(f"⚠️ Error reading raw CSV {raw_file}: {e}")
+            logger.info(f"⚠️ Error reading raw CSV {raw_file}: {e}")
         
         return summary_df, raw_df
     
@@ -642,10 +644,10 @@ class FunctionHistoryManager:
         """Index all enrichment terms from summary and raw CSV files"""
         
         if not self.enrichment_db_available or not self.enrichment_vector_db:
-            print("⚠️ Enrichment vector database not available, skipping indexing")
+            logger.info("⚠️ Enrichment vector database not available, skipping indexing")
             return
         
-        print(f"🔍 Starting enrichment indexing for {cell_type}...")
+        logger.info(f"🔍 Starting enrichment indexing for {cell_type}...")
         
         # Auto-detect performed analyses from enrichment_results structure
         performed_analyses = []
@@ -654,10 +656,10 @@ class FunctionHistoryManager:
                 performed_analyses.append(analysis_type)
         
         if not performed_analyses:
-            print("⚠️ No enrichment analyses found in results structure")
+            logger.info("⚠️ No enrichment analyses found in results structure")
             return
         
-        print(f"🧬 Detected analyses: {performed_analyses}")
+        logger.info(f"🧬 Detected analyses: {performed_analyses}")
         
         # Determine conditions to index
         conditions_to_index = ["all_combined"]  # Always index full dataset
@@ -684,7 +686,7 @@ class FunctionHistoryManager:
                             total_indexed += indexed_count
                             
                         except Exception as e:
-                            print(f"❌ Error indexing go_{domain} for condition {condition}: {e}")
+                            logger.info(f"❌ Error indexing go_{domain} for condition {condition}: {e}")
                             continue
             else:
                 # Other analysis types (kegg, reactome, gsea)
@@ -696,10 +698,10 @@ class FunctionHistoryManager:
                         total_indexed += indexed_count
                         
                     except Exception as e:
-                        print(f"❌ Error indexing {analysis_type} for condition {condition}: {e}")
+                        logger.info(f"❌ Error indexing {analysis_type} for condition {condition}: {e}")
                         continue
         
-        print(f"✅ Enrichment indexing complete: {total_indexed} terms indexed for {cell_type}")
+        logger.info(f"✅ Enrichment indexing complete: {total_indexed} terms indexed for {cell_type}")
     
     def _index_single_analysis(self, cell_type: str, analysis_type: str, 
                               condition: str, session_id: Optional[str] = None) -> int:
@@ -720,7 +722,7 @@ class FunctionHistoryManager:
         analysis_data = summary_df.copy()
         
         if len(analysis_data) == 0:
-            print(f"⚠️ No data found for {analysis_type} in summary CSV")
+            logger.info(f"⚠️ No data found for {analysis_type} in summary CSV")
             return 0
         
         # Create index for raw data lookup (if available)
@@ -782,10 +784,10 @@ class FunctionHistoryManager:
                     metadatas=metadatas,
                     ids=ids
                 )
-                print(f"📝 Indexed {len(texts)} terms for {analysis_type}/{condition}")
+                logger.info(f"📝 Indexed {len(texts)} terms for {analysis_type}/{condition}")
                 return len(texts)
             except Exception as e:
-                print(f"❌ Error inserting {analysis_type} data into vector DB: {e}")
+                logger.info(f"❌ Error inserting {analysis_type} data into vector DB: {e}")
                 return 0
         
         return 0
@@ -815,7 +817,7 @@ class FunctionHistoryManager:
             if analysis_type_filter:
                 filter_dict["analysis_type"] = analysis_type_filter
             
-            print(f"🔍 Searching enrichment: '{query}' for {cell_type} with filters: {filter_dict}")
+            logger.info(f"🔍 Searching enrichment: '{query}' for {cell_type} with filters: {filter_dict}")
             
             # Perform semantic search with relevance scores
             results = self.enrichment_vector_db.similarity_search_with_relevance_scores(
@@ -837,7 +839,7 @@ class FunctionHistoryManager:
             }
             
         except Exception as e:
-            print(f"❌ Enrichment search failed: {e}")
+            logger.info(f"❌ Enrichment search failed: {e}")
             return {
                 "error": f"Search failed: {e}",
                 "query": query,
@@ -887,20 +889,20 @@ class FunctionHistoryManager:
             reverse=True
         )
         
-        print(f"🎯 Found {len(processed_results)} unique enrichment terms for query: '{query}'")
+        logger.info(f"🎯 Found {len(processed_results)} unique enrichment terms for query: '{query}'")
         
         # DEBUG: Show what was actually found
         if processed_results:
-            print("📋 SEMANTIC SEARCH RESULTS:")
+            logger.info("📋 SEMANTIC SEARCH RESULTS:")
             for i, result in enumerate(processed_results[:10], 1):  # Show top 10
                 term_name = result.get("term_name", "Unknown")
                 analysis_type = result.get("analysis_type", "unknown").upper()
                 p_value = result.get("adj_p_value", "N/A")
                 similarity = result.get("similarity_score", 0)
                 rank = result.get("rank", "N/A")
-                print(f"  {i}. [{analysis_type}] {term_name}")
-                print(f"     p-value: {p_value}, similarity: {similarity:.3f}, rank: {rank}")
+                logger.info(f"  {i}. [{analysis_type}] {term_name}")
+                logger.info(f"     p-value: {p_value}, similarity: {similarity:.3f}, rank: {rank}")
         else:
-            print("📋 No results found in processed_results")
+            logger.info("📋 No results found in processed_results")
         
         return processed_results

@@ -14,6 +14,11 @@ from ..progress_manager import ProgressManager
 import os
 import uuid
 
+import logging
+logger = logging.getLogger(__name__)
+
+
+
 MAX_INLINE_HTML_BYTES = 8_388_608
 
 class ExecutorNode(BaseWorkflowNode):
@@ -34,7 +39,7 @@ class ExecutorNode(BaseWorkflowNode):
     def executor_node(self, state: ChatState) -> ChatState:
         """Execute the current step in the plan with hierarchy awareness and validation"""
         self._log_node_start("Executor", state)
-        print ("CHAT STATE AT EXECUTOR :", str(ChatState))
+        logger.info ("CHAT STATE AT EXECUTOR :", str(ChatState))
         # Initialize progress manager
         session_id = state.get("session_id", "default")
         progress_manager = ProgressManager(session_id)
@@ -83,11 +88,11 @@ class ExecutorNode(BaseWorkflowNode):
             else:
                 step = ExecutionStep(**step_data)
             
-            print(f"🔄 Executing step {state['current_step_index'] + 1}: {step.description}")
+            logger.info(f"🔄 Executing step {state['current_step_index'] + 1}: {step.description}")
 
             #ADDEDAUG
             if not getattr(step, "function_name", None):
-                print("ℹ️ No function for this step; treating as direct-answer/no-op.")
+                logger.info("ℹ️ No function for this step; treating as direct-answer/no-op.")
                 result_text = step.description or ""
                 # Build a dict we can safely store
                 if hasattr(step, "__dict__"):
@@ -103,14 +108,14 @@ class ExecutorNode(BaseWorkflowNode):
                 self._record_execution(state, safe_step, result_text, True, None, "direct_answer")
                 state["current_step_index"] += 1
                 steps_executed += 1
-                print(f"🔄 Advanced to step {state['current_step_index'] + 1}")
+                logger.info(f"🔄 Advanced to step {state['current_step_index'] + 1}")
                 continue
             #ADDEDAUG
 
             
             # DEBUG: Log the original function name to track mutations
             original_function_name = getattr(step_data, 'function_name', 'unknown') if hasattr(step_data, 'function_name') else step_data.get("function_name", "unknown")
-            print(f"🔍 STORAGE DEBUG: Original function_name from plan: '{original_function_name}'")
+            logger.info(f"🔍 STORAGE DEBUG: Original function_name from plan: '{original_function_name}'")
             
             success = False
             result = None
@@ -126,7 +131,7 @@ class ExecutorNode(BaseWorkflowNode):
                 success, result, error_msg = self._execute_step(state, step)
                 
                 if success:
-                    print(f"✅ Step {state['current_step_index'] + 1} completed successfully")
+                    logger.info(f"✅ Step {state['current_step_index'] + 1} completed successfully")
                     self._handle_successful_step(state, step, result)
                     # Update progress after successful step
                     progress_manager.increment_step(f"Completed: {step.description}")
@@ -134,7 +139,7 @@ class ExecutorNode(BaseWorkflowNode):
             except Exception as e:
                 error_msg = str(e)
                 success = False
-                print(f"❌ Step {state['current_step_index'] + 1} failed: {error_msg}")
+                logger.info(f"❌ Step {state['current_step_index'] + 1} failed: {error_msg}")
                 state["errors"].append(f"Step {state['current_step_index'] + 1} failed: {error_msg}")
             
             # Record execution
@@ -145,10 +150,10 @@ class ExecutorNode(BaseWorkflowNode):
             steps_executed += 1
             
             if success:
-                print(f"🔄 Advanced to step {state['current_step_index'] + 1}")
+                logger.info(f"🔄 Advanced to step {state['current_step_index'] + 1}")
             else:
-                print(f"❌ Step failed: {error_msg}")
-                print(f"📝 Recording error and advancing to step {state['current_step_index'] + 1} (no retries for deterministic operations)")
+                logger.info(f"❌ Step failed: {error_msg}")
+                logger.info(f"📝 Recording error and advancing to step {state['current_step_index'] + 1} (no retries for deterministic operations)")
                 
                 # Track failed supplementary steps to prevent infinite retry loops
                 step_description = step.description if hasattr(step, 'description') else step_data.get("description", "")
@@ -158,13 +163,13 @@ class ExecutorNode(BaseWorkflowNode):
                     if step_signature not in previously_failed:
                         previously_failed.append(step_signature)
                         state["previously_failed_supplementary_steps"] = previously_failed
-                        print(f"🚫 Recorded failed supplementary step: {step_signature}")
+                        logger.info(f"🚫 Recorded failed supplementary step: {step_signature}")
             
             # Check if we should continue executing (batch supplementary steps)
             continue_execution = self._should_continue_execution(state, steps_executed)
             
             if not continue_execution:
-                print(f"🛑 Stopping execution after {steps_executed} steps")
+                logger.info(f"🛑 Stopping execution after {steps_executed} steps")
                 break
         
         self._log_node_complete("Executor", state)
@@ -173,7 +178,7 @@ class ExecutorNode(BaseWorkflowNode):
     def _handle_skipped_step(self, state: ChatState, step_data: Any):
         """Handle a step that should be skipped."""
         skip_reason = getattr(step_data, 'skip_reason', None) if hasattr(step_data, 'skip_reason') else step_data.get('skip_reason')
-        print(f"⏭️ Skipping step {state['current_step_index'] + 1}: {skip_reason}")
+        logger.info(f"⏭️ Skipping step {state['current_step_index'] + 1}: {skip_reason}")
         
         # Record skipped step in execution history for post-execution awareness
         # Convert step_data to dict if it's an ExecutionStep object
@@ -201,7 +206,7 @@ class ExecutorNode(BaseWorkflowNode):
         """Execute a single step and return success, result, error_msg."""
         # Handle final question step
         if step.step_type == "final_question":
-            print("🎯 Executing final comprehensive question...")
+            logger.info("🎯 Executing final comprehensive question...")
             result = self._execute_final_question(state)
             return True, result, None
         
@@ -217,7 +222,7 @@ class ExecutorNode(BaseWorkflowNode):
         
         # Debug visualization function parameters
         if step.function_name in self.visualization_functions:
-            print(f"🔍 STEP DEBUG: Calling visualization function '{step.function_name}' with step parameters: {step.parameters}")
+            logger.info(f"🔍 STEP DEBUG: Calling visualization function '{step.function_name}' with step parameters: {step.parameters}")
         
         # For visualization functions, enhance parameters with cell_type from execution context if missing
         enhanced_params = self._enhance_visualization_params(state, step)
@@ -225,7 +230,7 @@ class ExecutorNode(BaseWorkflowNode):
         # Check if enhancement determined this step should fail
         if enhanced_params.get("_should_fail"):
             error_msg = enhanced_params.get("_fail_reason", "Step cannot be executed")
-            print(f"❌ Step execution blocked: {error_msg}")
+            logger.info(f"❌ Step execution blocked: {error_msg}")
             return False, None, error_msg
         
         # Remove internal flags before calling function
@@ -235,7 +240,7 @@ class ExecutorNode(BaseWorkflowNode):
         # CRITICAL FIX: Update step parameters with enhanced params for visualization functions
         # This ensures the execution history records the actual parameters used
         if step.function_name in self.visualization_functions and enhanced_params != step.parameters:
-            print(f"📝 Updating step parameters with enhanced params for execution history tracking")
+            logger.info(f"📝 Updating step parameters with enhanced params for execution history tracking")
             step.parameters = enhanced_params.copy()
         
         func = self.function_mapping[step.function_name]
@@ -267,7 +272,7 @@ class ExecutorNode(BaseWorkflowNode):
                         
                         if cell_type and cell_type != "unknown":
                             enhanced_params["cell_type"] = cell_type
-                            print(f"✅ Found cell type for {step.function_name}: {cell_type}")
+                            logger.info(f"✅ Found cell type for {step.function_name}: {cell_type}")
                             found_cell_type = True
                             break
                 
@@ -276,9 +281,9 @@ class ExecutorNode(BaseWorkflowNode):
                     available_cell_types = state.get("available_cell_types", [])
                     if available_cell_types and "Overall cells" in available_cell_types:
                         enhanced_params["cell_type"] = "Overall cells"
-                        print(f"✅ Using default cell type 'Overall cells' for {step.function_name}")
+                        logger.info(f"✅ Using default cell type 'Overall cells' for {step.function_name}")
                     else:
-                        print(f"❌ No suitable cell type found for {step.function_name}")
+                        logger.info(f"❌ No suitable cell type found for {step.function_name}")
                         enhanced_params["_should_fail"] = True
                         enhanced_params["_fail_reason"] = f"No processed cell data available for {step.function_name}"
             
@@ -302,12 +307,12 @@ class ExecutorNode(BaseWorkflowNode):
                         # Check if this analysis matches what the viz needs
                         if viz_analysis_type in analyses_performed and cell_type:
                             enhanced_params["cell_type"] = cell_type
-                            print(f"✅ Found matching {viz_analysis_type} analysis for visualization: {cell_type}")
+                            logger.info(f"✅ Found matching {viz_analysis_type} analysis for visualization: {cell_type}")
                             found_matching_analysis = True
                             break
                 
                 if not found_matching_analysis:
-                    print(f"❌ No successful {viz_analysis_type} enrichment analysis found to visualize")
+                    logger.info(f"❌ No successful {viz_analysis_type} enrichment analysis found to visualize")
                     enhanced_params["_should_fail"] = True
                     enhanced_params["_fail_reason"] = f"No {viz_analysis_type} enrichment analysis results available to visualize"
         
@@ -322,10 +327,10 @@ class ExecutorNode(BaseWorkflowNode):
         
         # Update hierarchy manager for process_cells steps
         if step.function_name == "process_cells" and self.hierarchy_manager:
-            print(f"🔍 EXECUTION NODE: About to call CellTypeExtractor.extract_from_annotation_result() for process_cells step")
+            logger.info(f"🔍 EXECUTION NODE: About to call CellTypeExtractor.extract_from_annotation_result() for process_cells step")
             new_cell_types = self.cell_type_extractor.extract_from_annotation_result(result)
             if new_cell_types:
-                print(f"🧬 Updating hierarchy manager with new cell types: {new_cell_types}")
+                logger.info(f"🧬 Updating hierarchy manager with new cell types: {new_cell_types}")
                 self.hierarchy_manager.update_after_process_cells(
                     step.parameters.get("cell_type", "unknown"),
                     new_cell_types
@@ -334,9 +339,9 @@ class ExecutorNode(BaseWorkflowNode):
                 # Update available cell types in state
                 state["available_cell_types"] = list(set(state["available_cell_types"] + new_cell_types))
                 for new_type in new_cell_types:
-                    print(f"✅ Discovered new cell type: {new_type}")
+                    logger.info(f"✅ Discovered new cell type: {new_type}")
             else:
-                print("⚠️ No new cell types discovered from process_cells")
+                logger.info("⚠️ No new cell types discovered from process_cells")
         
         # Update available cell types if this was a successful process_cells step
         if step.function_name == "process_cells" and result:
@@ -365,12 +370,12 @@ class ExecutorNode(BaseWorkflowNode):
         # current_function_name = step_data.get("function_name", "unknown")
         current_function_name = step_data.get("function_name") or (original_function_name or "direct_answer")
         if current_function_name != original_function_name:
-            print(f"⚠️ MUTATION DETECTED: function_name changed from '{original_function_name}' to '{current_function_name}'")
+            logger.info(f"⚠️ MUTATION DETECTED: function_name changed from '{original_function_name}' to '{current_function_name}'")
             # Fix the function name in the copy
             # step_data_copy["function_name"] = original_function_name
-            # print(f"🔧 CORRECTED: Restored function_name to '{original_function_name}' in execution history")
+            # logger.info(f"🔧 CORRECTED: Restored function_name to '{original_function_name}' in execution history")
             step_data_copy["function_name"] = current_function_name #ADDEDAUG
-            print(f"🔧 NORMALIZED: Using safe function_name '{current_function_name}' in execution history") #ADDEDAUG
+            logger.info(f"🔧 NORMALIZED: Using safe function_name '{current_function_name}' in execution history") #ADDEDAUG
 
         
         state["execution_history"].append({
@@ -416,15 +421,8 @@ class ExecutorNode(BaseWorkflowNode):
                 "result_summary": self._create_result_summary(function_name, result)
             }
         
-        # elif function_name.startswith("display_") and success:
-        # elif isinstance(function_name, str) and function_name.startswith("display_") and success: #ADDEDAUG
-        #     # Visualization functions - keep HTML but add metadata
-        #     return {
-        #         "result_type": "visualization", 
-        #         "result": result,  # Full HTML
-        #         "result_metadata": self._extract_viz_metadata(function_name, result),
-        #         "result_summary": f"Visualization generated: {function_name}"
-        #     }
+
+
         elif isinstance(function_name, str) and function_name.startswith("display_") and success:
             viz_payload = result
 
@@ -442,6 +440,7 @@ class ExecutorNode(BaseWorkflowNode):
                 "result_metadata": self._extract_viz_metadata(function_name, viz_payload),
                 "result_summary": f"Visualization generated: {function_name}"
             }
+
         
         else:
             # Other functions - use existing truncation
@@ -479,13 +478,7 @@ class ExecutorNode(BaseWorkflowNode):
         
         return str(result)[:100]
     
-    # def _extract_viz_metadata(self, function_name: str, result: Any) -> Dict[str, Any]:
-    #     """Extract metadata from visualization results"""
-    #     return {
-    #         "visualization_type": function_name,
-    #         "html_length": len(result) if isinstance(result, str) else 0,
-    #         "contains_html": bool(isinstance(result, str) and ('<div' in result or '<html' in result))
-    #     }
+
 
     def _extract_viz_metadata(self, function_name: str, result: Any) -> Dict[str, Any]:
         if isinstance(result, str):
@@ -508,11 +501,11 @@ class ExecutorNode(BaseWorkflowNode):
     def _log_storage_decision(self, result_storage: Dict[str, Any], function_name: str):
         """Log storage decision for monitoring."""
         if result_storage["result_type"] == "structured":
-            print(f"📊 Structured storage: {function_name} - Full data preserved")
+            logger.info(f"📊 Structured storage: {function_name} - Full data preserved")
         elif result_storage["result_type"] == "visualization":
-            print(f"🎨 Visualization storage: {function_name} - HTML preserved")
+            logger.info(f"🎨 Visualization storage: {function_name} - HTML preserved")
         else:
-            print(f"📄 Text storage: {function_name} - Truncated to 500 chars")
+            logger.info(f"📄 Text storage: {function_name} - Truncated to 500 chars")
     
     def _update_available_cell_types_from_result(self, state: ChatState, result: Any) -> None:
         """
@@ -553,11 +546,11 @@ class ExecutorNode(BaseWorkflowNode):
                 new_available = current_available.union(set(discovered_types))
                 state["available_cell_types"] = list(new_available)
                 
-                print(f"✅ Updated available cell types with discoveries: {discovered_types}")
-                print(f"🧬 Total available cell types: {len(state['available_cell_types'])}")
+                logger.info(f"✅ Updated available cell types with discoveries: {discovered_types}")
+                logger.info(f"🧬 Total available cell types: {len(state['available_cell_types'])}")
         
         except Exception as e:
-            print(f"⚠️ Error updating available cell types: {e}")
+            logger.info(f"⚠️ Error updating available cell types: {e}")
     
     
     def _should_continue_execution(self, state: ChatState, steps_executed: int) -> bool:
@@ -580,7 +573,7 @@ class ExecutorNode(BaseWorkflowNode):
         
         # Check if this is a supplementary step sequence
         if "Post-evaluation:" in next_step.get("description", ""):
-            print(f"🚀 Continuing execution - next step is supplementary: {next_step.get('function_name')}")
+            logger.info(f"🚀 Continuing execution - next step is supplementary: {next_step.get('function_name')}")
             return True
         
         # Check if next step is a visualization for the same cell type
@@ -594,14 +587,14 @@ class ExecutorNode(BaseWorkflowNode):
             if (last_cell_type == next_cell_type and 
                 next_step.get("function_name", "").startswith("display_") and
                 not last_step.get("function_name", "").startswith("display_")):
-                print(f"🎨 Continuing execution - visualization for same cell type: {next_cell_type}")
+                logger.info(f"🎨 Continuing execution - visualization for same cell type: {next_cell_type}")
                 return True
         
         # Check if we're in a search + visualization sequence
         if (next_step.get("function_name") == "display_enrichment_visualization" and
             steps_executed > 0 and 
             state["execution_history"][-1].get("step", {}).get("function_name") == "search_enrichment_semantic"):
-            print(f"🔍➡️🎨 Continuing execution - visualization after search")
+            logger.info(f"🔍➡️🎨 Continuing execution - visualization after search")
             return True
         
         # Default: stop after each step for regular workflow steps

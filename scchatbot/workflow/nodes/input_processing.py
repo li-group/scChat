@@ -12,6 +12,9 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from ...cell_types.models import ChatState
 from ..node_base import BaseWorkflowNode, ProcessingNodeMixin
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class InputProcessorNode(BaseWorkflowNode, ProcessingNodeMixin):
     """
@@ -83,20 +86,20 @@ class InputProcessorNode(BaseWorkflowNode, ProcessingNodeMixin):
         try:
             # LLM decides if context is needed and what to search for
             search_queries_json = self._call_llm(context_analysis_prompt)
-            print(f"🔍 LLM search query response: '{search_queries_json}'")
+            logger.info(f"🔍 LLM search query response: '{search_queries_json}'")
             
             search_queries = self._safe_json_parse(search_queries_json)
             if search_queries is None:
-                print("⚠️ LLM returned invalid response for context search")
+                logger.info("⚠️ LLM returned invalid response for context search")
                 search_queries = []
             
             if search_queries:
-                print(f"🧠 LLM requested {len(search_queries)} context sources: {search_queries}")
+                logger.info(f"🧠 LLM requested {len(search_queries)} context sources: {search_queries}")
                 self._add_context_to_state(state, search_queries)
                 
         except Exception as e:
             # Silent fail - continue without context
-            print(f"⚠️ Context retrieval skipped: {e}")
+            logger.info(f"⚠️ Context retrieval skipped: {e}")
     
     def _add_context_to_state(self, state: ChatState, search_queries: List[str]):
         """Add context information to state based on search queries."""
@@ -108,13 +111,13 @@ class InputProcessorNode(BaseWorkflowNode, ProcessingNodeMixin):
             if isinstance(msg, AIMessage) and any(prefix in msg.content for prefix in 
                 ["CURRENT_SESSION_STATE:", "CONVERSATION_HISTORY:", "CONVERSATION_CONTEXT:"]):
                 context_messages_removed += 1
-                print(f"🧹 CONTEXT CLEANUP: Removing old context message ({len(msg.content)} chars)")
+                logger.info(f"🧹 CONTEXT CLEANUP: Removing old context message ({len(msg.content)} chars)")
             else:
                 messages_to_keep.append(msg)
         
         if context_messages_removed > 0:
             state["messages"] = messages_to_keep
-            print(f"🧹 CONTEXT CLEANUP: Removed {context_messages_removed} old context messages")
+            logger.info(f"🧹 CONTEXT CLEANUP: Removed {context_messages_removed} old context messages")
         
         context_parts = []
         
@@ -124,22 +127,22 @@ class InputProcessorNode(BaseWorkflowNode, ProcessingNodeMixin):
                 # Add current session state information
                 session_context = self._build_session_state_context(state)
                 context_parts.append(f"CURRENT_SESSION_STATE: {session_context}")
-                print(f"✅ Added current session state context ({len(session_context)} chars)")
-                print(f"🔍 SESSION CONTEXT DEBUG: First 100 chars: '{session_context[:100]}...'")
+                logger.info(f"✅ Added current session state context ({len(session_context)} chars)")
+                logger.info(f"🔍 SESSION CONTEXT DEBUG: First 100 chars: '{session_context[:100]}...'")
             else:
                 # Treat as conversation search query
                 results = self.history_manager.search_conversations(query, k=2)
                 if results:
                     formatted_results = self.history_manager.format_search_results(results)
                     context_parts.append(f"CONVERSATION_HISTORY: {formatted_results}")
-                    print(f"✅ Added conversation context for '{query}' ({len(formatted_results)} chars)")
+                    logger.info(f"✅ Added conversation context for '{query}' ({len(formatted_results)} chars)")
         
         if context_parts:
             # Add fresh context to state
             full_context = "\n\n".join(context_parts)
             state["messages"].append(AIMessage(content=full_context))
             state["has_conversation_context"] = True
-            print(f"✅ Added fresh unified context ({len(full_context)} chars)")
+            logger.info(f"✅ Added fresh unified context ({len(full_context)} chars)")
     
     def _continue_input_processing(self, state: ChatState):
         """Continue the input processing after context retrieval"""
@@ -147,14 +150,14 @@ class InputProcessorNode(BaseWorkflowNode, ProcessingNodeMixin):
         if not state.get("available_cell_types"):
             # First question or state is empty - use initial types
             state["available_cell_types"] = self.initial_cell_types
-            print(f"🔄 Initialized with {len(self.initial_cell_types)} initial cell types")
+            logger.info(f"🔄 Initialized with {len(self.initial_cell_types)} initial cell types")
         else:
             # Subsequent questions - preserve existing discovered types
             existing_count = len(state["available_cell_types"])
-            print(f"✅ Preserving {existing_count} discovered cell types from previous operations")
+            logger.info(f"✅ Preserving {existing_count} discovered cell types from previous operations")
             
             # Optional: Debug logging to track what types are preserved
-            print(f"   Preserved types: {sorted(state['available_cell_types'])}")
+            logger.info(f"   Preserved types: {sorted(state['available_cell_types'])}")
         
         state["adata"] = self.adata
         

@@ -3,6 +3,18 @@
 import os
 import sys
 
+from logging_setup import setup_logging
+setup_logging()  # logs -> logs/app.log, rotates automatically
+import warnings
+
+# Ignore all warnings
+warnings.filterwarnings("ignore")
+
+# # or be selective:
+# warnings.filterwarnings("ignore", category=FutureWarning)
+# warnings.filterwarnings("ignore", category=UserWarning)
+# warnings.filterwarnings("ignore", category=PerformanceWarning)
+
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv

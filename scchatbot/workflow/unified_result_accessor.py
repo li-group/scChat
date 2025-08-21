@@ -8,6 +8,9 @@ import pandas as pd
 from typing import Dict, Any, List, Optional
 from abc import ABC, abstractmethod
 import uuid
+import logging
+logger = logging.getLogger(__name__)
+
 
 MAX_PLOT_HTML_BYTES = 8_388_608
 
@@ -116,15 +119,15 @@ class EnrichmentResultAccessor(ResultAccessorBase):
                                             "columns_used": {"term": term_column, "p_value": p_value_column}
                                         }
                                     else:
-                                        print(f"⚠️ Column mapping failed for {csv_path}: term_col={term_column}, p_val_col={p_value_column}")
-                                        print(f"   Available columns: {list(df.columns)}")
+                                        logger.info(f"⚠️ Column mapping failed for {csv_path}: term_col={term_column}, p_val_col={p_value_column}")
+                                        logger.info(f"   Available columns: {list(df.columns)}")
                             except Exception as e:
-                                print(f"⚠️ Error reading {csv_path}: {e}")
+                                logger.info(f"⚠️ Error reading {csv_path}: {e}")
             
             return results
             
         except Exception as e:
-            print(f"❌ EnrichmentResultAccessor error: {e}")
+            logger.info(f"❌ EnrichmentResultAccessor error: {e}")
             return {"error": str(e), "cell_type": "unknown"}
     
     def format_for_synthesis(self, results: Dict[str, Any], cell_type: str) -> str:
@@ -179,7 +182,7 @@ class EnrichmentResultAccessor(ResultAccessorBase):
                 # Keep original format as enrichment function saves with spaces, not underscores
                 conditions = list(conditions)
                 
-                print(f"🔍 ENRICHMENT: Loaded {len(conditions)} conditions from mapping file: {conditions}")
+                logger.info(f"🔍 ENRICHMENT: Loaded {len(conditions)} conditions from mapping file: {conditions}")
                 return conditions
             else:
                 raise FileNotFoundError(f"Sample mapping file not found: {mapping_file}")
@@ -220,7 +223,7 @@ class DEAResultAccessor(ResultAccessorBase):
                         df = pd.read_csv(csv_path)
                         if len(df) > 0:
                             # Debug: Print column names
-                            print(f"📊 DEA CSV columns for {condition}: {list(df.columns)}")
+                            logger.info(f"📊 DEA CSV columns for {condition}: {list(df.columns)}")
                             
                             # Determine the correct column names
                             logfc_col = "log_fc" if "log_fc" in df.columns else "logFC" if "logFC" in df.columns else "logfoldchanges"
@@ -238,12 +241,12 @@ class DEAResultAccessor(ResultAccessorBase):
                                 "source_file": csv_path
                             }
                     except Exception as e:
-                        print(f"⚠️ Error reading DEA file {csv_path}: {e}")
+                        logger.info(f"⚠️ Error reading DEA file {csv_path}: {e}")
             
             return results
             
         except Exception as e:
-            print(f"❌ DEAResultAccessor error: {e}")
+            logger.info(f"❌ DEAResultAccessor error: {e}")
             return {"error": str(e), "cell_type": "unknown"}
     
     def format_for_synthesis(self, results: Dict[str, Any], cell_type: str) -> str:
@@ -342,7 +345,7 @@ class DEAResultAccessor(ResultAccessorBase):
                 # Keep original format as DEA function saves with spaces, not underscores
                 conditions = list(set(conditions))  # Remove duplicates
                 
-                print(f"🔍 DEA: Loaded {len(conditions)} conditions from mapping file: {conditions}")
+                logger.info(f"🔍 DEA: Loaded {len(conditions)} conditions from mapping file: {conditions}")
                 return conditions
             else:
                 raise FileNotFoundError(f"Sample mapping file not found: {mapping_file}")
@@ -389,7 +392,7 @@ class CellCountResultAccessor(ResultAccessorBase):
                 }
                 
         except Exception as e:
-            print(f"❌ CellCountResultAccessor error: {e}")
+            logger.info(f"❌ CellCountResultAccessor error: {e}")
             return {"error": str(e), "cell_type": "unknown"}
     
     def format_for_synthesis(self, results: Dict[str, Any], cell_type: str) -> str:
@@ -434,14 +437,14 @@ class SemanticSearchResultAccessor(ResultAccessorBase):
             query = parameters.get("query", "unknown")
             
             # DEBUG: Log parameter extraction for cell type confusion debugging
-            print(f"🔍 SEMANTIC SEARCH DEBUG: Extracted cell_type='{cell_type}', query='{query}'")
-            print(f"🔍 SEMANTIC SEARCH DEBUG: Full parameters: {parameters}")
+            logger.info(f"🔍 SEMANTIC SEARCH DEBUG: Extracted cell_type='{cell_type}', query='{query}'")
+            logger.info(f"🔍 SEMANTIC SEARCH DEBUG: Full parameters: {parameters}")
             
             # Also check if result contains different cell type info
             if isinstance(result, dict) and "cell_type" in result:
                 result_cell_type = result.get("cell_type")
                 if result_cell_type != cell_type:
-                    print(f"⚠️ CELL TYPE MISMATCH: Parameters say '{cell_type}', result says '{result_cell_type}'")
+                    logger.info(f"⚠️ CELL TYPE MISMATCH: Parameters say '{cell_type}', result says '{result_cell_type}'")
                     # Use the result's cell type as it's more reliable
                     cell_type = result_cell_type
             
@@ -461,7 +464,7 @@ class SemanticSearchResultAccessor(ResultAccessorBase):
                 }
                 
         except Exception as e:
-            print(f"❌ SemanticSearchResultAccessor error: {e}")
+            logger.info(f"❌ SemanticSearchResultAccessor error: {e}")
             return {"error": str(e), "cell_type": "unknown", "query": "unknown"}
     
     def format_for_synthesis(self, results: Dict[str, Any], cell_type: str) -> str:
@@ -511,7 +514,7 @@ class ValidationResultAccessor(ResultAccessorBase):
             }
                 
         except Exception as e:
-            print(f"❌ ValidationResultAccessor error: {e}")
+            logger.info(f"❌ ValidationResultAccessor error: {e}")
             return {"error": str(e)}
     
     def format_for_synthesis(self, results: Dict[str, Any], cell_type: str) -> str:
@@ -573,7 +576,7 @@ class VisualizationResultAccessor(ResultAccessorBase):
 
                 
         except Exception as e:
-            print(f"❌ VisualizationResultAccessor error: {e}")
+            logger.info(f"❌ VisualizationResultAccessor error: {e}")
             return {"error": str(e), "cell_type": "unknown", "function_name": "unknown"}
     
     def format_for_synthesis(self, results: Dict[str, Any], cell_type: str) -> str:
@@ -654,7 +657,7 @@ class ProcessCellsResultAccessor(ResultAccessorBase):
             }
             
         except Exception as e:
-            print(f"❌ ProcessCellsResultAccessor error: {e}")
+            logger.info(f"❌ ProcessCellsResultAccessor error: {e}")
             return {"error": str(e), "cell_type": "unknown"}
     
     def format_for_synthesis(self, results: Dict[str, Any], cell_type: str) -> str:
@@ -713,7 +716,7 @@ class UnifiedResultAccessor:
             "total_failed_steps": 0
         }
         
-        print(f"🔍 UNIFIED ACCESSOR: Processing {len(execution_history)} execution steps")
+        logger.info(f"🔍 UNIFIED ACCESSOR: Processing {len(execution_history)} execution steps")
         
         for i, step in enumerate(execution_history):
             try:
@@ -730,23 +733,23 @@ class UnifiedResultAccessor:
                 parameters = step_data.get("parameters", {})
                 cell_type = parameters.get("cell_type", f"step_{i}")
                 
-                print(f"🔍 Step {i+1}: {function_name} for {cell_type}")
+                logger.info(f"🔍 Step {i+1}: {function_name} for {cell_type}")
                 
                 # DEBUG: Extra logging for semantic search steps to catch cell type issues
                 if function_name == "search_enrichment_semantic":
-                    print(f"🔍 SEMANTIC DEBUG: Step {i+1} parameters: {parameters}")
+                    logger.info(f"🔍 SEMANTIC DEBUG: Step {i+1} parameters: {parameters}")
                     if "query" in parameters:
-                        print(f"🔍 SEMANTIC DEBUG: Query parameter: '{parameters['query']}'")
+                        logger.info(f"🔍 SEMANTIC DEBUG: Query parameter: '{parameters['query']}'")
                 # elif function_name.startswith("display_"):
                 elif isinstance(function_name, str) and function_name.startswith("display_"):
-                    print(f"🎨 VISUALIZATION DEBUG: Step {i+1} function: {function_name}")
-                    print(f"🎨 VISUALIZATION DEBUG: Parameters: {parameters}")
+                    logger.info(f"🎨 VISUALIZATION DEBUG: Step {i+1} function: {function_name}")
+                    logger.info(f"🎨 VISUALIZATION DEBUG: Parameters: {parameters}")
                 
                 # Route to appropriate accessor based on function name
                 handled = False
                 for accessor in self.accessors:
                     if accessor.can_handle(function_name):
-                        print(f"✅ Handling {function_name} with {accessor.__class__.__name__}")
+                        logger.info(f"✅ Handling {function_name} with {accessor.__class__.__name__}")
                         
                         results = accessor.get_results(step)
                         
@@ -782,13 +785,13 @@ class UnifiedResultAccessor:
                         break
                 
                 if not handled:
-                    print(f"⚠️ No accessor found for function: {function_name}")
+                    logger.info(f"⚠️ No accessor found for function: {function_name}")
                     
             except Exception as e:
-                print(f"❌ Error processing step {i}: {e}")
+                logger.info(f"❌ Error processing step {i}: {e}")
                 unified_results["total_failed_steps"] += 1
         
-        print(f"✅ UNIFIED ACCESSOR: Processed {unified_results['total_successful_steps']} successful steps")
+        logger.info(f"✅ UNIFIED ACCESSOR: Processed {unified_results['total_successful_steps']} successful steps")
         unified_results["has_plots"] = len(unified_results["plots"]) > 0
         return unified_results
     
@@ -869,7 +872,7 @@ class UnifiedResultAccessor:
             
         
         result = "\n".join(sections).strip()
-        print(f"🎯 UNIFIED FORMATTER: Generated {len(result)} characters for synthesis")
+        logger.info(f"🎯 UNIFIED FORMATTER: Generated {len(result)} characters for synthesis")
         return result
 
 
