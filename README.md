@@ -67,7 +67,7 @@ Follow these steps to utilize the application effectively:
 
   
 ### Step 4: Initialize the Application
-- run python3 manage.py runserver
+- Run python3 manage.py runserver
 
 ### Step 5: Access the Application
 - Open your web browser and navigate to:
