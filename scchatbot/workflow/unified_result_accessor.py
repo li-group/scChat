@@ -7,6 +7,28 @@ import os
 import pandas as pd
 from typing import Dict, Any, List, Optional
 from abc import ABC, abstractmethod
+import uuid
+
+MAX_PLOT_HTML_BYTES = 8_388_608
+
+def _normalize_viz_result(result):
+    """
+    Normalize visualization payloads into a small dict so the LLM can be told
+    that visualizations exist, regardless of size/shape.
+    """
+    MAX_PLOT_HTML_BYTES = 8_388_608
+    if isinstance(result, str):
+        if len(result) <= MAX_PLOT_HTML_BYTES:
+            return {"kind": "inline_html", "html_length": len(result)}
+        else:
+            return {"kind": "too_large_inline", "html_length": len(result)}
+    if isinstance(result, dict):
+        if result.get("type") == "file_ref":
+            return {"kind": "file_ref", "path": result.get("path")}
+        if result.get("multiple_plots"):
+            return {"kind": "bundle", "count": len(result.get("plots", []))}
+    # fallback
+    return {"kind": "unknown"}
 
 
 class ResultAccessorBase(ABC):
@@ -505,29 +527,50 @@ class VisualizationResultAccessor(ResultAccessorBase):
     """Accessor for visualization/display results"""
     
     def can_handle(self, function_name: str) -> bool:
-        return function_name.startswith("display_")
+        # return function_name.startswith("display_")
+        return isinstance(function_name, str) and function_name.startswith("display_")
     
     def get_results(self, execution_step: Dict[str, Any]) -> Dict[str, Any]:
         """Get visualization results from execution step"""
         try:
-            result = execution_step.get("result")
+            # result = execution_step.get("result")
+            raw_result = execution_step.get("result")
+            meta = execution_step.get("result_metadata", {})
+
             step_data = execution_step.get("step", {})
             parameters = step_data.get("parameters", {})
             function_name = step_data.get("function_name", "unknown_display")
             cell_type = parameters.get("cell_type", "unknown")
             
-            # Check if result contains HTML plot data
-            has_html_plot = isinstance(result, str) and ('<div' in result or '<html' in result) and len(result) > 1000
+            # # Check if result contains HTML plot data
+            # has_html_plot = isinstance(result, str) and ('<div' in result or '<html' in result) and len(result) > 1000
             
+            # return {
+            #     "function_name": function_name,
+            #     "cell_type": cell_type,
+            #     "parameters": parameters,
+            #     "has_plot": has_html_plot,
+            #     "plot_size": len(str(result)) if result else 0,
+            #     "plot_html": result if has_html_plot else None,
+            #     "source": "execution_result"
+            # }
+            # Normalize to recognize inline HTML, file_ref, or bundles
+            norm = _normalize_viz_result(raw_result)
+            has_plot = norm.get("kind") in {"inline_html", "too_large_inline", "file_ref", "bundle"}
+            plot_size = len(raw_result) if isinstance(raw_result, str) else 0
+
             return {
                 "function_name": function_name,
                 "cell_type": cell_type,
                 "parameters": parameters,
-                "has_plot": has_html_plot,
-                "plot_size": len(str(result)) if result else 0,
-                "plot_html": result if has_html_plot else None,
-                "source": "execution_result"
+                "result": raw_result,          # keep raw payload for downstream consumers
+                "metadata": meta,              # optional metadata from executor
+                "has_plot": has_plot,
+                "plot_kind": norm.get("kind", "unknown"),
+                "plot_size": plot_size,
+                "source": "execution_result",
             }
+
                 
         except Exception as e:
             print(f"❌ VisualizationResultAccessor error: {e}")
@@ -539,9 +582,12 @@ class VisualizationResultAccessor(ResultAccessorBase):
             return f"  Visualization error for {cell_type}: {results['error']}"
         
         function_name = results.get("function_name", "unknown_display")
+        # has_plot = results.get("has_plot", False)
+        # plot_size = results.get("plot_size", 0)
+        kind = results.get("plot_kind", "unknown")
         has_plot = results.get("has_plot", False)
         plot_size = results.get("plot_size", 0)
-        
+
         # Create user-friendly description
         viz_descriptions = {
             "display_enrichment_visualization": "enrichment analysis visualization",
@@ -554,8 +600,16 @@ class VisualizationResultAccessor(ResultAccessorBase):
         lines = [f"VISUALIZATION - {cell_type.upper()}:"]
         
         if has_plot:
-            lines.append(f"  ✅ Generated {viz_type} ({plot_size:,} chars)")
-            lines.append(f"  📊 Interactive plot available for display")
+            # lines.append(f"  ✅ Generated {viz_type} ({plot_size:,} chars)")
+            # lines.append(f"  📊 Interactive plot available for display")
+            if kind == "file_ref":
+                lines.append(f"  ✅ {viz_type} saved to file (rendered in UI)")
+            elif kind == "bundle":
+                lines.append(f"  ✅ {viz_type} (multiple plots)")
+            else:
+                lines.append(f"  ✅ {viz_type} ready ({plot_size:,} chars)")
+            lines.append("  📊 Interactive plot available in the UI")
+
         else:
             lines.append(f"  ⚠️ {viz_type} attempted but no plot data found")
         
@@ -572,6 +626,7 @@ class VisualizationResultAccessor(ResultAccessorBase):
 class ProcessCellsResultAccessor(ResultAccessorBase):
     """Accessor for process_cells results"""
     
+
     def can_handle(self, function_name: str) -> bool:
         return function_name == "process_cells"
     
@@ -652,6 +707,8 @@ class UnifiedResultAccessor:
             "semantic_search_results": {},
             "validation_results": {},
             "visualization_results": {},
+            "plots": [],                 # NEW: lightweight plot summaries
+            "has_plots": False,          # NEW: flag for response generator
             "total_successful_steps": 0,
             "total_failed_steps": 0
         }
@@ -680,7 +737,8 @@ class UnifiedResultAccessor:
                     print(f"🔍 SEMANTIC DEBUG: Step {i+1} parameters: {parameters}")
                     if "query" in parameters:
                         print(f"🔍 SEMANTIC DEBUG: Query parameter: '{parameters['query']}'")
-                elif function_name.startswith("display_"):
+                # elif function_name.startswith("display_"):
+                elif isinstance(function_name, str) and function_name.startswith("display_"):
                     print(f"🎨 VISUALIZATION DEBUG: Step {i+1} function: {function_name}")
                     print(f"🎨 VISUALIZATION DEBUG: Parameters: {parameters}")
                 
@@ -710,6 +768,15 @@ class UnifiedResultAccessor:
                             function_name = results.get("function_name", "unknown_display")
                             viz_key = f"{function_name}_{cell_type}"
                             unified_results["visualization_results"][viz_key] = results
+
+                            # NEW: normalize a tiny summary for the LLM hint
+                            unified_results["plots"].append({
+                                "key": viz_key,
+                                "cell_type": cell_type,
+                                "function": function_name,
+                                "summary": _normalize_viz_result(results.get("result"))
+                            })
+
                         
                         handled = True
                         break
@@ -722,6 +789,7 @@ class UnifiedResultAccessor:
                 unified_results["total_failed_steps"] += 1
         
         print(f"✅ UNIFIED ACCESSOR: Processed {unified_results['total_successful_steps']} successful steps")
+        unified_results["has_plots"] = len(unified_results["plots"]) > 0
         return unified_results
     
     def format_for_synthesis(self, unified_results: Dict[str, Any]) -> str:
@@ -737,6 +805,13 @@ class UnifiedResultAccessor:
         sections.append(f"- Successful analyses: {total_success}")
         sections.append(f"- Failed analyses: {total_failed}")
         sections.append("")
+
+        # NEW: concise hint to the LLM that visualizations exist
+        if unified_results.get("has_plots"):
+            kinds = sorted({ p["summary"]["kind"] for p in unified_results.get("plots", []) })
+            sections.append("[NOTE] Visualizations are available in the UI "
+                            f"({', '.join(kinds)}). Do NOT say plots failed.")
+            sections.append("")
         
         # Format each analysis type using its specific accessor
         for accessor in self.accessors:

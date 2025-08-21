@@ -28,9 +28,28 @@ class EvaluatorNode(BaseWorkflowNode):
         """Handle both validation steps AND post-execution evaluation."""
         # Check if current step is a validation step  
         execution_plan = state.get("execution_plan", {})
-        steps = execution_plan.get("steps", [])
+        # steps = execution_plan.get("steps", [])
+        steps = execution_plan.get("steps", []) or []
+
         current_index = state.get("current_step_index", 0)
         
+        # --- NEW: fast-path for "no-tool / direct-answer" plans ---
+        # (a) truly empty plan, or (b) all steps lack a function_name
+        has_callable = any((s.get("function_name") or "").strip() for s in steps)
+        if not steps or not has_callable:
+            print("ℹ️ Evaluator: no callable steps in plan; skipping post-execution evaluation.")
+            # Provide a stub so downstream never sees None
+            state["post_execution_evaluation"] = {
+                "mentioned_cell_types": [],
+                "supplementary_steps": [],
+                "evaluation_complete": True,
+                "question_type": "general_comparison",
+                "analysis_relevance": {}
+            }
+            state["conversation_complete"] = True
+            return state
+
+
         if current_index < len(steps):
             current_step = steps[current_index]
             if current_step.get("step_type") == "validation":

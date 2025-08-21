@@ -25,29 +25,6 @@ def upload_file(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'No file was uploaded.'}, status=400)
 
-# @csrf_exempt
-# @require_http_methods(["GET", "POST"])
-# def chat_with_ai(request):
-#     """
-#     Combined view for chatbot UI (GET) and chat message processing (POST).
-#     """
-#     if request.method == "GET":
-#         return render(request, "scchatbot/index.html")
-#     elif request.method == "POST":
-#         try:
-#             data = json.loads(request.body)
-#             user_message = data.get('message', '')
-#             if classify_intent(user_message) == 'web_search':
-#                 response_text = browse_web(user_message)
-#                 return JsonResponse({"response": response_text})
-#             response_text = chatbot_instance.send_message(user_message)
-#             return JsonResponse({"response": response_text})
-#         except json.JSONDecodeError:
-#             return JsonResponse({"error": "Invalid JSON"}, status=400)
-#         except Exception as e:
-#             return JsonResponse({"error": str(e)}, status=500)
-#
-
 
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
@@ -89,13 +66,13 @@ def chat_with_ai(request):
             
             # Pass room name to chatbot for progress updates
             response_text = chatbot_instance.send_message(user_message, session_id=room_name)
-            print("chat_with_ai: Chatbot response (first 300 chars):", response_text[:300])
+            # print("chat_with_ai: Chatbot response (first 300 chars):", response_text[:300])
             
             try:
                 parsed_response = json.loads(response_text)
                 # Trim the output for logging purposes.
                 trimmed_response = {k: (v[:300] + '...') if isinstance(v, str) and len(v) > 300 else v for k, v in parsed_response.items()}
-                print("chat_with_ai: Parsed chatbot response as JSON (trimmed):", trimmed_response)
+                # print("chat_with_ai: Parsed chatbot response as JSON (trimmed):", trimmed_response)
             except json.JSONDecodeError as e:
                 print("chat_with_ai: JSON decode error - response is not valid JSON (first 300 chars):", response_text[:300], "Error:", e)
                 parsed_response = {"response": response_text}

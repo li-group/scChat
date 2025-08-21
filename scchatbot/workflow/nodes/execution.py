@@ -11,7 +11,10 @@ from typing import Dict, Any, List
 from ...cell_types.models import ChatState, ExecutionStep
 from ..node_base import BaseWorkflowNode
 from ..progress_manager import ProgressManager
+import os
+import uuid
 
+MAX_INLINE_HTML_BYTES = 8_388_608
 
 class ExecutorNode(BaseWorkflowNode):
     """
@@ -31,7 +34,7 @@ class ExecutorNode(BaseWorkflowNode):
     def executor_node(self, state: ChatState) -> ChatState:
         """Execute the current step in the plan with hierarchy awareness and validation"""
         self._log_node_start("Executor", state)
-        
+        print ("CHAT STATE AT EXECUTOR :", str(ChatState))
         # Initialize progress manager
         session_id = state.get("session_id", "default")
         progress_manager = ProgressManager(session_id)
@@ -41,6 +44,21 @@ class ExecutorNode(BaseWorkflowNode):
         progress_manager.set_total_steps(total_steps)
         progress_manager.update_stage("execution", "Starting analysis execution...")
         
+        #ADDEDAUG
+        #No steps required - planner had 0 function calls essentially - we can skip nodes.
+        # === Fast-path: no actionable steps -> direct LLM answer ===
+        # If the planner produced zero steps, mark this as a no-tool answer so the
+        # final evaluator/router can jump straight to the response generator.
+
+        plan = state.get("execution_plan") or {}
+        steps = plan.get("steps") or []
+        if not steps:
+            state["no_tool_answer"] = True
+            state["conversation_complete"] = True  # ensures final evaluator won't loop
+            self._log_node_complete("Executor", state)
+            return state
+        #ADDEDAUG
+
         # Continue executing while there are steps, with special handling for supplementary steps
         steps_executed = 0
         continue_execution = True
@@ -66,6 +84,29 @@ class ExecutorNode(BaseWorkflowNode):
                 step = ExecutionStep(**step_data)
             
             print(f"🔄 Executing step {state['current_step_index'] + 1}: {step.description}")
+
+            #ADDEDAUG
+            if not getattr(step, "function_name", None):
+                print("ℹ️ No function for this step; treating as direct-answer/no-op.")
+                result_text = step.description or ""
+                # Build a dict we can safely store
+                if hasattr(step, "__dict__"):
+                    safe_step = dict(step.__dict__)
+                elif isinstance(step_data, dict):
+                    safe_step = copy.deepcopy(step_data)
+                else:
+                    safe_step = {"description": step.description or ""}
+                # Force a safe function name and params
+                safe_step["function_name"] = safe_step.get("function_name") or "direct_answer"
+                safe_step["parameters"] = safe_step.get("parameters", {}) or {}
+                # Record execution as successful text result
+                self._record_execution(state, safe_step, result_text, True, None, "direct_answer")
+                state["current_step_index"] += 1
+                steps_executed += 1
+                print(f"🔄 Advanced to step {state['current_step_index'] + 1}")
+                continue
+            #ADDEDAUG
+
             
             # DEBUG: Log the original function name to track mutations
             original_function_name = getattr(step_data, 'function_name', 'unknown') if hasattr(step_data, 'function_name') else step_data.get("function_name", "unknown")
@@ -321,12 +362,16 @@ class ExecutorNode(BaseWorkflowNode):
         step_data_copy = copy.deepcopy(step_data)
         
         # DEBUG: Check if function name was mutated
-        current_function_name = step_data.get("function_name", "unknown")
+        # current_function_name = step_data.get("function_name", "unknown")
+        current_function_name = step_data.get("function_name") or (original_function_name or "direct_answer")
         if current_function_name != original_function_name:
             print(f"⚠️ MUTATION DETECTED: function_name changed from '{original_function_name}' to '{current_function_name}'")
             # Fix the function name in the copy
-            step_data_copy["function_name"] = original_function_name
-            print(f"🔧 CORRECTED: Restored function_name to '{original_function_name}' in execution history")
+            # step_data_copy["function_name"] = original_function_name
+            # print(f"🔧 CORRECTED: Restored function_name to '{original_function_name}' in execution history")
+            step_data_copy["function_name"] = current_function_name #ADDEDAUG
+            print(f"🔧 NORMALIZED: Using safe function_name '{current_function_name}' in execution history") #ADDEDAUG
+
         
         state["execution_history"].append({
             "step_index": state["current_step_index"],
@@ -346,7 +391,14 @@ class ExecutorNode(BaseWorkflowNode):
         Intelligent result storage that preserves structure for critical functions
         """
         # Use provided original function name or fallback to step_data
-        function_name = original_function_name or step_data.get("function_name", "")
+        # function_name = original_function_name or step_data.get("function_name", "")
+        function_name = (original_function_name or step_data.get("function_name") or "direct_answer")         #ADDEDAUG
+
+        #ADDEDAUG
+        if function_name is None:
+            function_name = ""
+        #ADDEDAUG
+
         
         # Critical functions that need full structure preservation
         STRUCTURE_PRESERVED_FUNCTIONS = {
@@ -364,12 +416,30 @@ class ExecutorNode(BaseWorkflowNode):
                 "result_summary": self._create_result_summary(function_name, result)
             }
         
-        elif function_name.startswith("display_") and success:
-            # Visualization functions - keep HTML but add metadata
+        # elif function_name.startswith("display_") and success:
+        # elif isinstance(function_name, str) and function_name.startswith("display_") and success: #ADDEDAUG
+        #     # Visualization functions - keep HTML but add metadata
+        #     return {
+        #         "result_type": "visualization", 
+        #         "result": result,  # Full HTML
+        #         "result_metadata": self._extract_viz_metadata(function_name, result),
+        #         "result_summary": f"Visualization generated: {function_name}"
+        #     }
+        elif isinstance(function_name, str) and function_name.startswith("display_") and success:
+            viz_payload = result
+
+            # If the plot is a huge inline HTML string, persist it as a file_ref
+            if isinstance(result, str) and len(result) > MAX_INLINE_HTML_BYTES:
+                os.makedirs("figures", exist_ok=True)
+                ref = f"figures/plot_{uuid.uuid4().hex}.html"
+                with open(ref, "w", encoding="utf-8") as f:
+                    f.write(result)
+                viz_payload = {"type": "file_ref", "path": ref}
+
             return {
-                "result_type": "visualization", 
-                "result": result,  # Full HTML
-                "result_metadata": self._extract_viz_metadata(function_name, result),
+                "result_type": "visualization",
+                "result": viz_payload,
+                "result_metadata": self._extract_viz_metadata(function_name, viz_payload),
                 "result_summary": f"Visualization generated: {function_name}"
             }
         
@@ -409,13 +479,31 @@ class ExecutorNode(BaseWorkflowNode):
         
         return str(result)[:100]
     
+    # def _extract_viz_metadata(self, function_name: str, result: Any) -> Dict[str, Any]:
+    #     """Extract metadata from visualization results"""
+    #     return {
+    #         "visualization_type": function_name,
+    #         "html_length": len(result) if isinstance(result, str) else 0,
+    #         "contains_html": bool(isinstance(result, str) and ('<div' in result or '<html' in result))
+    #     }
+
     def _extract_viz_metadata(self, function_name: str, result: Any) -> Dict[str, Any]:
-        """Extract metadata from visualization results"""
-        return {
-            "visualization_type": function_name,
-            "html_length": len(result) if isinstance(result, str) else 0,
-            "contains_html": bool(isinstance(result, str) and ('<div' in result or '<html' in result))
-        }
+        if isinstance(result, str):
+            return {
+                "visualization_type": function_name,
+                "html_length": len(result),
+                "contains_html": ("<div" in result or "<html" in result)
+            }
+        if isinstance(result, dict):
+            if result.get("type") == "file_ref":
+                return {"visualization_type": function_name, "file_ref": result.get("path")}
+            if result.get("multiple_plots"):
+                return {
+                    "visualization_type": function_name,
+                    "bundle": True,
+                    "num_plots": len(result.get("plots", []))
+                }
+        return {"visualization_type": function_name}
     
     def _log_storage_decision(self, result_storage: Dict[str, Any], function_name: str):
         """Log storage decision for monitoring."""

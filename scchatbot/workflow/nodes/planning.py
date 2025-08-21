@@ -67,6 +67,7 @@ class PlannerNode(BaseWorkflowNode):
         plan_result = self._create_enhanced_plan(state, message, available_functions, available_cell_types, function_history, unavailable_cell_types)
         
         self._log_node_complete("Planner", state)
+        print ("FINAL PLAN : ", plan_result)
         return plan_result
     
     def _create_enhanced_plan(self, state: ChatState, message: str, available_functions: List, available_cell_types: List[str], function_history: Dict, unavailable_cell_types: List[str]) -> ChatState:
