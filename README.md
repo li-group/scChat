@@ -20,7 +20,6 @@ If you found this work useful, please cite this [preprint](https://arxiv.org/abs
 
 ## Table of Contents
 - [Overview](#overview)
-- [Installation](#installation)
 - [Tutorial](#tutorial)
 - [Chat Example](#chat-example)
 - [Datasets](#datasets)
