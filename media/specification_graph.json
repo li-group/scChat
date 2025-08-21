@@ -1,7 +1,7 @@
 {
     "url": "bolt://localhost:7687",
-    "username": "neo4j",
-    "password": "ashleyscchat",
+    "username": "your-neo4j-username",
+    "password": "your-neo4j-password",
     "database": "human",
     "pathway_rag": "pathways",
     "sources": [
