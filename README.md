@@ -35,7 +35,7 @@ Please read our [scChat paper](https://www.biorxiv.org/content/10.1101/2024.10.0
 ## Scope
 Model: scChat currently supports analysis using AnnData-formatted single-cell RNA sequencing datasets.
 
-Capabilities: scChat integrates an LLM with specialized tools to enable tasks such as marker gene identification, UMAP clustering, and custom literature searches, all through conversational interactions.
+Capabilities: scChat integrates an LLM mutli-agent system with specialized tools to enable tasks, such as cell type annotation, enrichment analysis, and result visualization, all through conversational interactions.
 
 
 # Tutorial 
