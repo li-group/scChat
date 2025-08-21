@@ -39,7 +39,7 @@ Model: scChat currently supports analysis using AnnData-formatted single-cell RN
 Capabilities: scChat integrates an LLM with specialized tools to enable tasks such as marker gene identification, UMAP clustering, and custom literature searches, all through conversational interactions.
 
 
-# Installation
+# Tutorial 
 
 To set up the project environment and run the server, follow these steps:
 
@@ -49,18 +49,21 @@ To set up the project environment and run the server, follow these steps:
 
 Follow these steps to utilize the application effectively:
 ### Step 1: Set the OPENAI Key Environment Variable 
-- type and enter export OPENAI_API_KEY='your_openai_api_key' in your terminal
+- Type and enter export OPENAI_API_KEY='your_openai_api_key' in your terminal
 
   
 ### Step 2: Download Neo4j Desktop 2
 - Download Neo4j Desktop 2 (https://neo4j.com/download/)
 - Download required dump files (https://drive.google.com/drive/folders/17UCKv95G3tFqeyce1oQAo3ss2vS7uZQE)
-- Create database on Neo4j and import the dump files
-- start the database
+- Create a new instance on Neo4j (this step asks you set the password)
+- Import the dump files as new databases in the created instance.
+- Start the database
 
-### Step 3: Update  media/specification_graph.json
-- update specification_graph.json with your Neo4j username and password
-- update system and organ relevant to the database you are using
+### Step 3: Upload and update files
+- Upload scRNA-seq adata file (.h5ad)
+- Update specification_graph.json with your Neo4j username and password
+- Update specification_graph.json with system and organ relevant to the database you are using with specific format
+- Update sample_mapping.json with adata file corresponding "Sample name", which can be found in adata.obs, and write descriptions for each condition.
 
   
 ### Step 4: Initialize the Application
@@ -80,23 +83,6 @@ Follow these steps to utilize the application effectively:
   
   This will prevent previous chat sessions from being reprocessed.
 
-
-# Tutorial
-<a name="tutorial"></a>
-1. Upload scRNA-seq adata file (.h5ad)
-2. Upload sample mapping (.json file) (if required).
-3. Upload research context (.txt file) (if required).
-4. Request to generate UMAP for overall cells in the scRNA-seq Analysis. ("Generate UMAP")
-5. (4) Will return a Python dictionary. You can then request to label/annotate clusters for overall cells. ("Label clusters for overall cells")
-6. You can now ask to display the annotated UMAP for overall cells or view the unannotated UMAP for overall cells.
-7. You can ask for rationale or research questions specific to your dataset.
-8. If needed, you can filter and process a specific cell type for detailed subtype clustering and annotation.  ("Process <cell_type> cells")
-9. (8) would return a Python dictionary. You can then label/annotate clusters for the processed cell. ("Label clusters for <cell_type> cells")
-10. You can calculate cell population changes for overall cells or specific cell types. ("Calculate cell population change for <cell_type> cells")
-11. You can display the cell population change for previously calculated cell types. ("Display cell population change for <cell_type> cells")
-12. You can ask for reasoning, possible hypotheses, experimental designs, and additional insights.
-13. You can compare differential gene expression between two samples for a specific cell type. ("Calculate sample differential expression genes comparison for <cell_type> <sample_1> <sample_2>")
-
 ## Chat Example
 <a name="chat-example"></a>
 <p align="center">
@@ -104,8 +90,8 @@ Follow these steps to utilize the application effectively:
 </p>
 
 # Datasets
-The datasets used for testing can be found at https://docs.google.com/spreadsheets/d/1NwN5GydHn0B3-W0DLcAfvnNtZVJEMUgBW9YyzXnS83A/edit?usp=sharing
-
+The datasets used for testing and examples for sample_mapping.json and specification_graph.json can be found at [https://docs.google.com/spreadsheets/d/1NwN5GydHn0B3-W0DLcAfvnNtZVJEMUgBW9YyzXnS83A/edit?usp=sharing
+](https://drive.google.com/drive/u/4/folders/1RJRETtwI3zxsOJK0Lop197JGm3Isl4iB)
 
 ## scChat Retrieval-Augmented Generation (RAG) Configuration
 
@@ -126,12 +112,6 @@ For example, to analyze normal blood cells from a human, the configuration would
 }
 ```
 This configuration will retrieve and process the relevant dataset based on the selected organism, tissue, and condition, enabling a customized and context-specific analysis.
-
-
-## How to create specification.json
-- refer to {dataset}/specification.json from the available datasets here : https://drive.google.com/drive/folders/1RJRETtwI3zxsOJK0Lop197JGm3Isl4iB
-- update specification_graph.json with your Neo4j username and password
-- update system and organ relevant to the database you are using
 
 ### Available Organisms and Tissues
 
