@@ -128,6 +128,11 @@ For example, to analyze normal blood cells from a human, the configuration would
 This configuration will retrieve and process the relevant dataset based on the selected organism, tissue, and condition, enabling a customized and context-specific analysis.
 
 
+## How to create specification.json
+- refer to {dataset}/specification.json from the available datasets here : https://drive.google.com/drive/folders/1RJRETtwI3zxsOJK0Lop197JGm3Isl4iB
+- update specification_graph.json with your Neo4j username and password
+- update system and organ relevant to the database you are using
+
 ### Available Organisms and Tissues
 
 #### Human
