@@ -61,8 +61,8 @@ Follow these steps to utilize the application effectively:
 
 ### Step 3: Upload and update files
 - Upload scRNA-seq adata file (.h5ad)
-- Update specification_graph.json with your Neo4j username and password
-- Update specification_graph.json with system and organ relevant to the database you are using with specific format
+- Upload the pathway vector-based model (.pkl and .faiss), which can be found in this link: https://drive.google.com/drive/u/4/folders/1OklM2u5T5FsjiUvvYRYyWxrssQIb84Ky
+- Update specification_graph.json with your Neo4j username, password, system and organ relevant to the database you are using with specific format
 - Update sample_mapping.json with adata file corresponding "Sample name", which can be found in adata.obs, and write descriptions for each condition.
 
   
