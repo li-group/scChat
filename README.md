@@ -113,41 +113,140 @@ For example, to analyze normal blood cells from a human, the configuration would
 ```
 This configuration will retrieve and process the relevant dataset based on the selected organism, tissue, and condition, enabling a customized and context-specific analysis.
 
-### Available Organisms and Tissues
+### Available systems and organs
 
 #### Human
-- Adipose Tissue
-- Blood
-- Bone Marrow
-- Brain
-- Breast
-- Eye
-- Heart
-- Intestine
-- Kidney
-- Liver
-- Lung
-- Ovary
-- Pancreas
-- Salivary Gland
-- Skin
-- Testis
+- Nervous system
+  - Brain
+  - Spinal cord
+  - Ganglion
+  - Eye
+  - Ear     
+- Musculoskeletal system
+  - Synovial tissue
+  - Tendo
+  - Muscle
+  - Bone
+- Female Reproductive System
+  - Vagina
+  - Cervix
+  - Egg
+  - Breast
+  - Uterus
+  - Ovary
+  - Oviduct (Fallopian tube)
+- Cardiovascular System
+  - Capillary
+  - Heart
+  - Artery
+  - Vein
+- Digestive System
+  - Stomach
+  - Esophagus
+  - Liver
+  - Mouth
+  - Intestine
+  - Abdomen
+- Endocrine System
+  - Pancreas
+  - Parathyroid gland
+  - Adrenal gland
+  - Thyroid gland
+- Urinary System
+  - Kidney
+  - Ureters
+  - Bladder
+  - Urethra
+- Male Reproductive System
+  - Penis
+  - Testis
+  - Prostate gland
+- Respiratory System
+  - Nose
+  - Lung
+  - Trachea
+  - Larynx
+  - Pharynx
+- Lymphatic System
+  - Spleen
+  - Peripheral blood
+  - Umbilical cord blood
+  - Bone marrow
+  - Lymph node
+  - Thymus
+- Integumentary System
+  - Adipose tissue
+  - Skin
+- Embryonic Structure
+  - Embryo
+  - Fetus
+  - Placenta
 
 #### Mouse
-- Adipose Tissue
-- Blood
-- Bone Marrow
-- Brain
-- Heart
-- Kidney
-- Liver
-- Lung
-- Ovary
-- Pancreas
-- Spleen
-- Testis
-
-Each tissue has a corresponding `normal.json` and `normal_and_cancer.json` file for both organisms, making it easy to switch between healthy and diseased conditions.
+- Endocrine System
+  - Thyroid gland
+  - Parathyroid gland
+  - Adrenal gland
+  - Pancreas
+- Cardiovascular System
+  - Capillary
+  - Artery
+  - Vein
+  - Heart
+- Nervous System
+  - Spinal cord
+  - Eye
+  - Ear
+  - Ganglion
+  - Brain
+- Respiratory System
+  - Nose
+  - Larynx
+  - Trachea
+  - Lung
+  - Pharynx
+- Integumentary System
+  - Adipose tissue
+  - Skin
+- Lymphatic System
+  - Thymus
+  - Peripheral blood
+  - Bone marrow
+  - Spleen
+  - Lymph node
+- Embryonic Structure
+  - Embryo
+  - Placenta
+  - Fetus
+- Female Reproductive System
+  - Oviduct (Fallopian tube)
+  - Uterus
+  - Vagina
+  - Breast
+  - Egg
+  - Ovary
+  - Cervix
+- Digestive System
+  - Esophagus
+  - Liver
+  - Mouth
+  - Intestine
+  - Abdomen
+  - Stomach
+- Male Reproductive System
+  - Penis
+  - Prostate gland
+  - Testis
+- Urinary System
+  - Bladder
+  - Ureters
+  - Urethra
+  - Kidney
+- Musculoskeletal System
+  - Synovial tissue
+  - Muscle
+  - Tendo
+  - Bone
 
 ## Citation
 
