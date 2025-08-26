@@ -315,6 +315,40 @@ class ExecutorNode(BaseWorkflowNode):
                     enhanced_params["_should_fail"] = True
                     enhanced_params["_fail_reason"] = f"No {viz_analysis_type} enrichment analysis results available to visualize"
         
+        # Special handling for display_cell_count_comparison - aggregate results from compare_cell_counts steps
+        if step.function_name == "display_cell_count_comparison":
+            logger.info(f"🔍 AGGREGATION: Handling display_cell_count_comparison - aggregating compare_cell_counts results")
+            
+            execution_history = state.get("execution_history", [])
+            cell_types_data = {}
+            
+            # Find all successful compare_cell_counts executions
+            for execution in execution_history:
+                step_data = execution.get("step", {})
+                if (execution.get("success") and 
+                    step_data.get("function_name") == "compare_cell_counts"):
+                    
+                    cell_type = step_data.get("parameters", {}).get("cell_type")
+                    result = execution.get("result")
+                    
+                    if cell_type and result:
+                        # Handle different result formats
+                        if isinstance(result, dict) and "count_results" in result:
+                            # Enhanced format from hierarchy wrapper
+                            cell_types_data[cell_type] = result["count_results"]
+                        elif isinstance(result, list):
+                            # Direct format from compare_cell_count function
+                            cell_types_data[cell_type] = result
+                        logger.info(f"🔍 AGGREGATION: Added data for {cell_type}: {len(result) if isinstance(result, list) else 'dict'} entries")
+            
+            if cell_types_data:
+                enhanced_params["cell_types_data"] = cell_types_data
+                logger.info(f"✅ AGGREGATION: Successfully aggregated data for {len(cell_types_data)} cell types")
+            else:
+                logger.info(f"❌ AGGREGATION: No compare_cell_counts results found to aggregate")
+                enhanced_params["_should_fail"] = True
+                enhanced_params["_fail_reason"] = "No compare_cell_counts results available to visualize"
+        
         return enhanced_params
     
     def _handle_successful_step(self, state: ChatState, step: ExecutionStep, result: Any):

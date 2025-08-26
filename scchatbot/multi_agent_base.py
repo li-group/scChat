@@ -18,7 +18,8 @@ from .cell_types.annotation_pipeline import initial_cell_annotation
 from .analysis.visualizations import (
     display_dotplot,
     display_processed_umap,
-    display_enrichment_visualization
+    display_enrichment_visualization,
+    display_cell_count_comparison
 )
 from .cell_types.utils import clear_directory
 from .cell_types.models import ChatState
@@ -260,6 +261,26 @@ class MultiAgentChatBot:
                 }
             },
             {
+                "name": "display_cell_count_comparison",
+                "description": "Create stacked or grouped bar chart comparing cell counts across experimental conditions for multiple cell types. Use after multiple compare_cell_counts analyses to visualize the results together. Shows which cell types are abundant in which conditions.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "cell_types_data": {
+                            "type": "object",
+                            "description": "Dictionary where keys are cell types and values are count results from compare_cell_counts function calls"
+                        },
+                        "plot_type": {
+                            "type": "string",
+                            "enum": ["stacked", "grouped"],
+                            "default": "stacked",
+                            "description": "Type of bar chart: 'stacked' shows conditions as stacked portions, 'grouped' shows conditions side-by-side"
+                        }
+                    },
+                    "required": ["cell_types_data"]
+                }
+            },
+            {
                 "name": "compare_cell_counts",
                 "description": "Compare cell counts between experimental conditions for specific cell type(s). Use when analyzing how cell type abundance differs across conditions (e.g., pre vs post treatment). Supports both single cell type ('T cell') and multi-cell type comparisons ('B cell vs T cell' or 'B cell and T cell').", 
                 "parameters": {
@@ -302,6 +323,7 @@ class MultiAgentChatBot:
             "display_dotplot": self._wrap_visualization(display_dotplot),
             "display_processed_umap": self._wrap_visualization(display_processed_umap),
             "display_enrichment_visualization": self._wrap_visualization(display_enrichment_visualization),
+            "display_cell_count_comparison": self._wrap_visualization(display_cell_count_comparison),
             "perform_enrichment_analyses": self._wrap_enrichment_analysis,
             "process_cells": self._wrap_process_cells,
             "dea_split_by_condition": self._wrap_dea_analysis,

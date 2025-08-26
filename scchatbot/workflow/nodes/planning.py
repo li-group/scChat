@@ -240,6 +240,15 @@ class PlannerNode(BaseWorkflowNode):
                     - "show ONLY barplot" → use "display_enrichment_visualization" with "plot_type": "bar"
                     - "show ONLY dotplot" → use "display_enrichment_visualization" with "plot_type": "dot"
                     - "display both plots" → use "display_enrichment_visualization" (default plot_type="both")
+                
+                - For cell count comparison visualization, use "display_cell_count_comparison":
+                * Use AFTER multiple "compare_cell_counts" steps have been executed to show aggregate results
+                * Aggregates results from multiple cell types into a single comparative visualization
+                * Examples:
+                    - After comparing T cell, B cell, Macrophages counts → create visualization step to show all together
+                    - "show cell count comparison" → use "display_cell_count_comparison" with results from previous steps
+                    - "visualize cell abundance across conditions" → use "display_cell_count_comparison"
+                * The "cell_types_data" parameter should contain aggregated results from executed compare_cell_counts steps
                     
                 SEMANTIC SEARCH GUIDELINES:
                 - For questions seeking specific pathway/term information beyond the top-ranked results, consider using "search_enrichment_semantic"

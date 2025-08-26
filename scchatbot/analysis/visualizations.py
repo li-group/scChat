@@ -472,4 +472,132 @@ def _filter_umap_for_descendants(umap_data, target_cell_type: str):
     return filtered_data
 
 
+def display_cell_count_comparison(cell_types_data: dict, plot_type: str = "stacked") -> str:
+    """
+    Create stacked bar chart comparing cell counts across conditions for multiple cell types.
+    
+    Args:
+        cell_types_data: Dictionary where keys are cell types and values are count results
+        Example: {
+            "T cell": [{"category": "pre", "cell_count": 150, "description": "..."}, ...],
+            "B cell": [{"category": "pre", "cell_count": 75, "description": "..."}, ...],
+            "Macrophages": [{"category": "pre", "cell_count": 200, "description": "..."}, ...]
+        }
+        plot_type: "stacked" or "grouped" (default: "stacked")
+    
+    Returns:
+        HTML string containing the plot
+    """
+    import plotly.express as px
+    import plotly.io as pio
+    
+    try:
+        # Validate input
+        if not cell_types_data or not isinstance(cell_types_data, dict):
+            return "Error: No cell count data provided for visualization."
+        
+        # Convert aggregated data to plotting format
+        plot_data = []
+        all_conditions = set()
+        
+        for cell_type, count_results in cell_types_data.items():
+            if not isinstance(count_results, list):
+                continue
+                
+            for result in count_results:
+                if isinstance(result, dict) and 'category' in result and 'cell_count' in result:
+                    plot_data.append({
+                        'cell_type': cell_type,
+                        'condition': result['category'],
+                        'cell_count': int(result['cell_count']),
+                        'description': result.get('description', result['category'])
+                    })
+                    all_conditions.add(result['category'])
+        
+        if not plot_data:
+            return "Error: No valid cell count data found for visualization."
+        
+        # Convert to DataFrame for easier plotting
+        df = pd.DataFrame(plot_data)
+        
+        print(f"📊 Creating cell count comparison with {len(df)} data points")
+        print(f"📊 Cell types: {df['cell_type'].unique()}")
+        print(f"📊 Conditions: {df['condition'].unique()}")
+        
+        # Create the visualization based on plot type
+        if plot_type == "stacked":
+            # Create stacked bar chart
+            fig = px.bar(
+                df,
+                x='cell_type',
+                y='cell_count',
+                color='condition',
+                title='Cell Type Count Comparison Across Conditions',
+                labels={
+                    'cell_type': 'Cell Type',
+                    'cell_count': 'Cell Count',
+                    'condition': 'Condition'
+                },
+                hover_data=['description'],
+                color_discrete_sequence=px.colors.qualitative.Set2
+            )
+            
+            # Update layout for better readability
+            fig.update_layout(
+                height=600,
+                width=1000,
+                xaxis_title="Cell Type",
+                yaxis_title="Cell Count",
+                legend_title="Condition",
+                xaxis={'categoryorder': 'total descending'},
+                margin=dict(l=80, r=50, t=80, b=100),
+                font=dict(size=12)
+            )
+            
+            # Rotate x-axis labels if needed
+            fig.update_xaxes(tickangle=45)
+            
+        elif plot_type == "grouped":
+            # Create grouped bar chart
+            fig = px.bar(
+                df,
+                x='cell_type',
+                y='cell_count',
+                color='condition',
+                barmode='group',
+                title='Cell Type Count Comparison Across Conditions (Grouped)',
+                labels={
+                    'cell_type': 'Cell Type',
+                    'cell_count': 'Cell Count',
+                    'condition': 'Condition'
+                },
+                hover_data=['description'],
+                color_discrete_sequence=px.colors.qualitative.Set2
+            )
+            
+            fig.update_layout(
+                height=600,
+                width=1000,
+                xaxis_title="Cell Type",
+                yaxis_title="Cell Count",
+                legend_title="Condition",
+                xaxis={'categoryorder': 'total descending'},
+                margin=dict(l=80, r=50, t=80, b=100),
+                font=dict(size=12)
+            )
+            
+            fig.update_xaxes(tickangle=45)
+            
+        else:
+            return f"Error: Unsupported plot type '{plot_type}'. Use 'stacked' or 'grouped'."
+        
+        # Convert to HTML
+        plot_html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
+        
+        print(f"✅ Cell count comparison visualization generated: {len(plot_html)} characters")
+        return plot_html
+        
+    except Exception as e:
+        return f"Error generating cell count comparison plot: {e}"
+
 

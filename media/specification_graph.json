@@ -1,17 +1,13 @@
 {
     "url": "bolt://localhost:7687",
-    "username": "your-neo4j-username",
-    "password": "your-neo4j-password",
+    "username": "neo4j",
+    "password": "37754262",
     "database": "human",
     "pathway_rag": "pathways",
     "sources": [
         {
-            "system": "Lymphatic System",
-            "organ": "Peripheral blood"
-        },
-        {
             "system": "Nervous System",
-            "organ": "Brain"
+            "organ": "Eye"
         }
     ]
 }

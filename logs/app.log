@@ -1,1 +1,1054 @@
 
+2025-08-26 14:07:47,526 | INFO | django.utils.autoreload | Watching for file changes with StatReloader
+2025-08-26 14:07:53,681 | INFO | faiss.loader | Loading faiss.
+2025-08-26 14:07:53,709 | INFO | faiss.loader | Successfully loaded faiss.
+2025-08-26 14:07:54,509 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-26 14:07:56,167 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-26 14:07:56,257 | INFO | scchatbot.workflow.function_history | ✅ Vector database initialized at conversation_history/conversation_vectors
+2025-08-26 14:07:56,257 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-26 14:07:56,266 | INFO | scchatbot.workflow.function_history | ✅ Enrichment vector database initialized at conversation_history/conversation_vectors/enrichment
+2025-08-26 14:07:57,296 | INFO | jax._src.xla_bridge | Unable to initialize backend 'cuda': 
+2025-08-26 14:07:57,297 | INFO | jax._src.xla_bridge | Unable to initialize backend 'rocm': module 'jaxlib.xla_extension' has no attribute 'GpuAllocatorConfig'
+2025-08-26 14:07:57,301 | INFO | jax._src.xla_bridge | Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: dlopen(libtpu.so, 0x0001): tried: 'libtpu.so' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibtpu.so' (no such file), '/opt/anaconda3/envs/ScChatbot/bin/../lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache), 'libtpu.so' (no such file), '/usr/local/lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache)
+2025-08-26 14:08:08,119 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-26 14:08:09,279 | INFO | scchatbot.workflow.function_history | ✅ Vector database initialized at conversation_history/conversation_vectors
+2025-08-26 14:08:09,281 | INFO | scchatbot.workflow.function_history | ✅ Enrichment vector database initialized at conversation_history/conversation_vectors/enrichment
+2025-08-26 14:08:17,947 | INFO | scchatbot.multi_agent_base | 🧹 Starting cleanup...
+2025-08-26 14:08:17,947 | INFO | scchatbot.multi_agent_base | ✅ Cleanup completed
+2025-08-26 14:11:38,109 | INFO | django.utils.autoreload | Watching for file changes with StatReloader
+2025-08-26 14:11:42,857 | INFO | faiss.loader | Loading faiss.
+2025-08-26 14:11:42,883 | INFO | faiss.loader | Successfully loaded faiss.
+2025-08-26 14:11:43,563 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-26 14:11:45,173 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-26 14:11:45,256 | INFO | scchatbot.workflow.function_history | ✅ Vector database initialized at conversation_history/conversation_vectors
+2025-08-26 14:11:45,257 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-26 14:11:45,266 | INFO | scchatbot.workflow.function_history | ✅ Enrichment vector database initialized at conversation_history/conversation_vectors/enrichment
+2025-08-26 14:11:46,288 | INFO | jax._src.xla_bridge | Unable to initialize backend 'cuda': 
+2025-08-26 14:11:46,288 | INFO | jax._src.xla_bridge | Unable to initialize backend 'rocm': module 'jaxlib.xla_extension' has no attribute 'GpuAllocatorConfig'
+2025-08-26 14:11:46,290 | INFO | jax._src.xla_bridge | Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: dlopen(libtpu.so, 0x0001): tried: 'libtpu.so' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibtpu.so' (no such file), '/opt/anaconda3/envs/ScChatbot/bin/../lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache), 'libtpu.so' (no such file), '/usr/local/lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache)
+2025-08-26 14:12:02,660 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:12:18,695 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:14:34,566 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:14:35,397 | INFO | scchatbot.multi_agent_base | ✅ Unified hierarchical cell type management initialized
+2025-08-26 14:14:35,398 | INFO | scchatbot.multi_agent_base | ✅ Unified cell type extractor initialized
+2025-08-26 14:14:35,398 | INFO | scchatbot.multi_agent_base | 1
+2025-08-26 14:14:35,996 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: mps
+2025-08-26 14:14:35,996 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-26 14:14:37,381 | INFO | scchatbot.multi_agent_base | 2
+2025-08-26 14:14:37,383 | INFO | scchatbot.multi_agent_base | 3
+2025-08-26 14:14:37,383 | INFO | scchatbot.multi_agent_base | ✅ Session state management initialized
+2025-08-26 14:14:42,752 | ERROR | django.request | Internal Server Error: /
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/contrib/sessions/backends/base.py", line 187, in _get_session
+    return self._session_cache
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SessionStore' object has no attribute '_session_cache'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such table: django_session
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/views/decorators/csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/views/decorators/http.py", line 43, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seanchiu/Desktop/scchat_fin/scChat/scchatbot/views.py", line 36, in chat_with_ai
+    room_name = request.session.get('chat_room', 'default')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/contrib/sessions/backends/base.py", line 68, in get
+    return self._session.get(key, default)
+           ^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/contrib/sessions/backends/base.py", line 192, in _get_session
+    self._session_cache = self.load()
+                          ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/contrib/sessions/backends/db.py", line 42, in load
+    s = self._get_session_from_db()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/contrib/sessions/backends/db.py", line 32, in _get_session_from_db
+    return self.model.objects.get(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/models/query.py", line 633, in get
+    num = len(clone)
+          ^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/models/query.py", line 380, in __len__
+    self._fetch_all()
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/models/query.py", line 1881, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such table: django_session
+2025-08-26 14:15:14,233 | ERROR | django.request | Internal Server Error: /
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/contrib/sessions/backends/base.py", line 187, in _get_session
+    return self._session_cache
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SessionStore' object has no attribute '_session_cache'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such table: django_session
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/views/decorators/csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/views/decorators/http.py", line 43, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seanchiu/Desktop/scchat_fin/scChat/scchatbot/views.py", line 36, in chat_with_ai
+    room_name = request.session.get('chat_room', 'default')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/contrib/sessions/backends/base.py", line 68, in get
+    return self._session.get(key, default)
+           ^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/contrib/sessions/backends/base.py", line 192, in _get_session
+    self._session_cache = self.load()
+                          ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/contrib/sessions/backends/db.py", line 42, in load
+    s = self._get_session_from_db()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/contrib/sessions/backends/db.py", line 32, in _get_session_from_db
+    return self.model.objects.get(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/models/query.py", line 633, in get
+    num = len(clone)
+          ^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/models/query.py", line 380, in __len__
+    self._fetch_all()
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/models/query.py", line 1881, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/ScChatbot/lib/python3.11/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such table: django_session
+2025-08-26 14:19:24,023 | INFO | numexpr.utils | NumExpr defaulting to 14 threads.
+2025-08-26 14:20:19,899 | INFO | numexpr.utils | NumExpr defaulting to 14 threads.
+2025-08-26 14:21:12,075 | INFO | faiss.loader | Loading faiss.
+2025-08-26 14:21:12,089 | INFO | faiss.loader | Successfully loaded faiss.
+2025-08-26 14:21:12,743 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-26 14:21:14,445 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-26 14:21:14,529 | INFO | scchatbot.workflow.function_history | ✅ Vector database initialized at conversation_history/conversation_vectors
+2025-08-26 14:21:14,530 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-26 14:21:14,539 | INFO | scchatbot.workflow.function_history | ✅ Enrichment vector database initialized at conversation_history/conversation_vectors/enrichment
+2025-08-26 14:21:15,475 | INFO | jax._src.xla_bridge | Unable to initialize backend 'cuda': 
+2025-08-26 14:21:15,475 | INFO | jax._src.xla_bridge | Unable to initialize backend 'rocm': module 'jaxlib.xla_extension' has no attribute 'GpuAllocatorConfig'
+2025-08-26 14:21:15,477 | INFO | jax._src.xla_bridge | Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: dlopen(libtpu.so, 0x0001): tried: 'libtpu.so' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibtpu.so' (no such file), '/opt/anaconda3/envs/ScChatbot/bin/../lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache), 'libtpu.so' (no such file), '/usr/local/lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache)
+2025-08-26 14:21:29,486 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:21:47,064 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:23:46,416 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:23:47,463 | INFO | scchatbot.multi_agent_base | ✅ Unified hierarchical cell type management initialized
+2025-08-26 14:23:47,463 | INFO | scchatbot.multi_agent_base | ✅ Unified cell type extractor initialized
+2025-08-26 14:23:47,463 | INFO | scchatbot.multi_agent_base | 1
+2025-08-26 14:23:48,050 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: mps
+2025-08-26 14:23:48,050 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-26 14:23:49,578 | INFO | scchatbot.multi_agent_base | 2
+2025-08-26 14:23:49,580 | INFO | scchatbot.multi_agent_base | 3
+2025-08-26 14:23:49,580 | INFO | scchatbot.multi_agent_base | ✅ Session state management initialized
+2025-08-26 14:24:31,463 | INFO | django.utils.autoreload | Watching for file changes with StatReloader
+2025-08-26 14:24:35,764 | INFO | faiss.loader | Loading faiss.
+2025-08-26 14:24:35,778 | INFO | faiss.loader | Successfully loaded faiss.
+2025-08-26 14:24:36,428 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-26 14:24:38,239 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-26 14:24:38,289 | INFO | scchatbot.workflow.function_history | ✅ Vector database initialized at conversation_history/conversation_vectors
+2025-08-26 14:24:38,289 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-26 14:24:38,299 | INFO | scchatbot.workflow.function_history | ✅ Enrichment vector database initialized at conversation_history/conversation_vectors/enrichment
+2025-08-26 14:24:39,209 | INFO | jax._src.xla_bridge | Unable to initialize backend 'cuda': 
+2025-08-26 14:24:39,210 | INFO | jax._src.xla_bridge | Unable to initialize backend 'rocm': module 'jaxlib.xla_extension' has no attribute 'GpuAllocatorConfig'
+2025-08-26 14:24:39,211 | INFO | jax._src.xla_bridge | Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: dlopen(libtpu.so, 0x0001): tried: 'libtpu.so' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibtpu.so' (no such file), '/opt/anaconda3/envs/ScChatbot/bin/../lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache), 'libtpu.so' (no such file), '/usr/local/lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache)
+2025-08-26 14:24:54,118 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:24:59,069 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:27:12,191 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 502 Bad Gateway"
+2025-08-26 14:27:12,194 | INFO | openai._base_client | Retrying request to /chat/completions in 0.387078 seconds
+2025-08-26 14:27:17,565 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 502 Bad Gateway"
+2025-08-26 14:27:17,566 | INFO | openai._base_client | Retrying request to /chat/completions in 0.799702 seconds
+2025-08-26 14:27:39,306 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:27:40,167 | INFO | scchatbot.multi_agent_base | ✅ Unified hierarchical cell type management initialized
+2025-08-26 14:27:40,167 | INFO | scchatbot.multi_agent_base | ✅ Unified cell type extractor initialized
+2025-08-26 14:27:40,167 | INFO | scchatbot.multi_agent_base | 1
+2025-08-26 14:27:40,808 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: mps
+2025-08-26 14:27:40,808 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-26 14:27:42,160 | INFO | scchatbot.multi_agent_base | 2
+2025-08-26 14:27:42,162 | INFO | scchatbot.multi_agent_base | 3
+2025-08-26 14:27:42,162 | INFO | scchatbot.multi_agent_base | ✅ Session state management initialized
+2025-08-26 14:28:49,645 | WARNING | django.request | Not Found: /ws/chat/36fac317/
+2025-08-26 14:28:52,676 | WARNING | django.request | Not Found: /ws/chat/36fac317/
+2025-08-26 14:28:55,691 | WARNING | django.request | Not Found: /ws/chat/36fac317/
+2025-08-26 14:29:07,739 | INFO | scchatbot.multi_agent_base | 🆕 Creating new session state for '36fac317'
+2025-08-26 14:29:07,741 | INFO | scchatbot.workflow.node_base | 🔄 InputProcessor: Starting execution
+2025-08-26 14:29:07,741 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell....
+2025-08-26 14:29:08,469 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:29:08,473 | INFO | scchatbot.workflow.nodes.input_processing | 🔍 LLM search query response: '```json
+["current_session_state"]
+```'
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.nodes.input_processing | 🧠 LLM requested 1 context sources: ['current_session_state']
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Building session context...
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Found 0 cell types: []
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Generated 33 chars, starts with: 'No current session data available...'
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.nodes.input_processing | ✅ Added current session state context (33 chars)
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.nodes.input_processing | 🔍 SESSION CONTEXT DEBUG: First 100 chars: 'No current session data available...'
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.nodes.input_processing | ✅ Added fresh unified context (56 chars)
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.nodes.input_processing | 🔄 Initialized with 4 initial cell types
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.node_base | ✅ InputProcessor: Execution complete
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.node_base | 🔄 Planner: Starting execution
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell....
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.nodes.planning | 🧬 PLANNER: Cell type status for planning:
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.nodes.planning |    • Initial types: 4
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.nodes.planning |    • Currently available: 4
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.nodes.planning |    • Discovered this session: 0
+2025-08-26 14:29:08,474 | INFO | scchatbot.workflow.nodes.planning | 🧬 Planning for question: 'Compare the cell counts of each condition for T cell.'
+2025-08-26 14:29:11,589 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:29:12,715 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:29:12,718 | INFO | scchatbot.workflow.nodes.planning | 🧬 Planner identified needed cell types: ['T cell']
+2025-08-26 14:29:12,718 | INFO | scchatbot.workflow.nodes.planning | 🧬 Available cell types: ['Epithelial cell', 'Stromal cell', 'Immune cell', 'Glial cell']
+2025-08-26 14:29:12,718 | INFO | scchatbot.workflow.nodes.planning | 📋 Preserving LLM analysis step: compare_cell_counts(T cell)
+2025-08-26 14:29:12,769 | INFO | scchatbot.workflow.nodes.planning | 🧬 Creating discovery steps only...
+2025-08-26 14:29:12,795 | INFO | scchatbot.workflow.nodes.planning | 🔄 Found path from 'Immune cell' to 'T cell': Immune cell → T cell
+2025-08-26 14:29:12,796 | INFO | scchatbot.workflow.nodes.planning | 🧬 Added process_cells(Immune cell) to discover ['T cell']
+2025-08-26 14:29:12,796 | INFO | scchatbot.workflow.nodes.planning | 🔍 Created validation step for process_cells(Immune cell) expecting: ['T cell']
+2025-08-26 14:29:12,796 | INFO | scchatbot.workflow.nodes.planning | 🔄 Interleaved: process_cells(Immune cell) → validation(Immune cell)
+2025-08-26 14:29:12,798 | INFO | scchatbot.workflow.nodes.planning | 📋 Plan merge complete:
+2025-08-26 14:29:12,798 | INFO | scchatbot.workflow.nodes.planning |    - Discovery steps: 1
+2025-08-26 14:29:12,798 | INFO | scchatbot.workflow.nodes.planning |    - Validation steps: 1
+2025-08-26 14:29:12,799 | INFO | scchatbot.workflow.nodes.planning |    - Analysis steps: 1
+2025-08-26 14:29:12,799 | INFO | scchatbot.workflow.nodes.planning |    - Other steps: 1
+2025-08-26 14:29:12,799 | INFO | scchatbot.workflow.nodes.planning |    - Filtered out: 0 steps for undiscoverable types
+2025-08-26 14:29:12,799 | INFO | scchatbot.workflow.nodes.planning | 🔍 ENRICHMENT DEBUG: Found 0 enrichment steps
+2025-08-26 14:29:12,800 | INFO | scchatbot.workflow.nodes.planning | 🔍 PATHWAY EXTRACTOR: Processing 4 steps
+2025-08-26 14:29:12,800 | INFO | scchatbot.workflow.nodes.planning | ✅ Planner created execution plan with 4 steps
+2025-08-26 14:29:12,800 | INFO | scchatbot.workflow.nodes.planning |    • 1 process_cells steps
+2025-08-26 14:29:12,801 | INFO | scchatbot.workflow.nodes.planning |    • 1 validation steps
+2025-08-26 14:29:12,801 | INFO | scchatbot.workflow.nodes.planning |    • 2 analysis steps
+2025-08-26 14:29:12,801 | INFO | scchatbot.workflow.node_base | ✅ Planner: Execution complete
+2025-08-26 14:29:12,801 | INFO | scchatbot.workflow.nodes.planning | FINAL PLAN : 
+2025-08-26 14:29:12,803 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-08-26 14:29:12,803 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell....
+2025-08-26 14:29:12,805 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 1: Process Immune cell to discover T cell
+2025-08-26 14:29:12,805 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'process_cells'
+2025-08-26 14:29:18,273 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:29:26,300 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:30:10,734 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:30:10,743 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 1 completed successfully
+2025-08-26 14:30:10,744 | INFO | scchatbot.workflow.nodes.execution | 🔍 EXECUTION NODE: About to call CellTypeExtractor.extract_from_annotation_result() for process_cells step
+2025-08-26 14:30:10,744 | INFO | scchatbot.workflow.nodes.execution | 🧬 Updating hierarchy manager with new cell types: ['T cell', 'B cell', 'Mononuclear phagocyte', 'Natural killer cell', 'Mast cell']
+2025-08-26 14:30:10,766 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: T cell
+2025-08-26 14:30:10,766 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: B cell
+2025-08-26 14:30:10,766 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: Mononuclear phagocyte
+2025-08-26 14:30:10,766 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: Natural killer cell
+2025-08-26 14:30:10,766 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: Mast cell
+2025-08-26 14:30:10,768 | INFO | scchatbot.workflow.nodes.execution | 📊 Structured storage: process_cells - Full data preserved
+2025-08-26 14:30:10,768 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 2
+2025-08-26 14:30:10,768 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-08-26 14:30:10,769 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-08-26 14:30:10,769 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Executing validation step...
+2025-08-26 14:30:10,769 | INFO | scchatbot.workflow.node_base | 🔄 Validation: Starting execution
+2025-08-26 14:30:10,769 | INFO | scchatbot.workflow.node_base |    Current message: Validating Immune cell -> ['T cell']...
+2025-08-26 14:30:10,769 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Exact match found: 'T cell'
+2025-08-26 14:30:10,770 | INFO | scchatbot.workflow.node_base | ✅ Validation: Execution complete
+2025-08-26 14:30:10,770 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Validation passed: All 1 expected cell types found successfully
+2025-08-26 14:30:10,770 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 CALLING update_remaining_steps_with_discovered_types with result status: success
+2025-08-26 14:30:10,770 | INFO | scchatbot.workflow.nodes.evaluation | 🔄 Updating remaining steps: expected=['T cell'], found=['T cell'], missing=[]
+2025-08-26 14:30:10,770 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Validation result full structure: {'status': 'success', 'message': 'All 1 expected cell types found successfully', 'found_children': ['T cell'], 'missing_children': [], 'available_types': ['Glial cell', 'Mast cell', 'Stromal cell', 'Natural killer cell', 'Epithelial cell', 'Mononuclear phagocyte', 'B cell', 'T cell']}
+2025-08-26 14:30:10,770 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Will skip steps for missing cell types: []
+2025-08-26 14:30:10,770 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 DEBUG: Scanning 2 remaining steps...
+2025-08-26 14:30:10,770 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 DEBUG: Step 3: compare_cell_counts(cell_type='T cell')
+2025-08-26 14:30:10,770 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 DEBUG: Step 3 cell type 'T cell' not in missing list []
+2025-08-26 14:30:10,770 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 DEBUG: Step 4: display_cell_count_comparison(params={'cell_types_data': 'results from compare_cell_counts step'})
+2025-08-26 14:30:10,770 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 DEBUG: Step 4 cell type 'None' not in missing list []
+2025-08-26 14:30:10,770 | INFO | scchatbot.workflow.nodes.evaluation | 🔄 Advanced to step 3
+2025-08-26 14:30:10,771 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-08-26 14:30:10,771 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell....
+2025-08-26 14:30:10,772 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 3: Compare the cell counts of T cells between different experimental conditions.
+2025-08-26 14:30:10,772 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'compare_cell_counts'
+2025-08-26 14:30:10,773 | INFO | scchatbot.multi_agent_base | 🔍 compare_cell_counts called with cell_type='T cell', kwargs={'cell_type': 'T cell'}
+2025-08-26 14:30:10,773 | INFO | scchatbot.multi_agent_base | 🔄 Processing single cell type comparison: T cell
+2025-08-26 14:30:10,798 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 3 completed successfully
+2025-08-26 14:30:10,805 | INFO | scchatbot.workflow.nodes.execution | 📊 Structured storage: compare_cell_counts - Full data preserved
+2025-08-26 14:30:10,805 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 4
+2025-08-26 14:30:10,805 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-08-26 14:30:10,805 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-08-26 14:30:10,805 | INFO | scchatbot.workflow.nodes.evaluation | 🔄 Steps still remaining (3/4), skipping post-execution evaluation
+2025-08-26 14:30:10,806 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-08-26 14:30:10,806 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell....
+2025-08-26 14:30:10,806 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 4: Visualize the comparison of T cell counts across different conditions.
+2025-08-26 14:30:10,807 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'display_cell_count_comparison'
+2025-08-26 14:30:10,807 | INFO | scchatbot.multi_agent_base | 🔍 VIZ WRAPPER DEBUG: display_cell_count_comparison called with kwargs: {'cell_types_data': 'results from compare_cell_counts step'}
+2025-08-26 14:30:10,807 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 4 completed successfully
+2025-08-26 14:30:10,808 | INFO | scchatbot.workflow.nodes.execution | 🎨 Visualization storage: display_cell_count_comparison - HTML preserved
+2025-08-26 14:30:10,808 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 5
+2025-08-26 14:30:10,808 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-08-26 14:30:10,808 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-08-26 14:30:10,808 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 All steps complete (4/4), running post-execution evaluation
+2025-08-26 14:30:10,808 | INFO | scchatbot.workflow.nodes.evaluation | 🏁 Evaluator: Starting sophisticated post-execution evaluation...
+2025-08-26 14:30:10,808 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Starting post-execution evaluation...
+2025-08-26 14:30:12,276 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:30:12,943 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:30:12,952 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:30:12,952 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: T cell
+2025-08-26 14:30:13,746 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:30:13,749 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:30:14,774 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:30:14,793 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for T cell: '```json
+["compare_cell_counts"]
+```' (length: 35)
+2025-08-26 14:30:14,799 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for T cell: ['compare_cell_counts']
+2025-08-26 14:30:14,800 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'T cell' is in unavailable list: []
+2025-08-26 14:30:14,800 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 4 entries
+2025-08-26 14:30:14,800 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for T cell: compare_cell_counts (execution 3)
+2025-08-26 14:30:14,801 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for T cell: ['compare_cell_counts']
+2025-08-26 14:30:14,801 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for T cell
+2025-08-26 14:30:14,801 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Post-execution evaluation complete: 0 total supplementary steps
+2025-08-26 14:30:14,801 | INFO | scchatbot.workflow.nodes.evaluation | 📝 Generated relevance hints for cell_abundance question
+2025-08-26 14:30:14,801 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Execution Summary:
+2025-08-26 14:30:14,801 | INFO | scchatbot.workflow.nodes.evaluation |    • Total steps executed: 4
+2025-08-26 14:30:14,802 | INFO | scchatbot.workflow.nodes.evaluation |    • Successful: 4
+2025-08-26 14:30:14,802 | INFO | scchatbot.workflow.nodes.evaluation |    • Failed: 0
+2025-08-26 14:30:14,802 | INFO | scchatbot.workflow.nodes.evaluation |    • Supplementary steps generated: 0
+2025-08-26 14:30:14,802 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Available analysis results:
+2025-08-26 14:30:14,802 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 Evaluator: Post-execution evaluation complete, ready for response generation
+2025-08-26 14:30:14,804 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 All steps complete (4/4), running post-execution evaluation
+2025-08-26 14:30:14,804 | INFO | scchatbot.workflow.nodes.evaluation | 🏁 Evaluator: Starting sophisticated post-execution evaluation...
+2025-08-26 14:30:14,804 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Starting post-execution evaluation...
+2025-08-26 14:30:15,906 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:30:16,494 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:30:16,497 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:30:16,497 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: T cell
+2025-08-26 14:30:17,226 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:30:17,227 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:30:17,843 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:30:17,846 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for T cell: '```json
+["compare_cell_counts"]
+```' (length: 35)
+2025-08-26 14:30:17,847 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for T cell: ['compare_cell_counts']
+2025-08-26 14:30:17,847 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'T cell' is in unavailable list: []
+2025-08-26 14:30:17,847 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 4 entries
+2025-08-26 14:30:17,847 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for T cell: compare_cell_counts (execution 3)
+2025-08-26 14:30:17,847 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for T cell: ['compare_cell_counts']
+2025-08-26 14:30:17,847 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for T cell
+2025-08-26 14:30:17,848 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Post-execution evaluation complete: 0 total supplementary steps
+2025-08-26 14:30:17,848 | INFO | scchatbot.workflow.nodes.evaluation | 📝 Generated relevance hints for cell_abundance question
+2025-08-26 14:30:17,848 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Execution Summary:
+2025-08-26 14:30:17,848 | INFO | scchatbot.workflow.nodes.evaluation |    • Total steps executed: 4
+2025-08-26 14:30:17,848 | INFO | scchatbot.workflow.nodes.evaluation |    • Successful: 4
+2025-08-26 14:30:17,848 | INFO | scchatbot.workflow.nodes.evaluation |    • Failed: 0
+2025-08-26 14:30:17,848 | INFO | scchatbot.workflow.nodes.evaluation |    • Supplementary steps generated: 0
+2025-08-26 14:30:17,848 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Available analysis results:
+2025-08-26 14:30:17,848 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 Evaluator: Post-execution evaluation complete, ready for response generation
+2025-08-26 14:30:17,849 | INFO | scchatbot.multi_agent_base | 🔄 Routing: Post-execution evaluation complete, generating response
+2025-08-26 14:30:17,851 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Generating LLM-synthesized response with conversation awareness...
+2025-08-26 14:30:17,851 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 UNIFIED ACCESSOR: Processing 4 execution steps
+2025-08-26 14:30:17,851 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 1: process_cells for Immune cell
+2025-08-26 14:30:17,851 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling process_cells with ProcessCellsResultAccessor
+2025-08-26 14:30:17,851 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 2: validate_processing_results for step_1
+2025-08-26 14:30:17,852 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling validate_processing_results with ValidationResultAccessor
+2025-08-26 14:30:17,852 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 3: compare_cell_counts for T cell
+2025-08-26 14:30:17,852 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling compare_cell_counts with CellCountResultAccessor
+2025-08-26 14:30:17,852 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 4: display_cell_count_comparison for step_3
+2025-08-26 14:30:17,852 | INFO | scchatbot.workflow.unified_result_accessor | 🎨 VISUALIZATION DEBUG: Step 4 function: display_cell_count_comparison
+2025-08-26 14:30:17,852 | INFO | scchatbot.workflow.unified_result_accessor | 🎨 VISUALIZATION DEBUG: Parameters: {'cell_types_data': 'results from compare_cell_counts step'}
+2025-08-26 14:30:17,852 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling display_cell_count_comparison with VisualizationResultAccessor
+2025-08-26 14:30:17,852 | INFO | scchatbot.workflow.unified_result_accessor | ✅ UNIFIED ACCESSOR: Processed 4 successful steps
+2025-08-26 14:30:17,853 | INFO | scchatbot.workflow.unified_result_accessor | 🎯 UNIFIED FORMATTER: Generated 873 characters for synthesis
+2025-08-26 14:30:17,853 | INFO | scchatbot.workflow.nodes.response | ✅ Unified results extracted and formatted successfully
+2025-08-26 14:30:17,853 | INFO | scchatbot.workflow.nodes.response | ✅ Failed analyses retrieved
+2025-08-26 14:30:17,853 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Found context message (56 chars)
+2025-08-26 14:30:17,853 | INFO | scchatbot.workflow.nodes.response | ✅ Conversation context processed
+2025-08-26 14:30:17,853 | INFO | scchatbot.workflow.nodes.response | ✅ Synthesis prompt created with relevance hints
+2025-08-26 14:30:19,024 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:30:19,027 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Checking 4 execution steps
+2025-08-26 14:30:19,028 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 1: process_cells, success=True, has_result=True
+2025-08-26 14:30:19,028 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 2: validate_processing_results, success=True, has_result=True
+2025-08-26 14:30:19,028 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 3: compare_cell_counts, success=True, has_result=True
+2025-08-26 14:30:19,028 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 4: display_cell_count_comparison, success=True, has_result=True
+2025-08-26 14:30:19,029 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Added plot plot_1: Cell Count Comparison (53 chars)
+2025-08-26 14:30:19,029 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Successfully extracted 1 individual plots (total: 53 chars)
+2025-08-26 14:30:19,029 | INFO | scchatbot.workflow.nodes.response | 🎨 SIZE VALIDATION: Validated 1 plots, total size: 53 bytes
+2025-08-26 14:30:19,030 | INFO | scchatbot.workflow.nodes.response | 🎯 ResponseGeneratorNode: Found 1 individual plots
+2025-08-26 14:30:19,030 | INFO | scchatbot.workflow.nodes.response | 🎨 Creating multiple messages structure: 1 plots + 1 text (plots first)
+2025-08-26 14:30:19,033 | INFO | scchatbot.workflow.nodes.response | 🎨 Created multiple messages structure with 2 total messages (plots first, then text)
+2025-08-26 14:30:19,034 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Generated response (304 chars)
+2025-08-26 14:30:19,121 | INFO | scchatbot.multi_agent_base | ✅ Conversation recorded in vector database
+2025-08-26 14:30:19,121 | INFO | scchatbot.multi_agent_base | 💾 Session state saved for '36fac317' with 8 available cell types
+2025-08-26 14:34:29,199 | INFO | django.utils.autoreload | /Users/seanchiu/Desktop/scchat_fin/scChat/scchatbot/workflow/nodes/execution.py changed, reloading.
+2025-08-26 14:34:31,390 | INFO | django.utils.autoreload | Watching for file changes with StatReloader
+2025-08-26 14:35:28,575 | INFO | django.utils.autoreload | Watching for file changes with StatReloader
+2025-08-26 14:35:33,331 | INFO | faiss.loader | Loading faiss.
+2025-08-26 14:35:33,355 | INFO | faiss.loader | Successfully loaded faiss.
+2025-08-26 14:35:34,227 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-26 14:35:35,960 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-26 14:35:36,040 | INFO | scchatbot.workflow.function_history | ✅ Vector database initialized at conversation_history/conversation_vectors
+2025-08-26 14:35:36,042 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-26 14:35:36,053 | INFO | scchatbot.workflow.function_history | ✅ Enrichment vector database initialized at conversation_history/conversation_vectors/enrichment
+2025-08-26 14:35:36,926 | INFO | jax._src.xla_bridge | Unable to initialize backend 'cuda': 
+2025-08-26 14:35:36,927 | INFO | jax._src.xla_bridge | Unable to initialize backend 'rocm': module 'jaxlib.xla_extension' has no attribute 'GpuAllocatorConfig'
+2025-08-26 14:35:36,929 | INFO | jax._src.xla_bridge | Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: dlopen(libtpu.so, 0x0001): tried: 'libtpu.so' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibtpu.so' (no such file), '/opt/anaconda3/envs/ScChatbot/bin/../lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache), 'libtpu.so' (no such file), '/usr/local/lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache)
+2025-08-26 14:35:54,894 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:36:06,906 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:38:33,480 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:38:34,561 | INFO | scchatbot.multi_agent_base | ✅ Unified hierarchical cell type management initialized
+2025-08-26 14:38:34,561 | INFO | scchatbot.multi_agent_base | ✅ Unified cell type extractor initialized
+2025-08-26 14:38:34,561 | INFO | scchatbot.multi_agent_base | 1
+2025-08-26 14:38:35,214 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: mps
+2025-08-26 14:38:35,214 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-26 14:38:36,605 | INFO | scchatbot.multi_agent_base | 2
+2025-08-26 14:38:36,607 | INFO | scchatbot.multi_agent_base | 3
+2025-08-26 14:38:36,607 | INFO | scchatbot.multi_agent_base | ✅ Session state management initialized
+2025-08-26 14:40:07,920 | WARNING | django.request | Not Found: /ws/chat/36fac317/
+2025-08-26 14:40:10,965 | WARNING | django.request | Not Found: /ws/chat/36fac317/
+2025-08-26 14:40:13,977 | WARNING | django.request | Not Found: /ws/chat/36fac317/
+2025-08-26 14:40:14,405 | INFO | scchatbot.multi_agent_base | 🆕 Creating new session state for '36fac317'
+2025-08-26 14:40:14,406 | INFO | scchatbot.workflow.node_base | 🔄 InputProcessor: Starting execution
+2025-08-26 14:40:14,407 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell....
+2025-08-26 14:40:15,697 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:40:15,708 | INFO | scchatbot.workflow.nodes.input_processing | 🔍 LLM search query response: '```json
+["current_session_state"]
+```'
+2025-08-26 14:40:15,708 | INFO | scchatbot.workflow.nodes.input_processing | 🧠 LLM requested 1 context sources: ['current_session_state']
+2025-08-26 14:40:15,708 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Building session context...
+2025-08-26 14:40:15,708 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Found 0 cell types: []
+2025-08-26 14:40:15,709 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Generated 33 chars, starts with: 'No current session data available...'
+2025-08-26 14:40:15,709 | INFO | scchatbot.workflow.nodes.input_processing | ✅ Added current session state context (33 chars)
+2025-08-26 14:40:15,709 | INFO | scchatbot.workflow.nodes.input_processing | 🔍 SESSION CONTEXT DEBUG: First 100 chars: 'No current session data available...'
+2025-08-26 14:40:15,709 | INFO | scchatbot.workflow.nodes.input_processing | ✅ Added fresh unified context (56 chars)
+2025-08-26 14:40:15,709 | INFO | scchatbot.workflow.nodes.input_processing | 🔄 Initialized with 4 initial cell types
+2025-08-26 14:40:15,709 | INFO | scchatbot.workflow.node_base | ✅ InputProcessor: Execution complete
+2025-08-26 14:40:15,713 | INFO | scchatbot.workflow.node_base | 🔄 Planner: Starting execution
+2025-08-26 14:40:15,714 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell....
+2025-08-26 14:40:15,715 | INFO | scchatbot.workflow.nodes.planning | 🧬 PLANNER: Cell type status for planning:
+2025-08-26 14:40:15,715 | INFO | scchatbot.workflow.nodes.planning |    • Initial types: 4
+2025-08-26 14:40:15,715 | INFO | scchatbot.workflow.nodes.planning |    • Currently available: 4
+2025-08-26 14:40:15,715 | INFO | scchatbot.workflow.nodes.planning |    • Discovered this session: 0
+2025-08-26 14:40:15,715 | INFO | scchatbot.workflow.nodes.planning | 🧬 Planning for question: 'Compare the cell counts of each condition for T cell.'
+2025-08-26 14:40:18,405 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:40:20,173 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:40:20,182 | INFO | scchatbot.workflow.nodes.planning | 🧬 Planner identified needed cell types: ['T cell']
+2025-08-26 14:40:20,182 | INFO | scchatbot.workflow.nodes.planning | 🧬 Available cell types: ['Epithelial cell', 'Stromal cell', 'Immune cell', 'Glial cell']
+2025-08-26 14:40:20,182 | INFO | scchatbot.workflow.nodes.planning | 📋 Preserving LLM analysis step: compare_cell_counts(T cell)
+2025-08-26 14:40:20,306 | INFO | scchatbot.workflow.nodes.planning | 🧬 Creating discovery steps only...
+2025-08-26 14:40:20,326 | INFO | scchatbot.workflow.nodes.planning | 🔄 Found path from 'Immune cell' to 'T cell': Immune cell → T cell
+2025-08-26 14:40:20,326 | INFO | scchatbot.workflow.nodes.planning | 🧬 Added process_cells(Immune cell) to discover ['T cell']
+2025-08-26 14:40:20,326 | INFO | scchatbot.workflow.nodes.planning | 🔍 Created validation step for process_cells(Immune cell) expecting: ['T cell']
+2025-08-26 14:40:20,326 | INFO | scchatbot.workflow.nodes.planning | 🔄 Interleaved: process_cells(Immune cell) → validation(Immune cell)
+2025-08-26 14:40:20,326 | INFO | scchatbot.workflow.nodes.planning | 📋 Plan merge complete:
+2025-08-26 14:40:20,326 | INFO | scchatbot.workflow.nodes.planning |    - Discovery steps: 1
+2025-08-26 14:40:20,326 | INFO | scchatbot.workflow.nodes.planning |    - Validation steps: 1
+2025-08-26 14:40:20,327 | INFO | scchatbot.workflow.nodes.planning |    - Analysis steps: 1
+2025-08-26 14:40:20,327 | INFO | scchatbot.workflow.nodes.planning |    - Other steps: 1
+2025-08-26 14:40:20,327 | INFO | scchatbot.workflow.nodes.planning |    - Filtered out: 0 steps for undiscoverable types
+2025-08-26 14:40:20,327 | INFO | scchatbot.workflow.nodes.planning | 🔍 ENRICHMENT DEBUG: Found 0 enrichment steps
+2025-08-26 14:40:20,327 | INFO | scchatbot.workflow.nodes.planning | 🔍 PATHWAY EXTRACTOR: Processing 4 steps
+2025-08-26 14:40:20,327 | INFO | scchatbot.workflow.nodes.planning | ✅ Planner created execution plan with 4 steps
+2025-08-26 14:40:20,327 | INFO | scchatbot.workflow.nodes.planning |    • 1 process_cells steps
+2025-08-26 14:40:20,327 | INFO | scchatbot.workflow.nodes.planning |    • 1 validation steps
+2025-08-26 14:40:20,327 | INFO | scchatbot.workflow.nodes.planning |    • 2 analysis steps
+2025-08-26 14:40:20,327 | INFO | scchatbot.workflow.node_base | ✅ Planner: Execution complete
+2025-08-26 14:40:20,327 | INFO | scchatbot.workflow.nodes.planning | FINAL PLAN : 
+2025-08-26 14:40:20,327 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-08-26 14:40:20,327 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell....
+2025-08-26 14:40:20,328 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 1: Process Immune cell to discover T cell
+2025-08-26 14:40:20,328 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'process_cells'
+2025-08-26 14:40:25,919 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:40:33,682 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:07,599 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:07,606 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 1 completed successfully
+2025-08-26 14:41:07,606 | INFO | scchatbot.workflow.nodes.execution | 🔍 EXECUTION NODE: About to call CellTypeExtractor.extract_from_annotation_result() for process_cells step
+2025-08-26 14:41:07,607 | INFO | scchatbot.workflow.nodes.execution | 🧬 Updating hierarchy manager with new cell types: ['T cell', 'B cell', 'Mononuclear phagocyte', 'Natural killer cell', 'Mast cell']
+2025-08-26 14:41:07,626 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: T cell
+2025-08-26 14:41:07,626 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: B cell
+2025-08-26 14:41:07,626 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: Mononuclear phagocyte
+2025-08-26 14:41:07,626 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: Natural killer cell
+2025-08-26 14:41:07,626 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: Mast cell
+2025-08-26 14:41:07,627 | INFO | scchatbot.workflow.nodes.execution | 📊 Structured storage: process_cells - Full data preserved
+2025-08-26 14:41:07,627 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 2
+2025-08-26 14:41:07,627 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-08-26 14:41:07,627 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Executing validation step...
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.node_base | 🔄 Validation: Starting execution
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.node_base |    Current message: Validating Immune cell -> ['T cell']...
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Exact match found: 'T cell'
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.node_base | ✅ Validation: Execution complete
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Validation passed: All 1 expected cell types found successfully
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 CALLING update_remaining_steps_with_discovered_types with result status: success
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.nodes.evaluation | 🔄 Updating remaining steps: expected=['T cell'], found=['T cell'], missing=[]
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Validation result full structure: {'status': 'success', 'message': 'All 1 expected cell types found successfully', 'found_children': ['T cell'], 'missing_children': [], 'available_types': ['B cell', 'T cell', 'Mast cell', 'Mononuclear phagocyte', 'Epithelial cell', 'Stromal cell', 'Glial cell', 'Natural killer cell']}
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Will skip steps for missing cell types: []
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 DEBUG: Scanning 2 remaining steps...
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 DEBUG: Step 3: compare_cell_counts(cell_type='T cell')
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 DEBUG: Step 3 cell type 'T cell' not in missing list []
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 DEBUG: Step 4: display_cell_count_comparison(params={'cell_types_data': 'results from compare_cell_counts'})
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 DEBUG: Step 4 cell type 'None' not in missing list []
+2025-08-26 14:41:07,628 | INFO | scchatbot.workflow.nodes.evaluation | 🔄 Advanced to step 3
+2025-08-26 14:41:07,629 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-08-26 14:41:07,629 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell....
+2025-08-26 14:41:07,629 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 3: Compare the cell counts of T cells between different experimental conditions.
+2025-08-26 14:41:07,629 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'compare_cell_counts'
+2025-08-26 14:41:07,629 | INFO | scchatbot.multi_agent_base | 🔍 compare_cell_counts called with cell_type='T cell', kwargs={'cell_type': 'T cell'}
+2025-08-26 14:41:07,629 | INFO | scchatbot.multi_agent_base | 🔄 Processing single cell type comparison: T cell
+2025-08-26 14:41:07,667 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 3 completed successfully
+2025-08-26 14:41:07,671 | INFO | scchatbot.workflow.nodes.execution | 📊 Structured storage: compare_cell_counts - Full data preserved
+2025-08-26 14:41:07,671 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 4
+2025-08-26 14:41:07,671 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-08-26 14:41:07,671 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-08-26 14:41:07,672 | INFO | scchatbot.workflow.nodes.evaluation | 🔄 Steps still remaining (3/4), skipping post-execution evaluation
+2025-08-26 14:41:07,672 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-08-26 14:41:07,672 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell....
+2025-08-26 14:41:07,672 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 4: Visualize the comparison of T cell counts across conditions.
+2025-08-26 14:41:07,672 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'display_cell_count_comparison'
+2025-08-26 14:41:07,673 | INFO | scchatbot.workflow.nodes.execution | 🔍 AGGREGATION: Handling display_cell_count_comparison - aggregating compare_cell_counts results
+2025-08-26 14:41:07,673 | INFO | scchatbot.workflow.nodes.execution | 🔍 AGGREGATION: Added data for T cell: dict entries
+2025-08-26 14:41:07,673 | INFO | scchatbot.workflow.nodes.execution | ✅ AGGREGATION: Successfully aggregated data for 1 cell types
+2025-08-26 14:41:07,673 | INFO | scchatbot.multi_agent_base | 🔍 VIZ WRAPPER DEBUG: display_cell_count_comparison called with kwargs: {'cell_types_data': {'T cell': [{'category': 'cataract', 'cell_count': 205, 'description': 'This is a condition where the lens of the eye becomes cloudy.'}, {'category': 'basal laminar drusen', 'cell_count': 153, 'description': "These are deposits that accumulate between the RPE and Bruch's membrane and are a hallmark of aging and a risk factor for AMD."}, {'category': 'age related macular degeneration', 'cell_count': 177, 'description': 'This is a primary focus of the study as it is a leading cause of irreversible blindness where dysfunction of the RPE and choroid is heavily implicated.'}]}}
+2025-08-26 14:41:08,175 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 4 completed successfully
+2025-08-26 14:41:08,176 | INFO | scchatbot.workflow.nodes.execution | 🎨 Visualization storage: display_cell_count_comparison - HTML preserved
+2025-08-26 14:41:08,176 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 5
+2025-08-26 14:41:08,176 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-08-26 14:41:08,176 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-08-26 14:41:08,177 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 All steps complete (4/4), running post-execution evaluation
+2025-08-26 14:41:08,177 | INFO | scchatbot.workflow.nodes.evaluation | 🏁 Evaluator: Starting sophisticated post-execution evaluation...
+2025-08-26 14:41:08,177 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Starting post-execution evaluation...
+2025-08-26 14:41:09,822 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:10,414 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:10,415 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:41:10,415 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: T cell
+2025-08-26 14:41:10,922 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:10,957 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:41:11,476 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:11,478 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for T cell: '```json
+["compare_cell_counts"]
+```' (length: 35)
+2025-08-26 14:41:11,479 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for T cell: ['compare_cell_counts']
+2025-08-26 14:41:11,479 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'T cell' is in unavailable list: []
+2025-08-26 14:41:11,479 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 4 entries
+2025-08-26 14:41:11,479 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for T cell: compare_cell_counts (execution 3)
+2025-08-26 14:41:11,479 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for T cell: ['compare_cell_counts']
+2025-08-26 14:41:11,479 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for T cell
+2025-08-26 14:41:11,480 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Post-execution evaluation complete: 0 total supplementary steps
+2025-08-26 14:41:11,480 | INFO | scchatbot.workflow.nodes.evaluation | 📝 Generated relevance hints for cell_abundance question
+2025-08-26 14:41:11,480 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Execution Summary:
+2025-08-26 14:41:11,480 | INFO | scchatbot.workflow.nodes.evaluation |    • Total steps executed: 4
+2025-08-26 14:41:11,480 | INFO | scchatbot.workflow.nodes.evaluation |    • Successful: 4
+2025-08-26 14:41:11,480 | INFO | scchatbot.workflow.nodes.evaluation |    • Failed: 0
+2025-08-26 14:41:11,480 | INFO | scchatbot.workflow.nodes.evaluation |    • Supplementary steps generated: 0
+2025-08-26 14:41:11,481 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Available analysis results:
+2025-08-26 14:41:11,481 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 Evaluator: Post-execution evaluation complete, ready for response generation
+2025-08-26 14:41:11,482 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 All steps complete (4/4), running post-execution evaluation
+2025-08-26 14:41:11,482 | INFO | scchatbot.workflow.nodes.evaluation | 🏁 Evaluator: Starting sophisticated post-execution evaluation...
+2025-08-26 14:41:11,482 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Starting post-execution evaluation...
+2025-08-26 14:41:13,262 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:13,714 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:13,722 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:41:13,722 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: T cell
+2025-08-26 14:41:14,414 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:14,431 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:41:14,914 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:14,917 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for T cell: '```json
+["compare_cell_counts"]
+```' (length: 35)
+2025-08-26 14:41:14,917 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for T cell: ['compare_cell_counts']
+2025-08-26 14:41:14,918 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'T cell' is in unavailable list: []
+2025-08-26 14:41:14,918 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 4 entries
+2025-08-26 14:41:14,918 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for T cell: compare_cell_counts (execution 3)
+2025-08-26 14:41:14,919 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for T cell: ['compare_cell_counts']
+2025-08-26 14:41:14,919 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for T cell
+2025-08-26 14:41:14,920 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Post-execution evaluation complete: 0 total supplementary steps
+2025-08-26 14:41:14,922 | INFO | scchatbot.workflow.nodes.evaluation | 📝 Generated relevance hints for cell_abundance question
+2025-08-26 14:41:14,922 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Execution Summary:
+2025-08-26 14:41:14,923 | INFO | scchatbot.workflow.nodes.evaluation |    • Total steps executed: 4
+2025-08-26 14:41:14,923 | INFO | scchatbot.workflow.nodes.evaluation |    • Successful: 4
+2025-08-26 14:41:14,923 | INFO | scchatbot.workflow.nodes.evaluation |    • Failed: 0
+2025-08-26 14:41:14,923 | INFO | scchatbot.workflow.nodes.evaluation |    • Supplementary steps generated: 0
+2025-08-26 14:41:14,924 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Available analysis results:
+2025-08-26 14:41:14,924 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 Evaluator: Post-execution evaluation complete, ready for response generation
+2025-08-26 14:41:14,924 | INFO | scchatbot.multi_agent_base | 🔄 Routing: Post-execution evaluation complete, generating response
+2025-08-26 14:41:14,926 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Generating LLM-synthesized response with conversation awareness...
+2025-08-26 14:41:14,926 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 UNIFIED ACCESSOR: Processing 4 execution steps
+2025-08-26 14:41:14,926 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 1: process_cells for Immune cell
+2025-08-26 14:41:14,926 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling process_cells with ProcessCellsResultAccessor
+2025-08-26 14:41:14,926 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 2: validate_processing_results for step_1
+2025-08-26 14:41:14,927 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling validate_processing_results with ValidationResultAccessor
+2025-08-26 14:41:14,927 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 3: compare_cell_counts for T cell
+2025-08-26 14:41:14,927 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling compare_cell_counts with CellCountResultAccessor
+2025-08-26 14:41:14,927 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 4: display_cell_count_comparison for step_3
+2025-08-26 14:41:14,927 | INFO | scchatbot.workflow.unified_result_accessor | 🎨 VISUALIZATION DEBUG: Step 4 function: display_cell_count_comparison
+2025-08-26 14:41:14,927 | INFO | scchatbot.workflow.unified_result_accessor | 🎨 VISUALIZATION DEBUG: Parameters: {'cell_types_data': 'results from compare_cell_counts'}
+2025-08-26 14:41:14,927 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling display_cell_count_comparison with VisualizationResultAccessor
+2025-08-26 14:41:14,927 | INFO | scchatbot.workflow.unified_result_accessor | ✅ UNIFIED ACCESSOR: Processed 4 successful steps
+2025-08-26 14:41:14,927 | INFO | scchatbot.workflow.unified_result_accessor | 🎯 UNIFIED FORMATTER: Generated 877 characters for synthesis
+2025-08-26 14:41:14,927 | INFO | scchatbot.workflow.nodes.response | ✅ Unified results extracted and formatted successfully
+2025-08-26 14:41:14,928 | INFO | scchatbot.workflow.nodes.response | ✅ Failed analyses retrieved
+2025-08-26 14:41:14,928 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Found context message (56 chars)
+2025-08-26 14:41:14,928 | INFO | scchatbot.workflow.nodes.response | ✅ Conversation context processed
+2025-08-26 14:41:14,928 | INFO | scchatbot.workflow.nodes.response | ✅ Synthesis prompt created with relevance hints
+2025-08-26 14:41:16,217 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:16,220 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Checking 4 execution steps
+2025-08-26 14:41:16,223 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 1: process_cells, success=True, has_result=True
+2025-08-26 14:41:16,225 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 2: validate_processing_results, success=True, has_result=True
+2025-08-26 14:41:16,225 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 3: compare_cell_counts, success=True, has_result=True
+2025-08-26 14:41:16,225 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 4: display_cell_count_comparison, success=True, has_result=True
+2025-08-26 14:41:16,225 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Added plot plot_1: Cell Count Comparison (10074 chars)
+2025-08-26 14:41:16,225 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Successfully extracted 1 individual plots (total: 10,074 chars)
+2025-08-26 14:41:16,225 | INFO | scchatbot.workflow.nodes.response | 🎨 SIZE VALIDATION: Validated 1 plots, total size: 10,074 bytes
+2025-08-26 14:41:16,225 | INFO | scchatbot.workflow.nodes.response | 🎯 ResponseGeneratorNode: Found 1 individual plots
+2025-08-26 14:41:16,226 | INFO | scchatbot.workflow.nodes.response | 🎨 Creating multiple messages structure: 1 plots + 1 text (plots first)
+2025-08-26 14:41:16,226 | INFO | scchatbot.workflow.nodes.response | 🎨 Created multiple messages structure with 2 total messages (plots first, then text)
+2025-08-26 14:41:16,226 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Generated response (283 chars)
+2025-08-26 14:41:16,331 | INFO | scchatbot.multi_agent_base | ✅ Conversation recorded in vector database
+2025-08-26 14:41:16,331 | INFO | scchatbot.multi_agent_base | 💾 Session state saved for '36fac317' with 8 available cell types
+2025-08-26 14:41:49,603 | INFO | scchatbot.multi_agent_base | 🔄 Reusing session state for '36fac317' with 8 available cell types
+2025-08-26 14:41:49,606 | INFO | scchatbot.workflow.node_base | 🔄 InputProcessor: Starting execution
+2025-08-26 14:41:49,606 | INFO | scchatbot.workflow.node_base |    Current message: What are the cell types we get right now?...
+2025-08-26 14:41:50,279 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:50,282 | INFO | scchatbot.workflow.nodes.input_processing | 🔍 LLM search query response: '```json
+["current_session_state"]
+```'
+2025-08-26 14:41:50,283 | INFO | scchatbot.workflow.nodes.input_processing | 🧠 LLM requested 1 context sources: ['current_session_state']
+2025-08-26 14:41:50,283 | INFO | scchatbot.workflow.nodes.input_processing | 🧹 CONTEXT CLEANUP: Removing old context message (56 chars)
+2025-08-26 14:41:50,283 | INFO | scchatbot.workflow.nodes.input_processing | 🧹 CONTEXT CLEANUP: Removed 1 old context messages
+2025-08-26 14:41:50,283 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Building session context...
+2025-08-26 14:41:50,283 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Found 8 cell types: ['B cell', 'T cell', 'Mast cell', 'Mononuclear phagocyte', 'Epithelial cell', 'Stromal cell', 'Glial cell', 'Natural killer cell']
+2025-08-26 14:41:50,283 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Generated 250 chars, starts with: 'Cell types currently available in the dataset:
+  •...'
+2025-08-26 14:41:50,283 | INFO | scchatbot.workflow.nodes.input_processing | ✅ Added current session state context (250 chars)
+2025-08-26 14:41:50,283 | INFO | scchatbot.workflow.nodes.input_processing | 🔍 SESSION CONTEXT DEBUG: First 100 chars: 'Cell types currently available in the dataset:
+  • B cell
+  • Epithelial cell
+  • Glial cell
+  • Mas...'
+2025-08-26 14:41:50,284 | INFO | scchatbot.workflow.nodes.input_processing | ✅ Added fresh unified context (273 chars)
+2025-08-26 14:41:50,284 | INFO | scchatbot.workflow.nodes.input_processing | ✅ Preserving 8 discovered cell types from previous operations
+2025-08-26 14:41:50,284 | INFO | scchatbot.workflow.nodes.input_processing |    Preserved types: ['B cell', 'Epithelial cell', 'Glial cell', 'Mast cell', 'Mononuclear phagocyte', 'Natural killer cell', 'Stromal cell', 'T cell']
+2025-08-26 14:41:50,284 | INFO | scchatbot.workflow.node_base | ✅ InputProcessor: Execution complete
+2025-08-26 14:41:50,285 | INFO | scchatbot.workflow.node_base | 🔄 Planner: Starting execution
+2025-08-26 14:41:50,285 | INFO | scchatbot.workflow.node_base |    Current message: What are the cell types we get right now?...
+2025-08-26 14:41:50,285 | INFO | scchatbot.workflow.nodes.planning | 🧬 PLANNER: Cell type status for planning:
+2025-08-26 14:41:50,288 | INFO | scchatbot.workflow.nodes.planning |    • Initial types: 4
+2025-08-26 14:41:50,288 | INFO | scchatbot.workflow.nodes.planning |    • Currently available: 8
+2025-08-26 14:41:50,288 | INFO | scchatbot.workflow.nodes.planning |    • Discovered this session: 4
+2025-08-26 14:41:50,288 | INFO | scchatbot.workflow.nodes.planning |    • New types discovered: B cell, Mast cell, Mononuclear phagocyte, Natural killer cell, T cell
+2025-08-26 14:41:50,289 | INFO | scchatbot.workflow.nodes.planning | 🧬 Planning for question: 'What are the cell types we get right now?'
+2025-08-26 14:41:51,932 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:52,987 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:53,009 | INFO | scchatbot.workflow.nodes.planning | 🔍 No specific cell types identified in question
+2025-08-26 14:41:53,009 | INFO | scchatbot.workflow.nodes.planning | 🔍 ENRICHMENT DEBUG: Found 0 enrichment steps
+2025-08-26 14:41:53,009 | INFO | scchatbot.workflow.nodes.planning | 🔍 PATHWAY EXTRACTOR: Processing 1 steps
+2025-08-26 14:41:53,009 | INFO | scchatbot.workflow.nodes.planning | ✅ Planner created execution plan with 1 steps
+2025-08-26 14:41:53,009 | INFO | scchatbot.workflow.nodes.planning |    • 0 process_cells steps
+2025-08-26 14:41:53,009 | INFO | scchatbot.workflow.nodes.planning |    • 0 validation steps
+2025-08-26 14:41:53,009 | INFO | scchatbot.workflow.nodes.planning |    • 0 analysis steps
+2025-08-26 14:41:53,009 | INFO | scchatbot.workflow.node_base | ✅ Planner: Execution complete
+2025-08-26 14:41:53,015 | INFO | scchatbot.workflow.nodes.planning | FINAL PLAN : 
+2025-08-26 14:41:53,016 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-08-26 14:41:53,016 | INFO | scchatbot.workflow.node_base |    Current message: What are the cell types we get right now?...
+2025-08-26 14:41:53,017 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 1: Respond to the user's query by listing the currently available cell types.
+2025-08-26 14:41:53,017 | INFO | scchatbot.workflow.nodes.execution | ℹ️ No function for this step; treating as direct-answer/no-op.
+2025-08-26 14:41:53,018 | INFO | scchatbot.workflow.nodes.execution | 📄 Text storage: direct_answer - Truncated to 500 chars
+2025-08-26 14:41:53,018 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 2
+2025-08-26 14:41:53,018 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-08-26 14:41:53,019 | INFO | scchatbot.workflow.nodes.evaluation | ℹ️ Evaluator: no callable steps in plan; skipping post-execution evaluation.
+2025-08-26 14:41:53,019 | INFO | scchatbot.workflow.nodes.evaluation | ℹ️ Evaluator: no callable steps in plan; skipping post-execution evaluation.
+2025-08-26 14:41:53,019 | INFO | scchatbot.multi_agent_base | 🔄 Routing: Post-execution evaluation complete, generating response
+2025-08-26 14:41:53,020 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Generating LLM-synthesized response with conversation awareness...
+2025-08-26 14:41:53,020 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 UNIFIED ACCESSOR: Processing 1 execution steps
+2025-08-26 14:41:53,020 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 1: direct_answer for step_0
+2025-08-26 14:41:53,020 | INFO | scchatbot.workflow.unified_result_accessor | ⚠️ No accessor found for function: direct_answer
+2025-08-26 14:41:53,020 | INFO | scchatbot.workflow.unified_result_accessor | ✅ UNIFIED ACCESSOR: Processed 1 successful steps
+2025-08-26 14:41:53,021 | INFO | scchatbot.workflow.unified_result_accessor | 🎯 UNIFIED FORMATTER: Generated 64 characters for synthesis
+2025-08-26 14:41:53,021 | INFO | scchatbot.workflow.nodes.response | ✅ Unified results extracted and formatted successfully
+2025-08-26 14:41:53,021 | INFO | scchatbot.workflow.nodes.response | ✅ Failed analyses retrieved
+2025-08-26 14:41:53,021 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Found context message (273 chars)
+2025-08-26 14:41:53,021 | INFO | scchatbot.workflow.nodes.response | ✅ Conversation context processed
+2025-08-26 14:41:53,021 | INFO | scchatbot.workflow.nodes.response | ✅ Synthesis prompt created with relevance hints
+2025-08-26 14:41:55,317 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:41:55,318 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Checking 1 execution steps
+2025-08-26 14:41:55,318 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 1: direct_answer, success=True, has_result=True
+2025-08-26 14:41:55,318 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: No valid plots found
+2025-08-26 14:41:55,318 | INFO | scchatbot.workflow.nodes.response | 🎯 ResponseGeneratorNode: Found 0 individual plots
+2025-08-26 14:41:55,318 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Generated response (389 chars)
+2025-08-26 14:41:55,351 | INFO | scchatbot.multi_agent_base | ✅ Conversation recorded in vector database
+2025-08-26 14:41:55,351 | INFO | scchatbot.multi_agent_base | 💾 Session state saved for '36fac317' with 8 available cell types
+2025-08-26 14:42:20,039 | INFO | scchatbot.multi_agent_base | 🔄 Reusing session state for '36fac317' with 8 available cell types
+2025-08-26 14:42:20,041 | INFO | scchatbot.workflow.node_base | 🔄 InputProcessor: Starting execution
+2025-08-26 14:42:20,041 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell, B cell, Glial cell, and epithelial cell....
+2025-08-26 14:42:20,889 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:20,890 | INFO | scchatbot.workflow.nodes.input_processing | 🔍 LLM search query response: '```json
+["current_session_state"]
+```'
+2025-08-26 14:42:20,890 | INFO | scchatbot.workflow.nodes.input_processing | 🧠 LLM requested 1 context sources: ['current_session_state']
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.nodes.input_processing | 🧹 CONTEXT CLEANUP: Removing old context message (273 chars)
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.nodes.input_processing | 🧹 CONTEXT CLEANUP: Removed 1 old context messages
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Building session context...
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Found 8 cell types: ['B cell', 'T cell', 'Mast cell', 'Mononuclear phagocyte', 'Epithelial cell', 'Stromal cell', 'Glial cell', 'Natural killer cell']
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Generated 226 chars, starts with: 'Cell types currently available in the dataset:
+  •...'
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.nodes.input_processing | ✅ Added current session state context (226 chars)
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.nodes.input_processing | 🔍 SESSION CONTEXT DEBUG: First 100 chars: 'Cell types currently available in the dataset:
+  • B cell
+  • Epithelial cell
+  • Glial cell
+  • Mas...'
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.nodes.input_processing | ✅ Added fresh unified context (249 chars)
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.nodes.input_processing | ✅ Preserving 8 discovered cell types from previous operations
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.nodes.input_processing |    Preserved types: ['B cell', 'Epithelial cell', 'Glial cell', 'Mast cell', 'Mononuclear phagocyte', 'Natural killer cell', 'Stromal cell', 'T cell']
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.node_base | ✅ InputProcessor: Execution complete
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.node_base | 🔄 Planner: Starting execution
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell, B cell, Glial cell, and epithelial cell....
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.nodes.planning | 🧬 PLANNER: Cell type status for planning:
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.nodes.planning |    • Initial types: 4
+2025-08-26 14:42:20,891 | INFO | scchatbot.workflow.nodes.planning |    • Currently available: 8
+2025-08-26 14:42:20,892 | INFO | scchatbot.workflow.nodes.planning |    • Discovered this session: 4
+2025-08-26 14:42:20,892 | INFO | scchatbot.workflow.nodes.planning |    • New types discovered: B cell, Mast cell, Mononuclear phagocyte, Natural killer cell, T cell
+2025-08-26 14:42:20,892 | INFO | scchatbot.workflow.nodes.planning | 🧬 Planning for question: 'Compare the cell counts of each condition for T cell, B cell, Glial cell, and epithelial cell.'
+2025-08-26 14:42:24,717 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:26,531 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:26,534 | INFO | scchatbot.workflow.nodes.planning | 🧬 Planner identified needed cell types: ['T cell', 'B cell', 'Glial cell', 'Epithelial cell']
+2025-08-26 14:42:26,535 | INFO | scchatbot.workflow.nodes.planning | 🧬 Available cell types: ['B cell', 'T cell', 'Mast cell', 'Mononuclear phagocyte', 'Epithelial cell', 'Stromal cell', 'Glial cell', 'Natural killer cell']
+2025-08-26 14:42:26,535 | INFO | scchatbot.workflow.nodes.planning | 📋 Preserving LLM analysis step: compare_cell_counts(T cell)
+2025-08-26 14:42:26,535 | INFO | scchatbot.workflow.nodes.planning | 📋 Preserving LLM analysis step: compare_cell_counts(B cell)
+2025-08-26 14:42:26,535 | INFO | scchatbot.workflow.nodes.planning | 📋 Preserving LLM analysis step: compare_cell_counts(Glial cell)
+2025-08-26 14:42:26,535 | INFO | scchatbot.workflow.nodes.planning | 📋 Preserving LLM analysis step: compare_cell_counts(Epithelial cell)
+2025-08-26 14:42:26,535 | INFO | scchatbot.workflow.nodes.planning | ✅ 'T cell' already available
+2025-08-26 14:42:26,535 | INFO | scchatbot.workflow.nodes.planning | ✅ 'B cell' already available
+2025-08-26 14:42:26,535 | INFO | scchatbot.workflow.nodes.planning | ✅ 'Glial cell' already available
+2025-08-26 14:42:26,535 | INFO | scchatbot.workflow.nodes.planning | ✅ 'Epithelial cell' already available
+2025-08-26 14:42:26,535 | INFO | scchatbot.workflow.nodes.planning | 📋 Plan merge complete:
+2025-08-26 14:42:26,535 | INFO | scchatbot.workflow.nodes.planning |    - Discovery steps: 0
+2025-08-26 14:42:26,536 | INFO | scchatbot.workflow.nodes.planning |    - Validation steps: 0
+2025-08-26 14:42:26,536 | INFO | scchatbot.workflow.nodes.planning |    - Analysis steps: 4
+2025-08-26 14:42:26,536 | INFO | scchatbot.workflow.nodes.planning |    - Other steps: 1
+2025-08-26 14:42:26,536 | INFO | scchatbot.workflow.nodes.planning |    - Filtered out: 0 steps for undiscoverable types
+2025-08-26 14:42:26,536 | INFO | scchatbot.workflow.nodes.planning | 🔍 ENRICHMENT DEBUG: Found 0 enrichment steps
+2025-08-26 14:42:26,536 | INFO | scchatbot.workflow.nodes.planning | 🔍 PATHWAY EXTRACTOR: Processing 5 steps
+2025-08-26 14:42:26,536 | INFO | scchatbot.workflow.nodes.planning | ✅ Planner created execution plan with 5 steps
+2025-08-26 14:42:26,536 | INFO | scchatbot.workflow.nodes.planning |    • 0 process_cells steps
+2025-08-26 14:42:26,536 | INFO | scchatbot.workflow.nodes.planning |    • 0 validation steps
+2025-08-26 14:42:26,536 | INFO | scchatbot.workflow.nodes.planning |    • 4 analysis steps
+2025-08-26 14:42:26,536 | INFO | scchatbot.workflow.node_base | ✅ Planner: Execution complete
+2025-08-26 14:42:26,536 | INFO | scchatbot.workflow.nodes.planning | FINAL PLAN : 
+2025-08-26 14:42:26,537 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-08-26 14:42:26,537 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell, B cell, Glial cell, and epithelial cell....
+2025-08-26 14:42:26,540 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 1: Compare cell counts for T cells across experimental conditions.
+2025-08-26 14:42:26,540 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'compare_cell_counts'
+2025-08-26 14:42:26,541 | INFO | scchatbot.multi_agent_base | 🔍 compare_cell_counts called with cell_type='T cell', kwargs={'cell_type': 'T cell'}
+2025-08-26 14:42:26,541 | INFO | scchatbot.multi_agent_base | 🔄 Processing single cell type comparison: T cell
+2025-08-26 14:42:26,565 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 1 completed successfully
+2025-08-26 14:42:26,566 | INFO | scchatbot.workflow.nodes.execution | 📊 Structured storage: compare_cell_counts - Full data preserved
+2025-08-26 14:42:26,566 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 2
+2025-08-26 14:42:26,566 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-08-26 14:42:26,566 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-08-26 14:42:26,567 | INFO | scchatbot.workflow.nodes.evaluation | 🔄 Steps still remaining (1/5), skipping post-execution evaluation
+2025-08-26 14:42:26,567 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-08-26 14:42:26,567 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell, B cell, Glial cell, and epithelial cell....
+2025-08-26 14:42:26,567 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 2: Compare cell counts for B cells across experimental conditions.
+2025-08-26 14:42:26,568 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'compare_cell_counts'
+2025-08-26 14:42:26,568 | INFO | scchatbot.multi_agent_base | 🔍 compare_cell_counts called with cell_type='B cell', kwargs={'cell_type': 'B cell'}
+2025-08-26 14:42:26,568 | INFO | scchatbot.multi_agent_base | 🔄 Processing single cell type comparison: B cell
+2025-08-26 14:42:26,593 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 2 completed successfully
+2025-08-26 14:42:26,594 | INFO | scchatbot.workflow.nodes.execution | 📊 Structured storage: compare_cell_counts - Full data preserved
+2025-08-26 14:42:26,594 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 3
+2025-08-26 14:42:26,595 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-08-26 14:42:26,595 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-08-26 14:42:26,595 | INFO | scchatbot.workflow.nodes.evaluation | 🔄 Steps still remaining (2/5), skipping post-execution evaluation
+2025-08-26 14:42:26,595 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-08-26 14:42:26,595 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell, B cell, Glial cell, and epithelial cell....
+2025-08-26 14:42:26,603 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 3: Compare cell counts for Glial cells across experimental conditions.
+2025-08-26 14:42:26,604 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'compare_cell_counts'
+2025-08-26 14:42:26,604 | INFO | scchatbot.multi_agent_base | 🔍 compare_cell_counts called with cell_type='Glial cell', kwargs={'cell_type': 'Glial cell'}
+2025-08-26 14:42:26,604 | INFO | scchatbot.multi_agent_base | 🔄 Processing single cell type comparison: Glial cell
+2025-08-26 14:42:26,621 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 3 completed successfully
+2025-08-26 14:42:26,623 | INFO | scchatbot.workflow.nodes.execution | 📊 Structured storage: compare_cell_counts - Full data preserved
+2025-08-26 14:42:26,623 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 4
+2025-08-26 14:42:26,623 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-08-26 14:42:26,623 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-08-26 14:42:26,623 | INFO | scchatbot.workflow.nodes.evaluation | 🔄 Steps still remaining (3/5), skipping post-execution evaluation
+2025-08-26 14:42:26,623 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-08-26 14:42:26,623 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell, B cell, Glial cell, and epithelial cell....
+2025-08-26 14:42:26,624 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 4: Compare cell counts for Epithelial cells across experimental conditions.
+2025-08-26 14:42:26,624 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'compare_cell_counts'
+2025-08-26 14:42:26,624 | INFO | scchatbot.multi_agent_base | 🔍 compare_cell_counts called with cell_type='Epithelial cell', kwargs={'cell_type': 'Epithelial cell'}
+2025-08-26 14:42:26,624 | INFO | scchatbot.multi_agent_base | 🔄 Processing single cell type comparison: Epithelial cell
+2025-08-26 14:42:26,641 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 4 completed successfully
+2025-08-26 14:42:26,642 | INFO | scchatbot.workflow.nodes.execution | 📊 Structured storage: compare_cell_counts - Full data preserved
+2025-08-26 14:42:26,642 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 5
+2025-08-26 14:42:26,642 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-08-26 14:42:26,642 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-08-26 14:42:26,642 | INFO | scchatbot.workflow.nodes.evaluation | 🔄 Steps still remaining (4/5), skipping post-execution evaluation
+2025-08-26 14:42:26,642 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-08-26 14:42:26,642 | INFO | scchatbot.workflow.node_base |    Current message: Compare the cell counts of each condition for T cell, B cell, Glial cell, and epithelial cell....
+2025-08-26 14:42:26,643 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 5: Create a visualization comparing cell counts across conditions for T cell, B cell, Glial cell, and Epithelial cell.
+2025-08-26 14:42:26,643 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'display_cell_count_comparison'
+2025-08-26 14:42:26,644 | INFO | scchatbot.workflow.nodes.execution | 🔍 AGGREGATION: Handling display_cell_count_comparison - aggregating compare_cell_counts results
+2025-08-26 14:42:26,644 | INFO | scchatbot.workflow.nodes.execution | 🔍 AGGREGATION: Added data for T cell: dict entries
+2025-08-26 14:42:26,644 | INFO | scchatbot.workflow.nodes.execution | 🔍 AGGREGATION: Added data for B cell: dict entries
+2025-08-26 14:42:26,644 | INFO | scchatbot.workflow.nodes.execution | 🔍 AGGREGATION: Added data for Glial cell: dict entries
+2025-08-26 14:42:26,644 | INFO | scchatbot.workflow.nodes.execution | 🔍 AGGREGATION: Added data for Epithelial cell: dict entries
+2025-08-26 14:42:26,645 | INFO | scchatbot.workflow.nodes.execution | ✅ AGGREGATION: Successfully aggregated data for 4 cell types
+2025-08-26 14:42:26,645 | INFO | scchatbot.multi_agent_base | 🔍 VIZ WRAPPER DEBUG: display_cell_count_comparison called with kwargs: {'cell_types_data': {'T cell': [{'category': 'cataract', 'cell_count': 205, 'description': 'This is a condition where the lens of the eye becomes cloudy.'}, {'category': 'basal laminar drusen', 'cell_count': 153, 'description': "These are deposits that accumulate between the RPE and Bruch's membrane and are a hallmark of aging and a risk factor for AMD."}, {'category': 'age related macular degeneration', 'cell_count': 177, 'description': 'This is a primary focus of the study as it is a leading cause of irreversible blindness where dysfunction of the RPE and choroid is heavily implicated.'}], 'B cell': [{'category': 'cataract', 'cell_count': 22, 'description': 'This is a condition where the lens of the eye becomes cloudy.'}, {'category': 'basal laminar drusen', 'cell_count': 62, 'description': "These are deposits that accumulate between the RPE and Bruch's membrane and are a hallmark of aging and a risk factor for AMD."}, {'category': 'age related macular degeneration', 'cell_count': 12, 'description': 'This is a primary focus of the study as it is a leading cause of irreversible blindness where dysfunction of the RPE and choroid is heavily implicated.'}], 'Glial cell': [{'category': 'cataract', 'cell_count': 103, 'description': 'This is a condition where the lens of the eye becomes cloudy.'}, {'category': 'basal laminar drusen', 'cell_count': 92, 'description': "These are deposits that accumulate between the RPE and Bruch's membrane and are a hallmark of aging and a risk factor for AMD."}, {'category': 'age related macular degeneration', 'cell_count': 338, 'description': 'This is a primary focus of the study as it is a leading cause of irreversible blindness where dysfunction of the RPE and choroid is heavily implicated.'}], 'Epithelial cell': [{'category': 'cataract', 'cell_count': 375, 'description': 'This is a condition where the lens of the eye becomes cloudy.'}, {'category': 'basal laminar drusen', 'cell_count': 231, 'description': "These are deposits that accumulate between the RPE and Bruch's membrane and are a hallmark of aging and a risk factor for AMD."}, {'category': 'age related macular degeneration', 'cell_count': 527, 'description': 'This is a primary focus of the study as it is a leading cause of irreversible blindness where dysfunction of the RPE and choroid is heavily implicated.'}]}}
+2025-08-26 14:42:26,666 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 5 completed successfully
+2025-08-26 14:42:26,668 | INFO | scchatbot.workflow.nodes.execution | 🎨 Visualization storage: display_cell_count_comparison - HTML preserved
+2025-08-26 14:42:26,668 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 6
+2025-08-26 14:42:26,668 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-08-26 14:42:26,668 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-08-26 14:42:26,669 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 All steps complete (5/5), running post-execution evaluation
+2025-08-26 14:42:26,669 | INFO | scchatbot.workflow.nodes.evaluation | 🏁 Evaluator: Starting sophisticated post-execution evaluation...
+2025-08-26 14:42:26,669 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Starting post-execution evaluation...
+2025-08-26 14:42:28,863 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:29,807 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:29,810 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:42:29,810 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: T cell
+2025-08-26 14:42:30,370 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:30,373 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:42:31,231 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:31,292 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for T cell: '```json
+["compare_cell_counts"]
+```' (length: 35)
+2025-08-26 14:42:31,292 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for T cell: ['compare_cell_counts']
+2025-08-26 14:42:31,292 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'T cell' is in unavailable list: []
+2025-08-26 14:42:31,292 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 5 entries
+2025-08-26 14:42:31,292 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for T cell: compare_cell_counts (execution 1)
+2025-08-26 14:42:31,292 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for T cell: ['compare_cell_counts']
+2025-08-26 14:42:31,292 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for T cell
+2025-08-26 14:42:31,292 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: B cell
+2025-08-26 14:42:32,415 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:32,424 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:42:32,986 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:32,990 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for B cell: '```json
+["compare_cell_counts"]
+```' (length: 35)
+2025-08-26 14:42:32,990 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for B cell: ['compare_cell_counts']
+2025-08-26 14:42:32,990 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'B cell' is in unavailable list: []
+2025-08-26 14:42:32,991 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 5 entries
+2025-08-26 14:42:32,991 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for B cell: compare_cell_counts (execution 2)
+2025-08-26 14:42:32,991 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for B cell: ['compare_cell_counts']
+2025-08-26 14:42:32,991 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for B cell
+2025-08-26 14:42:32,991 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: Glial cell
+2025-08-26 14:42:33,373 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:33,384 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:42:34,072 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:34,117 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for Glial cell: '```json
+["compare_cell_counts"]
+```' (length: 35)
+2025-08-26 14:42:34,118 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for Glial cell: ['compare_cell_counts']
+2025-08-26 14:42:34,118 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'Glial cell' is in unavailable list: []
+2025-08-26 14:42:34,118 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 5 entries
+2025-08-26 14:42:34,118 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for Glial cell: compare_cell_counts (execution 3)
+2025-08-26 14:42:34,118 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for Glial cell: ['compare_cell_counts']
+2025-08-26 14:42:34,118 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for Glial cell
+2025-08-26 14:42:34,118 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: Epithelial cell
+2025-08-26 14:42:34,965 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:34,967 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:42:35,721 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:35,724 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for Epithelial cell: '```json
+["compare_cell_counts"]
+```' (length: 35)
+2025-08-26 14:42:35,725 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for Epithelial cell: ['compare_cell_counts']
+2025-08-26 14:42:35,725 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'Epithelial cell' is in unavailable list: []
+2025-08-26 14:42:35,725 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 5 entries
+2025-08-26 14:42:35,725 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for Epithelial cell: compare_cell_counts (execution 4)
+2025-08-26 14:42:35,725 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for Epithelial cell: ['compare_cell_counts']
+2025-08-26 14:42:35,725 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for Epithelial cell
+2025-08-26 14:42:35,725 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Post-execution evaluation complete: 0 total supplementary steps
+2025-08-26 14:42:35,725 | INFO | scchatbot.workflow.nodes.evaluation | 📝 Generated relevance hints for cell_abundance question
+2025-08-26 14:42:35,726 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Execution Summary:
+2025-08-26 14:42:35,726 | INFO | scchatbot.workflow.nodes.evaluation |    • Total steps executed: 5
+2025-08-26 14:42:35,726 | INFO | scchatbot.workflow.nodes.evaluation |    • Successful: 5
+2025-08-26 14:42:35,726 | INFO | scchatbot.workflow.nodes.evaluation |    • Failed: 0
+2025-08-26 14:42:35,727 | INFO | scchatbot.workflow.nodes.evaluation |    • Supplementary steps generated: 0
+2025-08-26 14:42:35,727 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Available analysis results:
+2025-08-26 14:42:35,727 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 Evaluator: Post-execution evaluation complete, ready for response generation
+2025-08-26 14:42:35,728 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 All steps complete (5/5), running post-execution evaluation
+2025-08-26 14:42:35,728 | INFO | scchatbot.workflow.nodes.evaluation | 🏁 Evaluator: Starting sophisticated post-execution evaluation...
+2025-08-26 14:42:35,728 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Starting post-execution evaluation...
+2025-08-26 14:42:37,051 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:37,524 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:37,528 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:42:37,529 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: T cell
+2025-08-26 14:42:38,002 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:38,006 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:42:38,716 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:38,719 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for T cell: '```json
+["compare_cell_counts"]
+```' (length: 35)
+2025-08-26 14:42:38,719 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for T cell: ['compare_cell_counts']
+2025-08-26 14:42:38,719 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'T cell' is in unavailable list: []
+2025-08-26 14:42:38,720 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 5 entries
+2025-08-26 14:42:38,720 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for T cell: compare_cell_counts (execution 1)
+2025-08-26 14:42:38,720 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for T cell: ['compare_cell_counts']
+2025-08-26 14:42:38,720 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for T cell
+2025-08-26 14:42:38,720 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: B cell
+2025-08-26 14:42:39,236 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:39,237 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:42:39,855 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:39,866 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for B cell: '```json
+["compare_cell_counts"]
+```' (length: 35)
+2025-08-26 14:42:39,866 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for B cell: ['compare_cell_counts']
+2025-08-26 14:42:39,866 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'B cell' is in unavailable list: []
+2025-08-26 14:42:39,866 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 5 entries
+2025-08-26 14:42:39,866 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for B cell: compare_cell_counts (execution 2)
+2025-08-26 14:42:39,867 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for B cell: ['compare_cell_counts']
+2025-08-26 14:42:39,867 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for B cell
+2025-08-26 14:42:39,867 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: Glial cell
+2025-08-26 14:42:40,434 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:40,443 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:42:40,897 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:40,899 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for Glial cell: '```json
+["compare_cell_counts"]
+```' (length: 35)
+2025-08-26 14:42:40,899 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for Glial cell: ['compare_cell_counts']
+2025-08-26 14:42:40,899 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'Glial cell' is in unavailable list: []
+2025-08-26 14:42:40,899 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 5 entries
+2025-08-26 14:42:40,899 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for Glial cell: compare_cell_counts (execution 3)
+2025-08-26 14:42:40,899 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for Glial cell: ['compare_cell_counts']
+2025-08-26 14:42:40,900 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for Glial cell
+2025-08-26 14:42:40,900 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: Epithelial cell
+2025-08-26 14:42:41,431 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:41,440 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: cell_abundance
+2025-08-26 14:42:42,147 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:42,156 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for Epithelial cell: '```json
+["compare_cell_counts"]
+```' (length: 35)
+2025-08-26 14:42:42,157 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for Epithelial cell: ['compare_cell_counts']
+2025-08-26 14:42:42,157 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'Epithelial cell' is in unavailable list: []
+2025-08-26 14:42:42,157 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 5 entries
+2025-08-26 14:42:42,157 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for Epithelial cell: compare_cell_counts (execution 4)
+2025-08-26 14:42:42,157 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for Epithelial cell: ['compare_cell_counts']
+2025-08-26 14:42:42,158 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for Epithelial cell
+2025-08-26 14:42:42,158 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Post-execution evaluation complete: 0 total supplementary steps
+2025-08-26 14:42:42,158 | INFO | scchatbot.workflow.nodes.evaluation | 📝 Generated relevance hints for cell_abundance question
+2025-08-26 14:42:42,158 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Execution Summary:
+2025-08-26 14:42:42,158 | INFO | scchatbot.workflow.nodes.evaluation |    • Total steps executed: 5
+2025-08-26 14:42:42,158 | INFO | scchatbot.workflow.nodes.evaluation |    • Successful: 5
+2025-08-26 14:42:42,158 | INFO | scchatbot.workflow.nodes.evaluation |    • Failed: 0
+2025-08-26 14:42:42,158 | INFO | scchatbot.workflow.nodes.evaluation |    • Supplementary steps generated: 0
+2025-08-26 14:42:42,158 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Available analysis results:
+2025-08-26 14:42:42,158 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 Evaluator: Post-execution evaluation complete, ready for response generation
+2025-08-26 14:42:42,159 | INFO | scchatbot.multi_agent_base | 🔄 Routing: Post-execution evaluation complete, generating response
+2025-08-26 14:42:42,159 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Generating LLM-synthesized response with conversation awareness...
+2025-08-26 14:42:42,160 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 UNIFIED ACCESSOR: Processing 5 execution steps
+2025-08-26 14:42:42,160 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 1: compare_cell_counts for T cell
+2025-08-26 14:42:42,160 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling compare_cell_counts with CellCountResultAccessor
+2025-08-26 14:42:42,160 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 2: compare_cell_counts for B cell
+2025-08-26 14:42:42,160 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling compare_cell_counts with CellCountResultAccessor
+2025-08-26 14:42:42,160 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 3: compare_cell_counts for Glial cell
+2025-08-26 14:42:42,160 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling compare_cell_counts with CellCountResultAccessor
+2025-08-26 14:42:42,160 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 4: compare_cell_counts for Epithelial cell
+2025-08-26 14:42:42,161 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling compare_cell_counts with CellCountResultAccessor
+2025-08-26 14:42:42,161 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 5: display_cell_count_comparison for step_4
+2025-08-26 14:42:42,161 | INFO | scchatbot.workflow.unified_result_accessor | 🎨 VISUALIZATION DEBUG: Step 5 function: display_cell_count_comparison
+2025-08-26 14:42:42,161 | INFO | scchatbot.workflow.unified_result_accessor | 🎨 VISUALIZATION DEBUG: Parameters: {'cell_types_data': ['T cell', 'B cell', 'Glial cell', 'Epithelial cell']}
+2025-08-26 14:42:42,161 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling display_cell_count_comparison with VisualizationResultAccessor
+2025-08-26 14:42:42,161 | INFO | scchatbot.workflow.unified_result_accessor | ✅ UNIFIED ACCESSOR: Processed 5 successful steps
+2025-08-26 14:42:42,161 | INFO | scchatbot.workflow.unified_result_accessor | 🎯 UNIFIED FORMATTER: Generated 2226 characters for synthesis
+2025-08-26 14:42:42,161 | INFO | scchatbot.workflow.nodes.response | ✅ Unified results extracted and formatted successfully
+2025-08-26 14:42:42,161 | INFO | scchatbot.workflow.nodes.response | ✅ Failed analyses retrieved
+2025-08-26 14:42:42,162 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Found context message (249 chars)
+2025-08-26 14:42:42,162 | INFO | scchatbot.workflow.nodes.response | ✅ Conversation context processed
+2025-08-26 14:42:42,162 | INFO | scchatbot.workflow.nodes.response | ✅ Synthesis prompt created with relevance hints
+2025-08-26 14:42:45,606 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-26 14:42:45,613 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Checking 5 execution steps
+2025-08-26 14:42:45,613 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 1: compare_cell_counts, success=True, has_result=True
+2025-08-26 14:42:45,613 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 2: compare_cell_counts, success=True, has_result=True
+2025-08-26 14:42:45,613 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 3: compare_cell_counts, success=True, has_result=True
+2025-08-26 14:42:45,613 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 4: compare_cell_counts, success=True, has_result=True
+2025-08-26 14:42:45,613 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 5: display_cell_count_comparison, success=True, has_result=True
+2025-08-26 14:42:45,613 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Added plot plot_1: Cell Count Comparison (11285 chars)
+2025-08-26 14:42:45,613 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Successfully extracted 1 individual plots (total: 11,285 chars)
+2025-08-26 14:42:45,613 | INFO | scchatbot.workflow.nodes.response | 🎨 SIZE VALIDATION: Validated 1 plots, total size: 11,285 bytes
+2025-08-26 14:42:45,613 | INFO | scchatbot.workflow.nodes.response | 🎯 ResponseGeneratorNode: Found 1 individual plots
+2025-08-26 14:42:45,614 | INFO | scchatbot.workflow.nodes.response | 🎨 Creating multiple messages structure: 1 plots + 1 text (plots first)
+2025-08-26 14:42:45,614 | INFO | scchatbot.workflow.nodes.response | 🎨 Created multiple messages structure with 2 total messages (plots first, then text)
+2025-08-26 14:42:45,614 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Generated response (900 chars)
+2025-08-26 14:42:45,662 | INFO | scchatbot.multi_agent_base | ✅ Conversation recorded in vector database
+2025-08-26 14:42:45,662 | INFO | scchatbot.multi_agent_base | 💾 Session state saved for '36fac317' with 8 available cell types
+2025-08-26 14:46:36,926 | INFO | django.utils.autoreload | Watching for file changes with StatReloader
+2025-08-26 14:46:41,604 | INFO | faiss.loader | Loading faiss.
+2025-08-26 14:46:41,618 | INFO | faiss.loader | Successfully loaded faiss.
+2025-08-26 14:46:42,316 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-26 14:46:44,055 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-26 14:46:44,108 | INFO | scchatbot.workflow.function_history | ✅ Vector database initialized at conversation_history/conversation_vectors
+2025-08-26 14:46:44,109 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-08-26 14:46:44,118 | INFO | scchatbot.workflow.function_history | ✅ Enrichment vector database initialized at conversation_history/conversation_vectors/enrichment
+2025-08-26 14:46:44,625 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
