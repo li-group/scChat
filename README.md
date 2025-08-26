@@ -66,6 +66,7 @@ Follow these steps to utilize the application effectively:
 
   
 ### Step 4: Initialize the Application
+- Run python3 manage.py migrate (For the first time as you install scChat)
 - Run python3 manage.py runserver
 
 ### Step 5: Access the Application
