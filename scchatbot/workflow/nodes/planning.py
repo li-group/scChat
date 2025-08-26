@@ -206,6 +206,8 @@ class PlannerNode(BaseWorkflowNode):
                 - SKIP steps for unavailable cell types: {', '.join(unavailable_cell_types)}
                 - CELL TYPE STRATEGY: If a requested cell type is not in the available list, consider if it needs discovery
                 - AVAILABLE TYPES PRIORITY: Prefer using currently available cell types when possible
+                - CRITICAL STEP ORDER: For DEA heatmaps, ALWAYS put dea_split_by_condition BEFORE display_dea_heatmap for the same cell type
+                - Example: Step 1: dea_split_by_condition(cell_type="T cell"), Step 2: display_dea_heatmap(cell_type="T cell")
                 - Focus on creating a logical flow to answer the user's question
                 
                 VISUALIZATION-ONLY DETECTION:
@@ -249,6 +251,16 @@ class PlannerNode(BaseWorkflowNode):
                     - "show cell count comparison" → use "display_cell_count_comparison" with results from previous steps
                     - "visualize cell abundance across conditions" → use "display_cell_count_comparison"
                 * The "cell_types_data" parameter should contain aggregated results from executed compare_cell_counts steps
+                
+                - For DEA heatmap visualization, use "display_dea_heatmap":
+                * CRITICAL: Use IMMEDIATELY AFTER "dea_split_by_condition" step for the same cell type
+                * Creates heatmap showing gene expression patterns across conditions for one cell type
+                * CORRECT ORDER Examples:
+                    - Step N: dea_split_by_condition(cell_type="T cell"), Step N+1: display_dea_heatmap(cell_type="T cell") 
+                    - Step N: dea_split_by_condition(cell_type="B cell"), Step N+1: display_dea_heatmap(cell_type="B cell")
+                * NEVER put display_dea_heatmap BEFORE the corresponding dea_split_by_condition
+                * For multiple cell types, create pairs: analysis → heatmap for each cell type
+                * Parameters: cell_type (required), top_n_genes (default: 20), cluster_genes (default: true), cluster_samples (default: true)
                     
                 SEMANTIC SEARCH GUIDELINES:
                 - For questions seeking specific pathway/term information beyond the top-ranked results, consider using "search_enrichment_semantic"

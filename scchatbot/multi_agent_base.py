@@ -19,7 +19,8 @@ from .analysis.visualizations import (
     display_dotplot,
     display_processed_umap,
     display_enrichment_visualization,
-    display_cell_count_comparison
+    display_cell_count_comparison,
+    display_dea_heatmap
 )
 from .cell_types.utils import clear_directory
 from .cell_types.models import ChatState
@@ -261,6 +262,35 @@ class MultiAgentChatBot:
                 }
             },
             {
+                "name": "display_dea_heatmap",
+                "description": "Create interactive heatmap visualization from DEA (Differential Expression Analysis) results for a single cell type. Shows log fold changes across conditions with hierarchical clustering. Use after dea_split_by_condition analysis to visualize expression patterns.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "cell_type": {
+                            "type": "string",
+                            "description": "The cell type to visualize DEA results for"
+                        },
+                        "top_n_genes": {
+                            "type": "integer",
+                            "default": 20,
+                            "description": "Number of top differentially expressed genes to display"
+                        },
+                        "cluster_genes": {
+                            "type": "boolean",
+                            "default": True,
+                            "description": "Whether to apply hierarchical clustering to genes"
+                        },
+                        "cluster_samples": {
+                            "type": "boolean",
+                            "default": True,
+                            "description": "Whether to apply hierarchical clustering to conditions"
+                        }
+                    },
+                    "required": ["cell_type"]
+                }
+            },
+            {
                 "name": "display_cell_count_comparison",
                 "description": "Create stacked or grouped bar chart comparing cell counts across experimental conditions for multiple cell types. Use after multiple compare_cell_counts analyses to visualize the results together. Shows which cell types are abundant in which conditions.",
                 "parameters": {
@@ -324,6 +354,7 @@ class MultiAgentChatBot:
             "display_processed_umap": self._wrap_visualization(display_processed_umap),
             "display_enrichment_visualization": self._wrap_visualization(display_enrichment_visualization),
             "display_cell_count_comparison": self._wrap_visualization(display_cell_count_comparison),
+            "display_dea_heatmap": self._wrap_visualization(display_dea_heatmap),
             "perform_enrichment_analyses": self._wrap_enrichment_analysis,
             "process_cells": self._wrap_process_cells,
             "dea_split_by_condition": self._wrap_dea_analysis,

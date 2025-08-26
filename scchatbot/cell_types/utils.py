@@ -461,8 +461,8 @@ def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pva
         categories = adata_modified.obs["Exp_sample_category"].unique()
         result_list = []
         
-        # PART 1: Bulk DEA across all conditions
-        print(f"\n📊 Performing bulk DEA for {cell_type} across all conditions...")
+        # PART 1: Bulk DEA across all conditions (BIDIRECTIONAL)
+        print(f"\n📊 Performing bidirectional bulk DEA for {cell_type} across all conditions...")
         adata_bulk = adata_modified.copy()
         adata_bulk.obs["cell_type_group"] = "Other"
         cell_type_mask_bulk = adata_bulk.obs["cell_type"] == str(cell_type)
@@ -471,11 +471,27 @@ def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pva
         if sum(cell_type_mask_bulk) > 0:
             key_name_bulk = f"{cell_type}_markers_bulk"
             try:
+                # PROPER BIDIRECTIONAL APPROACH: Compare both directions
+                # First, get upregulated genes (cell_type vs Other)
                 sc.tl.rank_genes_groups(adata_bulk, groupby="cell_type_group", 
                                         groups=[str(cell_type)], reference="Other",
                                         method="wilcoxon", n_genes=n_genes, 
-                                        key_added=key_name_bulk, use_raw_=False)
-                data_bulk = sc.get.rank_genes_groups_df(adata_bulk, group=str(cell_type), key=key_name_bulk)
+                                        key_added=f"{key_name_bulk}_up", use_raw_=False)
+                data_up = sc.get.rank_genes_groups_df(adata_bulk, group=str(cell_type), key=f"{key_name_bulk}_up")
+                data_up['direction'] = 'upregulated'
+                
+                # Second, get downregulated genes (Other vs cell_type, then flip)
+                sc.tl.rank_genes_groups(adata_bulk, groupby="cell_type_group", 
+                                        groups=["Other"], reference=str(cell_type),
+                                        method="wilcoxon", n_genes=n_genes, 
+                                        key_added=f"{key_name_bulk}_down", use_raw_=False)
+                data_down = sc.get.rank_genes_groups_df(adata_bulk, group="Other", key=f"{key_name_bulk}_down")
+                # Flip the sign to represent downregulation in cell_type
+                data_down['logfoldchanges'] = -data_down['logfoldchanges']
+                data_down['direction'] = 'downregulated'
+                
+                # Combine both directions
+                data_bulk = pd.concat([data_up, data_down], ignore_index=True)
                 
                 significant_genes_bulk = list(data_bulk.loc[(data_bulk['pvals_adj'] < pval_threshold) & 
                                                             (abs(data_bulk['logfoldchanges']) > logfc_threshold), 'names'])
@@ -492,14 +508,30 @@ def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pva
                     "description": f"Combined analysis across all conditions (n={sum(cell_type_mask_bulk)} cells)"
                 })
             except Exception as bulk_error:
-                print(f"⚠️ Bulk DEA failed: {bulk_error}")
-                # Try t-test as fallback for bulk
+                print(f"⚠️ Bidirectional bulk DEA failed: {bulk_error}")
+                # Try t-test as fallback for bulk (bidirectional)
                 try:
+                    # PROPER BIDIRECTIONAL APPROACH: Compare both directions with t-test
+                    # First, get upregulated genes (cell_type vs Other)
                     sc.tl.rank_genes_groups(adata_bulk, groupby="cell_type_group", 
                                             groups=[str(cell_type)], reference="Other",
                                             method="t-test", n_genes=n_genes, 
-                                            key_added=key_name_bulk, use_raw_=False)
-                    data_bulk = sc.get.rank_genes_groups_df(adata_bulk, group=str(cell_type), key=key_name_bulk)
+                                            key_added=f"{key_name_bulk}_up", use_raw_=False)
+                    data_up = sc.get.rank_genes_groups_df(adata_bulk, group=str(cell_type), key=f"{key_name_bulk}_up")
+                    data_up['direction'] = 'upregulated'
+                    
+                    # Second, get downregulated genes (Other vs cell_type, then flip)
+                    sc.tl.rank_genes_groups(adata_bulk, groupby="cell_type_group", 
+                                            groups=["Other"], reference=str(cell_type),
+                                            method="t-test", n_genes=n_genes, 
+                                            key_added=f"{key_name_bulk}_down", use_raw_=False)
+                    data_down = sc.get.rank_genes_groups_df(adata_bulk, group="Other", key=f"{key_name_bulk}_down")
+                    # Flip the sign to represent downregulation in cell_type
+                    data_down['logfoldchanges'] = -data_down['logfoldchanges']
+                    data_down['direction'] = 'downregulated'
+                    
+                    # Combine both directions
+                    data_bulk = pd.concat([data_up, data_down], ignore_index=True)
                     significant_genes_bulk = list(data_bulk.loc[(data_bulk['pvals_adj'] < pval_threshold) & 
                                                                 (abs(data_bulk['logfoldchanges']) > logfc_threshold), 'names'])
                     if save_csv:
@@ -544,21 +576,53 @@ def dea_split_by_condition(adata, cell_type, n_genes=100, logfc_threshold=1, pva
             key_name = f"{cell_type}_markers_{cat}"
             
             try:
+                # PROPER BIDIRECTIONAL APPROACH: Compare both directions
+                # First, get upregulated genes (cell_type vs Other)
                 sc.tl.rank_genes_groups(adata_cat, groupby="cell_type_group", 
                                         groups=[str(cell_type)], reference="Other",
                                         method="wilcoxon", n_genes=n_genes, 
-                                        key_added=key_name, use_raw_=False)
-                data = sc.get.rank_genes_groups_df(adata_cat, group=str(cell_type), key=key_name)
-                print(f"  ✅ {cat}: Wilcoxon test succeeded")
+                                        key_added=f"{key_name}_up", use_raw_=False)
+                data_up = sc.get.rank_genes_groups_df(adata_cat, group=str(cell_type), key=f"{key_name}_up")
+                data_up['direction'] = 'upregulated'
+                
+                # Second, get downregulated genes (Other vs cell_type, then flip)
+                sc.tl.rank_genes_groups(adata_cat, groupby="cell_type_group", 
+                                        groups=["Other"], reference=str(cell_type),
+                                        method="wilcoxon", n_genes=n_genes, 
+                                        key_added=f"{key_name}_down", use_raw_=False)
+                data_down = sc.get.rank_genes_groups_df(adata_cat, group="Other", key=f"{key_name}_down")
+                # Flip the sign to represent downregulation in cell_type
+                data_down['logfoldchanges'] = -data_down['logfoldchanges']
+                data_down['direction'] = 'downregulated'
+                
+                # Combine both directions
+                data = pd.concat([data_up, data_down], ignore_index=True)
+                print(f"  ✅ {cat}: Proper bidirectional Wilcoxon test succeeded")
             except Exception as wilcox_error:
                 # Try t-test as fallback
                 try:
+                    # PROPER BIDIRECTIONAL APPROACH: Compare both directions with t-test
+                    # First, get upregulated genes (cell_type vs Other)
                     sc.tl.rank_genes_groups(adata_cat, groupby="cell_type_group", 
                                             groups=[str(cell_type)], reference="Other",
                                             method="t-test", n_genes=n_genes, 
-                                            key_added=key_name, use_raw_=False)
-                    data = sc.get.rank_genes_groups_df(adata_cat, group=str(cell_type), key=key_name)
-                    print(f"  ✅ {cat}: t-test fallback succeeded")
+                                            key_added=f"{key_name}_up", use_raw_=False)
+                    data_up = sc.get.rank_genes_groups_df(adata_cat, group=str(cell_type), key=f"{key_name}_up")
+                    data_up['direction'] = 'upregulated'
+                    
+                    # Second, get downregulated genes (Other vs cell_type, then flip)
+                    sc.tl.rank_genes_groups(adata_cat, groupby="cell_type_group", 
+                                            groups=["Other"], reference=str(cell_type),
+                                            method="t-test", n_genes=n_genes, 
+                                            key_added=f"{key_name}_down", use_raw_=False)
+                    data_down = sc.get.rank_genes_groups_df(adata_cat, group="Other", key=f"{key_name}_down")
+                    # Flip the sign to represent downregulation in cell_type
+                    data_down['logfoldchanges'] = -data_down['logfoldchanges']
+                    data_down['direction'] = 'downregulated'
+                    
+                    # Combine both directions
+                    data = pd.concat([data_up, data_down], ignore_index=True)
+                    print(f"  ✅ {cat}: Proper bidirectional t-test fallback succeeded")
                 except:
                     print(f"  ❌ {cat}: Both statistical methods failed, skipping")
                     continue

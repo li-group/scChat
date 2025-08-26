@@ -601,3 +601,364 @@ def display_cell_count_comparison(cell_types_data: dict, plot_type: str = "stack
         return f"Error generating cell count comparison plot: {e}"
 
 
+def display_dea_heatmap(cell_type: str, top_n_genes: int = 20, cluster_genes: bool = True, cluster_samples: bool = True) -> str:
+    """
+    Create dual heatmap visualization from DEA (Differential Expression Analysis) results for a single cell type.
+    Generates separate heatmaps for upregulated and downregulated genes.
+    
+    Args:
+        cell_type: The cell type to visualize DEA results for
+        top_n_genes: Number of top differentially expressed genes to display per direction (default: 20)
+        cluster_genes: Whether to apply hierarchical clustering to genes (default: True)
+        cluster_samples: Whether to apply hierarchical clustering to samples/conditions (default: True)
+    
+    Returns:
+        HTML string containing both interactive heatmap plots (upregulated and downregulated)
+    """
+    import plotly.graph_objects as go
+    import plotly.io as pio
+    from scipy.cluster.hierarchy import linkage, dendrogram
+    from scipy.spatial.distance import pdist
+    from ..cell_types.standardization import unified_cell_type_handler
+    
+    def create_single_heatmap(genes_data, direction, cell_type, conditions, cluster_genes, cluster_samples):
+        """Helper function to create a single heatmap for either up or downregulated genes"""
+        import numpy as np
+        
+        if not genes_data:
+            return f"<p>No {direction} genes found for {cell_type}</p>"
+        
+        # Create expression matrix
+        expression_matrix = []
+        gene_labels = []
+        
+        for gene in genes_data:
+            gene_row = []
+            for condition in conditions:
+                logfc = genes_data[gene].get(condition, 0)  # Use 0 if gene not found in condition
+                gene_row.append(logfc)
+            expression_matrix.append(gene_row)
+            gene_labels.append(gene)
+        
+        if not expression_matrix:
+            return f"<p>No expression data to visualize for {direction} genes in {cell_type}</p>"
+        
+        # Convert to numpy array for clustering
+        matrix = np.array(expression_matrix)
+        
+        # Apply clustering if requested
+        gene_order = list(range(len(gene_labels)))
+        condition_order = list(range(len(conditions)))
+        
+        if cluster_genes and len(gene_labels) > 1:
+            try:
+                gene_distances = pdist(matrix, metric='euclidean')
+                gene_linkage = linkage(gene_distances, method='ward')
+                gene_dendro = dendrogram(gene_linkage, no_plot=True)
+                gene_order = gene_dendro['leaves']
+            except Exception as e:
+                print(f"⚠️ Gene clustering failed for {direction}: {e}")
+        
+        if cluster_samples and len(conditions) > 1:
+            try:
+                condition_distances = pdist(matrix.T, metric='euclidean')
+                condition_linkage = linkage(condition_distances, method='ward')
+                condition_dendro = dendrogram(condition_linkage, no_plot=True)
+                condition_order = condition_dendro['leaves']
+            except Exception as e:
+                print(f"⚠️ Condition clustering failed for {direction}: {e}")
+        
+        # Reorder matrix based on clustering
+        clustered_matrix = matrix[np.ix_(gene_order, condition_order)]
+        clustered_genes = [gene_labels[i] for i in gene_order]
+        clustered_conditions = [conditions[i] for i in condition_order]
+        
+        # Choose appropriate colorscale based on direction
+        if direction == "upregulated":
+            colorscale = 'Reds'
+            color_range = [0, max(clustered_matrix.flatten()) if len(clustered_matrix.flatten()) > 0 else 1]
+        else:
+            colorscale = 'Blues_r'
+            color_range = [min(clustered_matrix.flatten()) if len(clustered_matrix.flatten()) > 0 else -1, 0]
+        
+        # Create heatmap
+        fig = go.Figure(data=go.Heatmap(
+            z=clustered_matrix,
+            x=clustered_conditions,
+            y=clustered_genes,
+            colorscale=colorscale,
+            zmin=color_range[0],
+            zmax=color_range[1],
+            colorbar=dict(
+                title="Log Fold Change",
+                titleside="right"
+            ),
+            hoverongaps=False,
+            hovertemplate='<b>Gene:</b> %{y}<br>' +
+                         '<b>Condition:</b> %{x}<br>' +
+                         '<b>Log FC:</b> %{z:.2f}<br>' +
+                         '<extra></extra>'
+        ))
+        
+        # Update layout with frontend-friendly settings
+        fig.update_layout(
+            title=f'{direction.title()} Genes - {cell_type}<br><sub>Top {len(clustered_genes)} {direction} genes</sub>',
+            xaxis_title="Conditions",
+            yaxis_title="Genes",
+            width=None,  # Let container control width
+            height=max(400, len(clustered_genes) * 25 + 150),
+            font=dict(size=10),
+            margin=dict(l=150, r=50, t=100, b=50),
+            xaxis=dict(
+                tickangle=45,
+                tickfont=dict(size=10)
+            ),
+            yaxis=dict(
+                tickfont=dict(size=9),
+                autorange='reversed'
+            ),
+            # Additional settings to prevent overlap
+            autosize=True,
+            showlegend=False
+        )
+        
+        # Generate HTML with improved configuration
+        return pio.to_html(
+            fig, 
+            full_html=False, 
+            include_plotlyjs='cdn',
+            config={
+                'displayModeBar': True,
+                'displaylogo': False,
+                'modeBarButtonsToRemove': ['pan2d', 'lasso2d', 'select2d'],
+                'responsive': True
+            },
+            div_id=f"heatmap_{direction}_{cell_type.replace(' ', '_')}"
+        )
+
+    try:
+        # Standardize cell type name
+        cell_type = unified_cell_type_handler(cell_type)
+        
+        # Look for DEA results files - try multiple possible locations
+        import glob
+        import os
+        
+        # Try different possible paths for DEA files
+        possible_paths = [
+            f"scchatbot/deg_res/{cell_type}_markers_*.csv",
+            f"deg_res/{cell_type}_markers_*.csv", 
+            f"scchatbot/{cell_type}_markers_*.csv",
+            f"{cell_type}_markers_*.csv"
+        ]
+        
+        dea_files = []
+        for path_pattern in possible_paths:
+            found_files = glob.glob(path_pattern)
+            if found_files:
+                dea_files = found_files
+                print(f"📊 Found DEA files at: {path_pattern}")
+                break
+        
+        if not dea_files:
+            return f"Error: No DEA results found for {cell_type}. Please run DEA analysis first using dea_split_by_condition."
+        
+        print(f"📊 Found {len(dea_files)} DEA result files for {cell_type}")
+        
+        # Separate storage for upregulated and downregulated genes
+        upregulated_genes = {}  # gene -> {condition: logfc}
+        downregulated_genes = {}  # gene -> {condition: logfc}
+        conditions = []
+        
+        for file_path in dea_files:
+            # Extract condition from filename
+            filename = os.path.basename(file_path)
+            if "_bulk.csv" in filename:
+                condition = "bulk"
+            else:
+                # Extract condition name from filename like "T cell_markers_condition1.csv"
+                condition = filename.replace(f"{cell_type}_markers_", "").replace(".csv", "")
+            
+            conditions.append(condition)
+            
+            try:
+                df = pd.read_csv(file_path)
+                print(f"📊 Loading DEA data from {condition}: {len(df)} genes")
+                
+                # Check column names in the CSV
+                print(f"📊 CSV columns: {list(df.columns)}")
+                
+                # Handle different column name formats
+                logfc_col = None
+                pval_col = None
+                gene_col = None
+                direction_col = None
+                
+                # Find the correct column names
+                for col in df.columns:
+                    if 'logfoldchange' in col.lower() or 'logfc' in col.lower() or col == 'log_fc':
+                        logfc_col = col
+                    elif 'pvals_adj' in col.lower() or 'padj' in col.lower() or 'fdr' in col.lower():
+                        pval_col = col
+                    elif 'names' in col.lower() or 'gene' in col.lower() or col == 'index':
+                        gene_col = col
+                    elif 'direction' in col.lower():
+                        direction_col = col
+                
+                if not all([logfc_col, pval_col, gene_col]):
+                    print(f"⚠️ Missing required columns in {file_path}")
+                    print(f"   logfc_col: {logfc_col}, pval_col: {pval_col}, gene_col: {gene_col}")
+                    continue
+                
+                # Get significant genes and separate by direction
+                df_filtered = df[
+                    (df[pval_col] < 0.05) & 
+                    (abs(df[logfc_col]) > 1)
+                ]
+                
+                if len(df_filtered) == 0:
+                    print(f"⚠️ No significant genes found in {condition}")
+                    continue
+                
+                # Separate upregulated and downregulated genes
+                if direction_col and direction_col in df_filtered.columns:
+                    # Use direction column if available
+                    df_up = df_filtered[df_filtered[direction_col] == 'upregulated'].copy()
+                    df_down = df_filtered[df_filtered[direction_col] == 'downregulated'].copy()
+                else:
+                    # Fall back to logFC sign
+                    df_up = df_filtered[df_filtered[logfc_col] > 0].copy()
+                    df_down = df_filtered[df_filtered[logfc_col] < 0].copy()
+                
+                # Sort and select top genes for each direction
+                df_up = df_up.reindex(df_up[logfc_col].sort_values(ascending=False).index).head(top_n_genes)
+                df_down = df_down.reindex(df_down[logfc_col].abs().sort_values(ascending=False).index).head(top_n_genes)
+                
+                # Store upregulated genes
+                for _, row in df_up.iterrows():
+                    gene = row[gene_col]
+                    logfc = row[logfc_col]
+                    if gene not in upregulated_genes:
+                        upregulated_genes[gene] = {}
+                    upregulated_genes[gene][condition] = logfc
+                
+                # Store downregulated genes
+                for _, row in df_down.iterrows():
+                    gene = row[gene_col]
+                    logfc = row[logfc_col]
+                    if gene not in downregulated_genes:
+                        downregulated_genes[gene] = {}
+                    downregulated_genes[gene][condition] = logfc
+                    
+            except Exception as e:
+                print(f"⚠️ Error loading {file_path}: {e}")
+                continue
+        
+        if not upregulated_genes and not downregulated_genes:
+            return f"Error: No significant genes found in DEA results for {cell_type}."
+        
+        # Clean up conditions list
+        conditions = sorted(set(conditions))  # Remove duplicates and sort
+        
+        # Select top genes for each direction based on maximum absolute fold change across conditions
+        def select_top_genes(genes_dict, n_genes):
+            gene_max_fc = {}
+            for gene, condition_data in genes_dict.items():
+                max_abs_fc = max([abs(fc) for fc in condition_data.values()])
+                gene_max_fc[gene] = max_abs_fc
+            return dict(list(sorted(gene_max_fc.items(), key=lambda x: x[1], reverse=True))[:n_genes])
+        
+        # Get top genes for each direction
+        top_upregulated = select_top_genes(upregulated_genes, top_n_genes) if upregulated_genes else {}
+        top_downregulated = select_top_genes(downregulated_genes, top_n_genes) if downregulated_genes else {}
+        
+        # Filter the gene dictionaries to only include top genes
+        filtered_upregulated = {gene: data for gene, data in upregulated_genes.items() if gene in top_upregulated}
+        filtered_downregulated = {gene: data for gene, data in downregulated_genes.items() if gene in top_downregulated}
+        
+        print(f"📊 Creating dual heatmaps: {len(filtered_upregulated)} upregulated, {len(filtered_downregulated)} downregulated genes")
+        
+        # Create both heatmaps
+        upregulated_html = create_single_heatmap(filtered_upregulated, "upregulated", cell_type, conditions, cluster_genes, cluster_samples)
+        downregulated_html = create_single_heatmap(filtered_downregulated, "downregulated", cell_type, conditions, cluster_genes, cluster_samples)
+        
+        # Combine both heatmaps in a single HTML response with proper layout
+        combined_html = f"""
+        <div style="
+            width: 100%; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden;
+            position: relative;
+        ">
+            <div style="
+                width: 100%;
+                margin-bottom: 50px;
+                padding: 20px;
+                background-color: #fafafa;
+                border-radius: 8px;
+                border: 1px solid #e0e0e0;
+                box-sizing: border-box;
+                overflow: hidden;
+                position: relative;
+                clear: both;
+            ">
+                <h2 style="
+                    text-align: center; 
+                    color: #d62728; 
+                    margin: 0 0 20px 0;
+                    padding: 10px;
+                    font-family: Arial, sans-serif;
+                    font-size: 18px;
+                    border-bottom: 2px solid #d62728;
+                ">Upregulated Genes</h2>
+                <div style="
+                    width: 100%;
+                    overflow: hidden;
+                    position: relative;
+                ">
+                    {upregulated_html}
+                </div>
+            </div>
+            
+            <div style="
+                width: 100%;
+                margin-top: 50px;
+                padding: 20px;
+                background-color: #fafafa;
+                border-radius: 8px;
+                border: 1px solid #e0e0e0;
+                box-sizing: border-box;
+                overflow: hidden;
+                position: relative;
+                clear: both;
+            ">
+                <h2 style="
+                    text-align: center; 
+                    color: #1f77b4; 
+                    margin: 0 0 20px 0;
+                    padding: 10px;
+                    font-family: Arial, sans-serif;
+                    font-size: 18px;
+                    border-bottom: 2px solid #1f77b4;
+                ">Downregulated Genes</h2>
+                <div style="
+                    width: 100%;
+                    overflow: hidden;
+                    position: relative;
+                ">
+                    {downregulated_html}
+                </div>
+            </div>
+        </div>
+        """
+        
+        print(f"✅ Dual DEA heatmaps generated for {cell_type}")
+        return combined_html
+        
+    except Exception as e:
+        return f"Error generating DEA heatmap for {cell_type}: {e}"
+
+
