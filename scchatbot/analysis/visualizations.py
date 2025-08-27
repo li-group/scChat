@@ -882,81 +882,117 @@ def display_dea_heatmap(cell_type: str, top_n_genes: int = 20, cluster_genes: bo
         upregulated_html = create_single_heatmap(filtered_upregulated, "upregulated", cell_type, conditions, cluster_genes, cluster_samples)
         downregulated_html = create_single_heatmap(filtered_downregulated, "downregulated", cell_type, conditions, cluster_genes, cluster_samples)
         
-        # Combine both heatmaps in a single HTML response with proper layout
-        combined_html = f"""
-        <div style="
-            width: 100%; 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding: 20px;
-            box-sizing: border-box;
-            overflow: hidden;
-            position: relative;
-        ">
-            <div style="
-                width: 100%;
-                margin-bottom: 50px;
-                padding: 20px;
-                background-color: #fafafa;
-                border-radius: 8px;
-                border: 1px solid #e0e0e0;
-                box-sizing: border-box;
-                overflow: hidden;
-                position: relative;
-                clear: both;
-            ">
-                <h2 style="
-                    text-align: center; 
-                    color: #d62728; 
-                    margin: 0 0 20px 0;
-                    padding: 10px;
-                    font-family: Arial, sans-serif;
-                    font-size: 18px;
-                    border-bottom: 2px solid #d62728;
-                ">Upregulated Genes</h2>
-                <div style="
-                    width: 100%;
-                    overflow: hidden;
-                    position: relative;
-                ">
-                    {upregulated_html}
-                </div>
-            </div>
-            
-            <div style="
-                width: 100%;
-                margin-top: 50px;
-                padding: 20px;
-                background-color: #fafafa;
-                border-radius: 8px;
-                border: 1px solid #e0e0e0;
-                box-sizing: border-box;
-                overflow: hidden;
-                position: relative;
-                clear: both;
-            ">
-                <h2 style="
-                    text-align: center; 
-                    color: #1f77b4; 
-                    margin: 0 0 20px 0;
-                    padding: 10px;
-                    font-family: Arial, sans-serif;
-                    font-size: 18px;
-                    border-bottom: 2px solid #1f77b4;
-                ">Downregulated Genes</h2>
-                <div style="
-                    width: 100%;
-                    overflow: hidden;
-                    position: relative;
-                ">
-                    {downregulated_html}
-                </div>
-            </div>
-        </div>
-        """
+        # Check if we have valid heatmaps to display
+        valid_plots = []
+        if upregulated_html and not upregulated_html.startswith("<p>No"):
+            valid_plots.append({
+                "type": "upregulated_heatmap",
+                "title": f"Upregulated Genes - {cell_type}",
+                "html": upregulated_html
+            })
         
-        print(f"✅ Dual DEA heatmaps generated for {cell_type}")
-        return combined_html
+        if downregulated_html and not downregulated_html.startswith("<p>No"):
+            valid_plots.append({
+                "type": "downregulated_heatmap", 
+                "title": f"Downregulated Genes - {cell_type}",
+                "html": downregulated_html
+            })
+        
+        if not valid_plots:
+            return f"No significant genes found for DEA heatmap visualization in {cell_type}."
+        
+        # If we have multiple valid plots, return multiple plots structure (like enrichment analysis)
+        if len(valid_plots) > 1:
+            print(f"🔗 Creating separate DEA heatmap objects for {len(valid_plots)} plots")
+            print(f"📊 Upregulated heatmap size: {len(valid_plots[0]['html'])} chars")
+            print(f"🔴 Downregulated heatmap size: {len(valid_plots[1]['html'])} chars")
+            
+            # Return multiple plots structure for backend processing (same as enrichment)
+            multiple_plots_result = {
+                "multiple_plots": True,
+                "plots": valid_plots
+            }
+            
+            # Add legacy combined HTML for backward compatibility
+            combined_html = f"""
+            <div style="
+                width: 100%; 
+                max-width: 1200px; 
+                margin: 0 auto; 
+                padding: 20px;
+                box-sizing: border-box;
+                overflow: hidden;
+                position: relative;
+            ">
+                <div style="
+                    width: 100%;
+                    margin-bottom: 50px;
+                    padding: 20px;
+                    background-color: #fafafa;
+                    border-radius: 8px;
+                    border: 1px solid #e0e0e0;
+                    box-sizing: border-box;
+                    overflow: hidden;
+                    position: relative;
+                    clear: both;
+                ">
+                    <h2 style="
+                        text-align: center; 
+                        color: #d62728; 
+                        margin: 0 0 20px 0;
+                        padding: 10px;
+                        font-family: Arial, sans-serif;
+                        font-size: 18px;
+                        border-bottom: 2px solid #d62728;
+                    ">Upregulated Genes</h2>
+                    <div style="
+                        width: 100%;
+                        overflow: hidden;
+                        position: relative;
+                    ">
+                        {upregulated_html}
+                    </div>
+                </div>
+                
+                <div style="
+                    width: 100%;
+                    margin-top: 50px;
+                    padding: 20px;
+                    background-color: #fafafa;
+                    border-radius: 8px;
+                    border: 1px solid #e0e0e0;
+                    box-sizing: border-box;
+                    overflow: hidden;
+                    position: relative;
+                    clear: both;
+                ">
+                    <h2 style="
+                        text-align: center; 
+                        color: #1f77b4; 
+                        margin: 0 0 20px 0;
+                        padding: 10px;
+                        font-family: Arial, sans-serif;
+                        font-size: 18px;
+                        border-bottom: 2px solid #1f77b4;
+                    ">Downregulated Genes</h2>
+                    <div style="
+                        width: 100%;
+                        overflow: hidden;
+                        position: relative;
+                    ">
+                        {downregulated_html}
+                    </div>
+                </div>
+            </div>
+            """
+            multiple_plots_result["legacy_combined_html"] = combined_html
+            
+            print(f"🎯 Created multiple DEA heatmap structure with {len(multiple_plots_result['plots'])} individual plots")
+            return multiple_plots_result
+        else:
+            # Single plot case - return the HTML directly
+            print(f"✅ Single DEA heatmap generated for {cell_type}")
+            return valid_plots[0]["html"]
         
     except Exception as e:
         return f"Error generating DEA heatmap for {cell_type}: {e}"
