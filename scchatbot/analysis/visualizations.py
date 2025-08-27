@@ -8,6 +8,79 @@ import os
 import glob
 
 
+def _save_plot_as_pdf(fig, filename: str) -> None:
+    """Save a Plotly figure as PDF in the scchatbot/plots directory."""
+    try:
+        plots_dir = "scchatbot/plots"
+        os.makedirs(plots_dir, exist_ok=True)
+        
+        # Check if kaleido is available
+        kaleido_available = False
+        try:
+            import kaleido
+            kaleido_available = True
+        except ImportError:
+            print(f"⚠️ Kaleido not available for PDF export. Install with: pip install kaleido")
+        
+        # Try multiple formats/engines for better compatibility
+        pdf_path = os.path.join(plots_dir, f"{filename}.pdf")
+        png_path = os.path.join(plots_dir, f"{filename}.png")
+        html_path = os.path.join(plots_dir, f"{filename}.html")
+        
+        if kaleido_available:
+            # Save as high-res PNG for consistency with frontend (discrete rendering)
+            # PDF vector format causes unwanted interpolation
+            try:
+                fig.write_image(
+                    png_path, 
+                    format="png",
+                    width=1200,
+                    height=800,
+                    scale=2  # High resolution for print quality
+                )
+                print(f"📷 Plot saved as high-res PNG: {png_path}")
+                
+                # Also save PDF for users who prefer vector format (with interpolation note)
+                try:
+                    fig.write_image(
+                        pdf_path, 
+                        format="pdf",
+                        width=1200,
+                        height=800,
+                        scale=1
+                    )
+                    print(f"📄 Plot also saved as PDF (with vector interpolation): {pdf_path}")
+                except Exception as pdf_error:
+                    print(f"⚠️ PDF save failed: {pdf_error}")
+                
+                return
+            except Exception as png_error:
+                print(f"⚠️ PNG save failed: {png_error}")
+                # Try PDF as fallback
+                try:
+                    fig.write_image(
+                        pdf_path, 
+                        format="pdf",
+                        width=1200,
+                        height=800,
+                        scale=1
+                    )
+                    print(f"📄 Plot saved as PDF (fallback, may have interpolation): {pdf_path}")
+                    return
+                except Exception as pdf_error2:
+                    print(f"⚠️ PDF fallback also failed: {pdf_error2}")
+        
+        # HTML fallback (always works)
+        try:
+            fig.write_html(html_path)
+            print(f"🌐 Plot saved as HTML (interactive format): {html_path}")
+        except Exception as html_error:
+            print(f"⚠️ HTML save failed: {html_error}")
+            
+    except Exception as e:
+        print(f"⚠️ Could not save plot {filename}: {e}")
+
+
 def _find_enrichment_file(analysis: str, cell_type: str, condition: str = None) -> str:
     """
     Unified file discovery function for enrichment analyses.
@@ -118,6 +191,10 @@ def display_enrichment_visualization(
                 margin=dict(l=100, r=50, t=50, b=50),  # Add margins to prevent cropping
                 autosize=True
             )
+            
+            # Save bar plot as PDF
+            _save_plot_as_pdf(bar_fig, f"{analysis}_{cell_type}_bar_plot")
+            
             bar_html = pio.to_html(bar_fig, full_html=False, include_plotlyjs="cdn")
             plots_html.append(bar_html)
             print(f"✅ Bar plot HTML generated: {len(bar_html)} characters")
@@ -156,6 +233,10 @@ def display_enrichment_visualization(
                 margin=dict(l=100, r=50, t=50, b=50),  # Add margins to prevent cropping
                 autosize=True
             )
+            
+            # Save dot plot as PDF
+            _save_plot_as_pdf(dot_fig, f"{analysis}_{cell_type}_dot_plot")
+            
             dot_html = pio.to_html(dot_fig, full_html=False, include_plotlyjs="cdn")
             plots_html.append(dot_html)
             print(f"✅ Dot plot HTML generated: {len(dot_html)} characters")
@@ -267,6 +348,10 @@ def display_dotplot(cell_type: str = "Overall cells") -> str:
         )
         fig.update_traces(marker=dict(opacity=0.8))
         fig.update_layout(width=1200, height=800, autosize=True)
+        
+        # Save dot plot as PDF
+        _save_plot_as_pdf(fig, f"dotplot_{cell_type_formatted}")
+        
         # Return the HTML snippet for embedding the interactive figure
         plot_html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
         return plot_html
@@ -327,6 +412,9 @@ def display_processed_umap(cell_type: str) -> str:
             showlegend=True,
             margin=dict(l=50, r=50, t=80, b=50)
         )
+
+        # Save UMAP plot as PDF
+        _save_plot_as_pdf(fig, f"UMAP_{std}")
 
         # return html snippet
         return pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
@@ -591,6 +679,9 @@ def display_cell_count_comparison(cell_types_data: dict, plot_type: str = "stack
         else:
             return f"Error: Unsupported plot type '{plot_type}'. Use 'stacked' or 'grouped'."
         
+        # Save cell count comparison plot as PDF
+        _save_plot_as_pdf(fig, f"cell_count_comparison_{plot_type}")
+        
         # Convert to HTML
         plot_html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
         
@@ -636,15 +727,25 @@ def display_dea_heatmap(cell_type: str, top_n_genes: int = 20, cluster_genes: bo
             gene_row = []
             for condition in conditions:
                 logfc = genes_data[gene].get(condition, 0)  # Use 0 if gene not found in condition
-                gene_row.append(logfc)
+                # Ensure we have a valid numeric value
+                if isinstance(logfc, (int, float)) and not np.isnan(logfc):
+                    gene_row.append(float(logfc))
+                else:
+                    gene_row.append(0.0)
             expression_matrix.append(gene_row)
-            gene_labels.append(gene)
+            gene_labels.append(str(gene))
         
         if not expression_matrix:
             return f"<p>No expression data to visualize for {direction} genes in {cell_type}</p>"
         
-        # Convert to numpy array for clustering
-        matrix = np.array(expression_matrix)
+        # Convert to numpy array for clustering and ensure proper data types
+        try:
+            matrix = np.array(expression_matrix, dtype=float)
+            if matrix.size == 0:
+                return f"<p>No valid expression data for {direction} genes in {cell_type}</p>"
+        except Exception as e:
+            print(f"⚠️ Error creating matrix for {direction} genes: {e}")
+            return f"<p>Error processing expression data for {direction} genes in {cell_type}</p>"
         
         # Apply clustering if requested
         gene_order = list(range(len(gene_labels)))
@@ -673,68 +774,96 @@ def display_dea_heatmap(cell_type: str, top_n_genes: int = 20, cluster_genes: bo
         clustered_genes = [gene_labels[i] for i in gene_order]
         clustered_conditions = [conditions[i] for i in condition_order]
         
+        # Validate clustered matrix
+        if clustered_matrix.size == 0:
+            return f"<p>No data available after clustering for {direction} genes in {cell_type}</p>"
+            
+        # Ensure all values are finite
+        clustered_matrix = np.nan_to_num(clustered_matrix, nan=0.0, posinf=0.0, neginf=0.0)
+        
         # Choose appropriate colorscale based on direction
         if direction == "upregulated":
             colorscale = 'Reds'
-            color_range = [0, max(clustered_matrix.flatten()) if len(clustered_matrix.flatten()) > 0 else 1]
+            max_val = np.max(clustered_matrix) if clustered_matrix.size > 0 else 1
+            color_range = [0, max(max_val, 0.1)]  # Ensure positive range
         else:
             colorscale = 'Blues_r'
-            color_range = [min(clustered_matrix.flatten()) if len(clustered_matrix.flatten()) > 0 else -1, 0]
+            min_val = np.min(clustered_matrix) if clustered_matrix.size > 0 else -1
+            color_range = [min(min_val, -0.1), 0]  # Ensure negative range
         
-        # Create heatmap
-        fig = go.Figure(data=go.Heatmap(
-            z=clustered_matrix,
-            x=clustered_conditions,
-            y=clustered_genes,
-            colorscale=colorscale,
-            zmin=color_range[0],
-            zmax=color_range[1],
-            colorbar=dict(
-                title="Log Fold Change",
-                titleside="right"
-            ),
-            hoverongaps=False,
-            hovertemplate='<b>Gene:</b> %{y}<br>' +
-                         '<b>Condition:</b> %{x}<br>' +
-                         '<b>Log FC:</b> %{z:.2f}<br>' +
-                         '<extra></extra>'
-        ))
+        # Create heatmap with forced discrete rendering
+        try:
+            fig = go.Figure(data=go.Heatmap(
+                z=clustered_matrix.tolist(),  # Convert to list for better compatibility
+                x=[str(c) for c in clustered_conditions],  # Ensure strings
+                y=[str(g) for g in clustered_genes],  # Ensure strings
+                colorscale=colorscale,
+                zmin=color_range[0],
+                zmax=color_range[1],
+                colorbar=dict(title="Log Fold Change"),
+                hoverongaps=False,
+                # Force discrete rendering parameters
+                connectgaps=False,  # Prevent interpolation between gaps
+                showscale=True,
+                transpose=False,  # Ensure proper orientation
+                hovertemplate='<b>Gene:</b> %{y}<br>' +
+                             '<b>Condition:</b> %{x}<br>' +
+                             '<b>Log FC:</b> %{z:.2f}<br>' +
+                             '<extra></extra>'
+            ))
+        except Exception as e:
+            print(f"⚠️ Error creating heatmap figure for {direction}: {e}")
+            return f"<p>Error creating heatmap figure for {direction} genes in {cell_type}: {e}</p>"
         
-        # Update layout with frontend-friendly settings
+        # Update layout with consistent rendering settings
         fig.update_layout(
             title=f'{direction.title()} Genes - {cell_type}<br><sub>Top {len(clustered_genes)} {direction} genes</sub>',
             xaxis_title="Conditions",
             yaxis_title="Genes",
-            width=None,  # Let container control width
+            width=1200,  # Fixed width for consistency across formats
             height=max(400, len(clustered_genes) * 25 + 150),
             font=dict(size=10),
             margin=dict(l=150, r=50, t=100, b=50),
             xaxis=dict(
                 tickangle=45,
-                tickfont=dict(size=10)
+                tickfont=dict(size=10),
+                type='category'  # Ensure categorical axis
             ),
             yaxis=dict(
                 tickfont=dict(size=9),
-                autorange='reversed'
+                autorange='reversed',
+                type='category'  # Ensure categorical axis
             ),
-            # Additional settings to prevent overlap
-            autosize=True,
-            showlegend=False
+            # Settings for consistent rendering
+            autosize=False,  # Use fixed dimensions
+            showlegend=False,
+            plot_bgcolor='white',  # Consistent background
+            paper_bgcolor='white'
         )
         
+        # Save heatmap as PDF (non-blocking)
+        try:
+            _save_plot_as_pdf(fig, f"DEA_{cell_type}_{direction}_heatmap")
+        except Exception as e:
+            print(f"⚠️ PDF save failed for {direction} heatmap: {e}")
+        
         # Generate HTML with improved configuration
-        return pio.to_html(
-            fig, 
-            full_html=False, 
-            include_plotlyjs='cdn',
-            config={
-                'displayModeBar': True,
-                'displaylogo': False,
-                'modeBarButtonsToRemove': ['pan2d', 'lasso2d', 'select2d'],
-                'responsive': True
-            },
-            div_id=f"heatmap_{direction}_{cell_type.replace(' ', '_')}"
-        )
+        try:
+            return pio.to_html(
+                fig, 
+                full_html=False, 
+                include_plotlyjs='cdn',
+                config={
+                    'displayModeBar': True,
+                    'displaylogo': False,
+                    'modeBarButtonsToRemove': ['pan2d', 'lasso2d', 'select2d'],
+                    'responsive': True
+                },
+                div_id=f"heatmap_{direction}_{cell_type.replace(' ', '_')}"
+            )
+        except Exception as e:
+            print(f"⚠️ Error generating HTML for {direction} heatmap: {e}")
+            return f"<p>Error generating HTML for {direction} genes in {cell_type}: {e}</p>"
 
     try:
         # Standardize cell type name
@@ -884,14 +1013,15 @@ def display_dea_heatmap(cell_type: str, top_n_genes: int = 20, cluster_genes: bo
         
         # Check if we have valid heatmaps to display
         valid_plots = []
-        if upregulated_html and not upregulated_html.startswith("<p>No"):
+        
+        if upregulated_html and not (upregulated_html.startswith("<p>No") or upregulated_html.startswith("Error") or len(upregulated_html) < 100):
             valid_plots.append({
                 "type": "upregulated_heatmap",
                 "title": f"Upregulated Genes - {cell_type}",
                 "html": upregulated_html
             })
         
-        if downregulated_html and not downregulated_html.startswith("<p>No"):
+        if downregulated_html and not (downregulated_html.startswith("<p>No") or downregulated_html.startswith("Error") or len(downregulated_html) < 100):
             valid_plots.append({
                 "type": "downregulated_heatmap", 
                 "title": f"Downregulated Genes - {cell_type}",
