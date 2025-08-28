@@ -1,0 +1,485 @@
+{
+  "original_questions": [
+    {
+      "question_id": "Q1",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Erythroid progenitor cell and Monocyte using their canonical markers?",
+      "required_functions": [
+        "process_cells (Progenitor cell)",
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (Monocyte)",
+        "dea_split_by_condition (Erythroid progenitor cell)"
+      ],
+      "answer": "Erythroid progenitor cells can be differentiated from Monocytes using their canonical markers as follows:\n\n- **Erythroid progenitor cells**: These cells are marked by the expression of CD326 and CD71.\n- **Monocytes**: These cells are marked by the expression of CD11c, Tim3, and CD33.\n\nBy identifying the presence of these specific markers, one can distinguish between Erythroid progenitor cells and Monocytes."
+    },
+    {
+      "question_id": "Q2",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Erythroid progenitor cell and Conventional dendritic cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Progenitor cell)",
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (Conventional dendritic cell)",
+        "dea_split_by_condition (Erythroid progenitor cell)"
+      ],
+      "answer": "Erythroid progenitor cells can be differentiated from Conventional dendritic cells using their canonical markers as follows:\n\n- **Erythroid progenitor cells**: These cells are marked by the expression of CD326 and CD71.\n- **Conventional dendritic cells**: These cells are marked by the expression of CD141 and CD1c.\n\nBy identifying the presence of these specific markers, one can distinguish between the two cell types."
+    },
+    {
+      "question_id": "Q3",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Monocyte and Conventional dendritic cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (Monocyte)",
+        "dea_split_by_condition (Conventional dendritic cell)"
+      ],
+      "answer": "Monocytes can be differentiated from Conventional dendritic cells using their canonical markers as follows:\n\n- Monocytes are characterized by the markers CD11c, Tim3, and CD33.\n- Conventional dendritic cells are characterized by the markers CD141 and CD1c."
+    },
+    {
+      "question_id": "Q4",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Monocyte and B cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (Monocyte)",
+        "dea_split_by_condition (B cell)"
+      ],
+      "answer": "Monocytes can be differentiated from B cells using their canonical markers as follows:\n\n- Monocytes are identified by the markers CD11c, Tim3, and CD33.\n- B cells are identified by the markers CD19, CD10, and CD38.\n\nThese distinct sets of markers allow for the differentiation between the two cell types."
+    },
+    {
+      "question_id": "Q5",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Conventional dendritic cell and B cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (Conventional dendritic cell)",
+        "dea_split_by_condition (B cell)"
+      ],
+      "answer": "Conventional dendritic cells can be differentiated from B cells using their canonical markers. Conventional dendritic cells are identified by the markers CD141 and CD1c, while B cells are identified by the markers CD19, CD10, and CD38."
+    },
+    {
+      "question_id": "Q6",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Conventional dendritic cell and T cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (Conventional dendritic cell)",
+        "dea_split_by_condition (T cell)"
+      ],
+      "answer": "Conventional dendritic cells can be differentiated from T cells using their canonical markers as follows:\n\n- Conventional dendritic cells are identified by the markers CD141 and CD1c.\n- T cells are identified by the markers CD3, CD4, and CD8."
+    },
+    {
+      "question_id": "Q7",
+      "category": "annotation",
+      "question_text": "How can we differentiate between B cell and T cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "dea_split_by_condition (B cell)",
+        "dea_split_by_condition (T cell)"
+      ],
+      "answer": "B cells can be differentiated from T cells using their canonical markers: B cells are identified by the presence of CD19, while T cells are identified by the presence of CD3."
+    },
+    {
+      "question_id": "Q8",
+      "category": "annotation",
+      "question_text": "How can we differentiate between B cell and Natural killer cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "dea_split_by_condition (B cell)",
+        "dea_split_by_condition (Natural killer cell)"
+      ],
+      "answer": "B cells can be differentiated from Natural killer (NK) cells using their canonical markers as follows:\n\n- B cells are characterized by the presence of markers CD19, CD10, and CD38.\n- Natural killer (NK) cells are characterized by the presence of markers CD56 and CD16."
+    },
+    {
+      "question_id": "Q9",
+      "category": "annotation",
+      "question_text": "How can we differentiate between T cell and Natural killer cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "dea_split_by_condition (T cell)",
+        "dea_split_by_condition (Natural killer cell)"
+      ],
+      "answer": "T cells can be differentiated from Natural killer (NK) cells using their canonical markers as follows:\n\n- T cells are characterized by the presence of CD3, CD4, and CD8 markers.\n- Natural killer (NK) cells are characterized by the presence of CD56 and CD16 markers."
+    },
+    {
+      "question_id": "Q10",
+      "category": "insights",
+      "question_text": "Regarding the Erythroid progenitor cells, what Expression in CD326 expression was observed in Young healthy when comparing CD326– to CD326+?",
+      "required_functions": [
+        "process_cells (Progenitor cell)",
+        "dea_split_by_condition (Erythroid progenitor cell)"
+      ],
+      "cell_type_status": "known",
+      "canonical_cell_type": "Erythroid progenitor cell",
+      "answer": "In Young healthy individuals, an increase in CD326 expression was observed along the erythroid trajectory when comparing CD326– to CD326+."
+    },
+    {
+      "question_id": "Q11",
+      "category": "enrichment",
+      "question_text": "Can we confirm if the cytotoxicity is enriched in known 'T cell' from the Young healthy?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "perform_enrichment_analyses (T cell)"
+      ],
+      "canonical_cell_type": "T cell",
+      "answer": "Yes, the cytotoxicity is enriched in known 'T cell' from the Young healthy group. The paper mentions a \"cytotoxicity score\" that explains variance in marker expression specifically for T cells, indicating an enrichment of cytotoxicity in this cell type."
+    },
+    {
+      "question_id": "Q12",
+      "category": "adaptive_outcomes",
+      "question_text": "What is the relationship between the abundance of Erythroid progenitor cell and the activity of HSPC differentiation, and how might this impact clinical outcomes in this study's findings?",
+      "required_functions": [
+        "process_cells (Progenitor cell)",
+        "perform_enrichment_analyses (HSPC differentiation)"
+      ],
+      "answer": "The relationship between the abundance of Erythroid progenitor cells and the activity of HSPC (Hematopoietic Stem and Progenitor Cell) differentiation is a critical aspect of understanding hematopoiesis, the process by which blood cells are formed. In the context of this study, the abundance of Erythroid progenitor cells is directly linked to the activity of HSPC differentiation, particularly along the erythroid lineage.\n\n### Relationship Analysis:\n\n1. **Erythroid Progenitor Cells and HSPC Differentiation:**\n   - Erythroid progenitor cells are identified by markers such as CD326 and CD71, which are indicative of erythroid commitment. The study highlights that CD326 expression increases along the erythroid differentiation trajectory, suggesting that as HSPCs differentiate, a subset commits to the erythroid lineage, increasing the abundance of Erythroid progenitor cells.\n   - The pseudotime analysis used in the study reveals that specific markers like CD326 are novel indicators of erythroid differentiation, providing insights into the stages of HSPC differentiation into erythroid progenitors.\n\n2. **Impact on Clinical Outcomes:**\n   - **AML (Acute Myeloid Leukemia) Context:** In AML patients, the differentiation pathways of HSPCs can be disrupted, leading to an imbalance in the production of various blood cell types, including erythroid progenitors. Understanding the differentiation trajectory and the abundance of erythroid progenitors can help in assessing the extent of hematopoietic disruption in AML.\n   - **Therapeutic Implications:** By mapping the differentiation pathways and identifying key markers like CD326, clinicians can potentially develop targeted therapies that aim to restore normal differentiation processes in AML patients. This could improve clinical outcomes by promoting the production of healthy erythroid cells and reducing leukemic cell proliferation.\n   - **Aging and Hematopoiesis:** The study also compares young and aged healthy donors, noting stable surface protein expression patterns. This suggests that despite aging, the differentiation capacity of HSPCs into erythroid progenitors remains relatively stable, which is crucial for maintaining effective hematopoiesis in older individuals.\n\n### Conclusion:\n\nThe study's findings on the relationship between Erythroid progenitor cell abundance and HSPC differentiation provide valuable insights into the mechanisms of hematopoiesis and its disruption in diseases like AML. By identifying and validating novel markers of differentiation, the research offers potential pathways for therapeutic intervention and improved clinical outcomes, particularly in the context of hematological disorders and aging. Understanding these dynamics is essential for developing strategies to manipulate HSPC differentiation in clinical settings, potentially leading to more effective treatments for conditions characterized by impaired blood cell production."
+    },
+    {
+      "question_id": "Q13",
+      "category": "adaptive_outcomes",
+      "question_text": "Let's synthesize the findings to explain how the interplay between Erythroid progenitor cell, Monocyte, Conventional dendritic cell and HSPC differentiation contributes to the overall tumor microenvironment.",
+      "required_functions": [
+        "process_cells (Progenitor cell)",
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "perform_enrichment_analyses (Erythroid progenitor cell)",
+        "perform_enrichment_analyses (Monocyte)",
+        "perform_enrichment_analyses (Conventional dendritic cell)"
+      ],
+      "answer": "The interplay between Erythroid progenitor cells, Monocytes, Conventional dendritic cells, and Hematopoietic Stem and Progenitor Cells (HSPCs) is crucial in shaping the tumor microenvironment, particularly in the context of acute myeloid leukemia (AML) and other hematological malignancies. This synthesis integrates insights from cellular biology, immunology, and oncology to elucidate their roles and interactions.\n\n### Erythroid Progenitor Cells\nErythroid progenitor cells, marked by CD326 and CD71, are involved in the differentiation pathway leading to mature red blood cells. In the tumor microenvironment, these cells can influence the oxygenation status and metabolic conditions, which are critical for tumor growth and survival. The presence of erythroid progenitors and their differentiation can affect the availability of oxygen and nutrients, potentially impacting the proliferation and survival of malignant cells.\n\n### Monocytes\nMonocytes, identified by markers such as CD11c, Tim3, and CD33, are key players in the immune response and can differentiate into macrophages and dendritic cells. In the tumor microenvironment, monocytes can be recruited and polarized into tumor-associated macrophages (TAMs), which often exhibit immunosuppressive functions. These TAMs can promote tumor growth by secreting growth factors, cytokines, and enzymes that remodel the extracellular matrix, facilitating tumor invasion and metastasis.\n\n### Conventional Dendritic Cells\nConventional dendritic cells, characterized by CD141 and CD1c, are essential for antigen presentation and the initiation of adaptive immune responses. In the context of a tumor, these cells can either stimulate anti-tumor immunity by presenting tumor antigens to T cells or, conversely, contribute to immune tolerance if they become dysfunctional or are influenced by the tumor microenvironment. The balance of these activities can significantly affect the immune surveillance and elimination of tumor cells.\n\n### HSPC Differentiation\nHSPCs, marked by CD34, are the progenitors of all blood cell lineages, including erythroid, myeloid, and lymphoid cells. The differentiation of HSPCs is a tightly regulated process that can be disrupted in malignancies like AML, leading to the accumulation of immature and dysfunctional cells. The differentiation pathways of HSPCs, including erythroid and myeloid differentiation, are critical for maintaining hematopoietic homeostasis and immune competence. In the tumor microenvironment, aberrant differentiation of HSPCs can contribute to the immunosuppressive milieu, supporting tumor progression.\n\n### Interplay and Impact on Tumor Microenvironment\nThe interplay between these cell types in the tumor microenvironment is complex and dynamic. Erythroid progenitors can influence the metabolic landscape, while monocytes and dendritic cells modulate immune responses. The differentiation of HSPCs into these lineages is crucial for maintaining a balance between effective immune surveillance and the potential for immune evasion by the tumor.\n\nIn AML, the disruption of normal HSPC differentiation can lead to an imbalance in these cell populations, contributing to a microenvironment that supports tumor growth and immune evasion. Understanding these interactions provides insights into potential therapeutic targets, such as modulating the differentiation pathways of HSPCs or altering the function of monocytes and dendritic cells to enhance anti-tumor immunity.\n\nOverall, the integration of these cellular processes highlights the importance of the hematopoietic system in the tumor microenvironment and underscores the potential for targeted therapies that can restore normal differentiation and immune function."
+    },
+    {
+      "question_id": "Q14",
+      "category": "adaptive_outcomes",
+      "question_text": "What are the key functional implications of Erythroid progenitor cell abundance changes observed in the experimental conditions?",
+      "required_functions": [
+        "process_cells (Progenitor cell)",
+        "compare_cell_counts (Erythroid progenitor cell)"
+      ],
+      "answer": "The study provides a comprehensive single-cell proteo-genomic atlas of human bone marrow, focusing on various cell types, including erythroid progenitor cells. The key functional implications of changes in erythroid progenitor cell abundance observed in the experimental conditions can be analyzed from several perspectives:\n\n1. **Hematopoietic Differentiation and Erythropoiesis**: Erythroid progenitor cells are crucial for erythropoiesis, the process of producing red blood cells. Changes in their abundance can directly impact the body's ability to produce adequate red blood cells, affecting oxygen transport and overall metabolic function. The study's pseudotime analysis identified CD326 as a novel marker for erythroid commitment, indicating that changes in erythroid progenitor abundance could reflect shifts in differentiation pathways within the hematopoietic system.\n\n2. **Disease Context and AML**: In the context of acute myeloid leukemia (AML), changes in erythroid progenitor cell abundance could indicate disruptions in normal hematopoietic differentiation. AML is characterized by the proliferation of immature myeloid cells, which can suppress normal erythropoiesis. The study's comparison of healthy and AML samples could reveal how leukemic conditions alter erythroid progenitor populations, potentially contributing to anemia commonly observed in AML patients.\n\n3. **Aging and Hematopoietic Stability**: The study notes that surface protein expression is highly similar between young and aged healthy bone marrow, suggesting stable patterns across populations. However, any observed changes in erythroid progenitor abundance with aging could provide insights into age-related hematopoietic decline or compensatory mechanisms that maintain erythropoiesis in older individuals.\n\n4. **Biological Pathways and Gene Expression**: The study highlights the role of specific genes, such as CD326 and CD71, in erythroid differentiation. Changes in erythroid progenitor abundance could be linked to alterations in these gene expression pathways, affecting the efficiency and regulation of erythropoiesis. Understanding these pathways can inform therapeutic strategies to modulate erythropoiesis in various clinical settings, including anemia and bone marrow disorders.\n\n5. **Technological and Methodological Insights**: The use of high-content single-cell proteo-genomic mapping and pseudotime analysis provides a detailed view of erythroid progenitor dynamics. This approach allows for the identification of novel markers and differentiation trajectories, enhancing our understanding of erythropoiesis at a single-cell level. The development of tools like the Abseq App for data visualization and gating strategy design further supports the functional analysis of erythroid progenitor changes.\n\nIn summary, changes in erythroid progenitor cell abundance have significant functional implications for understanding erythropoiesis, disease pathology in AML, aging-related hematopoietic changes, and the underlying biological pathways. These insights can guide future research and therapeutic interventions targeting erythropoietic disorders."
+    },
+    {
+      "question_id": "Q15",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Hematopoietic stem cell and B cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Stem cell)",
+        "process_cells (Immune cell)",
+        "dea_split_by_condition (Hematopoietic stem cell)",
+        "dea_split_by_condition (B cell)"
+      ],
+      "answer": "To differentiate between Hematopoietic Stem Cells (HSCs) and B cells using their canonical markers, you can look at the specific surface markers associated with each cell type:\n\n- **Hematopoietic Stem Cells (HSCs)** are characterized by the presence of the markers **CD34**, **CD38**, and **CD133**.\n- **B cells** are identified by the markers **CD19**, **CD10**, and **CD34**.\n\nWhile both cell types share the marker **CD34**, they can be distinguished by the presence of other markers. HSCs express **CD38** and **CD133**, which are not markers for B cells. Conversely, B cells express **CD19** and **CD10**, which are not markers for HSCs. Therefore, the presence of **CD19** and **CD10** would indicate a B cell, while the presence of **CD38** and **CD133** would indicate a Hematopoietic Stem Cell."
+    },
+    {
+      "question_id": "Q16",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Hematopoietic stem cell and T cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Stem cell)",
+        "process_cells (Immune cell)",
+        "dea_split_by_condition (Hematopoietic stem cell)",
+        "dea_split_by_condition (T cell)"
+      ],
+      "answer": "To differentiate between Hematopoietic Stem Cells and T Cells using their canonical markers, we can look at the specific surface markers associated with each cell type:\n\n- **Hematopoietic Stem Cells** are characterized by the presence of markers such as CD34, CD38, and CD133.\n- **T Cells** are identified by the presence of markers such as CD3, CD4, and CD8.\n\nTherefore, the presence of CD34, CD38, and CD133 would indicate Hematopoietic Stem Cells, while the presence of CD3, CD4, and CD8 would indicate T Cells. These distinct marker profiles allow for the differentiation between these two cell types."
+    },
+    {
+      "question_id": "Q17",
+      "category": "annotation",
+      "question_text": "How can we differentiate between B cell and T cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "dea_split_by_condition (B cell)",
+        "dea_split_by_condition (T cell)"
+      ],
+      "answer": "To differentiate between B cells and T cells using their canonical markers, you can look at the specific surface proteins that are characteristic of each cell type:\n\n- **B cells** are identified by the presence of the marker **CD19**. They also express **CD10** and **CD34**, but CD19 is the primary marker used for their identification.\n\n- **T cells** are identified by the presence of the marker **CD3**. They also express **CD4** and **CD8**, which are used to further classify T cells into subsets (e.g., CD4+ helper T cells and CD8+ cytotoxic T cells).\n\nTherefore, the presence of CD19 indicates a B cell, while the presence of CD3 indicates a T cell."
+    },
+    {
+      "question_id": "Q18",
+      "category": "annotation",
+      "question_text": "How can we differentiate between B cell and Natural killer cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "dea_split_by_condition (B cell)",
+        "dea_split_by_condition (Natural killer cell)"
+      ],
+      "answer": "To differentiate between B cells and Natural Killer (NK) cells using their canonical markers, you can look for the presence of specific surface proteins that are unique to each cell type. According to the paper:\n\n- B cells are characterized by the presence of the markers CD19, CD10, and CD34.\n- Natural Killer cells are characterized by the presence of the markers CD56 and CD16.\n\nTherefore, to distinguish between these two cell types, you would check for the presence of CD19, CD10, and CD34 to identify B cells, and for CD56 and CD16 to identify Natural Killer cells."
+    },
+    {
+      "question_id": "Q19",
+      "category": "annotation",
+      "question_text": "How can we differentiate between T cell and Natural killer cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "dea_split_by_condition (B cell)",
+        "dea_split_by_condition (T cell)"
+      ],
+      "answer": "To differentiate between T cells and Natural Killer (NK) cells using their canonical markers, you can look at the specific surface proteins that are characteristic of each cell type:\n\n- **T cells** are identified by the presence of markers such as CD3, CD4, and CD8.\n- **Natural Killer cells** are identified by the presence of markers such as CD56 and CD16.\n\nTherefore, the presence of CD3 is a key differentiator for T cells, while the presence of CD56 and CD16 is indicative of Natural Killer cells."
+    },
+    {
+      "question_id": "Q20",
+      "category": "annotation",
+      "question_text": "How can we differentiate between T cell and Monocyte using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (Monocyte)",
+        "dea_split_by_condition (T cell)"
+      ],
+      "answer": "To differentiate between T cells and Monocytes using their canonical markers, you can look for the presence of specific surface proteins that are characteristic of each cell type. According to the paper:\n\n- T cells are identified by the presence of markers CD3, CD4, and CD8.\n- Monocytes are identified by the presence of markers CD33 and CD14.\n\nTherefore, the presence of CD3, CD4, or CD8 would indicate a T cell, while the presence of CD33 or CD14 would indicate a Monocyte."
+    },
+    {
+      "question_id": "Q21",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Natural killer cell and Monocyte using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (Monocyte)",
+        "dea_split_by_condition (Natural killer cell)"
+      ],
+      "answer": "Natural killer cells can be differentiated from Monocytes using their canonical markers. Natural killer cells are characterized by the presence of CD56 and CD16 markers, whereas Monocytes are identified by the presence of CD33 and CD14 markers. By assessing the expression of these specific markers, one can distinguish between these two cell types."
+    },
+    {
+      "question_id": "Q22",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Natural killer cell and Conventional dendritic cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (Conventional dendritic cell)",
+        "dea_split_by_condition (Natural killer cell)"
+      ],
+      "answer": "To differentiate between Natural Killer cells and Conventional Dendritic cells using their canonical markers, you can look for the presence of specific surface markers unique to each cell type. \n\nNatural Killer cells are characterized by the markers CD56 and CD16. In contrast, Conventional Dendritic cells are identified by the markers CD11c and CD32. By assessing the expression of these markers, you can distinguish between these two cell types. If a cell expresses CD56 and CD16, it is likely a Natural Killer cell, whereas if it expresses CD11c and CD32, it is likely a Conventional Dendritic cell."
+    },
+    {
+      "question_id": "Q23",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Monocyte and Conventional dendritic cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (Conventional dendritic cell)",
+        "dea_split_by_condition (Monocyte)"
+      ],
+      "answer": "To differentiate between Monocytes and Conventional Dendritic Cells using their canonical markers, you can look at the specific surface markers associated with each cell type. Monocytes are characterized by the markers CD33 and CD14, while Conventional Dendritic Cells are identified by the markers CD11c and CD32. By assessing the presence of these markers, you can distinguish between the two cell types. Monocytes will express CD33 and CD14, whereas Conventional Dendritic Cells will express CD11c and CD32."
+    },
+    {
+      "question_id": "Q24",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Monocyte and Mesenchymal stem cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "process_cells (Stem cell) -> Figure out mesenchymal stem cell is missed",
+        "dea_split_by_condition (Monocyte)"
+      ],
+      "answer": "According to the paper, Monocytes can be differentiated using the canonical markers CD33 and CD14. In contrast, Mesenchymal Stem Cells do not have specific markers listed in the paper. Therefore, differentiation between Monocytes and Mesenchymal Stem Cells using canonical markers would rely on the presence of CD33 and CD14 for Monocytes, while the absence of these markers might suggest a Mesenchymal Stem Cell, given that no specific markers are provided for them in this study."
+    },
+    {
+      "question_id": "Q25",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Conventional dendritic cell and Mesenchymal stem cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "process_cells (Stem cell) -> Figure out mesenchymal stem cell is missed",
+        "dea_split_by_condition (Conventional dendritic cell)"
+      ],
+      "answer": "The differentiation between Conventional dendritic cells and Mesenchymal stem cells using their canonical markers can be achieved by identifying the presence or absence of specific surface markers. According to the paper, Conventional dendritic cells are characterized by the markers CD11c and CD32. In contrast, Mesenchymal stem cells do not have specific markers listed in the paper. Therefore, the presence of CD11c and CD32 would indicate a Conventional dendritic cell, while the absence of these markers, along with the lack of other specific markers, might suggest a Mesenchymal stem cell."
+    },
+    {
+      "question_id": "Q26",
+      "category": "insights",
+      "question_text": "Regarding the Hematopoietic stem cells, what changes in CD34 expression was observed in young healthy when comparing young healthy to aged healthy?",
+      "required_functions": [
+        "process_cells (Stem cell)",
+        "dea_split_by_condition (Hematopoietic stem cell)"
+      ],
+      "answer": "The paper does not provide specific details on changes in CD34 expression in Hematopoietic Stem Cells when comparing young healthy individuals to aged healthy individuals. It mentions that CD34 is a marker for Hematopoietic Stem Cells and that condition comparisons were made between young healthy, aged healthy, and AML, but it does not specify the results of these comparisons in terms of CD34 expression changes."
+    },
+    {
+      "question_id": "Q27",
+      "category": "insights",
+      "question_text": "Regarding the B cells, what changes in CD19 expression was observed in young healthy when comparing young healthy to aged healthy?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "dea_split_by_condition (B cell)"
+      ],
+      "answer": "The paper does not provide specific details on changes in CD19 expression when comparing young healthy to aged healthy individuals. It only mentions that CD19 is a marker for B cells and is part of the condition comparison between young healthy, aged healthy, and AML groups."
+    },
+    {
+      "question_id": "Q28",
+      "category": "insights",
+      "question_text": "Regarding the T cells, what changes in CD3 expression was observed in young healthy when comparing young healthy to aged healthy?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "dea_split_by_condition (T cell)"
+      ],
+      "answer": "The paper does not provide specific details on changes in CD3 expression in T cells when comparing young healthy individuals to aged healthy individuals. It only mentions that CD3 is a marker for T cells in the young healthy patient group and that condition comparisons were made between young healthy, aged healthy, and AML, but specific observations regarding changes in CD3 expression are not detailed."
+    },
+    {
+      "question_id": "Q29",
+      "category": "enrichment",
+      "question_text": "Can we confirm if the Hematopoiesis is enriched in Hematopoietic stem cell from the young healthy?",
+      "required_functions": [
+        "process_cells (Stem cell)",
+        "perform_enrichment_analyses (Hematopoietic stem cell)"
+      ],
+      "answer": "Yes, the paper confirms that the Hematopoiesis pathway is enriched in Hematopoietic Stem Cells from young healthy individuals. This is indicated in the \"gene_sets_pathways\" section, where Hematopoiesis is listed as a pathway associated with Hematopoietic Stem Cells in the young healthy patient group."
+    },
+    {
+      "question_id": "Q30",
+      "category": "enrichment",
+      "question_text": "Can we confirm if the Immune Response is enriched in T cell from the young healthy?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "perform_enrichment_analyses (T cell)"
+      ],
+      "answer": "Yes, the paper confirms that the \"Immune Response\" pathway is associated with T cells from the young healthy group. This is indicated in the \"gene_sets_pathways\" section, where the \"Immune Response\" is listed as a pathway for T cells in young healthy individuals."
+    },
+    {
+      "question_id": "Q31",
+      "category": "enrichment",
+      "question_text": "Can we confirm if the B cell Differentiation is enriched in B cell from the young healthy?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "perform_enrichment_analyses (B cell)"
+      ],
+      "answer": "Yes, the paper confirms that the B cell Differentiation pathway is associated with B cells from the young healthy group. The gene sets and pathways section specifically lists \"B cell Differentiation\" as being related to B cells in young healthy individuals, indicating enrichment in this context."
+    },
+    {
+      "question_id": "Q32",
+      "category": "adaptive_outcomes",
+      "question_text": "What is the relationship between the abundance of Conventional dendritic cell and the activity of  where Hematopoiesis is listed as a pathway, and how might this impact clinical outcomes in this study?",
+      "required_functions": [
+        "process_cells (Stem cell)",
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "compare_cell_counts (Conventional dendritic cell)",
+        "perform_enrichment_analyses (Hematopoietic stem cell)",
+        "perform_enrichment_analyses (Conventional dendritic cell)"
+      ],
+      "answer": "The study you provided focuses on creating comprehensive single-cell proteo-genomic reference maps of human blood and bone marrow, which include various hematopoietic cell types. While the paper identifies several cell types and pathways, it does not explicitly mention a direct relationship between the abundance of Conventional dendritic cells and the activity of the Hematopoiesis pathway. However, we can infer potential interactions based on the known roles of these components in the immune system and hematopoiesis.\n\n### Conventional Dendritic Cells and Hematopoiesis\n\n1. **Conventional Dendritic Cells (cDCs):**\n   - cDCs are crucial for antigen presentation and initiating immune responses. They are derived from hematopoietic stem cells (HSCs) and are part of the myeloid lineage.\n   - The abundance of cDCs can reflect the state of the immune system and its readiness to respond to pathogens.\n\n2. **Hematopoiesis Pathway:**\n   - Hematopoiesis is the process by which all blood cells, including immune cells like cDCs, are formed from HSCs.\n   - This pathway is essential for maintaining a balanced production of different blood cell types, ensuring proper immune function and homeostasis.\n\n### Potential Impact on Clinical Outcomes\n\n- **Immune Function and Disease Response:**\n  - An optimal abundance of cDCs is necessary for effective immune surveillance and response. If the Hematopoiesis pathway is disrupted, leading to altered cDC levels, it could impact the body's ability to mount an effective immune response.\n  - In the context of leukemia, where hematopoiesis is often dysregulated, the production and function of cDCs might be impaired, potentially affecting disease progression and response to treatment.\n\n- **Biomarker Identification:**\n  - The study's approach of linking surface markers to cell identities can help identify disease-specific markers. If cDC abundance or function is altered in leukemic conditions, these changes could serve as biomarkers for diagnosis or prognosis.\n\n- **Therapeutic Implications:**\n  - Understanding the relationship between cDC abundance and hematopoiesis could inform therapeutic strategies. For instance, treatments that restore normal hematopoiesis might also normalize cDC levels, improving immune function in patients with hematological disorders.\n\nIn summary, while the study does not directly address the relationship between cDC abundance and the Hematopoiesis pathway, understanding this interaction is crucial for interpreting immune function and developing clinical interventions in hematological diseases. The study's comprehensive mapping approach provides a valuable resource for exploring these relationships further."
+    },
+    {
+      "question_id": "Q33",
+      "category": "adaptive_outcomes",
+      "question_text": "Let's synthesize the findings to explain how the interplay between Conventional dendritic cell and  where Hematopoiesis is listed as a pathway contributes to the overall tumor microenvironment.",
+      "required_functions": [
+        "process_cells (Stem cell)",
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "perform_enrichment_analyses (Hematopoietic stem cell)",
+        "perform_enrichment_analyses (Conventional dendritic cell)"
+      ],
+      "answer": "The study provides a comprehensive analysis of the hematopoietic system, focusing on the identification and characterization of various cell types, including Conventional Dendritic Cells (cDCs), within the context of hematopoiesis. To understand the interplay between cDCs and the hematopoietic pathway in the tumor microenvironment, we need to consider several key aspects:\n\n1. **Role of Conventional Dendritic Cells (cDCs):**\n   - cDCs are crucial antigen-presenting cells that play a significant role in initiating and regulating immune responses. They capture, process, and present antigens to T cells, thus bridging innate and adaptive immunity.\n   - In the context of a tumor microenvironment, cDCs can influence the immune response against tumor cells. They can either promote anti-tumor immunity by activating T cells or contribute to immune tolerance if they become dysfunctional or are influenced by the tumor milieu.\n\n2. **Hematopoiesis Pathway:**\n   - Hematopoiesis is the process by which all blood cells, including immune cells like cDCs, are generated from hematopoietic stem cells (HSCs) in the bone marrow.\n   - The study highlights the diversity of cell types and states observed in hematopoiesis, which challenges classical models. This diversity is crucial for maintaining a dynamic and responsive immune system capable of adapting to various challenges, including tumor development.\n\n3. **Interplay in the Tumor Microenvironment:**\n   - The tumor microenvironment is a complex network of cancer cells, stromal cells, immune cells, and extracellular matrix components. The interaction between these elements can significantly influence tumor progression and response to therapy.\n   - cDCs, derived from the hematopoietic pathway, can infiltrate the tumor microenvironment and modulate immune responses. Their ability to present tumor antigens to T cells is vital for initiating an effective anti-tumor immune response.\n   - However, tumors can create an immunosuppressive environment that impairs cDC function, leading to reduced antigen presentation and T cell activation. This can result in immune evasion by the tumor.\n\n4. **Implications of the Study:**\n   - By providing a detailed proteo-genomic map of hematopoietic cells, the study enhances our understanding of how different cell types, including cDCs, are generated and function in both healthy and diseased states.\n   - The identification of disease-specific markers and differences in surface marker expression between healthy and leukemic states can inform the development of targeted therapies that aim to restore or enhance cDC function in the tumor microenvironment.\n   - Improved flow cytometry techniques, informed by single-cell genomic data, can lead to more precise isolation and characterization of cDCs, facilitating research into their role in cancer and potential therapeutic applications.\n\nIn summary, the interplay between cDCs and the hematopoietic pathway is crucial for maintaining immune surveillance and response within the tumor microenvironment. The study's findings provide valuable insights into the cellular dynamics of hematopoiesis and the potential for leveraging this knowledge to improve cancer immunotherapy strategies."
+    },
+    {
+      "question_id": "Q34",
+      "category": "annotation",
+      "question_text": "How can we differentiate between B cell and T cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "dea_split_by_condition (B cell)",
+        "dea_split_by_condition (T cell)"
+      ],
+      "answer": "To differentiate between B cells and T cells using their canonical markers, you can look for the presence of specific surface proteins that are characteristic of each cell type:\n\n- **B cells** are identified by the presence of markers such as **CD10**, **CD19**, and **CD38**. These markers are associated with B cell differentiation and lineage.\n\n- **T cells** are identified by the presence of markers such as **CD3**, **CD4**, and **CD8**. CD3 is a common marker for all T cells, while CD4 and CD8 are used to distinguish between helper T cells (CD4+) and cytotoxic T cells (CD8+).\n\nBy using these markers, you can effectively differentiate between B cells and T cells in a sample."
+    },
+    {
+      "question_id": "Q35",
+      "category": "annotation",
+      "question_text": "How can we differentiate between B cell and Conventional dendritic cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (B cell)",
+        "dea_split_by_condition (Conventional dendritic cell)"
+      ],
+      "answer": "To differentiate between B cells and Conventional dendritic cells using their canonical markers, you can look for the presence of specific surface markers associated with each cell type:\n\n- **B cells** are characterized by the presence of markers such as **CD10** and **CD19**. These markers are indicative of B cell lineage and differentiation.\n\n- **Conventional dendritic cells** are identified by the presence of the marker **CD11c**. This marker is specific to dendritic cells and helps distinguish them from other cell types.\n\nBy assessing the expression of these markers, you can effectively differentiate between B cells and Conventional dendritic cells."
+    },
+    {
+      "question_id": "Q36",
+      "category": "annotation",
+      "question_text": "How can we differentiate between T cell and Conventional dendritic cell using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (T cell)",
+        "dea_split_by_condition (Conventional dendritic cell)"
+      ],
+      "answer": "To differentiate between T cells and Conventional dendritic cells using their canonical markers, you can look for the presence of specific surface markers associated with each cell type:\n\n- **T cells** are characterized by the presence of markers such as **CD3**, **CD4**, and **CD8**. These markers are indicative of T cell populations in bone marrow and peripheral blood.\n\n- **Conventional dendritic cells** are identified by the marker **CD11c**. This marker is used to distinguish dendritic cells from other cell types.\n\nBy assessing the expression of these markers, you can effectively differentiate between T cells and Conventional dendritic cells."
+    },
+    {
+      "question_id": "Q37",
+      "category": "annotation",
+      "question_text": "How can we differentiate between T cell and Monocyte using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (T cell)",
+        "dea_split_by_condition (Monocyte)"
+      ],
+      "answer": "To differentiate between T cells and Monocytes using their canonical markers, you can look for the presence of specific surface markers unique to each cell type:\n\n- **T cells** are characterized by the presence of markers such as **CD3**, **CD4**, and **CD8**. These markers are indicative of T cell populations in bone marrow and peripheral blood.\n\n- **Monocytes** are identified by the presence of markers such as **CD14** and **CD33**. These markers are specific to monocyte subpopulations from the CD33+ compartment.\n\nBy using these markers, you can distinguish T cells from Monocytes in a sample."
+    },
+    {
+      "question_id": "Q38",
+      "category": "annotation",
+      "question_text": "How can we differentiate between Conventional dendritic cell and Monocyte using their canonical markers?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (Conventional dendritic cell)",
+        "dea_split_by_condition (Monocyte)"
+      ],
+      "answer": "To differentiate between Conventional dendritic cells and Monocytes using their canonical markers, you can use the following markers:\n\n- **Conventional dendritic cells**: These cells are identified by the marker **CD11c**.\n- **Monocytes**: These cells are identified by the markers **CD14** and **CD33**.\n\nBy assessing the presence of these markers, you can distinguish between the two cell types. Conventional dendritic cells will express CD11c, while Monocytes will express CD14 and CD33."
+    },
+    {
+      "question_id": "Q39",
+      "category": "insights",
+      "question_text": "Regarding the B cells, what changes in CD10 expression was observed in Healthy young and aged donors, AML patients when comparing non-B cells to B cells?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "dea_split_by_condition (B cell)"
+      ],
+      "answer": "The paper indicates that CD10 is a B cell differentiation marker. In the context of comparing non-B cells to B cells among healthy young and aged donors, as well as AML patients, CD10 is used to identify B cells. This suggests that CD10 expression is higher in B cells compared to non-B cells, serving as a marker to differentiate B cells from other cell types in these patient groups."
+    },
+    {
+      "question_id": "Q40",
+      "category": "insights",
+      "question_text": "Regarding the B cells, what changes in CD19 expression was observed in Healthy young and aged donors, AML patients when comparing non-B cells to B cells?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "dea_split_by_condition (B cell)"
+      ],
+      "answer": "The paper indicates that CD19 is a B cell lineage marker. In the context of comparing non-B cells to B cells among healthy young and aged donors, as well as AML patients, CD19 expression is used to identify B cells. This implies that CD19 is expressed in B cells and not in non-B cells, serving as a distinguishing marker for B cell identification across these patient groups."
+    },
+    {
+      "question_id": "Q41",
+      "category": "insights",
+      "question_text": "Regarding the Monocytes, what changes in CD14 expression was observed in Healthy young and aged donors, AML patients when comparing non-monocytes to monocytes?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (Monocyte)"
+      ],
+      "answer": "The paper indicates that CD14 is a surface marker for monocytes. In the context of comparing non-monocytes to monocytes among healthy young and aged donors, as well as AML patients, CD14 expression is used to identify monocytes. This implies that CD14 is expressed in monocytes but not in non-monocytes, serving as a distinguishing marker between these cell types. However, the paper does not provide specific details on changes in CD14 expression levels between these groups."
+    },
+    {
+      "question_id": "Q42",
+      "category": "insights",
+      "question_text": "Regarding the Conventional dendritic cells, what changes in CD11c expression was observed in Healthy young and aged donors, AML patients when comparing non-dendritic cells to dendritic cells?",
+      "required_functions": [
+        "process_cells (Immune cell)",
+        "process_cells (Mononuclear phagocyte)",
+        "dea_split_by_condition (Conventional dendritic cell)"
+      ],
+      "answer": "The paper indicates that CD11c is a marker for dendritic cells. In the context of comparing non-dendritic cells to dendritic cells among healthy young and aged donors, as well as AML patients, CD11c expression is used to identify dendritic cells. However, the paper does not provide specific details on changes in CD11c expression levels between these groups. It simply notes that CD11c is a marker for distinguishing dendritic cells from non-dendritic cells."
+    }
+  ]
+} 
