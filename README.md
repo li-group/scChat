@@ -80,6 +80,7 @@ Follow these steps to utilize the application effectively:
   1. Right-click on the page and select **Inspect**.
   2. Go to the **Application** tab.
   3. Under **Cookies**, remove `sessionid`.
+  4. You may have to run `python manage.py migrate` in some cases before Step 4.
   
   This will prevent previous chat sessions from being reprocessed.
 
