@@ -1,0 +1,23 @@
+[
+  {
+    "timestamp": "2025-09-16T15:37:07.032090",
+    "user_message": "Do GSEA to T cell.",
+    "bot_response": "The Gene Set Enrichment Analysis (GSEA) for T cells has identified several significant enrichment terms. Notably, the \"Kidney-nk Cell\" pathway is highly significant with a p-value of 1.86e-23. Other significant pathways include \"Muscle-mature Nk T Cell,\" \"Kidney-cd8-positive, Alpha-Beta T Cell,\" \"Spleen-nk Cell,\" and \"Mammary-nk Cell,\" each with a p-value of 1.45e-18. In total, 281 terms were found to be significant in the analysis. You can explore these results further through the interactive plots available in the UI.",
+    "session_id": "b05944ce",
+    "analysis_context": {
+      "execution_steps": 6,
+      "successful_analyses": 6,
+      "available_cell_types": [
+        "B cell",
+        "Mononuclear phagocyte",
+        "T cell",
+        "Stromal cell",
+        "Epithelial cell",
+        "Glial cell",
+        "Natural killer cell",
+        "Mast cell"
+      ],
+      "has_plots": false
+    }
+  }
+]

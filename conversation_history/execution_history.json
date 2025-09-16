@@ -1,0 +1,58 @@
+[
+  {
+    "timestamp": "2025-09-16T15:36:19.600837",
+    "function_name": "process_cells",
+    "parameters": {
+      "cell_type": "Immune cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell', '1': 'T cell', '2': 'T cell', '3': 'B cell', '4': 'Mononuclear phagocyte', '5': 'T cell', '6': 'Natural killer cell', '7': 'Mast cell', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD"
+  },
+  {
+    "timestamp": "2025-09-16T15:36:41.574939",
+    "function_name": "perform_enrichment_analyses",
+    "parameters": {
+      "cell_type": "T cell",
+      "analyses": [
+        "gsea"
+      ],
+      "gene_set_library": "Tabula_Sapiens"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'formatted_summary': \"\ud83d\udd2c Enrichment Analysis Results for T cell\\n============================================================\\n\\n\ud83d\udcca Analysis Parameters:\\n  \u2022 Log FC threshold: 1.0\\n  \u2022 P-value threshold: 0.05\\n  \u2022 Analyses performed: gsea\\n  \u2022 Condition-specific analysis: Yes\\n\\n\ud83c\udf10 FULL DATASET ANALYSIS\\n  \u2022 Number of significant genes: 74\\n\\n  \u2022 GSEA Results:\\n    1. Kidney-nk Cell (p-value: 4.4011142076929694e-26)\\n       Genes: SRGN;TSC22D3;GZMA;HLA-B;HLA-C;NKG7;CXCR4;CYBA;HLA-A;ZFP36L2;HLA-E;A"
+  },
+  {
+    "timestamp": "2025-09-16T15:36:46.754907",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "analysis": "gsea",
+      "plot_type": "both"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'multiple_plots': True, 'plots': [{'type': 'bar', 'title': 'Top 10 GSEA Terms - Bar Plot (T cell)', 'html': '<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: \\'local\\'};</script>\\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-3.1.0.min.js\" integrity=\"sha256-Ei4740bWZhaUTQuD6q9yQlgVCMPBz6CZWhevDYPv93A=\" crossorigin=\"anonymous\"></script>                <div id=\"7c474171-25a7-4b8b-b7ca-6b5f7f9624e0\" class=\"plotly-graph-div\" style=\""
+  },
+  {
+    "timestamp": "2025-09-16T15:36:50.835260",
+    "function_name": "search_enrichment_semantic",
+    "parameters": {
+      "cell_type": "T cell"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'error': 'Search query is required', 'results': []}"
+  },
+  {
+    "timestamp": "2025-09-16T15:36:55.888165",
+    "function_name": "display_enrichment_visualization",
+    "parameters": {
+      "cell_type": "T cell",
+      "analysis": "gsea"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "{'multiple_plots': True, 'plots': [{'type': 'bar', 'title': 'Top 10 GSEA Terms - Bar Plot (T cell)', 'html': '<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: \\'local\\'};</script>\\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-3.1.0.min.js\" integrity=\"sha256-Ei4740bWZhaUTQuD6q9yQlgVCMPBz6CZWhevDYPv93A=\" crossorigin=\"anonymous\"></script>                <div id=\"0ce53aaf-6964-48fe-9caa-11604c5ee592\" class=\"plotly-graph-div\" style=\""
+  }
+]

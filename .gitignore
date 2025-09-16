@@ -41,6 +41,8 @@ scchat2/
 # Large data files
 media/
 umaps/
+!umaps/annotated
+!umaps/annotated/.gitkeep
 
 # DBs
 db.sqlite3
@@ -58,6 +60,9 @@ __pycache__/
 scchatbot/annotated_adata/*
 !scchatbot/annotated_adata/*.md
 !scchatbot/annotated_adata/*.txt
+!scchatbot/annotated_adata/*.gitkeep
 
 db.sqlite3
 .DS_Store
+
+CLAUDE.md

@@ -6,6 +6,24 @@ from ..cell_types.standardization import unified_cell_type_handler
 import plotly.io as pio
 import os
 import glob
+from .palettes.seurat import seurat_blue_to_lightred
+
+
+def _seurat_colorscale_to_plotly():
+    """Convert Seurat blue-to-lightred colormap to Plotly colorscale format."""
+    cmap = seurat_blue_to_lightred()
+    # Sample the colormap at regular intervals
+    n_colors = 10
+    colors = []
+    for i in range(n_colors):
+        position = i / (n_colors - 1)
+        rgba = cmap(position)
+        # Convert RGBA to hex
+        hex_color = "#{:02x}{:02x}{:02x}".format(
+            int(rgba[0] * 255), int(rgba[1] * 255), int(rgba[2] * 255)
+        )
+        colors.append([position, hex_color])
+    return colors
 
 
 def _save_plot_as_pdf(fig, filename: str) -> None:
@@ -181,15 +199,24 @@ def display_enrichment_visualization(
                 top,
                 x="gene_ratio",
                 y="Term",
+                color="minus_log10_p",
                 orientation="h",
                 title=f"Top {top_n} {analysis.upper()} Terms - Bar Plot ({cell_type})",
-                labels={"gene_ratio": "Gene Ratio", "Term": "Term"},
+                labels={"gene_ratio": "Gene Ratio", "Term": "Term", "minus_log10_p": "-log10(p-value)"},
+                color_continuous_scale=_seurat_colorscale_to_plotly()
             )
             bar_fig.update_layout(
                 height=top_n * 40 + 200,
                 yaxis={"categoryorder": "total ascending"},
                 margin=dict(l=100, r=50, t=50, b=50),  # Add margins to prevent cropping
                 autosize=True
+            )
+
+            # Update colorbar for bar plot
+            bar_fig.update_coloraxes(
+                colorbar_title="-log10(p-value)",
+                colorbar_thickness=15,
+                colorbar_len=0.8
             )
             
             # Save bar plot as PDF
@@ -217,7 +244,8 @@ def display_enrichment_visualization(
                     "intersection_size": "Gene Count"
                 },
                 size_max=20,
-                orientation="h"
+                orientation="h",
+                color_continuous_scale=_seurat_colorscale_to_plotly()
             )
             # Ensure points are visible by setting minimum sizes and proper ranges
             dot_fig.update_traces(
@@ -232,6 +260,13 @@ def display_enrichment_visualization(
                 yaxis={"categoryorder": "total ascending"},
                 margin=dict(l=100, r=50, t=50, b=50),  # Add margins to prevent cropping
                 autosize=True
+            )
+
+            # Update colorbar title separately
+            dot_fig.update_coloraxes(
+                colorbar_title="-log10(p-value)",
+                colorbar_thickness=15,
+                colorbar_len=0.8
             )
             
             # Save dot plot as PDF

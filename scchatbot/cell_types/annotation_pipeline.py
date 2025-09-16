@@ -28,7 +28,10 @@ import os
 import ast
 from langchain.schema import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
-from .utils import get_rag, get_subtypes, save_analysis_results, explain_gene, get_mapping, filter_existing_genes, extract_genes, get_h5ad
+
+# Global variable to track accumulative cluster numbering across all annotation stages
+global_cluster_counter = 0
+from .utils import get_rag, get_subtypes, get_cell_type_markers, save_analysis_results, explain_gene, get_mapping, filter_existing_genes, extract_genes, get_h5ad
 import re
 import scvi
 from .standardization import unified_cell_type_handler, standardize_cell_type
@@ -230,7 +233,9 @@ def initial_cell_annotation(resolution=1):
     """
     import matplotlib
 
-    global sample_mapping
+    global sample_mapping, global_cluster_counter
+    # Initialize global cluster counter for accumulative leiden
+    global_cluster_counter = 0
     matplotlib.use('Agg')
     path = get_h5ad("media", ".h5ad")
     if not path:
@@ -248,6 +253,15 @@ def initial_cell_annotation(resolution=1):
             sample_mapping = None
     adata = preprocess_data(adata, sample_mapping)
     adata = perform_clustering(adata, resolution=resolution)
+    
+    # Assign accumulative leiden for initial clustering
+    unique_clusters = adata.obs['leiden'].unique()
+    cluster_mapping = {str(cluster): global_cluster_counter + int(cluster) 
+                      for cluster in unique_clusters}
+    adata.obs['accumulative_leiden'] = adata.obs['leiden'].map(cluster_mapping)
+    global_cluster_counter += len(unique_clusters)
+    print(f"📊 Initial clustering: {len(unique_clusters)} clusters, global counter now at {global_cluster_counter}")
+    
     adata = rank_genes(adata, groupby='leiden', n_genes=25, key_added='rank_genes_all')
     markers = get_rag()
     marker_tree = markers.copy()
@@ -260,6 +274,9 @@ def initial_cell_annotation(resolution=1):
         sc.tl.dendrogram(adata, groupby='leiden', use_rep=use_rep)
     else:
         sc.tl.dendrogram(adata, groupby='leiden')
+    # Convert categorical to object type before setting cell_type
+    if hasattr(adata.obs.get('cell_type', None), 'cat'):
+        adata.obs['cell_type'] = adata.obs['cell_type'].astype(str)
     adata.obs['cell_type'] = 'Unknown'
     save_analysis_results(
         adata, 
@@ -318,6 +335,8 @@ def process_cells(adata, cell_type, resolution=None):
     print(f"🔍 Processing cell type: {cell_type}")
     resolution = 1 if resolution is None else resolution
     
+    global global_cluster_counter
+    
     # Get subtypes from database
     markers_tree = get_subtypes(cell_type)
     # print(f"🔍 Retrieved markers_tree: {markers_tree}")
@@ -350,12 +369,33 @@ def process_cells(adata, cell_type, resolution=None):
     
     # Rest of the original function continues...
     filtered = adata[mask].copy()
+    
+    # Convert categorical to object type immediately after copying to avoid assignment errors
+    if hasattr(filtered.obs['cell_type'], 'cat'):
+        filtered.obs['cell_type'] = filtered.obs['cell_type'].astype(str)
+    
     mask_idx = adata.obs.index[mask]
     filtered_idx = filtered.obs.index
     
     sc.tl.pca(filtered, svd_solver="arpack")
     sc.pp.neighbors(filtered)
     filtered = perform_clustering(filtered, resolution=resolution)
+    
+    # Create hierarchical cluster names to avoid collisions
+    parent_cell_type = standardize_cell_type(cell_type).replace(" ", "_").lower()
+    hierarchical_clusters = [f"{parent_cell_type}_cluster_{cluster}" 
+                           for cluster in filtered.obs['leiden']]
+    filtered.obs['hierarchical_leiden'] = hierarchical_clusters
+    
+    # Assign accumulative leiden for re-clustering
+    unique_clusters = filtered.obs['leiden'].unique()
+    cluster_mapping = {str(cluster): global_cluster_counter + int(cluster) 
+                      for cluster in unique_clusters}
+    filtered.obs['accumulative_leiden'] = filtered.obs['leiden'].map(cluster_mapping)
+    
+    print(f"📊 Re-clustering {cell_type}: {len(unique_clusters)} new clusters, global counter: {global_cluster_counter} -> {global_cluster_counter + len(unique_clusters)}")
+    global_cluster_counter += len(unique_clusters)
+    
     sc.tl.dendrogram(filtered, groupby="leiden")
     
     base = standardize_cell_type(cell_type).replace(" ", "_").lower()
@@ -433,14 +473,48 @@ def process_cells(adata, cell_type, resolution=None):
         cell_type=cell_type,
         adata=filtered
     ) 
+    # Convert categorical to object type to allow new values before assignment
+    if hasattr(adata.obs['cell_type'], 'cat'):
+        adata.obs['cell_type'] = adata.obs['cell_type'].astype(str)
+    
     adata.obs.loc[mask, 'cell_type'] = annotated_filtered.obs['cell_type']
+    
+    # Copy hierarchical leiden clusters and accumulative leiden back to main dataset
+    if 'hierarchical_leiden' in annotated_filtered.obs.columns:
+        # Convert hierarchical_leiden to object type if needed
+        if 'hierarchical_leiden' not in adata.obs.columns:
+            adata.obs['hierarchical_leiden'] = 'Unknown'
+        elif hasattr(adata.obs['hierarchical_leiden'], 'cat'):
+            adata.obs['hierarchical_leiden'] = adata.obs['hierarchical_leiden'].astype(str)
+        adata.obs.loc[mask, 'hierarchical_leiden'] = annotated_filtered.obs['hierarchical_leiden']
+        
+    if 'accumulative_leiden' in annotated_filtered.obs.columns:
+        # Convert accumulative_leiden to object type if needed  
+        if 'accumulative_leiden' not in adata.obs.columns:
+            adata.obs['accumulative_leiden'] = -1
+        elif hasattr(adata.obs['accumulative_leiden'], 'cat'):
+            adata.obs['accumulative_leiden'] = adata.obs['accumulative_leiden'].astype(str)
+        adata.obs.loc[mask, 'accumulative_leiden'] = annotated_filtered.obs['accumulative_leiden']
+    
     for idx in filtered_idx[:3]:
         print(f"    • {idx}: filtered={annotated_filtered.obs.at[idx,'cell_type']} | adata={adata.obs.at[idx,'cell_type']}")
     umap_dir = "umaps/annotated"
     os.makedirs(umap_dir, exist_ok=True)
-    overall_df = adata.obs[["UMAP_1", "UMAP_2", "cell_type"]].copy()
+    # Include barcode, leiden, and other relevant columns in CSV
+    columns_to_save = ["UMAP_1", "UMAP_2", "cell_type"]
+    if "leiden" in adata.obs.columns:
+        columns_to_save.append("leiden")
+    if "hierarchical_leiden" in adata.obs.columns:
+        columns_to_save.append("hierarchical_leiden")
+    if "accumulative_leiden" in adata.obs.columns:
+        columns_to_save.append("accumulative_leiden")
     if "patient_name" in adata.obs.columns:
-        overall_df["patient_name"] = adata.obs["patient_name"]
+        columns_to_save.append("patient_name")
+    
+    overall_df = adata.obs[columns_to_save].copy()
+    # Add barcode as a column (it's the index)
+    overall_df.insert(0, "barcode", adata.obs.index)
+    
     csv_path = os.path.join(umap_dir, "Overall cells_umap_data.csv")
     overall_df.to_csv(csv_path, index=False)
     df_check = pd.read_csv(csv_path)
@@ -522,6 +596,9 @@ def label_clusters(annotation_result, cell_type, adata):
         # Ensure all keys are strings
         map2 = {str(key): value for key, value in map2.items()}
         if base_form == "overall":
+            # Convert categorical to object type to allow new values
+            if hasattr(adata.obs['cell_type'], 'cat'):
+                adata.obs['cell_type'] = adata.obs['cell_type'].astype(str)
             adata.obs['cell_type'] = 'Unknown'
             for group, cell_type_value in map2.items():
                 adata.obs.loc[adata.obs['leiden'] == group, 'cell_type'] = cell_type_value
@@ -536,6 +613,9 @@ def label_clusters(annotation_result, cell_type, adata):
                 pickle.dump(adata, file)
         else:
             specific_cells = adata.copy()
+            # Convert categorical to object type to allow new values
+            if hasattr(specific_cells.obs['cell_type'], 'cat'):
+                specific_cells.obs['cell_type'] = specific_cells.obs['cell_type'].astype(str)
             specific_cells.obs['cell_type'] = 'Unknown'
             for group, cell_type_value in map2.items():
                 specific_cells.obs.loc[specific_cells.obs['leiden'] == group, 'cell_type'] = cell_type_value

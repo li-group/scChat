@@ -1,17 +1,13 @@
 {
-    "url": "put your url here", 
-    "username": "put your username here",
-    "password": "put your password here",
-    "database": "make sure the database name is correct",
-    "pathway_rag": "make sure the pathway rag name is correct",
+    "url": "bolt://localhost:7687",
+    "username": "neo4j",
+    "password": "37754262",
+    "database": "human",
+    "pathway_rag": "pathways",
     "sources": [
         {
-            "system": "Lymphatic System",
-            "organ": "Peripheral blood"
-        },
-        {
             "system": "Nervous System",
-            "organ": "Brain"
+            "organ": "Eye"
         }
     ]
 }

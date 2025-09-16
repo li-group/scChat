@@ -235,6 +235,70 @@ def get_rag():
         driver.close()
     return combined_data
 
+def get_cell_type_markers(cell_type, top_k=5):
+    """Get marker genes for a specific cell type using Neo4j, supporting multiple sources."""
+    from neo4j import GraphDatabase
+    import json
+    import os
+    
+    file_path = "media/specification_graph.json"
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as file:
+            specification = json.load(file)
+    else:
+        print("specification not found")
+        return []
+    
+    # Load Neo4j credentials from configuration
+    required_keys = ["url", "username", "password"]
+    missing_keys = [key for key in required_keys if key not in specification or not specification[key]]
+    
+    if missing_keys:
+        print(f"Missing required configuration keys: {missing_keys}")
+        return []
+    
+    uri = specification["url"]
+    username = specification["username"]
+    password = specification["password"]
+    driver = GraphDatabase.driver(uri, auth=(username, password))
+    
+    database = specification['database']
+    
+    # Check if we have multiple sources or single source
+    if 'sources' in specification:
+        # Multiple sources
+        sources = specification['sources']
+    else:
+        # Single source (backward compatibility)
+        sources = [{'system': specification['system'], 'organ': specification['organ']}]
+        
+    all_markers = []
+    try:
+        with driver.session(database=database) as session:
+            # Loop through each source to find the cell type
+            for source in sources:
+                organ = source['organ']
+                
+                query = """
+                MATCH (c:CellType {name: $cell_type, organ: $organ})
+                RETURN c.markers as marker_list
+                """
+                result = session.run(query, cell_type=cell_type, organ=organ)
+                
+                for record in result:
+                    marker_genes = record["marker_list"] or []
+                    all_markers.extend(marker_genes)
+                    
+        # Remove duplicates and limit to top_k
+        unique_markers = list(dict.fromkeys(all_markers))  # Preserves order
+        return unique_markers[:top_k] if top_k else unique_markers
+                
+    except Exception as e:
+        print(f"Error accessing Neo4j: {e}")
+        return []
+    finally:
+        driver.close()
+
 def get_subtypes(cell_type):
     """Get subtypes of a given cell type using Neo4j, supporting multiple sources."""
     from neo4j import GraphDatabase
