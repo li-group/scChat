@@ -1,30 +1,42 @@
 [
   {
-    "timestamp": "2025-09-16T23:46:59.417493",
+    "timestamp": "2025-09-17T12:37:28.329241",
     "function_name": "process_cells",
     "parameters": {
       "cell_type": "Immune cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell', '1': 'T cell', '2': 'T cell', '3': 'B cell', '4': 'Mononuclear phagocyte', '5': 'T cell', '6': 'Natural killer cell', '7': 'Mast cell', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD"
+    "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell','1': 'T cell','2': 'T cell','3': 'B cell','4': 'Mononuclear phagocyte','5': 'T cell','6': 'Natural killer cell','7': 'Mast cell','8': 'Mononuclear phagocyte','9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD3E', 'ITM"
   },
   {
-    "timestamp": "2025-09-16T23:47:02.636476",
-    "function_name": "display_processed_umap",
-    "parameters": {},
+    "timestamp": "2025-09-17T12:37:31.652303",
+    "function_name": "display_leiden_umap",
+    "parameters": {
+      "cell_type": "T cell"
+    },
     "success": true,
     "error": null,
-    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-3.1.0.min.js\" integrity=\"sha256-Ei4740bWZhaUTQuD6q9yQlgVCMPBz6CZWhevDYPv93A=\" crossorigin=\"anonymous\"></script>                <div id=\"21f778bd-fbc6-4afd-b772-4b4ce587e824\" class=\"plotly-graph-div\" style=\"height:600px; width:800px;\"></div>            <script type=\"text/javascript\">                window.PLOTLYENV=win"
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-3.1.0.min.js\" integrity=\"sha256-Ei4740bWZhaUTQuD6q9yQlgVCMPBz6CZWhevDYPv93A=\" crossorigin=\"anonymous\"></script>                <div id=\"3eec0538-4edd-48a7-81ad-6d1aeb06d468\" class=\"plotly-graph-div\" style=\"height:600px; width:800px;\"></div>            <script type=\"text/javascript\">                window.PLOTLYENV=win"
   },
   {
-    "timestamp": "2025-09-16T23:47:09.525646",
+    "timestamp": "2025-09-17T12:37:37.646383",
     "function_name": "display_processed_umap",
     "parameters": {
       "cell_type": "T cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-3.1.0.min.js\" integrity=\"sha256-Ei4740bWZhaUTQuD6q9yQlgVCMPBz6CZWhevDYPv93A=\" crossorigin=\"anonymous\"></script>                <div id=\"4b72c473-fc9c-4cce-8bf2-1bf1dde6d5cc\" class=\"plotly-graph-div\" style=\"height:600px; width:800px;\"></div>            <script type=\"text/javascript\">                window.PLOTLYENV=win"
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-3.1.0.min.js\" integrity=\"sha256-Ei4740bWZhaUTQuD6q9yQlgVCMPBz6CZWhevDYPv93A=\" crossorigin=\"anonymous\"></script>                <div id=\"b9b7f065-5630-40a1-bc40-bb1ef4264d39\" class=\"plotly-graph-div\" style=\"height:600px; width:800px;\"></div>            <script type=\"text/javascript\">                window.PLOTLYENV=win"
+  },
+  {
+    "timestamp": "2025-09-17T12:38:10.846413",
+    "function_name": "display_overall_umap",
+    "parameters": {
+      "color_mode": "cell_type"
+    },
+    "success": true,
+    "error": null,
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-3.1.0.min.js\" integrity=\"sha256-Ei4740bWZhaUTQuD6q9yQlgVCMPBz6CZWhevDYPv93A=\" crossorigin=\"anonymous\"></script>                <div id=\"5ce389be-ac37-475c-9190-cc889d25cc81\" class=\"plotly-graph-div\" style=\"height:500px; width:700px;\"></div>            <script type=\"text/javascript\">                window.PLOTLYENV=win"
   }
 ]

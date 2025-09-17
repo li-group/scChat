@@ -19,6 +19,7 @@ from .analysis.visualizations import (
     display_dotplot,
     display_processed_umap,
     display_leiden_umap,
+    display_overall_umap,
     display_enrichment_visualization,
     display_cell_count_comparison,
     display_dea_heatmap,
@@ -187,7 +188,7 @@ class MultiAgentChatBot:
     def setup_functions(self):
         """Setup function descriptions and mappings"""
         self.visualization_functions = {
-            "display_dotplot", "display_processed_umap", "display_leiden_umap", "display_enrichment_visualization",
+            "display_dotplot", "display_processed_umap", "display_leiden_umap", "display_overall_umap", "display_enrichment_visualization",
             "display_feature_plot", "display_violin_plot", "display_cell_count_stacked_plot"
         }
 
@@ -219,6 +220,15 @@ class MultiAgentChatBot:
                     "type": "object",
                     "properties": {"cell_type": {"type": "string", "description": "The cell type to focus on for file discovery (e.g., 'T cell', 'Macrophage')"}},
                     "required": ["cell_type"],
+                },
+            },
+            {
+                "name": "display_overall_umap",
+                "description": "Display comprehensive UMAP plot with global view of the entire dataset. Provides both biological (cell types) and computational (consolidated leiden clusters) perspectives. Use when user wants to see the complete cellular landscape or global clustering view.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"color_mode": {"type": "string", "enum": ["cell_type", "accumulative_leiden"], "default": "cell_type", "description": "Color mode: 'cell_type' for biological annotation or 'accumulative_leiden' for consolidated global clusters"}},
+                    "required": [],
                 },
             },
             {
@@ -420,6 +430,7 @@ class MultiAgentChatBot:
             "display_dotplot": self._wrap_visualization(display_dotplot),
             "display_processed_umap": self._wrap_visualization(display_processed_umap),
             "display_leiden_umap": self._wrap_visualization(display_leiden_umap),
+            "display_overall_umap": self._wrap_visualization(display_overall_umap),
             "display_enrichment_visualization": self._wrap_visualization(display_enrichment_visualization),
             "display_cell_count_comparison": self._wrap_visualization(display_cell_count_comparison),
             "display_dea_heatmap": self._wrap_visualization(display_dea_heatmap),
@@ -666,6 +677,10 @@ class MultiAgentChatBot:
                     # Takes cell_type as positional argument
                     cell_type = kwargs.get('cell_type', 'overall')
                     return func(cell_type)
+                elif func_name == 'display_overall_umap':
+                    # Takes color_mode as optional parameter
+                    color_mode = kwargs.get('color_mode', 'cell_type')
+                    return func(color_mode)
                 elif func_name == 'display_enrichment_visualization':
                     # Takes analysis, cell_type and other keyword arguments
                     analysis = kwargs.pop('analysis', 'go')

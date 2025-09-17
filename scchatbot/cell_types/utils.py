@@ -501,7 +501,15 @@ def save_analysis_results(adata, prefix, leiden_key='leiden', save_umap=True,
             umap_cols.append('Exp_sample_category')
         if 'cell_type' in adata.obs.columns:
             umap_cols.append('cell_type')
-        adata.obs[umap_cols].to_csv(f"{prefix}_umap_data.csv", index=False)
+        if 'hierarchical_leiden' in adata.obs.columns:
+            umap_cols.append('hierarchical_leiden')
+        if 'accumulative_leiden' in adata.obs.columns:
+            umap_cols.append('accumulative_leiden')
+
+        # Create DataFrame with barcode index for consistency with Overall cells format
+        umap_df = adata.obs[umap_cols].copy()
+        umap_df.insert(0, "barcode", adata.obs.index)
+        umap_df.to_csv(f"{prefix}_umap_data.csv", index=False)
     if save_dendrogram and f'dendrogram_{leiden_key}' in adata.uns:
         dendrogram_data = adata.uns[f'dendrogram_{leiden_key}']
         pd_dendrogram_linkage = pd.DataFrame(

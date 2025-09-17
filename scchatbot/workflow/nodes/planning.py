@@ -310,6 +310,20 @@ class PlannerNode(BaseWorkflowNode):
                 * Uses same intelligent file discovery as other UMAP functions
                 * Colors points by leiden cluster numbers with Seurat discrete palette
 
+                - For comprehensive global UMAP visualization, use "display_overall_umap":
+                * Creates UMAP plot with complete dataset view showing entire cellular landscape
+                * Use when user wants to see the GLOBAL perspective or complete dataset overview
+                * Two color modes: biological (cell types) or computational (consolidated leiden clusters)
+                * Examples:
+                    - "show overall UMAP" → use "display_overall_umap" with color_mode="cell_type"
+                    - "display global cell landscape" → use "display_overall_umap" with color_mode="cell_type"
+                    - "show consolidated leiden clusters" → use "display_overall_umap" with color_mode="accumulative_leiden"
+                    - "global clustering view" → use "display_overall_umap" with color_mode="accumulative_leiden"
+                    - "complete cellular overview" → use "display_overall_umap"
+                * Parameters: color_mode (optional, defaults to "cell_type")
+                * Always uses complete dataset for comprehensive view
+                * Consolidates cell types into unified clusters when using accumulative_leiden mode
+
                 SEMANTIC SEARCH GUIDELINES:
                 - For questions seeking specific pathway/term information beyond the top-ranked results, consider using "search_enrichment_semantic"
                 - Use semantic search when:

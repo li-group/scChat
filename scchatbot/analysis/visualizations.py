@@ -582,6 +582,133 @@ def display_leiden_umap(cell_type: str) -> str:
         return f"Error generating leiden UMAP plot for {cell_type}: {e}"
 
 
+def display_overall_umap(color_mode: str = "cell_type") -> str:
+    """
+    Generate overall UMAP plot with global view using the comprehensive Overall cells dataset.
+    Provides both biological (cell type) and computational (accumulative leiden) perspectives.
+
+    Args:
+        color_mode: "cell_type" for biological annotation or "accumulative_leiden" for global clusters
+
+    Returns:
+        HTML string containing interactive Plotly UMAP plot
+    """
+    import os
+    import pandas as pd
+    import plotly.express as px
+    import plotly.io as pio
+
+    # Always use the comprehensive Overall cells file for global view
+    umap_path = 'umaps/annotated/Overall cells_umap_data.csv'
+
+    if not os.path.exists(umap_path):
+        return f"Error: Overall cells UMAP data not found at {umap_path}. Please ensure initial annotation has been completed."
+
+    print(f"📊 Loading global UMAP data from: {umap_path} (color_mode: {color_mode})")
+
+    try:
+        # Load the comprehensive dataset
+        umap_data = pd.read_csv(umap_path)
+
+        # Validate required columns
+        required_cols = ['UMAP_1', 'UMAP_2']
+        if color_mode == "cell_type":
+            required_cols.append('cell_type')
+        elif color_mode == "accumulative_leiden":
+            required_cols.append('accumulative_leiden')
+        else:
+            return f"Error: Invalid color_mode '{color_mode}'. Use 'cell_type' or 'accumulative_leiden'."
+
+        missing_cols = [col for col in required_cols if col not in umap_data.columns]
+        if missing_cols:
+            return f"Error: Missing required columns in UMAP data: {missing_cols}"
+
+        print(f"📊 Plotting {len(umap_data)} cells in global view (color_mode: {color_mode})")
+
+        # Prepare data based on color mode
+        if color_mode == "cell_type":
+            color_column = "cell_type"
+            title = "Overall Cell Types UMAP (Global View)"
+            legend_title = "Cell Type"
+
+            # Get unique cell types and assign Seurat discrete colors
+            unique_types = sorted(umap_data['cell_type'].unique())
+            n_types = len(unique_types)
+            seurat_colors = seurat_discrete(n_types)
+            seurat_colors_hex = [f"rgb({int(r*255)},{int(g*255)},{int(b*255)})" for r, g, b in seurat_colors]
+            color_map = {cell_type: color for cell_type, color in zip(unique_types, seurat_colors_hex)}
+
+        else:  # accumulative_leiden
+            color_column = "consolidated_leiden"
+            title = "Consolidated Leiden Clusters UMAP (Cell Type Unified)"
+            legend_title = "Consolidated Cluster"
+
+            # Consolidate leiden clusters by cell type
+            umap_data = umap_data.copy()
+
+            # Create mapping from cell type to consolidated leiden number
+            unique_cell_types = sorted(umap_data['cell_type'].unique())
+            cell_type_to_leiden = {cell_type: i for i, cell_type in enumerate(unique_cell_types)}
+
+            # Apply consolidation mapping
+            umap_data['consolidated_leiden'] = umap_data['cell_type'].map(cell_type_to_leiden).astype(str)
+
+            print(f"🔄 Consolidated {len(umap_data['accumulative_leiden'].unique())} original leiden clusters into {len(unique_cell_types)} cell-type-based clusters")
+
+            # Create color mapping for consolidated clusters
+            unique_clusters = sorted(umap_data['consolidated_leiden'].unique(),
+                                   key=lambda x: int(x) if x.isdigit() else float('inf'))
+            n_clusters = len(unique_clusters)
+            seurat_colors = seurat_discrete(n_clusters)
+            seurat_colors_hex = [f"rgb({int(r*255)},{int(g*255)},{int(b*255)})" for r, g, b in seurat_colors]
+            color_map = {cluster: color for cluster, color in zip(unique_clusters, seurat_colors_hex)}
+
+        # Create interactive scatter plot
+        fig = px.scatter(
+            umap_data,
+            x="UMAP_1",
+            y="UMAP_2",
+            color=color_column,
+            title=title,
+            labels={
+                "UMAP_1": "UMAP 1",
+                "UMAP_2": "UMAP 2",
+                color_column: legend_title
+            },
+            color_discrete_map=color_map
+        )
+
+        # Update plot styling
+        fig.update_traces(marker=dict(size=3, opacity=0.7))
+        fig.update_layout(
+            width=700,
+            height=500,
+            autosize=False,
+            showlegend=True,
+            margin=dict(l=50, r=120, t=70, b=50),  # Proportionally smaller margins
+            legend=dict(
+                orientation="v",
+                yanchor="top",
+                y=1,
+                xanchor="left",
+                x=1.01
+            )
+        )
+
+        # Save plot as PDF
+        plot_name = f"Overall_UMAP_{color_mode}"
+        _save_plot_as_pdf(fig, plot_name)
+
+        print(f"✅ Generated global UMAP plot with {len(unique_types if color_mode == 'cell_type' else unique_clusters)} {legend_title.lower()}s")
+
+        # Return HTML snippet
+        return pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
+
+    except Exception as e:
+        print(f"Error loading global UMAP data from {umap_path}: {e}")
+        return f"Error generating overall UMAP plot: {e}"
+
+
 def _find_hierarchical_umap_file(cell_type: str) -> tuple:
     """
     Find the appropriate UMAP file using hierarchical lookup strategy with intelligent filtering.

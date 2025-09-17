@@ -253,13 +253,13 @@ class ExecutorNode(BaseWorkflowNode):
         
         if step.function_name in self.visualization_functions and "cell_type" not in enhanced_params:
             # Handle different types of visualizations
-            if step.function_name in ["display_processed_umap", "display_dotplot", "display_feature_plot", "display_violin_plot", "display_dea_heatmap"]:
+            if step.function_name in ["display_processed_umap", "display_leiden_umap", "display_overall_umap", "display_dotplot", "display_feature_plot", "display_violin_plot", "display_dea_heatmap"]:
                 # These visualizations don't need enrichment analysis - they work with processed cell data
 
-                # Special case: display_feature_plot doesn't need cell_type parameter
-                if step.function_name == "display_feature_plot":
-                    logger.info(f"✅ Feature plot doesn't require cell_type parameter")
-                    # Don't add cell_type parameter for feature plots
+                # Special cases: these functions don't need cell_type parameter
+                if step.function_name in ["display_feature_plot", "display_overall_umap"]:
+                    logger.info(f"✅ {step.function_name} doesn't require cell_type parameter")
+                    # Don't add cell_type parameter for these functions
                 else:
                     # Other visualizations need cell_type parameter
                     execution_history = state.get("execution_history", [])
