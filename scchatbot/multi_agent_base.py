@@ -18,6 +18,7 @@ from .cell_types.annotation_pipeline import initial_cell_annotation
 from .analysis.visualizations import (
     display_dotplot,
     display_processed_umap,
+    display_leiden_umap,
     display_enrichment_visualization,
     display_cell_count_comparison,
     display_dea_heatmap,
@@ -186,7 +187,7 @@ class MultiAgentChatBot:
     def setup_functions(self):
         """Setup function descriptions and mappings"""
         self.visualization_functions = {
-            "display_dotplot", "display_processed_umap", "display_enrichment_visualization",
+            "display_dotplot", "display_processed_umap", "display_leiden_umap", "display_enrichment_visualization",
             "display_feature_plot", "display_violin_plot", "display_cell_count_stacked_plot"
         }
 
@@ -206,8 +207,17 @@ class MultiAgentChatBot:
                 "name": "display_processed_umap",
                 "description": "Display UMAP that IS annotated with cell types. Use when user wants to see cell type annotations on UMAP.",
                 "parameters": {
-                    "type": "object", 
+                    "type": "object",
                     "properties": {"cell_type": {"type": "string", "description": "The cell type to focus on, or 'overall' for all cells"}},
+                    "required": ["cell_type"],
+                },
+            },
+            {
+                "name": "display_leiden_umap",
+                "description": "Display UMAP colored by leiden clusters instead of cell types. Use when user wants to see cluster organization rather than cell type annotation. Uses same hierarchical file discovery as other UMAP functions.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"cell_type": {"type": "string", "description": "The cell type to focus on for file discovery (e.g., 'T cell', 'Macrophage')"}},
                     "required": ["cell_type"],
                 },
             },
@@ -409,6 +419,7 @@ class MultiAgentChatBot:
         self.function_mapping = {
             "display_dotplot": self._wrap_visualization(display_dotplot),
             "display_processed_umap": self._wrap_visualization(display_processed_umap),
+            "display_leiden_umap": self._wrap_visualization(display_leiden_umap),
             "display_enrichment_visualization": self._wrap_visualization(display_enrichment_visualization),
             "display_cell_count_comparison": self._wrap_visualization(display_cell_count_comparison),
             "display_dea_heatmap": self._wrap_visualization(display_dea_heatmap),
@@ -648,6 +659,10 @@ class MultiAgentChatBot:
                     cell_type = kwargs.get('cell_type', 'Overall cells')
                     return func(cell_type)
                 elif func_name == 'display_processed_umap':
+                    # Takes cell_type as positional argument
+                    cell_type = kwargs.get('cell_type', 'overall')
+                    return func(cell_type)
+                elif func_name == 'display_leiden_umap':
                     # Takes cell_type as positional argument
                     cell_type = kwargs.get('cell_type', 'overall')
                     return func(cell_type)

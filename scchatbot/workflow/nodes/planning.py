@@ -298,6 +298,18 @@ class PlannerNode(BaseWorkflowNode):
                 * Automatically shows pre/post treatment comparison if available
                 * Uses hierarchical cell type discovery (e.g., Treg → finds T cell data)
 
+                - For UMAP visualization colored by leiden clusters, use "display_leiden_umap":
+                * Creates interactive UMAP plots colored by leiden cluster assignments instead of cell types
+                * Use when user wants to see CLUSTER organization rather than cell type annotation
+                * Examples:
+                    - "show leiden clusters on UMAP" → use "display_leiden_umap" with cell_type for file discovery
+                    - "visualize cluster organization" → use "display_leiden_umap"
+                    - "display UMAP colored by clusters" → use "display_leiden_umap"
+                    - "show T cell leiden clusters" → use "display_leiden_umap" with cell_type="T cell"
+                * Parameters: cell_type (required for hierarchical file discovery)
+                * Uses same intelligent file discovery as other UMAP functions
+                * Colors points by leiden cluster numbers with Seurat discrete palette
+
                 SEMANTIC SEARCH GUIDELINES:
                 - For questions seeking specific pathway/term information beyond the top-ranked results, consider using "search_enrichment_semantic"
                 - Use semantic search when:

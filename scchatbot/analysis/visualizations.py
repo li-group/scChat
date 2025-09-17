@@ -338,18 +338,11 @@ def display_enrichment_visualization(
     except Exception as e:
         return f"Error generating {analysis} {plot_type} plot: {e}"
 
-
-
-
-
-
 def display_dotplot(cell_type: str = "Overall cells") -> str:
     """
     Creates a dotplot visualization from CSV data and returns an HTML snippet
     containing the Plotly figure. Uses dynamic file discovery instead of hardcoded paths.
     """
-    import os
-    import glob
     
     # Use dynamic file discovery
     cell_type_formatted = unified_cell_type_handler(cell_type)
@@ -413,35 +406,44 @@ def display_dotplot(cell_type: str = "Overall cells") -> str:
 
 
 def display_processed_umap(cell_type: str) -> str:
-    import os
-    import pandas as pd
-    import plotly.express as px
-    import plotly.io as pio
-
     # standardize your cell type into the form used by process_cells
     std = unified_cell_type_handler(cell_type)  # e.g. "Monocytes"
-    
-    # Use hierarchical UMAP file lookup strategy
-    umap_path, filter_for_descendants = _find_hierarchical_umap_file(std)
-    
+
+    # Use hierarchical UMAP file lookup strategy with intelligent filtering
+    result = _find_hierarchical_umap_file(std)
+    if len(result) == 3:
+        umap_path, filter_for_descendants, show_mode = result
+    else:
+        # Backward compatibility - old function returned 2 values
+        umap_path, filter_for_descendants = result
+        show_mode = 'legacy'
+
     if not umap_path:
         print(f"Warning: could not find any UMAP file for '{cell_type}' (standardized: '{std}')")
         return f"UMAP data not available for {cell_type}. Please ensure the cell type has been processed or its parent cell type has been analyzed."
 
-    print(f"📊 Loading UMAP data from: {umap_path} (filter_for_descendants: {filter_for_descendants})")
+    print(f"📊 Loading UMAP data from: {umap_path} (filter_for_descendants: {filter_for_descendants}, mode: {show_mode})")
 
     try:
         # load UMAP data
         umap_data = pd.read_csv(umap_path)
-        
-        # Apply filtering if we're using a parent file
+
+        # Apply filtering logic based on the discovery mode
         if filter_for_descendants:
             filtered_data = _filter_umap_for_descendants(umap_data, std)
-            title_suffix = f"{std} and Subtypes"
+            if show_mode == 'parent':
+                title_suffix = f"{std} (from parent cell type)"
+            elif show_mode == 'root':
+                title_suffix = f"{std} and Subtypes"
+            else:
+                title_suffix = f"{std} and Subtypes"
         else:
-            # Use data as-is (direct file match)
+            # Use data as-is (exact file match - show all subtypes in this file)
             filtered_data = umap_data
-            title_suffix = f"{std} (annotated)"
+            if show_mode == 'exact':
+                title_suffix = f"{std} Subtypes"
+            else:
+                title_suffix = f"{std} (annotated)"
         
         if filtered_data.empty:
             return f"No {cell_type} cells found in the UMAP data."
@@ -471,36 +473,142 @@ def display_processed_umap(cell_type: str) -> str:
 
         # return html snippet
         return pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
-        
+
     except Exception as e:
         print(f"Error loading UMAP data from {umap_path}: {e}")
         return f"Error generating UMAP plot for {cell_type}: {e}"
 
 
+def display_leiden_umap(cell_type: str) -> str:
+    """
+    Generate UMAP plot colored by leiden clusters instead of cell types.
+    Uses the same hierarchical file discovery logic as display_processed_umap.
+
+    Args:
+        cell_type: Cell type to analyze (used for file discovery)
+
+    Returns:
+        HTML string containing interactive Plotly UMAP plot colored by leiden clusters
+    """
+
+    # standardize your cell type into the form used by process_cells
+    std = unified_cell_type_handler(cell_type)  # e.g. "Monocytes"
+
+    # Use hierarchical UMAP file lookup strategy with intelligent filtering
+    result = _find_hierarchical_umap_file(std)
+    if len(result) == 3:
+        umap_path, filter_for_descendants, show_mode = result
+    else:
+        # Backward compatibility - old function returned 2 values
+        umap_path, filter_for_descendants = result
+        show_mode = 'legacy'
+
+    if not umap_path:
+        print(f"Warning: could not find any UMAP file for '{cell_type}' (standardized: '{std}')")
+        return f"UMAP data not available for {cell_type}. Please ensure the cell type has been processed or its parent cell type has been analyzed."
+
+    print(f"📊 Loading UMAP data for leiden clusters from: {umap_path} (filter_for_descendants: {filter_for_descendants}, mode: {show_mode})")
+
+    try:
+        # load UMAP data
+        umap_data = pd.read_csv(umap_path)
+
+        # Apply filtering logic based on the discovery mode
+        if filter_for_descendants:
+            filtered_data = _filter_umap_for_descendants(umap_data, std)
+            if show_mode == 'parent':
+                title_suffix = f"{std} Leiden Clusters (from parent cell type)"
+            elif show_mode == 'root':
+                title_suffix = f"{std} Leiden Clusters"
+            else:
+                title_suffix = f"{std} Leiden Clusters"
+        else:
+            # Use data as-is (exact file match - show all subtypes in this file)
+            filtered_data = umap_data
+            if show_mode == 'exact':
+                title_suffix = f"{std} Leiden Clusters"
+            else:
+                title_suffix = f"{std} Leiden Clusters"
+
+        if filtered_data.empty:
+            return f"No {cell_type} cells found in the UMAP data."
+
+        # Check if leiden column exists
+        if 'leiden' not in filtered_data.columns:
+            return f"Error: No leiden clustering information found in the data for {cell_type}."
+
+        print(f"📊 Plotting {len(filtered_data)} cells for {title_suffix}")
+
+        # Convert leiden to string to ensure proper discrete coloring
+        filtered_data = filtered_data.copy()
+        filtered_data['leiden'] = filtered_data['leiden'].astype(str)
+
+        # Get Seurat discrete colors for leiden clusters
+        unique_clusters = sorted(filtered_data['leiden'].unique(), key=lambda x: int(x) if x.isdigit() else float('inf'))
+        n_clusters = len(unique_clusters)
+        seurat_colors = seurat_discrete(n_clusters)
+        seurat_colors_hex = [f"rgb({int(r*255)},{int(g*255)},{int(b*255)})" for r, g, b in seurat_colors]
+
+        # Create color mapping
+        color_map = {cluster: color for cluster, color in zip(unique_clusters, seurat_colors_hex)}
+
+        # create scatter plot colored by leiden clusters
+        fig = px.scatter(
+            filtered_data,
+            x="UMAP_1",
+            y="UMAP_2",
+            color="leiden",
+            title=f"{title_suffix} UMAP Plot",
+            labels={"UMAP_1": "UMAP 1", "UMAP_2": "UMAP 2", "leiden": "Leiden Cluster"},
+            color_discrete_map=color_map
+        )
+        fig.update_traces(marker=dict(size=5, opacity=0.8))
+        fig.update_layout(
+            width=800,
+            height=600,
+            autosize=False,
+            showlegend=True,
+            margin=dict(l=50, r=50, t=80, b=50)
+        )
+
+        # Save UMAP plot as PDF
+        _save_plot_as_pdf(fig, f"UMAP_leiden_{std}")
+
+        # return html snippet
+        return pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
+
+    except Exception as e:
+        print(f"Error loading UMAP data from {umap_path}: {e}")
+        return f"Error generating leiden UMAP plot for {cell_type}: {e}"
+
+
 def _find_hierarchical_umap_file(cell_type: str) -> tuple:
     """
-    Find the appropriate UMAP file using hierarchical lookup strategy with Neo4j integration.
-    
+    Find the appropriate UMAP file using hierarchical lookup strategy with intelligent filtering.
+
     Returns:
-        (file_path, filter_for_descendants): 
+        (file_path, filter_for_descendants, show_mode):
         - file_path: path to the UMAP CSV file to use
         - filter_for_descendants: whether to filter for descendants of the cell type
+        - show_mode: 'exact' | 'parent' | 'root' for title generation
     """
-    import os
     from ..cell_types.utils import get_subtypes
-    
+
     # Strategy 1: Try exact match first (cell type was directly processed)
     exact_path = f'umaps/annotated/{cell_type}_umap_data.csv'
     if os.path.exists(exact_path):
         print(f"🎯 Found exact UMAP file for {cell_type}")
-        return exact_path, True  # Still filter to show descendants
-    
+        # For exact matches, determine if we should show subtypes or filter for the specific type
+        # If the user requested a specific cell type and we have its file, show all subtypes in that file
+        return exact_path, False, 'exact'  # Don't filter - show all cells in this file
+
     # Strategy 2: Find parent cell type that was processed and contains this cell type
     # Use hierarchy system to find the ancestor that was actually processed
     parent_path = _find_parent_umap_file(cell_type)
     if parent_path:
         print(f"🔍 Found parent UMAP file for {cell_type}: {parent_path}")
-        return parent_path, True
+        # When using parent file, we need to filter for the specific cell type and its descendants
+        return parent_path, True, 'parent'
 
     # Strategy 3: Check if this is a root cell type by querying Neo4j (only if no parent found)
     try:
@@ -511,26 +619,23 @@ def _find_hierarchical_umap_file(cell_type: str) -> tuple:
             overall_path = 'umaps/annotated/Overall cells_umap_data.csv'
             if os.path.exists(overall_path):
                 print(f"🌟 Using Overall cells file for root cell type: {cell_type}")
-                return overall_path, True
+                return overall_path, True, 'root'
     except Exception as e:
         print(f"⚠️ Error querying subtypes for {cell_type}: {e}")
-    
+
     # Strategy 4: Fallback to "Overall cells" if it exists
     overall_path = 'umaps/annotated/Overall cells_umap_data.csv'
     if os.path.exists(overall_path):
         print(f"🔄 Fallback to Overall cells file for {cell_type}")
-        return overall_path, True
-    
-    return None, False
+        return overall_path, True, 'root'
+
+    return None, False, None
 
 
 def _find_parent_umap_file(target_cell_type: str) -> str:
     """
     Find a parent UMAP file that contains the target cell type using the hierarchy system.
     """
-    import os
-    import glob
-    import pandas as pd
     
     # Search all available UMAP files
     umap_files = glob.glob('umaps/annotated/*_umap_data.csv')
@@ -562,7 +667,6 @@ def _find_parent_umap_file(target_cell_type: str) -> str:
 def _file_contains_cell_type(file_path: str, target_cell_type: str) -> bool:
     """Check if a UMAP file contains the target cell type."""
     try:
-        import pandas as pd
         df = pd.read_csv(file_path)
         if 'cell_type' not in df.columns:
             return False
@@ -633,10 +737,7 @@ def display_cell_count_comparison(cell_types_data: dict, plot_type: str = "stack
     
     Returns:
         HTML string containing the plot
-    """
-    import plotly.express as px
-    import plotly.io as pio
-    
+    """    
     try:
         # Validate input
         if not cell_types_data or not isinstance(cell_types_data, dict):
@@ -764,15 +865,11 @@ def display_dea_heatmap(cell_type: str, top_n_genes: int = 20, cluster_genes: bo
     Returns:
         HTML string containing both interactive heatmap plots (upregulated and downregulated)
     """
-    import plotly.graph_objects as go
-    import plotly.io as pio
     from scipy.cluster.hierarchy import linkage, dendrogram
     from scipy.spatial.distance import pdist
-    from ..cell_types.standardization import unified_cell_type_handler
     
     def create_single_heatmap(genes_data, direction, cell_type, conditions, cluster_genes, cluster_samples):
         """Helper function to create a single heatmap for either up or downregulated genes"""
-        import numpy as np
         
         if not genes_data:
             return f"<p>No {direction} genes found for {cell_type}</p>"
@@ -928,8 +1025,6 @@ def display_dea_heatmap(cell_type: str, top_n_genes: int = 20, cluster_genes: bo
         cell_type = unified_cell_type_handler(cell_type)
         
         # Look for DEA results files - try multiple possible locations
-        import glob
-        import os
         
         # Try different possible paths for DEA files
         possible_paths = [
@@ -1537,7 +1632,6 @@ def display_violin_plot(adata, cell_type: str, genes: List[str]) -> str:
             print(f"📊 Color mapping: {color_map}")
 
             # Create figure manually using go.Violin for better control
-            import plotly.graph_objects as go
 
             fig = go.Figure()
 
@@ -1606,9 +1700,6 @@ def display_cell_count_stacked_plot(adata, cell_types: List[str]) -> str:
     Returns:
         HTML string containing interactive Plotly stacked bar plot
     """
-    import plotly.express as px
-    import plotly.io as pio
-    import plotly.graph_objects as go
     from plotly.subplots import make_subplots
 
     print(f"📊 Creating stacked cell count plot for cell types: {cell_types}")
@@ -1771,4 +1862,3 @@ def display_cell_count_stacked_plot(adata, cell_types: List[str]) -> str:
     except Exception as e:
         print(f"❌ Error creating cell count plot: {e}")
         return f"Error creating cell count plot: {e}"
-

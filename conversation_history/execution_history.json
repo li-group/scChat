@@ -1,6 +1,6 @@
 [
   {
-    "timestamp": "2025-09-16T22:41:54.809937",
+    "timestamp": "2025-09-16T23:46:59.417493",
     "function_name": "process_cells",
     "parameters": {
       "cell_type": "Immune cell"
@@ -10,26 +10,21 @@
     "result_summary": "Annotation complete for Immune cell.\n\u2022 Annotation Result: Analysis: group_to_cell_type = {'0': 'T cell', '1': 'T cell', '2': 'T cell', '3': 'B cell', '4': 'Mononuclear phagocyte', '5': 'T cell', '6': 'Natural killer cell', '7': 'Mast cell', '8': 'Mononuclear phagocyte', '9': 'Mononuclear phagocyte'}.\n\u2022 Top-genes per cluster: {'0': ['DUSP2', 'GZMK', 'CXCR4', 'JUNB', 'RUNX3', 'ZFP36L2', 'CD8A', 'FYN', 'PTPRC', 'CST7', 'CRTAM', 'ID2', 'FOSB', 'CD8B', 'DUSP4', 'TGFB1', 'TIGIT', 'CYTIP', 'SOCS1', 'CD"
   },
   {
-    "timestamp": "2025-09-16T22:41:58.182062",
-    "function_name": "display_violin_plot",
-    "parameters": {
-      "cell_type": "T cell",
-      "genes": [
-        "CD3D"
-      ]
-    },
+    "timestamp": "2025-09-16T23:47:02.636476",
+    "function_name": "display_processed_umap",
+    "parameters": {},
     "success": true,
     "error": null,
-    "result_summary": "<div><div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-3.1.0.min.js\" integrity=\"sha256-Ei4740bWZhaUTQuD6q9yQlgVCMPBz6CZWhevDYPv93A=\" crossorigin=\"anonymous\"></script>                <div id=\"52ac0a84-fee8-438d-88fc-609e588395b7\" class=\"plotly-graph-div\" style=\"height:100%; width:100%;\"></div>            <script type=\"text/javascript\">                window.PLOTLYENV="
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-3.1.0.min.js\" integrity=\"sha256-Ei4740bWZhaUTQuD6q9yQlgVCMPBz6CZWhevDYPv93A=\" crossorigin=\"anonymous\"></script>                <div id=\"21f778bd-fbc6-4afd-b772-4b4ce587e824\" class=\"plotly-graph-div\" style=\"height:600px; width:800px;\"></div>            <script type=\"text/javascript\">                window.PLOTLYENV=win"
   },
   {
-    "timestamp": "2025-09-16T22:42:13.252929",
-    "function_name": "dea_split_by_condition",
+    "timestamp": "2025-09-16T23:47:09.525646",
+    "function_name": "display_processed_umap",
     "parameters": {
       "cell_type": "T cell"
     },
     "success": true,
     "error": null,
-    "result_summary": "{'dea_results': [{'category': 'bulk', 'significant_genes': ['PTPRC', 'CXCR4', 'SRGN', 'HLA-C', 'HLA-B', 'HLA-A', 'CST7', 'PPP2R5C', 'IL32', 'RUNX3', 'SARAF', 'FYN', 'CDC42SE2', 'ARHGDIB', 'TGFB1', 'CNOT6L', 'DUSP2', 'CD48', 'CYTIP', 'TMSB4X', 'STK4', 'LEPROTL1', 'CD3D', 'CREM', 'CD2', 'ARL4C', 'CYBA', 'CD53', 'SPOCK2', 'CD3E', 'ENSG00000273319', 'HCST', 'TSC22D3', 'TNFAIP3', 'GZMA', 'NKG7', 'HLA-E', 'ZFP36L2', 'SH3BGRL3', 'ISG20', 'ARPC2', 'IL7R', 'TAGAP', 'AKNA', 'ENSG00000257341', 'PTPRCAP', '"
+    "result_summary": "<div>                        <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n        <script charset=\"utf-8\" src=\"https://cdn.plot.ly/plotly-3.1.0.min.js\" integrity=\"sha256-Ei4740bWZhaUTQuD6q9yQlgVCMPBz6CZWhevDYPv93A=\" crossorigin=\"anonymous\"></script>                <div id=\"4b72c473-fc9c-4cce-8bf2-1bf1dde6d5cc\" class=\"plotly-graph-div\" style=\"height:600px; width:800px;\"></div>            <script type=\"text/javascript\">                window.PLOTLYENV=win"
   }
 ]

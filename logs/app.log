@@ -1729,3 +1729,381 @@
 2025-09-16 22:42:26,858 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Generated response (589 chars)
 2025-09-16 22:42:26,941 | INFO | scchatbot.multi_agent_base | ✅ Conversation recorded in vector database
 2025-09-16 22:42:26,941 | INFO | scchatbot.multi_agent_base | 💾 Session state saved for 'b05944ce' with 8 available cell types
+2025-09-16 23:39:40,262 | INFO | django.utils.autoreload | Watching for file changes with StatReloader
+2025-09-16 23:39:45,322 | INFO | faiss.loader | Loading faiss.
+2025-09-16 23:39:45,349 | INFO | faiss.loader | Successfully loaded faiss.
+2025-09-16 23:39:46,205 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-09-16 23:39:47,991 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-09-16 23:39:48,077 | INFO | scchatbot.workflow.function_history | ✅ Vector database initialized at conversation_history/conversation_vectors
+2025-09-16 23:39:48,077 | INFO | chromadb.telemetry.product.posthog | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-09-16 23:39:48,085 | INFO | scchatbot.workflow.function_history | ✅ Enrichment vector database initialized at conversation_history/conversation_vectors/enrichment
+2025-09-16 23:39:49,032 | INFO | jax._src.xla_bridge | Unable to initialize backend 'cuda': 
+2025-09-16 23:39:49,032 | INFO | jax._src.xla_bridge | Unable to initialize backend 'rocm': module 'jaxlib.xla_extension' has no attribute 'GpuAllocatorConfig'
+2025-09-16 23:39:49,034 | INFO | jax._src.xla_bridge | Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: dlopen(libtpu.so, 0x0001): tried: 'libtpu.so' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibtpu.so' (no such file), '/opt/anaconda3/envs/ScChatbot/bin/../lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache), 'libtpu.so' (no such file), '/usr/local/lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache)
+2025-09-16 23:40:05,381 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:40:24,542 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:43:21,244 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:43:22,090 | INFO | scchatbot.multi_agent_base | ✅ Unified hierarchical cell type management initialized
+2025-09-16 23:43:22,091 | INFO | scchatbot.multi_agent_base | ✅ Unified cell type extractor initialized
+2025-09-16 23:43:22,091 | INFO | scchatbot.multi_agent_base | 1
+2025-09-16 23:43:22,584 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: mps
+2025-09-16 23:43:22,584 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-09-16 23:43:24,163 | INFO | scchatbot.multi_agent_base | 2
+2025-09-16 23:43:24,165 | INFO | scchatbot.multi_agent_base | 3
+2025-09-16 23:43:24,165 | INFO | scchatbot.multi_agent_base | ✅ Session state management initialized
+2025-09-16 23:45:34,867 | WARNING | django.request | Not Found: /ws/chat/b05944ce/
+2025-09-16 23:45:37,892 | WARNING | django.request | Not Found: /ws/chat/b05944ce/
+2025-09-16 23:45:40,905 | WARNING | django.request | Not Found: /ws/chat/b05944ce/
+2025-09-16 23:45:43,972 | INFO | scchatbot.multi_agent_base | 🆕 Creating new session state for 'b05944ce'
+2025-09-16 23:45:43,978 | INFO | scchatbot.workflow.node_base | 🔄 InputProcessor: Starting execution
+2025-09-16 23:45:43,979 | INFO | scchatbot.workflow.node_base |    Current message: Plot the UMAP with T cell on it....
+2025-09-16 23:45:44,810 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:45:44,814 | INFO | scchatbot.workflow.nodes.input_processing | 🔍 LLM search query response: '```json
+["current_session_state"]
+```'
+2025-09-16 23:45:44,814 | INFO | scchatbot.workflow.nodes.input_processing | 🧠 LLM requested 1 context sources: ['current_session_state']
+2025-09-16 23:45:44,815 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Building session context...
+2025-09-16 23:45:44,815 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Found 0 cell types: []
+2025-09-16 23:45:44,815 | INFO | scchatbot.workflow.node_base | 🔍 CONTEXT BUILDER: Generated 33 chars, starts with: 'No current session data available...'
+2025-09-16 23:45:44,815 | INFO | scchatbot.workflow.nodes.input_processing | ✅ Added current session state context (33 chars)
+2025-09-16 23:45:44,815 | INFO | scchatbot.workflow.nodes.input_processing | 🔍 SESSION CONTEXT DEBUG: First 100 chars: 'No current session data available...'
+2025-09-16 23:45:44,815 | INFO | scchatbot.workflow.nodes.input_processing | ✅ Added fresh unified context (56 chars)
+2025-09-16 23:45:44,815 | INFO | scchatbot.workflow.nodes.input_processing | 🔄 Initialized with 4 initial cell types
+2025-09-16 23:45:44,815 | INFO | scchatbot.workflow.node_base | ✅ InputProcessor: Execution complete
+2025-09-16 23:45:44,817 | INFO | scchatbot.workflow.node_base | 🔄 Planner: Starting execution
+2025-09-16 23:45:44,817 | INFO | scchatbot.workflow.node_base |    Current message: Plot the UMAP with T cell on it....
+2025-09-16 23:45:44,817 | INFO | scchatbot.workflow.nodes.planning | 🧬 PLANNER: Cell type status for planning:
+2025-09-16 23:45:44,821 | INFO | scchatbot.workflow.nodes.planning |    • Initial types: 4
+2025-09-16 23:45:44,821 | INFO | scchatbot.workflow.nodes.planning |    • Currently available: 4
+2025-09-16 23:45:44,822 | INFO | scchatbot.workflow.nodes.planning |    • Discovered this session: 0
+2025-09-16 23:45:44,822 | INFO | scchatbot.workflow.nodes.planning | 🧬 Planning for question: 'Plot the UMAP with T cell on it.'
+2025-09-16 23:45:53,157 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:45:55,302 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:45:55,309 | INFO | scchatbot.workflow.nodes.planning | 🧬 Planner identified needed cell types: ['T cell']
+2025-09-16 23:45:55,309 | INFO | scchatbot.workflow.nodes.planning | 🧬 Available cell types: ['Epithelial cell', 'Stromal cell', 'Glial cell', 'Immune cell']
+2025-09-16 23:45:55,341 | INFO | scchatbot.workflow.nodes.planning | 🧬 Creating discovery steps only...
+2025-09-16 23:45:55,360 | INFO | scchatbot.workflow.nodes.planning | 🔄 Found path from 'Immune cell' to 'T cell': Immune cell → T cell
+2025-09-16 23:45:55,360 | INFO | scchatbot.workflow.nodes.planning | 🧬 Added process_cells(Immune cell) to discover ['T cell']
+2025-09-16 23:45:55,360 | INFO | scchatbot.workflow.nodes.planning | 🔍 Created validation step for process_cells(Immune cell) expecting: ['T cell']
+2025-09-16 23:45:55,360 | INFO | scchatbot.workflow.nodes.planning | 🔄 Interleaved: process_cells(Immune cell) → validation(Immune cell)
+2025-09-16 23:45:55,360 | INFO | scchatbot.workflow.nodes.planning | 📋 Plan merge complete:
+2025-09-16 23:45:55,360 | INFO | scchatbot.workflow.nodes.planning |    - Discovery steps: 1
+2025-09-16 23:45:55,360 | INFO | scchatbot.workflow.nodes.planning |    - Validation steps: 1
+2025-09-16 23:45:55,360 | INFO | scchatbot.workflow.nodes.planning |    - Analysis steps: 0
+2025-09-16 23:45:55,361 | INFO | scchatbot.workflow.nodes.planning |    - Other steps: 1
+2025-09-16 23:45:55,361 | INFO | scchatbot.workflow.nodes.planning |    - Filtered out: 0 steps for undiscoverable types
+2025-09-16 23:45:55,361 | INFO | scchatbot.workflow.nodes.planning | 🔍 ENRICHMENT DEBUG: Found 0 enrichment steps
+2025-09-16 23:45:55,361 | INFO | scchatbot.workflow.nodes.planning | 🔍 PATHWAY EXTRACTOR: Processing 3 steps
+2025-09-16 23:45:55,361 | INFO | scchatbot.workflow.nodes.planning | ✅ Planner created execution plan with 3 steps
+2025-09-16 23:45:55,361 | INFO | scchatbot.workflow.nodes.planning |    • 1 process_cells steps
+2025-09-16 23:45:55,361 | INFO | scchatbot.workflow.nodes.planning |    • 1 validation steps
+2025-09-16 23:45:55,361 | INFO | scchatbot.workflow.nodes.planning |    • 1 analysis steps
+2025-09-16 23:45:55,361 | INFO | scchatbot.workflow.node_base | ✅ Planner: Execution complete
+2025-09-16 23:45:55,361 | INFO | scchatbot.workflow.nodes.planning | FINAL PLAN : 
+2025-09-16 23:45:55,361 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-09-16 23:45:55,361 | INFO | scchatbot.workflow.node_base |    Current message: Plot the UMAP with T cell on it....
+2025-09-16 23:45:55,362 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 1: Process Immune cell to discover T cell
+2025-09-16 23:45:55,362 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'process_cells'
+2025-09-16 23:46:03,379 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:46:15,376 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:46:59,393 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:46:59,395 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 1 completed successfully
+2025-09-16 23:46:59,395 | INFO | scchatbot.workflow.nodes.execution | 🔍 EXECUTION NODE: About to call CellTypeExtractor.extract_from_annotation_result() for process_cells step
+2025-09-16 23:46:59,396 | INFO | scchatbot.workflow.nodes.execution | 🧬 Updating hierarchy manager with new cell types: ['T cell', 'B cell', 'Mononuclear phagocyte', 'Natural killer cell', 'Mast cell']
+2025-09-16 23:46:59,416 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: T cell
+2025-09-16 23:46:59,416 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: B cell
+2025-09-16 23:46:59,416 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: Mononuclear phagocyte
+2025-09-16 23:46:59,416 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: Natural killer cell
+2025-09-16 23:46:59,416 | INFO | scchatbot.workflow.nodes.execution | ✅ Discovered new cell type: Mast cell
+2025-09-16 23:46:59,417 | INFO | scchatbot.workflow.nodes.execution | 📊 Structured storage: process_cells - Full data preserved
+2025-09-16 23:46:59,417 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 2
+2025-09-16 23:46:59,418 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-09-16 23:46:59,418 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-09-16 23:46:59,418 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Executing validation step...
+2025-09-16 23:46:59,418 | INFO | scchatbot.workflow.node_base | 🔄 Validation: Starting execution
+2025-09-16 23:46:59,418 | INFO | scchatbot.workflow.node_base |    Current message: Validating Immune cell -> ['T cell']...
+2025-09-16 23:46:59,418 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Exact match found: 'T cell'
+2025-09-16 23:46:59,418 | INFO | scchatbot.workflow.node_base | ✅ Validation: Execution complete
+2025-09-16 23:46:59,418 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Validation passed: All 1 expected cell types found successfully
+2025-09-16 23:46:59,418 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 CALLING update_remaining_steps_with_discovered_types with result status: success
+2025-09-16 23:46:59,418 | INFO | scchatbot.workflow.nodes.evaluation | 🔄 Updating remaining steps: expected=['T cell'], found=['T cell'], missing=[]
+2025-09-16 23:46:59,419 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Validation result full structure: {'status': 'success', 'message': 'All 1 expected cell types found successfully', 'found_children': ['T cell'], 'missing_children': [], 'available_types': ['Mast cell', 'Stromal cell', 'Epithelial cell', 'Glial cell', 'Natural killer cell', 'B cell', 'Mononuclear phagocyte', 'T cell']}
+2025-09-16 23:46:59,419 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Will skip steps for missing cell types: []
+2025-09-16 23:46:59,419 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 DEBUG: Scanning 1 remaining steps...
+2025-09-16 23:46:59,419 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 DEBUG: Step 3: display_processed_umap(params={})
+2025-09-16 23:46:59,419 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 DEBUG: Step 3 cell type 'None' not in missing list []
+2025-09-16 23:46:59,419 | INFO | scchatbot.workflow.nodes.evaluation | 🔄 Advanced to step 3
+2025-09-16 23:46:59,419 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-09-16 23:46:59,419 | INFO | scchatbot.workflow.node_base |    Current message: Plot the UMAP with T cell on it....
+2025-09-16 23:46:59,419 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 3: Display the UMAP visualization with annotated cell types.
+2025-09-16 23:46:59,420 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'display_processed_umap'
+2025-09-16 23:46:59,420 | INFO | scchatbot.workflow.nodes.execution | 🔍 STEP DEBUG: Calling visualization function 'display_processed_umap' with step parameters: {}
+2025-09-16 23:46:59,420 | INFO | scchatbot.workflow.nodes.execution | ✅ Found cell type for display_processed_umap: Immune cell
+2025-09-16 23:46:59,420 | INFO | scchatbot.workflow.nodes.execution | 📝 Updating step parameters with enhanced params for execution history tracking
+2025-09-16 23:46:59,420 | INFO | scchatbot.multi_agent_base | 🔍 VIZ WRAPPER DEBUG: display_processed_umap called with kwargs: {'cell_type': 'Immune cell'}
+2025-09-16 23:46:59,933 | INFO | choreographer.browsers.chromium | Chromium init'ed with kwargs {}
+2025-09-16 23:46:59,936 | INFO | choreographer.browsers.chromium | Found chromium path: /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+2025-09-16 23:46:59,936 | INFO | choreographer.utils._tmpfile | Temp directory created: /var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmprz9cww70.
+2025-09-16 23:46:59,936 | INFO | choreographer.browser_async | Opening browser.
+2025-09-16 23:46:59,937 | INFO | choreographer.utils._tmpfile | Temp directory created: /var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmp0x9uo0xq.
+2025-09-16 23:46:59,938 | INFO | choreographer.browsers.chromium | Temporary directory at: /var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmp0x9uo0xq
+2025-09-16 23:47:00,503 | INFO | kaleido.kaleido | Conforming 1 to file:///var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmprz9cww70/index.html
+2025-09-16 23:47:00,503 | INFO | kaleido.kaleido | Waiting on all navigates
+2025-09-16 23:47:01,079 | INFO | kaleido.kaleido | All navigates done, putting them all in queue.
+2025-09-16 23:47:01,080 | INFO | kaleido.kaleido | Getting tab from queue (has 1)
+2025-09-16 23:47:01,080 | INFO | kaleido.kaleido | Got 7FD3
+2025-09-16 23:47:01,080 | INFO | kaleido._kaleido_tab | Processing Immune_cell_Subtypes_UMAP_Plot.png
+2025-09-16 23:47:01,080 | INFO | kaleido._kaleido_tab | Sending big command for Immune_cell_Subtypes_UMAP_Plot.png.
+2025-09-16 23:47:01,181 | INFO | kaleido._kaleido_tab | Sent big command for Immune_cell_Subtypes_UMAP_Plot.png.
+2025-09-16 23:47:01,183 | INFO | kaleido.kaleido | Reloading tab 7FD3 before return.
+2025-09-16 23:47:01,276 | INFO | kaleido.kaleido | Putting tab 7FD3 back (queue size: 0).
+2025-09-16 23:47:01,276 | INFO | kaleido.kaleido | Waiting for all cleanups to finish.
+2025-09-16 23:47:01,276 | INFO | kaleido.kaleido | Exiting Kaleido
+2025-09-16 23:47:01,277 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:01,277 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:01,277 | INFO | kaleido.kaleido | Cancelling tasks.
+2025-09-16 23:47:01,277 | INFO | kaleido.kaleido | Exiting Kaleido/Choreo
+2025-09-16 23:47:01,277 | INFO | choreographer.browser_async | Closing browser.
+2025-09-16 23:47:01,278 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:01,279 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:01,279 | INFO | kaleido.kaleido | Cancelling tasks.
+2025-09-16 23:47:01,279 | INFO | kaleido.kaleido | Exiting Kaleido/Choreo
+2025-09-16 23:47:01,279 | INFO | choreographer.browser_async | Closing browser.
+2025-09-16 23:47:01,374 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:01,374 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:01,377 | INFO | choreographer.browsers.chromium | Chromium init'ed with kwargs {}
+2025-09-16 23:47:01,378 | INFO | choreographer.browsers.chromium | Found chromium path: /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+2025-09-16 23:47:01,379 | INFO | choreographer.utils._tmpfile | Temp directory created: /var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmphajm6256.
+2025-09-16 23:47:01,379 | INFO | choreographer.browser_async | Opening browser.
+2025-09-16 23:47:01,380 | INFO | choreographer.utils._tmpfile | Temp directory created: /var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmpl0c0v1c_.
+2025-09-16 23:47:01,380 | INFO | choreographer.browsers.chromium | Temporary directory at: /var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmpl0c0v1c_
+2025-09-16 23:47:01,789 | INFO | kaleido.kaleido | Conforming 1 to file:///var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmphajm6256/index.html
+2025-09-16 23:47:01,792 | INFO | kaleido.kaleido | Waiting on all navigates
+2025-09-16 23:47:02,330 | INFO | kaleido.kaleido | All navigates done, putting them all in queue.
+2025-09-16 23:47:02,330 | INFO | kaleido.kaleido | Getting tab from queue (has 1)
+2025-09-16 23:47:02,330 | INFO | kaleido.kaleido | Got 331F
+2025-09-16 23:47:02,330 | INFO | kaleido._kaleido_tab | Processing Immune_cell_Subtypes_UMAP_Plot.pdf
+2025-09-16 23:47:02,330 | INFO | kaleido._kaleido_tab | Sending big command for Immune_cell_Subtypes_UMAP_Plot.pdf.
+2025-09-16 23:47:02,403 | INFO | kaleido._kaleido_tab | Sent big command for Immune_cell_Subtypes_UMAP_Plot.pdf.
+2025-09-16 23:47:02,458 | INFO | kaleido.kaleido | Reloading tab 331F before return.
+2025-09-16 23:47:02,533 | INFO | kaleido.kaleido | Putting tab 331F back (queue size: 0).
+2025-09-16 23:47:02,533 | INFO | kaleido.kaleido | Waiting for all cleanups to finish.
+2025-09-16 23:47:02,534 | INFO | kaleido.kaleido | Exiting Kaleido
+2025-09-16 23:47:02,534 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:02,534 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:02,534 | INFO | kaleido.kaleido | Cancelling tasks.
+2025-09-16 23:47:02,534 | INFO | kaleido.kaleido | Exiting Kaleido/Choreo
+2025-09-16 23:47:02,534 | INFO | choreographer.browser_async | Closing browser.
+2025-09-16 23:47:02,535 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:02,535 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:02,535 | INFO | kaleido.kaleido | Cancelling tasks.
+2025-09-16 23:47:02,535 | INFO | kaleido.kaleido | Exiting Kaleido/Choreo
+2025-09-16 23:47:02,535 | INFO | choreographer.browser_async | Closing browser.
+2025-09-16 23:47:02,624 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:02,624 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:02,635 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 3 completed successfully
+2025-09-16 23:47:02,636 | INFO | scchatbot.workflow.nodes.execution | 🎨 Visualization storage: display_processed_umap - HTML preserved
+2025-09-16 23:47:02,636 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 4
+2025-09-16 23:47:02,636 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-09-16 23:47:02,637 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-09-16 23:47:02,637 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 All steps complete (3/3), running post-execution evaluation
+2025-09-16 23:47:02,637 | INFO | scchatbot.workflow.nodes.evaluation | 🏁 Evaluator: Starting sophisticated post-execution evaluation...
+2025-09-16 23:47:02,637 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Starting post-execution evaluation...
+2025-09-16 23:47:04,183 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:47:04,969 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:47:04,970 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: general_comparison
+2025-09-16 23:47:04,971 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: T cell
+2025-09-16 23:47:06,118 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:47:06,129 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: general_comparison
+2025-09-16 23:47:06,880 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:47:06,970 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for T cell: '```json
+["display_processed_umap"]
+```' (length: 38)
+2025-09-16 23:47:06,970 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for T cell: ['display_processed_umap']
+2025-09-16 23:47:06,970 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'T cell' is in unavailable list: []
+2025-09-16 23:47:06,971 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 3 entries
+2025-09-16 23:47:06,971 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for T cell: []
+2025-09-16 23:47:06,971 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 No direct matches found for T cell, checking for related executions...
+2025-09-16 23:47:06,971 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 Generated missing step: display_processed_umap(T cell)
+2025-09-16 23:47:06,971 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found 1 missing steps for T cell
+2025-09-16 23:47:06,971 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Post-execution evaluation complete: 1 total supplementary steps
+2025-09-16 23:47:06,971 | INFO | scchatbot.workflow.nodes.evaluation | 📝 Generated relevance hints for general_comparison question
+2025-09-16 23:47:06,971 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Added 1 supplementary steps to execution plan (attempt 1/2)
+2025-09-16 23:47:06,971 | INFO | scchatbot.workflow.nodes.evaluation | 🔄 Marked conversation as incomplete to continue execution
+2025-09-16 23:47:06,971 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Execution Summary:
+2025-09-16 23:47:06,972 | INFO | scchatbot.workflow.nodes.evaluation |    • Total steps executed: 3
+2025-09-16 23:47:06,972 | INFO | scchatbot.workflow.nodes.evaluation |    • Successful: 3
+2025-09-16 23:47:06,972 | INFO | scchatbot.workflow.nodes.evaluation |    • Failed: 0
+2025-09-16 23:47:06,972 | INFO | scchatbot.workflow.nodes.evaluation |    • Supplementary steps generated: 1
+2025-09-16 23:47:06,972 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Available analysis results:
+2025-09-16 23:47:06,972 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 Evaluator: Post-execution evaluation complete, ready for response generation
+2025-09-16 23:47:06,972 | INFO | scchatbot.workflow.node_base | 🔄 Executor: Starting execution
+2025-09-16 23:47:06,973 | INFO | scchatbot.workflow.node_base |    Current message: Plot the UMAP with T cell on it....
+2025-09-16 23:47:06,973 | INFO | scchatbot.workflow.nodes.execution | 🔄 Executing step 4: Post-evaluation: display_processed_umap for T cell
+2025-09-16 23:47:06,974 | INFO | scchatbot.workflow.nodes.execution | 🔍 STORAGE DEBUG: Original function_name from plan: 'display_processed_umap'
+2025-09-16 23:47:06,974 | INFO | scchatbot.workflow.nodes.execution | 🔍 STEP DEBUG: Calling visualization function 'display_processed_umap' with step parameters: {'cell_type': 'T cell'}
+2025-09-16 23:47:06,974 | INFO | scchatbot.multi_agent_base | 🔍 VIZ WRAPPER DEBUG: display_processed_umap called with kwargs: {'cell_type': 'T cell'}
+2025-09-16 23:47:07,011 | INFO | choreographer.browsers.chromium | Chromium init'ed with kwargs {}
+2025-09-16 23:47:07,013 | INFO | choreographer.browsers.chromium | Found chromium path: /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+2025-09-16 23:47:07,013 | INFO | choreographer.utils._tmpfile | Temp directory created: /var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmp8b4odc5p.
+2025-09-16 23:47:07,014 | INFO | choreographer.browser_async | Opening browser.
+2025-09-16 23:47:07,014 | INFO | choreographer.utils._tmpfile | Temp directory created: /var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmpro34se16.
+2025-09-16 23:47:07,014 | INFO | choreographer.browsers.chromium | Temporary directory at: /var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmpro34se16
+2025-09-16 23:47:07,433 | INFO | kaleido.kaleido | Conforming 1 to file:///var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmp8b4odc5p/index.html
+2025-09-16 23:47:07,437 | INFO | kaleido.kaleido | Waiting on all navigates
+2025-09-16 23:47:07,956 | INFO | kaleido.kaleido | All navigates done, putting them all in queue.
+2025-09-16 23:47:07,957 | INFO | kaleido.kaleido | Getting tab from queue (has 1)
+2025-09-16 23:47:07,957 | INFO | kaleido.kaleido | Got AACE
+2025-09-16 23:47:07,957 | INFO | kaleido._kaleido_tab | Processing T_cell_from_parent_cell_type_UMAP_Plot.png
+2025-09-16 23:47:07,957 | INFO | kaleido._kaleido_tab | Sending big command for T_cell_from_parent_cell_type_UMAP_Plot.png.
+2025-09-16 23:47:08,051 | INFO | kaleido._kaleido_tab | Sent big command for T_cell_from_parent_cell_type_UMAP_Plot.png.
+2025-09-16 23:47:08,053 | INFO | kaleido.kaleido | Reloading tab AACE before return.
+2025-09-16 23:47:08,128 | INFO | kaleido.kaleido | Putting tab AACE back (queue size: 0).
+2025-09-16 23:47:08,129 | INFO | kaleido.kaleido | Waiting for all cleanups to finish.
+2025-09-16 23:47:08,129 | INFO | kaleido.kaleido | Exiting Kaleido
+2025-09-16 23:47:08,129 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:08,129 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:08,129 | INFO | kaleido.kaleido | Cancelling tasks.
+2025-09-16 23:47:08,129 | INFO | kaleido.kaleido | Exiting Kaleido/Choreo
+2025-09-16 23:47:08,129 | INFO | choreographer.browser_async | Closing browser.
+2025-09-16 23:47:08,130 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:08,130 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:08,130 | INFO | kaleido.kaleido | Cancelling tasks.
+2025-09-16 23:47:08,130 | INFO | kaleido.kaleido | Exiting Kaleido/Choreo
+2025-09-16 23:47:08,130 | INFO | choreographer.browser_async | Closing browser.
+2025-09-16 23:47:08,217 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:08,218 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:08,220 | INFO | choreographer.browsers.chromium | Chromium init'ed with kwargs {}
+2025-09-16 23:47:08,220 | INFO | choreographer.browsers.chromium | Found chromium path: /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+2025-09-16 23:47:08,221 | INFO | choreographer.utils._tmpfile | Temp directory created: /var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmp03wh09mp.
+2025-09-16 23:47:08,221 | INFO | choreographer.browser_async | Opening browser.
+2025-09-16 23:47:08,221 | INFO | choreographer.utils._tmpfile | Temp directory created: /var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmp_cob6f2h.
+2025-09-16 23:47:08,221 | INFO | choreographer.browsers.chromium | Temporary directory at: /var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmp_cob6f2h
+2025-09-16 23:47:08,646 | INFO | kaleido.kaleido | Conforming 1 to file:///var/folders/r_/s1247sfn6bl8ypsxp0tj3x3c0000gn/T/tmp03wh09mp/index.html
+2025-09-16 23:47:08,647 | INFO | kaleido.kaleido | Waiting on all navigates
+2025-09-16 23:47:09,222 | INFO | kaleido.kaleido | All navigates done, putting them all in queue.
+2025-09-16 23:47:09,222 | INFO | kaleido.kaleido | Getting tab from queue (has 1)
+2025-09-16 23:47:09,222 | INFO | kaleido.kaleido | Got FDE5
+2025-09-16 23:47:09,222 | INFO | kaleido._kaleido_tab | Processing T_cell_from_parent_cell_type_UMAP_Plot.pdf
+2025-09-16 23:47:09,222 | INFO | kaleido._kaleido_tab | Sending big command for T_cell_from_parent_cell_type_UMAP_Plot.pdf.
+2025-09-16 23:47:09,291 | INFO | kaleido._kaleido_tab | Sent big command for T_cell_from_parent_cell_type_UMAP_Plot.pdf.
+2025-09-16 23:47:09,348 | INFO | kaleido.kaleido | Reloading tab FDE5 before return.
+2025-09-16 23:47:09,427 | INFO | kaleido.kaleido | Putting tab FDE5 back (queue size: 0).
+2025-09-16 23:47:09,427 | INFO | kaleido.kaleido | Waiting for all cleanups to finish.
+2025-09-16 23:47:09,427 | INFO | kaleido.kaleido | Exiting Kaleido
+2025-09-16 23:47:09,427 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:09,427 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:09,427 | INFO | kaleido.kaleido | Cancelling tasks.
+2025-09-16 23:47:09,427 | INFO | kaleido.kaleido | Exiting Kaleido/Choreo
+2025-09-16 23:47:09,427 | INFO | choreographer.browser_async | Closing browser.
+2025-09-16 23:47:09,428 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:09,429 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:09,429 | INFO | kaleido.kaleido | Cancelling tasks.
+2025-09-16 23:47:09,429 | INFO | kaleido.kaleido | Exiting Kaleido/Choreo
+2025-09-16 23:47:09,429 | INFO | choreographer.browser_async | Closing browser.
+2025-09-16 23:47:09,515 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:09,515 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:09,524 | INFO | scchatbot.workflow.nodes.execution | ✅ Step 4 completed successfully
+2025-09-16 23:47:09,526 | INFO | scchatbot.workflow.nodes.execution | 🎨 Visualization storage: display_processed_umap - HTML preserved
+2025-09-16 23:47:09,526 | INFO | scchatbot.workflow.nodes.execution | 🔄 Advanced to step 5
+2025-09-16 23:47:09,526 | INFO | scchatbot.workflow.nodes.execution | 🛑 Stopping execution after 1 steps
+2025-09-16 23:47:09,526 | INFO | scchatbot.workflow.node_base | ✅ Executor: Execution complete
+2025-09-16 23:47:09,527 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 All steps complete (4/4), running post-execution evaluation
+2025-09-16 23:47:09,527 | INFO | scchatbot.workflow.nodes.evaluation | 🏁 Evaluator: Starting sophisticated post-execution evaluation...
+2025-09-16 23:47:09,527 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Starting post-execution evaluation...
+2025-09-16 23:47:09,531 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:09,531 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:09,531 | INFO | choreographer.utils._tmpfile | TemporaryDirectory.cleanup() worked.
+2025-09-16 23:47:09,531 | INFO | choreographer.utils._tmpfile | shutil.rmtree worked.
+2025-09-16 23:47:11,552 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:47:12,242 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:47:12,244 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: general_comparison
+2025-09-16 23:47:12,244 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: T cell
+2025-09-16 23:47:12,881 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:47:12,882 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: general_comparison
+2025-09-16 23:47:13,596 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:47:13,626 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for T cell: '```json
+["display_processed_umap"]
+```' (length: 38)
+2025-09-16 23:47:13,626 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for T cell: ['display_processed_umap']
+2025-09-16 23:47:13,626 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'T cell' is in unavailable list: []
+2025-09-16 23:47:13,626 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 4 entries
+2025-09-16 23:47:13,626 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for T cell: display_processed_umap (execution 4)
+2025-09-16 23:47:13,626 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for T cell: ['display_processed_umap']
+2025-09-16 23:47:13,626 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for T cell
+2025-09-16 23:47:13,627 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Post-execution evaluation complete: 0 total supplementary steps
+2025-09-16 23:47:13,627 | INFO | scchatbot.workflow.nodes.evaluation | 📝 Generated relevance hints for general_comparison question
+2025-09-16 23:47:13,627 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Execution Summary:
+2025-09-16 23:47:13,627 | INFO | scchatbot.workflow.nodes.evaluation |    • Total steps executed: 4
+2025-09-16 23:47:13,627 | INFO | scchatbot.workflow.nodes.evaluation |    • Successful: 4
+2025-09-16 23:47:13,627 | INFO | scchatbot.workflow.nodes.evaluation |    • Failed: 0
+2025-09-16 23:47:13,627 | INFO | scchatbot.workflow.nodes.evaluation |    • Supplementary steps generated: 0
+2025-09-16 23:47:13,627 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Available analysis results:
+2025-09-16 23:47:13,627 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 Evaluator: Post-execution evaluation complete, ready for response generation
+2025-09-16 23:47:13,628 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 All steps complete (4/4), running post-execution evaluation
+2025-09-16 23:47:13,628 | INFO | scchatbot.workflow.nodes.evaluation | 🏁 Evaluator: Starting sophisticated post-execution evaluation...
+2025-09-16 23:47:13,628 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Starting post-execution evaluation...
+2025-09-16 23:47:14,837 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:47:15,439 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:47:15,455 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: gene_markers
+2025-09-16 23:47:15,455 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Evaluating coverage for cell type: T cell
+2025-09-16 23:47:17,127 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:47:17,128 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Question classified as: general_comparison
+2025-09-16 23:47:18,185 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:47:18,186 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 LLM raw response for T cell: '```json
+["display_processed_umap"]
+```' (length: 38)
+2025-09-16 23:47:18,186 | INFO | scchatbot.workflow.nodes.evaluation | 🧠 LLM recommends for T cell: ['display_processed_umap']
+2025-09-16 23:47:18,186 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking if 'T cell' is in unavailable list: []
+2025-09-16 23:47:18,186 | INFO | scchatbot.workflow.nodes.evaluation | 🔧 DEBUG: Checking execution history with 4 entries
+2025-09-16 23:47:18,186 | INFO | scchatbot.workflow.nodes.evaluation | 📋 Found successful analysis for T cell: display_processed_umap (execution 4)
+2025-09-16 23:47:18,186 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Actually performed for T cell: ['display_processed_umap']
+2025-09-16 23:47:18,186 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Complete coverage for T cell
+2025-09-16 23:47:18,186 | INFO | scchatbot.workflow.nodes.evaluation | 🔍 Post-execution evaluation complete: 0 total supplementary steps
+2025-09-16 23:47:18,187 | INFO | scchatbot.workflow.nodes.evaluation | 📝 Generated relevance hints for gene_markers question
+2025-09-16 23:47:18,187 | INFO | scchatbot.workflow.nodes.evaluation | ✅ Execution Summary:
+2025-09-16 23:47:18,187 | INFO | scchatbot.workflow.nodes.evaluation |    • Total steps executed: 4
+2025-09-16 23:47:18,187 | INFO | scchatbot.workflow.nodes.evaluation |    • Successful: 4
+2025-09-16 23:47:18,187 | INFO | scchatbot.workflow.nodes.evaluation |    • Failed: 0
+2025-09-16 23:47:18,187 | INFO | scchatbot.workflow.nodes.evaluation |    • Supplementary steps generated: 0
+2025-09-16 23:47:18,187 | INFO | scchatbot.workflow.nodes.evaluation | 📊 Available analysis results:
+2025-09-16 23:47:18,187 | INFO | scchatbot.workflow.nodes.evaluation | 🎯 Evaluator: Post-execution evaluation complete, ready for response generation
+2025-09-16 23:47:18,187 | INFO | scchatbot.multi_agent_base | 🔄 Routing: Post-execution evaluation complete, generating response
+2025-09-16 23:47:18,187 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Generating LLM-synthesized response with conversation awareness...
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 UNIFIED ACCESSOR: Processing 4 execution steps
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 1: process_cells for Immune cell
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling process_cells with ProcessCellsResultAccessor
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 2: validate_processing_results for step_1
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling validate_processing_results with ValidationResultAccessor
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 3: display_processed_umap for step_2
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | 🎨 VISUALIZATION DEBUG: Step 3 function: display_processed_umap
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | 🎨 VISUALIZATION DEBUG: Parameters: {}
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling display_processed_umap with VisualizationResultAccessor
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | 🔍 Step 4: display_processed_umap for T cell
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | 🎨 VISUALIZATION DEBUG: Step 4 function: display_processed_umap
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | 🎨 VISUALIZATION DEBUG: Parameters: {'cell_type': 'T cell'}
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | ✅ Handling display_processed_umap with VisualizationResultAccessor
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | ✅ UNIFIED ACCESSOR: Processed 4 successful steps
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.unified_result_accessor | 🎯 UNIFIED FORMATTER: Generated 520 characters for synthesis
+2025-09-16 23:47:18,188 | INFO | scchatbot.workflow.nodes.response | ✅ Unified results extracted and formatted successfully
+2025-09-16 23:47:18,189 | INFO | scchatbot.workflow.nodes.response | ✅ Failed analyses retrieved
+2025-09-16 23:47:18,189 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Found context message (56 chars)
+2025-09-16 23:47:18,189 | INFO | scchatbot.workflow.nodes.response | ✅ Conversation context processed
+2025-09-16 23:47:18,189 | INFO | scchatbot.workflow.nodes.response | ✅ Discovery search completed
+2025-09-16 23:47:18,189 | INFO | scchatbot.workflow.nodes.response | ✅ Synthesis prompt created with relevance hints
+2025-09-16 23:47:20,586 | INFO | httpx | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-16 23:47:20,587 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Checking 4 execution steps
+2025-09-16 23:47:20,587 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 1: process_cells, success=True, has_result=True
+2025-09-16 23:47:20,587 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 2: validate_processing_results, success=True, has_result=True
+2025-09-16 23:47:20,587 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 3: display_processed_umap, success=True, has_result=True
+2025-09-16 23:47:20,587 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Added plot plot_1: Annotated UMAP (33026 chars)
+2025-09-16 23:47:20,587 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Step 4: display_processed_umap, success=True, has_result=True
+2025-09-16 23:47:20,587 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Skipping display_processed_umap - duplicate plot detected
+2025-09-16 23:47:20,587 | INFO | scchatbot.workflow.nodes.response | 🎨 PLOT EXTRACTION: Successfully extracted 1 individual plots (total: 33,026 chars)
+2025-09-16 23:47:20,587 | INFO | scchatbot.workflow.nodes.response | 🎨 SIZE VALIDATION: Validated 1 plots, total size: 33,026 bytes
+2025-09-16 23:47:20,587 | INFO | scchatbot.workflow.nodes.response | 🎯 ResponseGeneratorNode: Found 1 individual plots
+2025-09-16 23:47:20,587 | INFO | scchatbot.workflow.nodes.response | 🎨 Creating multiple messages structure: 1 plots + 1 text (plots first)
+2025-09-16 23:47:20,587 | INFO | scchatbot.workflow.nodes.response | 🎨 Created multiple messages structure with 2 total messages (plots first, then text)
+2025-09-16 23:47:20,588 | INFO | scchatbot.workflow.nodes.response | 🎯 UNIFIED: Generated response (311 chars)
+2025-09-16 23:47:20,668 | INFO | scchatbot.multi_agent_base | ✅ Conversation recorded in vector database
+2025-09-16 23:47:20,669 | INFO | scchatbot.multi_agent_base | 💾 Session state saved for 'b05944ce' with 8 available cell types
