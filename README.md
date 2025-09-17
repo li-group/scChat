@@ -64,44 +64,8 @@ Follow these steps to utilize the application effectively:
 - Update specification_graph.json with your Neo4j username, password, system and organ relevant to the database you are using with specific format
 - Update sample_mapping.json with adata file corresponding "Sample name", which can be found in adata.obs, and write descriptions for each condition.
 
-  
-### Step 4: Initialize the Application
-- Run python3 manage.py migrate (For the first time as you install scChat)
-- Run python3 manage.py runserver
-
-### Step 5: Access the Application
-- Open your web browser and navigate to:
-  `http://127.0.0.1:8000/schatbot`
-  
-- **Recommended:** Use Google Chrome for the best experience.
-
-### Additional Tip: Clear Cache to Avoid Previous Chat Data
-- Periodically clearing the cache is recommended to ensure a smooth experience:
-  1. Right-click on the page and select **Inspect**.
-  2. Go to the **Application** tab.
-  3. Under **Cookies**, remove `sessionid`.
-  
-  This will prevent previous chat sessions from being reprocessed.
-
-## Chat Example
-<a name="chat-example"></a>
-<p align="center">
-<!-- <img src="images/Chatbot_eg_highPPI.png" alt="drawing" width="700"/> -->
-</p>
-
-# Datasets
-The datasets used for testing and examples for sample_mapping.json and specification_graph.json can be found at [https://docs.google.com/spreadsheets/d/1NwN5GydHn0B3-W0DLcAfvnNtZVJEMUgBW9YyzXnS83A/edit?usp=sharing
-](https://drive.google.com/drive/u/4/folders/1RJRETtwI3zxsOJK0Lop197JGm3Isl4iB)
-
-## scChat Retrieval-Augmented Generation (RAG) Configuration
-
-The `cell type RAG` allows users to specify the system and organ for their single-cell RNA sequencing (scRNA-seq) analysis. Based on the source of the adata the RAG database can be set as human or mouse.
-
-### Usage
-Users need to configure the `.json` file by specifying the organism (`human` or `mouse`) in the database part.
-
-For example, to analyze peripheral blodd from lymphatic system, the configuration would look like this:
-
+### Step 4: Build the specification.json and sample_mapping.json for RAG specifications
+- Build the specification_graph.json with your Neo4j username, password, database(`human` or `mouse`), system and organ relevant to the file you are going to test with following format:
 ```json
 {
     "url": "put your url here", 
@@ -137,151 +101,62 @@ It's also allowed to pass multiple system and organ to the RAG. For example:
     ]
 }
 ```
+- Build the sample_mapping.json with adata file corresponding "Sample name", which can be found in adata.obs, and write descriptions for each condition. For example:
+```json
+{
+  "Sample name": "Sample",
+  "Sample categories": {
+    "0": "p1_pre",
+    "1": "p1_post",
+    "2": "p6_pre",
+    "3": "p6_post",
+    "4": "p7_pre",
+    "5": "p7_post"
+  },
+  "Sample description": {
+    "p1_pre": "Pre-treatment sample from patient 1",
+    "p1_post": "Post-treatment sample from patient 1",
+    "p6_pre": "Pre-treatment sample from patient 6",
+    "p6_post": "Post-treatment sample from patient 6",
+    "p7_pre": "Pre-treatment sample from patient 7",
+    "p7_post": "Post-treatment sample from patient 7"
+  }
+}
+```
+Notably, the available systems, organs and tissues are listed in available_cell_RAG.json.
 
-This configuration will retrieve and process the relevant dataset based on the selected system and organ.
+### Step 5: Initialize the Application
+- Run python3 manage.py migrate (For the first time as you install scChat)
+- Run python3 manage.py runserver
 
-### Available systems and organs
+### Step 6: Access the Application
+- Open your web browser and navigate to:
+  `http://127.0.0.1:8000/schatbot`
+  
+- **Recommended:** Use Google Chrome for the best experience.
 
-#### Human
-- Nervous system
-  - Brain
-  - Spinal cord
-  - Ganglion
-  - Eye
-  - Ear     
-- Musculoskeletal system
-  - Synovial tissue
-  - Tendo
-  - Muscle
-  - Bone
-- Female Reproductive System
-  - Vagina
-  - Cervix
-  - Egg
-  - Breast
-  - Uterus
-  - Ovary
-  - Oviduct (Fallopian tube)
-- Cardiovascular System
-  - Capillary
-  - Heart
-  - Artery
-  - Vein
-- Digestive System
-  - Stomach
-  - Esophagus
-  - Liver
-  - Mouth
-  - Intestine
-  - Abdomen
-- Endocrine System
-  - Pancreas
-  - Parathyroid gland
-  - Adrenal gland
-  - Thyroid gland
-- Urinary System
-  - Kidney
-  - Ureters
-  - Bladder
-  - Urethra
-- Male Reproductive System
-  - Penis
-  - Testis
-  - Prostate gland
-- Respiratory System
-  - Nose
-  - Lung
-  - Trachea
-  - Larynx
-  - Pharynx
-- Lymphatic System
-  - Spleen
-  - Peripheral blood
-  - Umbilical cord blood
-  - Bone marrow
-  - Lymph node
-  - Thymus
-- Integumentary System
-  - Adipose tissue
-  - Skin
-- Embryonic Structure
-  - Embryo
-  - Fetus
-  - Placenta
+### Additional Tip: Clear Cache to Avoid Previous Chat Data
+- Periodically clearing the cache is recommended to ensure a smooth experience:
+  1. Right-click on the page and select **Inspect**.
+  2. Go to the **Application** tab.
+  3. Under **Cookies**, remove `sessionid`.
+  4. You may have to run `python manage.py migrate` in some cases before Step 4.
+  
+  This will prevent previous chat sessions from being reprocessed.
 
-#### Mouse
-- Endocrine System
-  - Thyroid gland
-  - Parathyroid gland
-  - Adrenal gland
-  - Pancreas
-- Cardiovascular System
-  - Capillary
-  - Artery
-  - Vein
-  - Heart
-- Nervous System
-  - Spinal cord
-  - Eye
-  - Ear
-  - Ganglion
-  - Brain
-- Respiratory System
-  - Nose
-  - Larynx
-  - Trachea
-  - Lung
-  - Pharynx
-- Integumentary System
-  - Adipose tissue
-  - Skin
-- Lymphatic System
-  - Thymus
-  - Peripheral blood
-  - Bone marrow
-  - Spleen
-  - Lymph node
-- Embryonic Structure
-  - Embryo
-  - Placenta
-  - Fetus
-- Female Reproductive System
-  - Oviduct (Fallopian tube)
-  - Uterus
-  - Vagina
-  - Breast
-  - Egg
-  - Ovary
-  - Cervix
-- Digestive System
-  - Esophagus
-  - Liver
-  - Mouth
-  - Intestine
-  - Abdomen
-  - Stomach
-- Male Reproductive System
-  - Penis
-  - Prostate gland
-  - Testis
-- Urinary System
-  - Bladder
-  - Ureters
-  - Urethra
-  - Kidney
-- Musculoskeletal System
-  - Synovial tissue
-  - Muscle
-  - Tendo
-  - Bone
+## Chat Example
+<a name="chat-example"></a>
+<p align="center">
+<!-- <img src="images/Chatbot_eg_highPPI.png" alt="drawing" width="700"/> -->
+</p>
+
+# Datasets
+The datasets used for testing and examples for sample_mapping.json and specification_graph.json can be found at [https://docs.google.com/spreadsheets/d/1NwN5GydHn0B3-W0DLcAfvnNtZVJEMUgBW9YyzXnS83A/edit?usp=sharing
+](https://drive.google.com/drive/u/4/folders/1RJRETtwI3zxsOJK0Lop197JGm3Isl4iB)
 
 ## Citation
-
 The `cell type RAG` files were generated using data from:
 
 **CellMarker: a manually curated resource of cell markers in human and mouse**  
 *Published in Nucleic Acids Research, 2018*  
 DOI: [10.1093/nar/gky900](https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gky900/5115823)
-
-
-

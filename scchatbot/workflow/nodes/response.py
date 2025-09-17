@@ -5,7 +5,7 @@ This module contains the ResponseGeneratorNode which generates final responses
 by synthesizing analysis results and conversation context.
 """
 
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import json
 from langchain_core.messages import AIMessage, SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
@@ -85,17 +85,26 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             conversation_context = None
         
         try:
-            # 5. Get post-execution evaluation results for question type and relevance hints
+            # 5. Search for cell type discoveries if this is a "find X cell" query
+            discovery_context = self._search_for_cell_discoveries(state)
+            logger.info(f"✅ Discovery search completed")
+        except Exception as e:
+            logger.info(f"❌ Error searching for discoveries: {e}")
+            discovery_context = None
+
+        try:
+            # 6. Get post-execution evaluation results for question type and relevance hints
             post_eval = state.get("post_execution_evaluation", {})
             question_type = post_eval.get("question_type")
             analysis_relevance = post_eval.get("analysis_relevance", {})
-            
-            # 6. Generate synthesis prompt with conversation awareness and relevance hints
+
+            # 7. Generate synthesis prompt with conversation awareness and relevance hints
             synthesis_prompt = self._create_enhanced_synthesis_prompt_with_formatted_findings(
                 original_question=state.get("current_message", ""),
                 formatted_findings=formatted_findings,
                 failed_analyses=failed_analyses,
                 conversation_context=conversation_context,
+                discovery_context=discovery_context,
                 question_type=question_type,
                 analysis_relevance=analysis_relevance
             )
@@ -338,9 +347,10 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         
         return failed_analyses
     
-    def _create_enhanced_synthesis_prompt_with_formatted_findings(self, original_question: str, formatted_findings: str, 
+    def _create_enhanced_synthesis_prompt_with_formatted_findings(self, original_question: str, formatted_findings: str,
                                      failed_analyses: List[Dict],
                                      conversation_context: str = None,
+                                     discovery_context: str = None,
                                      question_type: str = None,
                                      analysis_relevance: Dict[str, Any] = None) -> str:
         """Create prompt for synthesizing analysis results with pre-formatted findings from unified accessor."""
@@ -402,6 +412,16 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                     7. Consider the conversation history and maintain continuity
                     8. Reference specific previous discussions when relevant
                     9. If the user is referring to something from earlier, address it specifically"""
+
+        # Add discovery context if available
+        if discovery_context:
+            prompt += f"""
+
+                    CELL TYPE DISCOVERY INFORMATION:
+                    {discovery_context}
+
+                    CRITICAL: If the user asks to "find" a cell type and you see it was discovered above,
+                    lead with "✅ [Cell Type] successfully discovered!" and explain it's now available for analysis."""
 
         prompt += "\n\nAnswer:"
         
@@ -685,7 +705,92 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             combined_parts.append(plot_html)
         
         return "\n".join(combined_parts)
-    
+
+    def _search_for_cell_discoveries(self, state: ChatState) -> Optional[str]:
+        """Search vector database for cell type discoveries relevant to user query."""
+        try:
+            # Get user's question
+            user_question = state.get("current_message", "").lower()
+
+            # Check if this is a "find X cell" type query
+            discovery_keywords = ["find", "discover", "identify", "locate", "search for"]
+            cell_keywords = ["cell", "cells", "cell type", "subtype"]
+
+            if not any(keyword in user_question for keyword in discovery_keywords):
+                return None
+
+            if not any(keyword in user_question for keyword in cell_keywords):
+                return None
+
+            logger.info(f"🔍 DISCOVERY SEARCH: Detected discovery query: '{user_question}'")
+
+            # Use the history manager available from BaseWorkflowNode
+            if not self.history_manager:
+                logger.info("⚠️ No history manager available for discovery search")
+                return None
+
+            # Search for cell type discoveries in conversation history
+            search_queries = [
+                f"discovered new cell type {user_question}",
+                f"✅ Discovered new cell type",
+                f"cell type discovery {user_question}",
+                user_question
+            ]
+
+            discovery_results = []
+            for query in search_queries:
+                try:
+                    results = self.history_manager.search_conversations(query, k=3)
+                    if results:
+                        discovery_results.extend(results)
+                except Exception as e:
+                    logger.info(f"⚠️ Search query '{query}' failed: {e}")
+                    continue
+
+            if not discovery_results:
+                logger.info("🔍 No discovery results found in conversation history")
+                return None
+
+            # Format discovery context
+            discovery_context = self._format_discovery_results(discovery_results, user_question)
+            logger.info(f"✅ Found {len(discovery_results)} discovery-related conversations")
+
+            return discovery_context
+
+        except Exception as e:
+            logger.info(f"❌ Discovery search failed: {e}")
+            return None
+
+    def _format_discovery_results(self, results: List[Any], user_question: str) -> str:
+        """Format discovery search results into context string."""
+        if not results:
+            return ""
+
+        discovery_lines = ["CELL TYPE DISCOVERY HISTORY:"]
+        seen_discoveries = set()
+
+        for result in results:
+            exchange = result.metadata.get("full_exchange", "")
+            if not exchange:
+                continue
+
+            # Look for discovery announcements in the exchange
+            if "✅ Discovered new cell type" in exchange or "discovered" in exchange.lower():
+                # Extract the discovery information
+                lines = exchange.split('\n')
+                for line in lines:
+                    if "✅ Discovered new cell type:" in line or "discovered new cell type" in line.lower():
+                        if line not in seen_discoveries:
+                            seen_discoveries.add(line)
+                            discovery_lines.append(f"  {line.strip()}")
+
+        if len(discovery_lines) > 1:  # More than just the header
+            discovery_lines.append("")
+            discovery_lines.append("IMPORTANT: Use this discovery information to provide accurate availability status.")
+            return "\n".join(discovery_lines)
+        else:
+            return ""
+
     def generate_response(self, state: ChatState) -> ChatState:
         """
         Alternative entry point for response generation.

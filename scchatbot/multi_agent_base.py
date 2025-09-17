@@ -20,7 +20,10 @@ from .analysis.visualizations import (
     display_processed_umap,
     display_enrichment_visualization,
     display_cell_count_comparison,
-    display_dea_heatmap
+    display_dea_heatmap,
+    display_feature_plot,
+    display_violin_plot,
+    display_cell_count_stacked_plot
 )
 from .cell_types.utils import clear_directory
 from .cell_types.models import ChatState
@@ -183,7 +186,8 @@ class MultiAgentChatBot:
     def setup_functions(self):
         """Setup function descriptions and mappings"""
         self.visualization_functions = {
-            "display_dotplot", "display_processed_umap", "display_enrichment_visualization"
+            "display_dotplot", "display_processed_umap", "display_enrichment_visualization",
+            "display_feature_plot", "display_violin_plot", "display_cell_count_stacked_plot"
         }
 
         self.function_descriptions = [
@@ -345,6 +349,59 @@ class MultiAgentChatBot:
                     },
                     "required": ["processed_parent", "expected_children"]
                 }
+            },
+            {
+                "name": "display_feature_plot",
+                "description": "Generate interactive feature plots showing gene expression overlaid on UMAP coordinates. Creates scatter plots where each cell is colored by gene expression level using Seurat-style color schemes. Use when user wants to visualize gene expression patterns on UMAP or see where genes are expressed across the cell landscape.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "genes": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "List of gene names to plot (e.g., ['CD3E', 'CD4', 'CD8A'])"
+                        },
+                        "cell_type_filter": {
+                            "type": "string",
+                            "description": "Optional filter to show only specific cell type on the plot (e.g., 'T cell', 'Macrophage')"
+                        }
+                    },
+                    "required": ["genes"]
+                }
+            },
+            {
+                "name": "display_violin_plot",
+                "description": "Generate interactive violin plots showing gene expression distribution across leiden clusters with pre/post treatment comparison. Shows expression levels as violin shapes grouped by cluster and colored by treatment condition. Use when user wants to compare gene expression across clusters or between experimental conditions.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "cell_type": {
+                            "type": "string",
+                            "description": "The cell type to analyze (e.g., 'T cell', 'Macrophage'). Uses hierarchical discovery to find appropriate data."
+                        },
+                        "genes": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "List of gene names to plot (e.g., ['IL32', 'GZMK', 'FOXP3'])"
+                        }
+                    },
+                    "required": ["cell_type", "genes"]
+                }
+            },
+            {
+                "name": "display_cell_count_stacked_plot",
+                "description": "Generate stacked bar plots comparing cell counts across conditions (pre/post treatment) for multiple cell types. Shows patient-specific treatment comparisons with cell types on x-axis and counts stacked by patient-treatment combinations. Use when user wants to compare cell counts, see treatment effects across patients, or analyze cell type abundance changes.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "cell_types": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "List of cell type names to include in the plot (e.g., ['T cell', 'B cell', 'Macrophage', 'Microglial cell']). Can be plural forms."
+                        }
+                    },
+                    "required": ["cell_types"]
+                }
             }
         ]
         
@@ -355,6 +412,9 @@ class MultiAgentChatBot:
             "display_enrichment_visualization": self._wrap_visualization(display_enrichment_visualization),
             "display_cell_count_comparison": self._wrap_visualization(display_cell_count_comparison),
             "display_dea_heatmap": self._wrap_visualization(display_dea_heatmap),
+            "display_feature_plot": self._wrap_visualization_with_adata(display_feature_plot),
+            "display_violin_plot": self._wrap_visualization_with_adata(display_violin_plot),
+            "display_cell_count_stacked_plot": self._wrap_visualization_with_adata(display_cell_count_stacked_plot),
             "perform_enrichment_analyses": self._wrap_enrichment_analysis,
             "process_cells": self._wrap_process_cells,
             "dea_split_by_condition": self._wrap_dea_analysis,
@@ -646,6 +706,31 @@ class MultiAgentChatBot:
                     return func(**kwargs)
             except Exception as e:
                 logger.info(f"❌ Visualization error: {e}")
+                return f"Visualization failed: {e}"
+        return wrapper
+
+    def _wrap_visualization_with_adata(self, func):
+        """Wrapper for visualization functions that require live adata object"""
+        def wrapper(**kwargs):
+            try:
+                func_name = func.__name__
+
+                # DEBUG: Log all parameters passed to visualization wrapper
+                logger.info(f"🔍 VIZ ADATA WRAPPER DEBUG: {func_name} called with kwargs: {kwargs}")
+
+                # These functions need the live adata object as first parameter
+                if func_name in ['display_feature_plot', 'display_violin_plot', 'display_cell_count_stacked_plot']:
+                    # Pass the live adata object from the workflow
+                    if self.adata is not None:
+                        return func(self.adata, **kwargs)
+                    else:
+                        return f"Error: No data available for {func_name}. Please ensure data has been loaded."
+                else:
+                    # Fallback for unexpected functions
+                    return func(**kwargs)
+
+            except Exception as e:
+                logger.info(f"❌ Visualization with adata error: {e}")
                 return f"Visualization failed: {e}"
         return wrapper
 

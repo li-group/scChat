@@ -253,38 +253,44 @@ class ExecutorNode(BaseWorkflowNode):
         
         if step.function_name in self.visualization_functions and "cell_type" not in enhanced_params:
             # Handle different types of visualizations
-            if step.function_name in ["display_processed_umap", "display_dotplot"]:
+            if step.function_name in ["display_processed_umap", "display_dotplot", "display_feature_plot", "display_violin_plot", "display_dea_heatmap"]:
                 # These visualizations don't need enrichment analysis - they work with processed cell data
-                # Try to find any successful process_cells execution
-                execution_history = state.get("execution_history", [])
-                
-                found_cell_type = False
-                for recent_execution in reversed(execution_history[-10:]):
-                    step_data = recent_execution.get("step", {})
-                    
-                    # Look for any successful cell processing or analysis
-                    if (recent_execution.get("success") and 
-                        step_data.get("function_name") in ["process_cells", "perform_enrichment_analyses", "dea_split_by_condition"]):
-                        
-                        step_params = step_data.get("parameters", {})
-                        cell_type = step_params.get("cell_type")
-                        
-                        if cell_type and cell_type != "unknown":
-                            enhanced_params["cell_type"] = cell_type
-                            logger.info(f"✅ Found cell type for {step.function_name}: {cell_type}")
-                            found_cell_type = True
-                            break
-                
-                if not found_cell_type:
-                    # For UMAP and other basic visualizations, try default cell types
-                    available_cell_types = state.get("available_cell_types", [])
-                    if available_cell_types and "Overall cells" in available_cell_types:
-                        enhanced_params["cell_type"] = "Overall cells"
-                        logger.info(f"✅ Using default cell type 'Overall cells' for {step.function_name}")
-                    else:
-                        logger.info(f"❌ No suitable cell type found for {step.function_name}")
-                        enhanced_params["_should_fail"] = True
-                        enhanced_params["_fail_reason"] = f"No processed cell data available for {step.function_name}"
+
+                # Special case: display_feature_plot doesn't need cell_type parameter
+                if step.function_name == "display_feature_plot":
+                    logger.info(f"✅ Feature plot doesn't require cell_type parameter")
+                    # Don't add cell_type parameter for feature plots
+                else:
+                    # Other visualizations need cell_type parameter
+                    execution_history = state.get("execution_history", [])
+
+                    found_cell_type = False
+                    for recent_execution in reversed(execution_history[-10:]):
+                        step_data = recent_execution.get("step", {})
+
+                        # Look for any successful cell processing or analysis
+                        if (recent_execution.get("success") and
+                            step_data.get("function_name") in ["process_cells", "perform_enrichment_analyses", "dea_split_by_condition"]):
+
+                            step_params = step_data.get("parameters", {})
+                            cell_type = step_params.get("cell_type")
+
+                            if cell_type and cell_type != "unknown":
+                                enhanced_params["cell_type"] = cell_type
+                                logger.info(f"✅ Found cell type for {step.function_name}: {cell_type}")
+                                found_cell_type = True
+                                break
+
+                    if not found_cell_type:
+                        # For UMAP and other basic visualizations, try default cell types
+                        available_cell_types = state.get("available_cell_types", [])
+                        if available_cell_types and "Overall cells" in available_cell_types:
+                            enhanced_params["cell_type"] = "Overall cells"
+                            logger.info(f"✅ Using default cell type 'Overall cells' for {step.function_name}")
+                        else:
+                            logger.info(f"❌ No suitable cell type found for {step.function_name}")
+                            enhanced_params["_should_fail"] = True
+                            enhanced_params["_fail_reason"] = f"No processed cell data available for {step.function_name}"
             
             else:
                 # Enrichment-based visualizations (display_enrichment_*)

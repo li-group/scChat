@@ -165,8 +165,9 @@ class PlannerNode(BaseWorkflowNode):
                 🔢 CELL TYPE ANALYSIS - Use processing/counting functions when the user asks about:
                 - Cell type abundance, proportions, distributions
                 - Cell type identification and characterization
-                - Examples: "How many T cells are there?", "Compare cell type proportions"
-                - → Use functions like: process_cells, compare_cell_counts
+                - Cell count comparisons and visualizations
+                - Examples: "How many T cells are there?", "Compare cell type proportions", "Show cell count plots"
+                - → Use functions like: process_cells, compare_cell_counts, display_cell_count_stacked_plot
                 
                 💬 CONVERSATIONAL RESPONSE - For simple queries:
                 - Direct greetings or simple questions
@@ -176,8 +177,9 @@ class PlannerNode(BaseWorkflowNode):
                 
                 🎯 ANALYSIS SELECTION GUIDE:
                 - Gene/marker questions → DEA analysis
-                - Pathway/functional questions → Enrichment analysis  
-                - Cell abundance/counting questions → Cell processing/counting
+                - Pathway/functional questions → Enrichment analysis
+                - Cell abundance/counting questions → Cell processing/counting + display_cell_count_stacked_plot
+                - Cell count visualization requests → display_cell_count_stacked_plot (direct visualization)
                 - Explanation/interpretation questions → Conversational response
                 - When unclear, consider what type of biological question is being asked
                 
@@ -251,6 +253,19 @@ class PlannerNode(BaseWorkflowNode):
                     - "show cell count comparison" → use "display_cell_count_comparison" with results from previous steps
                     - "visualize cell abundance across conditions" → use "display_cell_count_comparison"
                 * The "cell_types_data" parameter should contain aggregated results from executed compare_cell_counts steps
+
+                - For cell count stacked bar plot visualization, use "display_cell_count_stacked_plot":
+                * Creates stacked bar plots comparing cell counts across conditions for multiple cell types
+                * Use when user wants to see patient-specific treatment comparisons or cell type abundance changes
+                * Works directly with live data - NO need for prior compare_cell_counts steps
+                * Examples:
+                    - "create stacked bar plot for T cells, B cells, and Macrophages" → use "display_cell_count_stacked_plot" with cell_types=["T cell", "B cell", "Macrophage"]
+                    - "show cell count comparison across patients" → use "display_cell_count_stacked_plot" with relevant cell types
+                    - "plot cell abundance by treatment" → use "display_cell_count_stacked_plot" with cell types of interest
+                    - "compare cell counts in a stacked plot" → use "display_cell_count_stacked_plot"
+                * Parameters: cell_types (required list) - can accept plural forms like "T cells", "B cells"
+                * Automatically extracts patient and treatment information from metadata
+                * Shows cell types on x-axis with stacked bars by patient-treatment combinations
                 
                 - For DEA heatmap visualization, use "display_dea_heatmap":
                 * CRITICAL: Use IMMEDIATELY AFTER "dea_split_by_condition" step for the same cell type
@@ -261,7 +276,28 @@ class PlannerNode(BaseWorkflowNode):
                 * NEVER put display_dea_heatmap BEFORE the corresponding dea_split_by_condition
                 * For multiple cell types, create pairs: analysis → heatmap for each cell type
                 * Parameters: cell_type (required), top_n_genes (default: 20), cluster_genes (default: true), cluster_samples (default: true)
-                    
+
+                - For gene expression visualization on UMAP, use "display_feature_plot":
+                * Creates interactive scatter plots showing gene expression overlaid on UMAP coordinates
+                * Use when user wants to see WHERE genes are expressed across the cell landscape
+                * Examples:
+                    - "show CD3E expression on UMAP" → use "display_feature_plot" with genes=["CD3E"]
+                    - "visualize T cell markers on the map" → use "display_feature_plot" with genes=["CD3E", "CD4", "CD8A"]
+                    - "plot gene expression patterns" → use "display_feature_plot" with relevant genes
+                * Parameters: genes (required list), cell_type_filter (optional to highlight specific cell types)
+                * Can plot single or multiple genes in subplot layout
+
+                - For gene expression distribution analysis, use "display_violin_plot":
+                * Creates interactive violin plots showing expression across leiden clusters with treatment comparison
+                * Use when user wants to compare gene expression LEVELS across clusters or conditions
+                * Examples:
+                    - "compare IL32 expression across T cell clusters" → use "display_violin_plot" with cell_type="T cell", genes=["IL32"]
+                    - "show treatment differences in gene expression" → use "display_violin_plot" with relevant cell_type and genes
+                    - "violin plot for marker genes" → use "display_violin_plot" with cell_type and marker gene list
+                * Parameters: cell_type (required), genes (required list)
+                * Automatically shows pre/post treatment comparison if available
+                * Uses hierarchical cell type discovery (e.g., Treg → finds T cell data)
+
                 SEMANTIC SEARCH GUIDELINES:
                 - For questions seeking specific pathway/term information beyond the top-ranked results, consider using "search_enrichment_semantic"
                 - Use semantic search when:
