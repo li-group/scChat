@@ -70,7 +70,6 @@ class MultiAgentChatBot:
         # Initialize cell type extractor
         self.cell_type_extractor = None
         self._initialize_cell_type_extractor()
-        logger.info("1")
         
         # Initialize workflow nodes
         self.workflow_nodes = WorkflowNodes(
@@ -84,11 +83,9 @@ class MultiAgentChatBot:
             self.function_mapping,
             self.visualization_functions
         )
-        logger.info("2")
         
         # Create LangGraph workflow
         self.workflow = self._create_workflow()
-        logger.info("3")
         # Initialize session state management for conversation continuity
         self.session_states = {}  # Dict to store state for each session
         logger.info("✅ Session state management initialized")
@@ -98,7 +95,7 @@ class MultiAgentChatBot:
         directories_to_clear = [
             'figures', 'process_cell_data', 'scchatbot/annotated_adata',
             'scchatbot/enrichment', 'umaps/annotated', 'scchatbot/runtime_data/basic_data/',
-            'scchatbot/deg_res', 'conversation_history'
+            'scchatbot/deg_res', 'conversation_history', 'scchatbot/plots'
         ]
         for directory in directories_to_clear:
             clear_directory(directory)

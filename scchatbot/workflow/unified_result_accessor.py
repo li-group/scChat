@@ -82,15 +82,107 @@ class EnrichmentResultAccessor(ResultAccessorBase):
             analysis_dirs = {
                 "go": ["go_bp", "go_cc", "go_mf"] + [f"go_{condition}" for condition in conditions],
                 "kegg": ["kegg"] + [f"kegg_{condition}" for condition in conditions],
-                "reactome": ["reactome"] + [f"reactome_{condition}" for condition in conditions], 
+                "reactome": ["reactome"] + [f"reactome_{condition}" for condition in conditions],
                 "gsea": ["gsea"] + [f"gsea_{condition}" for condition in conditions]
             }
-            
+
             for analysis_type in analyses:
-                if analysis_type in analysis_dirs:
+                if analysis_type == "gsea":
+                    # Special handling for GSEA with library-specific folders
+                    import glob
+
+                    # Try library-specific folders first
+                    search_patterns = [
+                        f"scchatbot/enrichment/gsea_*/results_summary_{cell_type}_*.csv",
+                        f"scchatbot/enrichment/gsea*/results_summary_{cell_type}_*.csv",
+                        f"scchatbot/enrichment/gsea_*/results_summary_{cell_type}.csv"
+                    ]
+
+                    found_files = []
+                    for pattern in search_patterns:
+                        found_files.extend(glob.glob(pattern))
+
+                    # Process found files
+                    for csv_path in found_files:
+                        if os.path.exists(csv_path):
+                            try:
+                                df = pd.read_csv(csv_path)
+                                if len(df) > 0:
+                                    # Handle different column name variations across analysis types
+                                    term_column = None
+                                    for col_name in ["term_name", "Term", "pathway", "term"]:
+                                        if col_name in df.columns:
+                                            term_column = col_name
+                                            break
+
+                                    # Handle p-value column variations
+                                    p_value_column = None
+                                    for col_name in ["adj_p_value", "p_value", "pvalue", "FDR"]:
+                                        if col_name in df.columns:
+                                            p_value_column = col_name
+                                            break
+
+                                    if term_column and p_value_column:
+                                        # Get folder name for key (e.g., gsea_MSigDBHallmark2020)
+                                        folder_name = os.path.basename(os.path.dirname(csv_path))
+
+                                        # Get top terms with their statistics
+                                        results["analysis_types"][folder_name] = {
+                                            "top_terms": df[term_column].head(10).tolist(),
+                                            "p_values": df[p_value_column].head(10).tolist(),
+                                            "total_significant": len(df),
+                                            "source_file": csv_path,
+                                            "columns_used": {"term": term_column, "p_value": p_value_column}
+                                        }
+                                    else:
+                                        logger.info(f"⚠️ Column mapping failed for {csv_path}: term_col={term_column}, p_val_col={p_value_column}")
+                                        logger.info(f"   Available columns: {list(df.columns)}")
+                            except Exception as e:
+                                logger.info(f"⚠️ Error reading {csv_path}: {e}")
+
+                    # Fallback to simple structure if no library-specific files found
+                    if not results["analysis_types"] and analysis_type in analysis_dirs:
+                        for subdir in analysis_dirs[analysis_type]:
+                            csv_path = f"scchatbot/enrichment/{subdir}/results_summary_{cell_type}.csv"
+                            if os.path.exists(csv_path):
+                                # Process fallback files (same logic as other analyses)
+                                try:
+                                    df = pd.read_csv(csv_path)
+                                    if len(df) > 0:
+                                        # Handle different column name variations across analysis types
+                                        term_column = None
+                                        for col_name in ["term_name", "Term", "pathway", "term"]:
+                                            if col_name in df.columns:
+                                                term_column = col_name
+                                                break
+
+                                        # Handle p-value column variations
+                                        p_value_column = None
+                                        for col_name in ["adj_p_value", "p_value", "pvalue", "FDR"]:
+                                            if col_name in df.columns:
+                                                p_value_column = col_name
+                                                break
+
+                                        if term_column and p_value_column:
+                                            # Get top terms with their statistics
+                                            results["analysis_types"][subdir] = {
+                                                "top_terms": df[term_column].head(10).tolist(),
+                                                "p_values": df[p_value_column].head(10).tolist(),
+                                                "total_significant": len(df),
+                                                "source_file": csv_path,
+                                                "columns_used": {"term": term_column, "p_value": p_value_column}
+                                            }
+                                        else:
+                                            logger.info(f"⚠️ Column mapping failed for {csv_path}: term_col={term_column}, p_val_col={p_value_column}")
+                                            logger.info(f"   Available columns: {list(df.columns)}")
+                                except Exception as e:
+                                    logger.info(f"⚠️ Error reading {csv_path}: {e}")
+
+                elif analysis_type in analysis_dirs:
+                    # Original logic for GO, KEGG, Reactome
                     for subdir in analysis_dirs[analysis_type]:
                         csv_path = f"scchatbot/enrichment/{subdir}/results_summary_{cell_type}.csv"
-                        
+
                         if os.path.exists(csv_path):
                             try:
                                 df = pd.read_csv(csv_path)

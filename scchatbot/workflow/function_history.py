@@ -588,23 +588,78 @@ class FunctionHistoryManager:
                     raw_file = f"{base_dir}/results_raw_{cell_type}.csv"
         
         else:
-            # For KEGG, Reactome, GSEA - simpler structure
-            if condition and condition != "all_combined":
-                # Condition-specific folder
-                folder = f"{base_dir}/{analysis_type}_{condition}"
-                summary_file = f"{folder}/results_summary_{cell_type}_{condition}.csv"
-                raw_file = f"{folder}/results_raw_{cell_type}_{condition}.csv"
+            # For KEGG, Reactome, GSEA - handle different structures
+            if analysis_type == "gsea":
+                # GSEA has library-specific folders (e.g., gsea_MSigDBHallmark2020)
+                if condition and condition != "all_combined":
+                    # Condition-specific: try library-specific folders first, then fallback
+                    import glob
+
+                    # Try to find library-specific condition folders
+                    search_patterns = [
+                        f"{base_dir}/gsea_{condition}_*/results_summary_{cell_type}_{condition}_*.csv",
+                        f"{base_dir}/gsea_*_{condition}/results_summary_{cell_type}_{condition}_*.csv",
+                        f"{base_dir}/gsea*{condition}*/results_summary_{cell_type}_*.csv"
+                    ]
+
+                    summary_file = None
+                    for pattern in search_patterns:
+                        found_files = glob.glob(pattern)
+                        if found_files:
+                            summary_file = found_files[0]  # Take first match
+                            folder = os.path.dirname(summary_file)
+                            # Derive raw file name from summary file
+                            raw_file = summary_file.replace("results_summary_", "results_raw_")
+                            break
+
+                    if not summary_file:
+                        # Fallback to simple structure
+                        folder = f"{base_dir}/{analysis_type}_{condition}"
+                        summary_file = f"{folder}/results_summary_{cell_type}_{condition}.csv"
+                        raw_file = f"{folder}/results_raw_{cell_type}_{condition}.csv"
+                else:
+                    # Full dataset: try library-specific folders first
+                    import glob
+
+                    search_patterns = [
+                        f"{base_dir}/gsea_*/results_summary_{cell_type}_*.csv",
+                        f"{base_dir}/gsea*/results_summary_{cell_type}_*.csv",
+                        f"{base_dir}/gsea_*/results_summary_{cell_type}.csv"
+                    ]
+
+                    summary_file = None
+                    for pattern in search_patterns:
+                        found_files = glob.glob(pattern)
+                        if found_files:
+                            summary_file = found_files[0]  # Take first match
+                            folder = os.path.dirname(summary_file)
+                            # Derive raw file name from summary file
+                            raw_file = summary_file.replace("results_summary_", "results_raw_")
+                            break
+
+                    if not summary_file:
+                        # Fallback to simple structure
+                        folder = f"{base_dir}/{analysis_type}"
+                        summary_file = f"{folder}/results_summary_{cell_type}.csv"
+                        raw_file = f"{folder}/results_raw_{cell_type}.csv"
             else:
-                # Full dataset folder
-                folder = f"{base_dir}/{analysis_type}"
-                summary_file = f"{folder}/results_summary_{cell_type}.csv"
-                raw_file = f"{folder}/results_raw_{cell_type}.csv"
-                
-                # Special case for raw files that might have analysis type suffix
-                if not os.path.exists(raw_file):
-                    raw_file_alt = f"{folder}/results_raw_{cell_type}_{analysis_type}.csv"
-                    if os.path.exists(raw_file_alt):
-                        raw_file = raw_file_alt
+                # For KEGG, Reactome - simpler structure
+                if condition and condition != "all_combined":
+                    # Condition-specific folder
+                    folder = f"{base_dir}/{analysis_type}_{condition}"
+                    summary_file = f"{folder}/results_summary_{cell_type}_{condition}.csv"
+                    raw_file = f"{folder}/results_raw_{cell_type}_{condition}.csv"
+                else:
+                    # Full dataset folder
+                    folder = f"{base_dir}/{analysis_type}"
+                    summary_file = f"{folder}/results_summary_{cell_type}.csv"
+                    raw_file = f"{folder}/results_raw_{cell_type}.csv"
+
+                    # Special case for raw files that might have analysis type suffix
+                    if not os.path.exists(raw_file):
+                        raw_file_alt = f"{folder}/results_raw_{cell_type}_{analysis_type}.csv"
+                        if os.path.exists(raw_file_alt):
+                            raw_file = raw_file_alt
         
         summary_df = None
         raw_df = None

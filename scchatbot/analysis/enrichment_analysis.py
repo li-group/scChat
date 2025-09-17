@@ -932,7 +932,8 @@ def perform_enrichment_analyses(
     pval_threshold: float = 0.05,
     top_n_terms: int = 10,
     include_condition_split: bool = True,
-    gene_set_library: str = None
+    gene_set_library: str = None,
+    gene_set_libraries: List[str] = None
 ) -> Dict[str, Any]:
     """
     Runs reactome, go, kegg, gsea on DE genes for both full dataset and condition-specific datasets.
@@ -954,8 +955,11 @@ def perform_enrichment_analyses(
     include_condition_split : bool, default=True
         Whether to perform condition-specific enrichment analysis.
     gene_set_library : str, optional
-        Gene set library to use for GSEA analysis. Only used when 'gsea' is in analyses.
+        Single gene set library to use for GSEA analysis. Only used when 'gsea' is in analyses.
         Examples: 'MSigDB_Hallmark_2020', 'MSigDB_Canonical_Pathways', etc.
+    gene_set_libraries : List[str], optional
+        Multiple gene set libraries to use for GSEA analysis. If provided, overrides gene_set_library.
+        Each library will be analyzed separately and results will be combined.
     
     Returns:
     --------
@@ -1011,16 +1015,54 @@ def perform_enrichment_analyses(
                 significance_threshold=pval_threshold
             )
         else:  # gsea
-            # Use provided gene_set_library or default
-            gsea_library = gene_set_library if gene_set_library else "MSigDB_Hallmark_2020"
-            out = gsea_enrichment_analysis(
-                cell_type, sig_genes, gene_to_logfc,
-                gene_set_library=gsea_library,
-                top_n_terms=top_n_terms,
-                output_prefix="scchatbot/enrichment/gsea",
-                save_plots=False,
-                significance_threshold=pval_threshold
-            )
+            # Handle multiple gene set libraries for comprehensive analysis
+            libraries_to_use = []
+            if gene_set_libraries:
+                libraries_to_use = gene_set_libraries
+            elif gene_set_library:
+                libraries_to_use = [gene_set_library]
+            else:
+                libraries_to_use = ["MSigDB_Hallmark_2020"]
+
+            # Run GSEA for each library and combine results
+            combined_raw_results = []
+            combined_summary_results = []
+
+            for lib in libraries_to_use:
+                print(f"🔍 Running GSEA with library: {lib}")
+                lib_output_prefix = f"scchatbot/enrichment/gsea_{lib.replace('_', '').replace(' ', '')}"
+
+                out = gsea_enrichment_analysis(
+                    f"{cell_type}_{lib}", sig_genes, gene_to_logfc,
+                    gene_set_library=lib,
+                    top_n_terms=top_n_terms,
+                    output_prefix=lib_output_prefix,
+                    save_plots=False,
+                    significance_threshold=pval_threshold
+                )
+
+                # Add library info to results
+                if out.get("raw_results") is not None:
+                    raw_df = out["raw_results"]
+                    if hasattr(raw_df, "to_dict"):
+                        raw_list = raw_df.to_dict(orient="records")
+                        for item in raw_list:
+                            item['source_library'] = lib
+                        combined_raw_results.extend(raw_list)
+
+                if out.get("summary_results") is not None:
+                    sum_df = out["summary_results"]
+                    if hasattr(sum_df, "to_dict"):
+                        sum_list = sum_df.to_dict(orient="records")
+                        for item in sum_list:
+                            item['source_library'] = lib
+                        combined_summary_results.extend(sum_list)
+
+            # Create combined output
+            out = {
+                "raw_results": combined_raw_results,
+                "summary_results": combined_summary_results
+            }
 
         # Convert any DataFrame → list of dicts
         raw_df = out.get("raw_results")
@@ -1040,9 +1082,16 @@ def perform_enrichment_analyses(
                     if hasattr(df, "to_dict"):
                         sum_list.extend(df.to_dict(orient="records"))
         else:
-            # Other analyses return flat DataFrames
-            raw_list = raw_df.to_dict(orient="records") if hasattr(raw_df, "to_dict") else []
-            sum_list = sum_df.to_dict(orient="records") if hasattr(sum_df, "to_dict") else []
+            # Other analyses return flat DataFrames, but GSEA with multiple libraries returns lists
+            if isinstance(raw_df, list):
+                raw_list = raw_df  # Already a list of dictionaries
+            else:
+                raw_list = raw_df.to_dict(orient="records") if hasattr(raw_df, "to_dict") else []
+
+            if isinstance(sum_df, list):
+                sum_list = sum_df  # Already a list of dictionaries
+            else:
+                sum_list = sum_df.to_dict(orient="records") if hasattr(sum_df, "to_dict") else []
 
         per_analysis_full[key] = {
             "raw_results":   raw_list,
@@ -1121,16 +1170,54 @@ def perform_enrichment_analyses(
                         significance_threshold=pval_threshold
                     )
                 else:  # gsea
-                    # Use provided gene_set_library or default
-                    gsea_library = gene_set_library if gene_set_library else "MSigDB_Hallmark_2020"
-                    out = gsea_enrichment_analysis(
-                        f"{cell_type}_{category}", condition_sig_genes, condition_gene_to_logfc,
-                        gene_set_library=gsea_library,
-                        top_n_terms=top_n_terms,
-                        output_prefix=output_prefix,
-                        save_plots=False,
-                        significance_threshold=pval_threshold
-                    )
+                    # Handle multiple gene set libraries for condition-specific analysis
+                    libraries_to_use = []
+                    if gene_set_libraries:
+                        libraries_to_use = gene_set_libraries
+                    elif gene_set_library:
+                        libraries_to_use = [gene_set_library]
+                    else:
+                        libraries_to_use = ["MSigDB_Hallmark_2020"]
+
+                    # Run GSEA for each library and combine results
+                    combined_raw_results = []
+                    combined_summary_results = []
+
+                    for lib in libraries_to_use:
+                        print(f"🔍 Running condition-specific GSEA with library: {lib}")
+                        lib_output_prefix = f"{output_prefix}_{lib.replace('_', '').replace(' ', '')}"
+
+                        out = gsea_enrichment_analysis(
+                            f"{cell_type}_{category}_{lib}", condition_sig_genes, condition_gene_to_logfc,
+                            gene_set_library=lib,
+                            top_n_terms=top_n_terms,
+                            output_prefix=lib_output_prefix,
+                            save_plots=False,
+                            significance_threshold=pval_threshold
+                        )
+
+                        # Add library info to results
+                        if out.get("raw_results") is not None:
+                            raw_df = out["raw_results"]
+                            if hasattr(raw_df, "to_dict"):
+                                raw_list = raw_df.to_dict(orient="records")
+                                for item in raw_list:
+                                    item['source_library'] = lib
+                                combined_raw_results.extend(raw_list)
+
+                        if out.get("summary_results") is not None:
+                            sum_df = out["summary_results"]
+                            if hasattr(sum_df, "to_dict"):
+                                sum_list = sum_df.to_dict(orient="records")
+                                for item in sum_list:
+                                    item['source_library'] = lib
+                                combined_summary_results.extend(sum_list)
+
+                    # Create combined output
+                    out = {
+                        "raw_results": combined_raw_results,
+                        "summary_results": combined_summary_results
+                    }
 
                 # Convert any DataFrame → list of dicts
                 raw_df = out.get("raw_results")
@@ -1150,9 +1237,16 @@ def perform_enrichment_analyses(
                             if hasattr(df, "to_dict"):
                                 sum_list.extend(df.to_dict(orient="records"))
                 else:
-                    # Other analyses return flat DataFrames
-                    raw_list = raw_df.to_dict(orient="records") if hasattr(raw_df, "to_dict") else []
-                    sum_list = sum_df.to_dict(orient="records") if hasattr(sum_df, "to_dict") else []
+                    # Other analyses return flat DataFrames, but GSEA with multiple libraries returns lists
+                    if isinstance(raw_df, list):
+                        raw_list = raw_df  # Already a list of dictionaries
+                    else:
+                        raw_list = raw_df.to_dict(orient="records") if hasattr(raw_df, "to_dict") else []
+
+                    if isinstance(sum_df, list):
+                        sum_list = sum_df  # Already a list of dictionaries
+                    else:
+                        sum_list = sum_df.to_dict(orient="records") if hasattr(sum_df, "to_dict") else []
 
                 per_analysis_condition[key] = {
                     "raw_results":   raw_list,

@@ -209,7 +209,113 @@ class EnrichmentChecker:
         except Exception as e:
             print(f"⚠️ EnrichmentChecker: Vector search failed: {e}")
             return []
-    
+
+    def _search_gene_set_library(self, library_query: str, k: int = 3) -> List[str]:
+        """
+        Search for gene set library names using vector similarity.
+
+        Args:
+            library_query: User's library query (e.g., "hallmark", "canonical")
+            k: Number of top matches to consider
+
+        Returns:
+            List of best matching gene set library names, or empty list if not found
+        """
+        if self.vector_search_status != "loaded":
+            print(f"⚠️ EnrichmentChecker: Vector search not available for library search")
+            return []
+
+        try:
+            # Get unique gene set libraries from Neo4j database
+            unique_libraries = self._get_gene_set_libraries_from_neo4j()
+
+            if not unique_libraries:
+                print(f"⚠️ EnrichmentChecker: No gene set libraries found in Neo4j")
+                return []
+
+            print(f"🔍 Searching gene set libraries for '{library_query}' among {len(unique_libraries)} available libraries")
+
+            # Encode the query
+            query_embedding = self.vector_model.encode([library_query])
+            query_embedding = np.array(query_embedding).astype('float32')
+
+            # Calculate similarity with each library name
+            library_scores = []
+            for library in unique_libraries:
+                library_embedding = self.vector_model.encode([library])
+                library_embedding = np.array(library_embedding).astype('float32')
+
+                # Calculate cosine similarity
+                similarity = np.dot(query_embedding[0], library_embedding[0]) / (
+                    np.linalg.norm(query_embedding[0]) * np.linalg.norm(library_embedding[0])
+                )
+
+                library_scores.append({
+                    'library': library,
+                    'similarity': float(similarity)
+                })
+
+            # Sort by similarity and get top matches
+            library_scores.sort(key=lambda x: x['similarity'], reverse=True)
+            top_matches = library_scores[:k]
+
+            print(f"🔍 Top library matches for '{library_query}':")
+            for i, match in enumerate(top_matches, 1):
+                print(f"   {i}. '{match['library']}' (similarity: {match['similarity']:.3f})")
+
+            # Return all good matches (similarity > 0.5) for comprehensive analysis
+            good_matches = [match['library'] for match in top_matches if match['similarity'] > 0.5]
+
+            if good_matches:
+                print(f"✅ Selected gene set libraries: {good_matches}")
+                return good_matches
+            else:
+                print(f"⚠️ No good gene set library matches found for '{library_query}'")
+                return []
+
+        except Exception as e:
+            print(f"⚠️ Gene set library search failed: {e}")
+            return []
+
+    def _get_gene_set_libraries_from_neo4j(self) -> set:
+        """
+        Retrieve all unique gene set libraries from Neo4j enrichment database.
+
+        Returns:
+            Set of unique gene set library names
+        """
+        if not self.driver:
+            print(f"⚠️ EnrichmentChecker: Neo4j driver not available for library search")
+            return set()
+
+        try:
+            # Query to get all unique gene set libraries from pathway database
+            query = """
+            MATCH (lib:GeneSetLibrary)
+            RETURN DISTINCT lib.name as library_name
+            ORDER BY lib.name
+            """
+
+            unique_libraries = set()
+            # Use pathway database (same as existing working code)
+            with self.driver.session(database=self.neo4j_database) as session:
+                result = session.run(query)
+
+                for record in result:
+                    library_name = record.get('library_name')
+                    if library_name:
+                        unique_libraries.add(library_name)
+
+            print(f"🔍 Found {len(unique_libraries)} gene set libraries in Neo4j pathway database:")
+            for lib in sorted(unique_libraries):
+                print(f"   • {lib}")
+
+            return unique_libraries
+
+        except Exception as e:
+            print(f"⚠️ Failed to retrieve gene set libraries from Neo4j: {e}")
+            return set()
+
     def _validate_vector_matches_in_neo4j(self, vector_matches: List[Dict]) -> List[EnrichmentRecommendation]:
         """
         Validate vector search results against Neo4j database and build recommendations.
@@ -631,15 +737,15 @@ class EnrichmentChecker:
         
         enhanced_step = plan_step.copy()
         
-        # Collect all analyses and determine gene_set_library
+        # Collect all analyses and determine gene_set_libraries
         all_analyses = []
-        gene_set_library = None
+        gene_set_libraries = []
         pathway_descriptions = []
-        
+
         for rec in recommendations:
             all_analyses.extend(rec.analyses)
-            if rec.gene_set_library:
-                gene_set_library = rec.gene_set_library
+            if rec.gene_set_library and rec.gene_set_library not in gene_set_libraries:
+                gene_set_libraries.append(rec.gene_set_library)
             
             # Extract pathway name from reasoning for description
             if "validated" in rec.reasoning:
@@ -660,8 +766,8 @@ class EnrichmentChecker:
             "analyses": unique_analyses
         })
         
-        if gene_set_library:
-            enhanced_step["parameters"]["gene_set_library"] = gene_set_library
+        if gene_set_libraries:
+            enhanced_step["parameters"]["gene_set_libraries"] = gene_set_libraries
         
         # Remove pathway_include after processing to avoid filtering errors
         enhanced_step["parameters"].pop("pathway_include", None)

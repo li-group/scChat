@@ -750,54 +750,110 @@ class PlannerNode(BaseWorkflowNode):
     
     def _extract_pathway_keywords(self, step: Dict[str, Any], message: str) -> Dict[str, Any]:
         """
-        Extract pathway keywords and use enrichment_checker to enhance the step.
-        
-        This function extracts pathway keywords and calls enrichment_checker directly
-        to get the proper analyses and gene_set_library parameters.
-        
+        Extract pathway keywords and intelligently decide whether to use enrichment_checker.
+
+        This function uses LLM to classify user intent and routes appropriately:
+        - Explicit methods: Direct execution (bypass vector search)
+        - Pathway queries: Use enrichment_checker with vector search
+        - General requests: Default GO analysis
+
         Args:
             step: Enrichment step from planner with minimal parameters
             message: Original user message for context
-            
+
         Returns:
             Step with proper analyses and gene_set_library parameters
         """
         try:
-            # Extract pathway keywords using minimal LLM call
-            pathway_keywords = self._call_llm_for_pathway_extraction(message)
-            
+            # Get LLM analysis (now includes intent classification)
+            llm_result = self._call_llm_for_pathway_extraction(message)
+
             enhanced_step = step.copy()
             if "parameters" not in enhanced_step:
                 enhanced_step["parameters"] = {}
-            
-            if pathway_keywords and self.enrichment_checker_available and self.enrichment_checker:
-                logger.info(f"🔍 PlannerNode: Using enrichment_checker for pathway keywords: '{pathway_keywords}'")
-                
-                # Set pathway_include temporarily to trigger enrichment_checker
-                enhanced_step["parameters"]["pathway_include"] = pathway_keywords
-                
-                # Call enrichment_checker to get proper analyses and gene_set_library
-                enhanced_step = self.enrichment_checker.enhance_enrichment_plan(enhanced_step)
-                
-                # Log the enhancement
-                analyses = enhanced_step["parameters"].get("analyses", [])
-                gene_set_library = enhanced_step["parameters"].get("gene_set_library")
-                logger.info(f"✅ EnrichmentChecker enhanced step:")
-                logger.info(f"   • analyses: {analyses}")
+
+            # Clean and normalize LLM result
+            llm_result_clean = llm_result.strip().strip('"').strip("'")
+            logger.info(f"🧠 LLM result after cleaning: '{llm_result_clean}'")
+
+            if llm_result_clean.startswith("EXPLICIT_METHOD:"):
+                # User explicitly requested specific methods - bypass vector search
+                method_part = llm_result_clean[len("EXPLICIT_METHOD:"):]
+
+                if ":" in method_part and method_part.split(":")[0] == "gsea":
+                    # GSEA with specific library: "gsea:MSigDB_Hallmark_2020" or "gsea:hallmark"
+                    parts = method_part.split(":")
+                    analyses = [parts[0]]
+                    user_library_query = parts[1] if len(parts) > 1 else None
+
+                    # Use vector search to find the correct gene set library name
+                    gene_set_library = None
+                    if user_library_query and self.enrichment_checker_available and self.enrichment_checker:
+                        logger.info(f"🔍 Searching for gene set library matching '{user_library_query}'")
+                        library_matches = self.enrichment_checker._search_gene_set_library(user_library_query)
+
+                        if library_matches:
+                            # For explicit method requests, use only the first/best match (user was specific)
+                            gene_set_library = library_matches[0]
+                            logger.info(f"✅ Selected best match: '{gene_set_library}'")
+                        else:
+                            logger.info(f"⚠️ Could not find gene set library for '{user_library_query}', using default")
+                            gene_set_library = "MSigDB_Hallmark_2020"  # Fallback
+                    elif user_library_query:
+                        # If enrichment_checker not available, try direct use (might be exact name)
+                        gene_set_library = user_library_query
+                else:
+                    # Regular methods: "go,kegg"
+                    analyses = [m.strip() for m in method_part.split(",")]
+                    gene_set_library = None
+
+                enhanced_step["parameters"]["analyses"] = analyses
                 if gene_set_library:
-                    logger.info(f"   • gene_set_library: {gene_set_library}")
-                
-            elif pathway_keywords:
-                logger.info(f"⚠️ Pathway keywords '{pathway_keywords}' extracted but enrichment_checker not available")
-                # Fallback to basic GSEA
-                enhanced_step["parameters"]["analyses"] = ["gsea"]
-                enhanced_step["parameters"]["gene_set_library"] = "MSigDB_Hallmark_2020"
+                    enhanced_step["parameters"]["gene_set_library"] = gene_set_library
+
+                logger.info(f"🎯 Explicit method request detected: {analyses}")
+                if gene_set_library:
+                    logger.info(f"   Gene set library: {gene_set_library}")
+
+                # Use enrichment_checker only for description enhancement (no vector search)
+                if self.enrichment_checker_available and self.enrichment_checker:
+                    enhanced_step = self.enrichment_checker._enhance_explicit_analysis_plan(
+                        enhanced_step,
+                        enhanced_step["parameters"].get("cell_type", "unknown"),
+                        analyses
+                    )
+
+            elif llm_result_clean and not llm_result_clean.startswith("EXPLICIT_METHOD:"):
+                # User mentioned specific pathways - use vector search & enrichment_checker
+                pathway_keywords = llm_result_clean
+
+                if self.enrichment_checker_available and self.enrichment_checker:
+                    logger.info(f"🔍 Pathway-specific request: Using enrichment_checker for '{pathway_keywords}'")
+
+                    # Set pathway_include to trigger enrichment_checker
+                    enhanced_step["parameters"]["pathway_include"] = pathway_keywords
+
+                    # Call enrichment_checker to get proper analyses and gene_set_library
+                    enhanced_step = self.enrichment_checker.enhance_enrichment_plan(enhanced_step)
+
+                    # Log the enhancement
+                    analyses = enhanced_step["parameters"].get("analyses", [])
+                    gene_set_library = enhanced_step["parameters"].get("gene_set_library")
+                    logger.info(f"✅ EnrichmentChecker enhanced step:")
+                    logger.info(f"   • analyses: {analyses}")
+                    if gene_set_library:
+                        logger.info(f"   • gene_set_library: {gene_set_library}")
+                else:
+                    logger.info(f"⚠️ Pathway keywords '{pathway_keywords}' extracted but enrichment_checker not available")
+                    enhanced_step["parameters"]["analyses"] = ["go"]
+
             else:
-                logger.info("🔧 No pathway keywords extracted, using default analyses")
+                # General enrichment request or no keywords - use default
+                logger.info("🔧 General enrichment request, using default GO analysis")
                 enhanced_step["parameters"]["analyses"] = ["go"]
-            
+
             return enhanced_step
-            
+
         except Exception as e:
             logger.info(f"⚠️ Pathway keyword extraction and enhancement failed: {e}")
             # Return step with default analyses
@@ -806,53 +862,74 @@ class PlannerNode(BaseWorkflowNode):
     
     def _call_llm_for_pathway_extraction(self, message: str) -> str:
         """
-        Extract pathway keywords from user message using minimal LLM call.
-        
+        Enhanced pathway extraction with intent classification.
+
         Args:
             message: User query to extract pathway terms from
-            
+
         Returns:
-            String of pathway keywords for enrichment_checker
+            String indicating intent and content:
+            - For explicit methods: "EXPLICIT_METHOD:go,kegg" or "EXPLICIT_METHOD:gsea:MSigDB_Hallmark_2020"
+            - For pathway queries: pathway keywords string
+            - For general requests: empty string
         """
         prompt = f"""
-                    Extract biological pathway-related keywords from this query:
-                    
-                    User Query: "{message}"
-                    
-                    Extract specific pathway terms, biological processes, or cellular functions mentioned.
-                    Return only the most relevant pathway keywords as a single string.
-                    
-                    Examples:
-                    - "interferon response" → "interferon response"
-                    - "T cell activation pathways" → "T cell activation"
-                    - "apoptosis in cancer cells" → "apoptosis"
-                    - "cell cycle regulation" → "cell cycle regulation"
-                    
-                    If no specific pathways are mentioned, return an empty string.
-                    
-                    Pathway keywords:
-                  """
-        
+        Analyze this enrichment analysis query and determine intent:
+
+        User Query: "{message}"
+
+        First classify the user intent:
+
+        1. EXPLICIT_METHOD: User explicitly requests specific analysis methods
+           Examples: "run GO analysis", "perform KEGG", "do GSEA with MSigDB_Hallmark_2020"
+
+        2. PATHWAY_SPECIFIC: User mentions specific biological pathways/processes
+           Examples: "find interferon response pathways", "cell cycle regulation", "apoptosis pathways"
+
+        3. GENERAL: General enrichment without specific methods or pathways
+           Examples: "do enrichment analysis", "find enriched pathways"
+
+        Response format:
+        - For EXPLICIT_METHOD: Return "EXPLICIT_METHOD:method1,method2" or "EXPLICIT_METHOD:gsea:LibraryName"
+        - For PATHWAY_SPECIFIC: Return only the pathway keywords (like before)
+        - For GENERAL: Return empty string
+
+        Examples:
+        - "run GO analysis" → "EXPLICIT_METHOD:go"
+        - "perform KEGG and Reactome" → "EXPLICIT_METHOD:kegg,reactome"
+        - "GSEA with MSigDB_Hallmark_2020" → "EXPLICIT_METHOD:gsea:MSigDB_Hallmark_2020"
+        - "find interferon response pathways" → "interferon response"
+        - "do enrichment analysis" → ""
+
+        Extract specific pathway terms, biological processes, or cellular functions mentioned.
+        Return only the most relevant pathway keywords as a single string.
+
+        If no specific pathways are mentioned, return an empty string.
+
+        Result:
+        """
+
         try:
             from langchain_openai import ChatOpenAI
             from langchain_core.messages import SystemMessage, HumanMessage
-            
+
             model = ChatOpenAI(
                 model="gpt-4o-mini",
                 temperature=0.1,
                 max_tokens=50
             )
-            
+
             messages = [
-                SystemMessage(content="You are a pathway keyword extractor. Return only relevant biological pathway terms."),
+                SystemMessage(content="You are an enrichment analysis classifier. Follow the format exactly."),
                 HumanMessage(content=prompt)
             ]
-            
+
             response = model.invoke(messages)
-            pathway_keywords = response.content.strip()
-            
-            return pathway_keywords if pathway_keywords and pathway_keywords.lower() != "none" else ""
-            
+            result = response.content.strip()
+
+            logger.info(f"🧠 LLM enrichment analysis: '{result}'")
+            return result if result and result.lower() != "none" else ""
+
         except Exception as e:
             logger.info(f"⚠️ LLM pathway extraction failed: {e}")
             return ""

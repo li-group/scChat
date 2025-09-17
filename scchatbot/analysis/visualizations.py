@@ -151,17 +151,24 @@ def _find_enrichment_file(analysis: str, cell_type: str, condition: str = None) 
         if os.path.exists(path_alt):
             return path_alt
     
-    # If still not found for GSEA, try glob patterns
+    # If still not found for GSEA, try extensive glob patterns for library-specific folders
     if base == "gsea" and not os.path.exists(path):
         search_patterns = [
+            # Library-specific patterns: gsea_{lib}/results_summary_{cell_type}_{lib}.csv
+            f"scchatbot/enrichment/gsea_*/results_summary_{cell_type}_*.csv",
+            f"scchatbot/enrichment/gsea*/results_summary_{cell_type}_*.csv",
+            # Legacy patterns: gsea_{lib}/results_summary_{cell_type}.csv
+            f"scchatbot/enrichment/gsea_*/results_summary_{cell_type}.csv",
             f"scchatbot/enrichment/gsea*/results_summary_{cell_type}.csv",
+            # Backup patterns
             f"scchatbot/enrichment/gsea/results_summary_*.csv",
             f"scchatbot/enrichment/gsea*/results_summary_*.csv"
         ]
-        
+
         for pattern in search_patterns:
             found_files = glob.glob(pattern)
             if found_files:
+                print(f"🔍 Found GSEA results at: {found_files[0]}")
                 return found_files[0]
     
     return path if os.path.exists(path) else None
