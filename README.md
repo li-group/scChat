@@ -38,7 +38,7 @@ Capabilities: scChat integrates an LLM mutli-agent system with specialized tools
 ## 3. Methodology
 <a name="system overview"></a>
 <p align="center">
-<img src="scchat framework.png" alt="drawing" width="500"/>
+<img src="images/scchat framework.png" alt="drawing" width="500"/>
 </p>
  scChat – a multi-agent scRNA-seq research co-scientist – that can autonomously generate executable plans for multi-step analyses, ranging from data preprocessing and follow-up analysis to results visualization.
  scChat includes five main agents in it:
