@@ -43,30 +43,11 @@ Capabilities: scChat integrates an LLM mutli-agent system with specialized tools
 scChat – a multi-agent scRNA-seq research co-scientist – that can autonomously generate executable plans for multi-step analyses, ranging from data preprocessing and follow-up analysis to results visualization.
 scChat includes five main agents in it:
 
-<details>
-<summary><strong>🧠 Planner</strong></summary>
-Searches for function execution and conversation history, parses the query, and decomposes it to generate a plan with several function calls arranged as steps in sequence.
-</details>
-
-<details>
-<summary><strong>⚡ Executor</strong></summary>
-Performs the function specified in the plan iteratively.
-</details>
-
-<details>
-<summary><strong>✅ Evaluator</strong></summary>
-Validates the outcome of each function from the executor, handling errors and interrupting the plan to pass error messages to the response generator if needed. Additionally, it checks the availability of remaining steps and determines the next step in the workflow.
-</details>
-
-<details>
-<summary><strong>🔍 Critic</strong></summary>
-Identifies potentially missing functions by creating a separate plan based on the function results, ensuring targeted analyses of specific cell types with all necessary downstream steps.
-</details>
-
-<details>
-<summary><strong>📝 Response Generator</strong></summary>
-Compiles all relevant function results to generate the final response to the user's query. After generating the response, it stores the final response and the function execution results in conversation and function histories, respectively.
-</details>
+- **🧠 Planner**: Searches for function execution and conversation history, parses the query, and decomposes it to generate a plan with several function calls arranged as steps in sequence.
+- **⚡ Executor**: Performs the function specified in the plan iteratively.
+- **✅ Evaluator**: Validates the outcome of each function from the executor, handling errors and interrupting the plan to pass error messages to the response generator if needed. Additionally, it checks the availability of remaining steps and determines the next step in the workflow.
+- **🔍 Critic**: Identifies potentially missing functions by creating a separate plan based on the function results, ensuring targeted analyses of specific cell types with all necessary downstream steps.
+- **📝 Response Generator**: Compiles all relevant function results to generate the final response to the user's query. After generating the response, it stores the final response and the function execution results in conversation and function histories, respectively.
 
 # Tutorial 
 
