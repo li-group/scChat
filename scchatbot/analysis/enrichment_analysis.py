@@ -344,13 +344,13 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
             
                 go_enrichment_dict = {}
             for index, row in go_enrichment_results.iterrows():
-                    if row['p_value'] >= significance_threshold:
+                if row['p_value'] >= significance_threshold:
                     continue
                 term_id = row['native']
                 if not all(col in row for col in ['name', 'p_value', 'source', 'intersection_size', 'intersections']):
                     continue
-                
-                    intersecting_genes = []
+
+                intersecting_genes = []
                 if isinstance(row['intersections'], list):
                     intersecting_genes = row['intersections']
                 elif isinstance(row['intersections'], str):
@@ -385,7 +385,7 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                 }
             
             if go_enrichment_dict:
-                    go_output_df = pd.DataFrame([
+                go_output_df = pd.DataFrame([
                     {
                         'Term_ID': term_id,
                         'Term': info['name'],
@@ -398,15 +398,15 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                     }
                     for term_id, info in go_enrichment_dict.items()
                 ])
-                
-                    go_output_df = go_output_df.sort_values('p_value')
+
+                go_output_df = go_output_df.sort_values('p_value')
                 original_count = len(go_output_df)
-                    go_output_df = go_output_df[go_output_df['p_value'] < significance_threshold]
+                go_output_df = go_output_df[go_output_df['p_value'] < significance_threshold]
                 filtered_count = len(go_output_df)
                 print(f"📊 GO {domain}: {filtered_count}/{original_count} terms passed significance threshold (p < {significance_threshold})")
                 results['summary_results'][domain] = go_output_df
-                
-                    if save_summary:
+
+                if save_summary:
                     # summary_output_filename = f'{domain_prefix}_results_summary_{cell_type}.csv'
                     summary_output_filename = os.path.join(
                         domain_prefix,
@@ -418,20 +418,20 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                         significant_df = go_output_df[go_output_df['p_value'] < p_value_threshold].copy()
                     
                     if not significant_df.empty:
-                            if (significant_df['p_value'] == 0).any():
+                        if (significant_df['p_value'] == 0).any():
                             min_non_zero_p = significant_df[significant_df['p_value'] > 0]['p_value'].min()
                             replacement_p = min_non_zero_p / 1000 if pd.notna(min_non_zero_p) and min_non_zero_p > 0 else 1e-300
                             significant_df['p_value'] = significant_df['p_value'].replace(0, replacement_p)
-                        
-                            significant_df['-log10(p_value)'] = -np.log10(significant_df['p_value'])
-                        
-                            significant_df = significant_df.sort_values('p_value', ascending=True)
+
+                        significant_df['-log10(p_value)'] = -np.log10(significant_df['p_value'])
+
+                        significant_df = significant_df.sort_values('p_value', ascending=True)
                         top_n_actual = min(top_n_terms, len(significant_df))
-                        
+
                         if top_n_actual > 0:
                             plot_df = significant_df.head(top_n_actual)
-                            
-                                    plot_df_bar = plot_df.sort_values('gene_ratio', ascending=False)
+
+                            plot_df_bar = plot_df.sort_values('gene_ratio', ascending=False)
                             plt.figure(figsize=(10, max(6, top_n_actual * 0.5)))  # Adjust height based on N
                             sns.barplot(
                                 x='gene_ratio',
@@ -448,8 +448,8 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                             plt.savefig(barplot_filename, dpi=300, bbox_inches='tight')
                             plt.close()
                             print(f"Saved bar plot to {barplot_filename}")
-                            
-                                    plot_df_dot = plot_df.sort_values('gene_ratio', ascending=False)
+
+                            plot_df_dot = plot_df.sort_values('gene_ratio', ascending=False)
                             plt.figure(figsize=(12, max(6, top_n_actual * 0.5)))  # Adjust height
                             scatter = sns.scatterplot(
                                 data=plot_df_dot,

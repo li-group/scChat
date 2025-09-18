@@ -136,7 +136,7 @@ class EnrichmentResultAccessor(ResultAccessorBase):
                                 try:
                                     df = pd.read_csv(csv_path)
                                     if len(df) > 0:
-                                            term_column = None
+                                        term_column = None
                                         for col_name in ["term_name", "Term", "pathway", "term"]:
                                             if col_name in df.columns:
                                                 term_column = col_name

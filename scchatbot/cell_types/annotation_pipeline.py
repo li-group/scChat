@@ -502,7 +502,8 @@ def process_cells(adata, cell_type, resolution=None):
         f"• Top-genes per cluster: {gene_dict}\n"
         f"• Marker-tree: {markers_tree}\n"
         f"• Explanation: {explanation}"
-    )    return final_result
+    )
+    return final_result
 
 
 def handle_process_cells_result(adata, cell_type, resolution=None):

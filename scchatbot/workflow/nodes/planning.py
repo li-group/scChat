@@ -101,7 +101,7 @@ class PlannerNode(BaseWorkflowNode):
             response = model.invoke(messages)
             plan_data = json.loads(response.content)
             
-            enhanced_plan = self._process_plan(plan_data, message, available_cell_types, unavailable_cell_types)
+            enhanced_plan = self._process_plan(plan_data, message, available_cell_types, unavailable_cell_types, state)
             
             state["execution_plan"] = enhanced_plan
             state["execution_plan"]["original_question"] = message
@@ -328,8 +328,8 @@ class PlannerNode(BaseWorkflowNode):
                 * "Find pathways similar to what we discussed earlier" → use conversation context to determine relevant search terms
                 """
     
-    def _process_plan(self, plan_data: Dict[str, Any], message: str, 
-                     available_cell_types: List[str], unavailable_cell_types: List[str]) -> Dict[str, Any]:
+    def _process_plan(self, plan_data: Dict[str, Any], message: str,
+                     available_cell_types: List[str], unavailable_cell_types: List[str], state: ChatState) -> Dict[str, Any]:
         """Process and enhance the plan with various optimizations."""
         enhanced_plan = self._add_cell_discovery_to_plan(plan_data, message, available_cell_types)
         
@@ -885,6 +885,15 @@ class PlannerNode(BaseWorkflowNode):
                     logger.info("🔧 General enrichment request, using default GO analysis")
                     enhanced_step["parameters"]["analyses"] = ["go"]
 
+            return enhanced_step
+
+        except Exception as e:
+            logger.error(f"Error in pathway extraction: {e}")
+            # Return original step with default GO analysis
+            enhanced_step = step.copy()
+            if "parameters" not in enhanced_step:
+                enhanced_step["parameters"] = {}
+            enhanced_step["parameters"]["analyses"] = ["go"]
             return enhanced_step
 
     def _check_existing_enrichment_analysis(self, execution_history: List[Dict[str, Any]], cell_type: str) -> Optional[Dict[str, Any]]:

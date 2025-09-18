@@ -49,6 +49,23 @@ scChat includes five main agents in it:
 - **🔍 Critic**: Identifies potentially missing functions by creating a separate plan based on the function results, ensuring targeted analyses of specific cell types with all necessary downstream steps.
 - **📝 Response Generator**: Compiles all relevant function results to generate the final response to the user's query. After generating the response, it stores the final response and the function execution results in conversation and function histories, respectively.
 
+scChat is highly rely on RAG to perform the function. Below provides the explanation of cell type RAG and pathway RAG for cell type annotation and enrichment analysis.
+<a name="annotation"></a>
+<p align="center">
+<img src="images/cell annotation.png" alt="drawing" width="500"/>
+</p>
+The hierarchy links “System,” “Organ,” and “CellType” nodes through functional edges, enabling marker retrieval and annotation. Cell lineage is traced with “develops to,” while cell type RAG derives from CellMarker. The retrived information then be used to do matching for cell type annotation.
+
+**CellMarker: a manually curated resource of cell markers in human and mouse**  
+*Published in Nucleic Acids Research, 2018*  
+DOI: [10.1093/nar/gky900](https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gky900/5115823)
+
+<a name="enrichment"></a>
+<p align="center">
+<img src="images/enrichment.png" alt="drawing" width="500"/>
+</p>
+The pathway knowledge graph has “Database,” “GeneSetLibrary,” and “Pathway” nodes. Databases include GO, KEGG, Reactome, and GSEA, with the first three directly connected to pathways through “found in” edges. It assists scChat to determine which method and gene set library should be used for enrichment analysis.
+
 # Tutorial 
 
 To set up the project environment and run the server, follow these steps:
@@ -134,7 +151,7 @@ It's also allowed to pass multiple system and organ to the RAG. For example:
   }
 }
 ```
-Notably, the available systems, organs and tissues are listed in available_cell_RAG.json.
+Notably, the available systems, organs and tissues are listed in **available_cell_RAG.json**.
 
 ### Step 6: Initialize the Application
 - Run python3 manage.py migrate (For the first time as you install scChat)
@@ -154,12 +171,6 @@ Notably, the available systems, organs and tissues are listed in available_cell_
   4. You may have to run `python manage.py migrate` in some cases before Step 4.
   
   This will prevent previous chat sessions from being reprocessed.
-
-## Chat Example
-<a name="chat-example"></a>
-<p align="center">
-<!-- <img src="images/Chatbot_eg_highPPI.png" alt="drawing" width="700"/> -->
-</p>
 
 # Datasets
 The datasets used for testing and examples for sample_mapping.json and specification_graph.json can be found at [https://docs.google.com/spreadsheets/d/1NwN5GydHn0B3-W0DLcAfvnNtZVJEMUgBW9YyzXnS83A/edit?usp=sharing
