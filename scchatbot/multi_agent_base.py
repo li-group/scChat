@@ -523,14 +523,14 @@ class MultiAgentChatBot:
             return "continue"
 
     def route_from_final_evaluator(self, state: ChatState) -> Literal["continue_execution", "generate_response"]:
-        """Route from final evaluator based on post-execution evaluation results"""
+        """Route from final evaluator based on critic analysis results"""
         
         # If conversation_complete is False, it means supplementary steps were added
         if not state.get("conversation_complete", True):
-            logger.info("🔄 Routing: Post-execution evaluation added supplementary steps, continuing execution")
+            logger.info("🔄 Routing: Critic analysis added supplementary steps, continuing execution")
             return "continue_execution"
         else:
-            logger.info("🔄 Routing: Post-execution evaluation complete, generating response")
+            logger.info("🔄 Routing: Critic analysis complete, generating response")
             return "generate_response"
 
     def send_message(self, message: str, session_id: str = "default") -> str:

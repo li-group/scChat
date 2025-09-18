@@ -179,7 +179,7 @@ class ExecutorNode(BaseWorkflowNode):
         skip_reason = getattr(step_data, 'skip_reason', None) if hasattr(step_data, 'skip_reason') else step_data.get('skip_reason')
         logger.info(f"⏭️ Skipping step {state['current_step_index'] + 1}: {skip_reason}")
         
-        # Record skipped step in execution history for post-execution awareness
+        # Record skipped step in execution history for critic awareness
         # Convert step_data to dict if it's an ExecutionStep object
         if hasattr(step_data, '__dict__'):
             step_dict = {k: v for k, v in step_data.__dict__.items()}

@@ -93,8 +93,8 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             discovery_context = None
 
         try:
-            # 6. Get post-execution evaluation results for question type and relevance hints
-            post_eval = state.get("post_execution_evaluation", {})
+            # 6. Get critic analysis results for question type and relevance hints
+            post_eval = state.get("critic", {})
             question_type = post_eval.get("question_type")
             analysis_relevance = post_eval.get("analysis_relevance", {})
 

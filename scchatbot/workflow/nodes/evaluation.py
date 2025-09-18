@@ -1,7 +1,7 @@
 """
 Evaluation node implementation.
 
-This module contains the EvaluatorNode which handles post-execution evaluation,
+This module contains the EvaluatorNode which handles evaluation and critic agent,
 plan consolidation, and validation logic.
 """
 
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 class EvaluatorNode(BaseWorkflowNode):
     """
-    Evaluator node that handles post-execution review and validation.
+    Evaluator node that handles evaluation and critic agent functionality.
     
     Responsibilities:
     - Review execution history for completeness
@@ -28,7 +28,7 @@ class EvaluatorNode(BaseWorkflowNode):
     """
     
     def execute(self, state: ChatState) -> ChatState:
-        """Handle both validation steps AND post-execution evaluation."""
+        """Handle both validation steps AND critic analysis."""
         # Check if current step is a validation step  
         execution_plan = state.get("execution_plan", {})
         # steps = execution_plan.get("steps", [])
@@ -40,9 +40,9 @@ class EvaluatorNode(BaseWorkflowNode):
         # (a) truly empty plan, or (b) all steps lack a function_name
         has_callable = any((s.get("function_name") or "").strip() for s in steps)
         if not steps or not has_callable:
-            logger.info("ℹ️ Evaluator: no callable steps in plan; skipping post-execution evaluation.")
+            logger.info("ℹ️ Evaluator: no callable steps in plan; skipping critic analysis.")
             # Provide a stub so downstream never sees None
-            state["post_execution_evaluation"] = {
+            state["critic"] = {
                 "mentioned_cell_types": [],
                 "supplementary_steps": [],
                 "evaluation_complete": True,
@@ -59,20 +59,20 @@ class EvaluatorNode(BaseWorkflowNode):
                 # Handle validation step (moved from ExecutorNode)
                 return self._execute_validation_step(state, current_step)
         
-        # CRITICAL FIX: Only run post-execution evaluation when ALL steps are complete
+        # CRITICAL FIX: Only run critic analysis when ALL steps are complete
         # Check if we've reached the end of ALL steps (including any supplementary ones)
         if current_index >= len(steps):
-            logger.info(f"🎯 All steps complete ({current_index}/{len(steps)}), running post-execution evaluation")
+            logger.info(f"🎯 All steps complete ({current_index}/{len(steps)}), running critic analysis")
             return self.evaluator_node(state)
         else:
-            logger.info(f"🔄 Steps still remaining ({current_index}/{len(steps)}), skipping post-execution evaluation")
+            logger.info(f"🔄 Steps still remaining ({current_index}/{len(steps)}), skipping critic analysis")
             return state
     
     def evaluator_node(self, state: ChatState) -> ChatState:
         """
-        Sophisticated LLM-powered post-execution evaluation with gap analysis.
-        
-        This method performs comprehensive post-execution evaluation by:
+        Sophisticated LLM-powered critic analysis with gap analysis.
+
+        This method performs comprehensive critic analysis by:
         - Extracting mentioned cell types from the original question
         - Using LLM to determine required analyses per cell type
         - Checking what was actually performed
@@ -83,10 +83,10 @@ class EvaluatorNode(BaseWorkflowNode):
             state: Current workflow state with completed execution
             
         Returns:
-            Updated state with post-execution evaluation results
+            Updated state with critic analysis results
         """
         
-        logger.info("🏁 Evaluator: Starting sophisticated post-execution evaluation...")
+        logger.info("🏁 Evaluator: Starting sophisticated critic analysis...")
         
         # Defensive check: ensure execution_plan exists
         if not state.get("execution_plan"):
@@ -94,11 +94,11 @@ class EvaluatorNode(BaseWorkflowNode):
             state["conversation_complete"] = True
             return state
         
-        # Run the sophisticated LLM-powered post-execution evaluation
-        evaluation_result = self._post_execution_evaluation(state)
+        # Run the sophisticated LLM-powered critic analysis
+        evaluation_result = self._critic(state)
         
-        # Store evaluation results in state for response generation
-        state["post_execution_evaluation"] = evaluation_result
+        # Store critic results in state for response generation
+        state["critic"] = evaluation_result
         
         # Count successful and failed steps for logging
         execution_history = state.get("execution_history", [])
@@ -125,7 +125,7 @@ class EvaluatorNode(BaseWorkflowNode):
         
         # Mark conversation as complete for response generation
         state["conversation_complete"] = True
-        logger.info("🎯 Evaluator: Post-execution evaluation complete, ready for response generation")
+        logger.info("🎯 Evaluator: Critic analysis complete, ready for response generation")
         
         return state
     
@@ -459,11 +459,11 @@ class EvaluatorNode(BaseWorkflowNode):
             logger.info(f"⚠️ Question classification failed: {e}")
             return "general_comparison"
     
-    def _post_execution_evaluation(self, state: ChatState) -> Dict[str, Any]:
+    def _critic(self, state: ChatState) -> Dict[str, Any]:
         """
-        Cell-type specific LLM-powered gap analysis - FINAL APPROACH
+        Cell-type specific LLM-powered gap analysis - Critic Agent
         """
-        logger.info("🔍 Starting post-execution evaluation...")
+        logger.info("🔍 Starting critic analysis...")
         
         original_question = state["execution_plan"]["original_question"]
         
@@ -477,7 +477,7 @@ class EvaluatorNode(BaseWorkflowNode):
         question_type = self._classify_question_type(original_question)
         
         if not mentioned_types:
-            logger.info("📋 No specific cell types mentioned, skipping post-execution evaluation")
+            logger.info("📋 No specific cell types mentioned, skipping critic analysis")
             return {"mentioned_cell_types": [], "supplementary_steps": [], "evaluation_complete": True}
         
         supplementary_steps = []
@@ -490,7 +490,7 @@ class EvaluatorNode(BaseWorkflowNode):
         for cell_type in mentioned_types:
             # Skip cell types that were marked as unavailable during validation
             if cell_type in unavailable_cell_types:
-                logger.info(f"⏭️ Skipping post-execution evaluation for unavailable cell type: {cell_type}")
+                logger.info(f"⏭️ Skipping critic analysis for unavailable cell type: {cell_type}")
                 continue
                 
             logger.info(f"🔍 Evaluating coverage for cell type: {cell_type}")
@@ -518,7 +518,7 @@ class EvaluatorNode(BaseWorkflowNode):
             else:
                 logger.info(f"✅ Complete coverage for {cell_type}")
         
-        logger.info(f"🔍 Post-execution evaluation complete: {len(supplementary_steps)} total supplementary steps")
+        logger.info(f"🔍 Critic analysis complete: {len(supplementary_steps)} total supplementary steps")
         
         # Add analysis relevance hints based on question type
         all_performed_analyses = {}
@@ -527,8 +527,8 @@ class EvaluatorNode(BaseWorkflowNode):
         
         analysis_relevance = self._get_analysis_relevance_hints(question_type, all_performed_analyses)
         
-        # Track post-execution attempts to prevent infinite loops
-        post_execution_attempts = state.get("post_execution_attempts", 0)
+        # Track critic attempts to prevent infinite loops
+        critic_attempts = state.get("critic_attempts", 0)
         previously_failed_steps = state.get("previously_failed_supplementary_steps", [])
         
         # Check if we're suggesting the same failed steps again
@@ -540,26 +540,26 @@ class EvaluatorNode(BaseWorkflowNode):
             else:
                 logger.info(f"⚠️ Skipping previously failed supplementary step: {step_signature}")
         
-        # CRITICAL FIX: Add retry limit for post-execution supplementary steps
-        MAX_POST_EXECUTION_ATTEMPTS = 2
+        # CRITICAL FIX: Add retry limit for critic supplementary steps
+        MAX_CRITIC_ATTEMPTS = 2
         
-        if new_unique_steps and post_execution_attempts < MAX_POST_EXECUTION_ATTEMPTS:
+        if new_unique_steps and critic_attempts < MAX_CRITIC_ATTEMPTS:
             execution_plan = state.get("execution_plan", {})
             if "steps" in execution_plan:
                 # Add supplementary steps to the execution plan
                 execution_plan["steps"].extend(new_unique_steps)
-                logger.info(f"✅ Added {len(new_unique_steps)} supplementary steps to execution plan (attempt {post_execution_attempts + 1}/{MAX_POST_EXECUTION_ATTEMPTS})")
+                logger.info(f"✅ Added {len(new_unique_steps)} supplementary steps to execution plan (attempt {critic_attempts + 1}/{MAX_CRITIC_ATTEMPTS})")
                 
                 # Increment attempt counter
-                state["post_execution_attempts"] = post_execution_attempts + 1
+                state["critic_attempts"] = critic_attempts + 1
                 
                 # Mark conversation as incomplete so execution continues
                 state["conversation_complete"] = False
                 logger.info(f"🔄 Marked conversation as incomplete to continue execution")
             else:
                 logger.info("⚠️ No execution plan found to add supplementary steps")
-        elif post_execution_attempts >= MAX_POST_EXECUTION_ATTEMPTS:
-            logger.info(f"⚠️ Reached maximum post-execution attempts ({MAX_POST_EXECUTION_ATTEMPTS}), stopping supplementary step generation")
+        elif critic_attempts >= MAX_CRITIC_ATTEMPTS:
+            logger.info(f"⚠️ Reached maximum critic attempts ({MAX_CRITIC_ATTEMPTS}), stopping supplementary step generation")
             state["conversation_complete"] = True
         elif not new_unique_steps and supplementary_steps:
             logger.info(f"⚠️ All {len(supplementary_steps)} supplementary steps have been tried before and failed, stopping")
@@ -684,7 +684,7 @@ class EvaluatorNode(BaseWorkflowNode):
         # If this cell type is known to be unavailable, don't try to generate steps for it
         if cell_type in unavailable_cell_types:
             logger.info(f"🚫 Cell type '{cell_type}' is unavailable - not generating missing steps")
-            # Return dummy analysis to prevent post-execution from trying to add steps
+            # Return dummy analysis to prevent critic from trying to add steps
             return ["analysis_skipped_cell_type_unavailable"]
         
         for i, ex in enumerate(execution_history):
