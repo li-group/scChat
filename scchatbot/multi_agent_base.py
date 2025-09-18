@@ -47,31 +47,24 @@ class MultiAgentChatBot:
     """
     
     def __init__(self):
-        # Initialize core components
         self._initialize_directories()
         self.api_key = os.getenv("OPENAI_API_KEY")
         openai.api_key = self.api_key
         self.adata = None
         
-        # Initialize memory and awareness systems
         self.history_manager = FunctionHistoryManager("conversation_history")
         
         
-        # Initialize hierarchical management components
         self.hierarchy_manager = None
         self.analysis_wrapper = None
         
-        # Setup functions and initialize data
         self.setup_functions()
         self._initialize_annotation()
-        # Initialize hierarchical management after adata is ready
         self._initialize_hierarchical_management()
         
-        # Initialize cell type extractor
         self.cell_type_extractor = None
         self._initialize_cell_type_extractor()
         
-        # Initialize workflow nodes
         self.workflow_nodes = WorkflowNodes(
             self.initial_annotation_content,
             self.initial_cell_types,
@@ -84,9 +77,7 @@ class MultiAgentChatBot:
             self.visualization_functions
         )
         
-        # Create LangGraph workflow
         self.workflow = self._create_workflow()
-        # Initialize session state management for conversation continuity
         self.session_states = {}  # Dict to store state for each session
         logger.info("✅ Session state management initialized")
         

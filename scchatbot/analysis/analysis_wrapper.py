@@ -26,12 +26,10 @@ class AnalysisFunctionWrapper:
     def perform_enrichment_analyses_hierarchical(self, cell_type: str, **kwargs):
         """Hierarchy-aware enrichment analysis"""
         try:
-            # Get analysis-ready adata
             analysis_adata, metadata = self.hierarchy_manager.get_analysis_ready_adata(cell_type)
             
             print(f"🧬 Performing enrichment analysis on {metadata.get('cell_count', 'unknown')} cells")
             
-            # Filter kwargs to only include valid parameters for perform_enrichment_analyses
             valid_params = {'analyses', 'logfc_threshold', 'pval_threshold', 'top_n_terms', 'include_condition_split', 'gene_set_library'}
             filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_params}
             
@@ -40,10 +38,8 @@ class AnalysisFunctionWrapper:
                 print(f"⚠️ Filtered out invalid enrichment parameters: {invalid_params}")
                 print(f"✅ Valid parameters passed: {filtered_kwargs}")
             
-            # Call original function with resolved adata and filtered parameters
             result = perform_enrichment_analyses(analysis_adata, cell_type, **filtered_kwargs)
             
-            # Add hierarchy metadata to result
             if isinstance(result, dict):
                 result["hierarchy_metadata"] = metadata
                 result["resolution_info"] = f"Resolved via {metadata['resolution_method']}"
@@ -51,7 +47,6 @@ class AnalysisFunctionWrapper:
             return result
             
         except ValueError as e:
-            # Handle case where process_cells is needed
             if "requires process_cells" in str(e):
                 return {
                     "status": "needs_processing", 
@@ -67,7 +62,6 @@ class AnalysisFunctionWrapper:
             
             print(f"🧬 Performing DEA on {metadata.get('cell_count', 'unknown')} cells")
             
-            # Filter kwargs to only include valid parameters for dea_split_by_condition
             valid_params = {'n_genes', 'logfc_threshold', 'pval_threshold', 'save_csv'}
             filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_params}
             
@@ -76,10 +70,8 @@ class AnalysisFunctionWrapper:
                 print(f"⚠️ Filtered out invalid DEA parameters: {invalid_params}")
                 print(f"✅ Valid parameters passed: {filtered_kwargs}")
             
-            # Call original function with resolved adata and filtered parameters
             result = dea_split_by_condition(analysis_adata, cell_type, **filtered_kwargs)
             
-            # Add metadata
             if isinstance(result, (list, dict)):
                 return {
                     "dea_results": result,
@@ -103,10 +95,8 @@ class AnalysisFunctionWrapper:
         try:
             analysis_adata, metadata = self.hierarchy_manager.get_analysis_ready_adata(cell_type)
             
-            # Call original function
             result = compare_cell_count(analysis_adata, cell_type, **kwargs)
             
-            # Add metadata
             if isinstance(result, list):
                 return {
                     "count_results": result,

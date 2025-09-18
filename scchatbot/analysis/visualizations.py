@@ -13,13 +13,11 @@ from .palettes.seurat import seurat_blue_to_lightred, seurat_continuous_lightgre
 def _seurat_colorscale_to_plotly():
     """Convert Seurat blue-to-lightred colormap to Plotly colorscale format."""
     cmap = seurat_blue_to_lightred()
-    # Sample the colormap at regular intervals
     n_colors = 10
     colors = []
     for i in range(n_colors):
         position = i / (n_colors - 1)
         rgba = cmap(position)
-        # Convert RGBA to hex
         hex_color = "#{:02x}{:02x}{:02x}".format(
             int(rgba[0] * 255), int(rgba[1] * 255), int(rgba[2] * 255)
         )
@@ -30,13 +28,11 @@ def _seurat_colorscale_to_plotly():
 def _seurat_feature_colorscale_to_plotly():
     """Convert Seurat lightgrey-to-red colormap to Plotly colorscale format for feature plots."""
     cmap = seurat_continuous_lightgrey_red()
-    # Sample the colormap at regular intervals
     n_colors = 10
     colors = []
     for i in range(n_colors):
         position = i / (n_colors - 1)
         rgba = cmap(position)
-        # Convert RGBA to hex
         hex_color = "#{:02x}{:02x}{:02x}".format(
             int(rgba[0] * 255), int(rgba[1] * 255), int(rgba[2] * 255)
         )
@@ -50,7 +46,6 @@ def _save_plot_as_pdf(fig, filename: str) -> None:
         plots_dir = "scchatbot/plots"
         os.makedirs(plots_dir, exist_ok=True)
         
-        # Check if kaleido is available
         kaleido_available = False
         try:
             import kaleido
@@ -58,14 +53,11 @@ def _save_plot_as_pdf(fig, filename: str) -> None:
         except ImportError:
             print(f"⚠️ Kaleido not available for PDF export. Install with: pip install kaleido")
         
-        # Try multiple formats/engines for better compatibility
         pdf_path = os.path.join(plots_dir, f"{filename}.pdf")
         png_path = os.path.join(plots_dir, f"{filename}.png")
         html_path = os.path.join(plots_dir, f"{filename}.html")
         
         if kaleido_available:
-            # Save as high-res PNG for consistency with frontend (discrete rendering)
-            # PDF vector format causes unwanted interpolation
             try:
                 fig.write_image(
                     png_path, 
@@ -76,7 +68,6 @@ def _save_plot_as_pdf(fig, filename: str) -> None:
                 )
                 print(f"📷 Plot saved as high-res PNG: {png_path}")
                 
-                # Also save PDF for users who prefer vector format (with interpolation note)
                 try:
                     fig.write_image(
                         pdf_path, 
@@ -92,7 +83,6 @@ def _save_plot_as_pdf(fig, filename: str) -> None:
                 return
             except Exception as png_error:
                 print(f"⚠️ PNG save failed: {png_error}")
-                # Try PDF as fallback
                 try:
                     fig.write_image(
                         pdf_path, 
@@ -106,7 +96,6 @@ def _save_plot_as_pdf(fig, filename: str) -> None:
                 except Exception as pdf_error2:
                     print(f"⚠️ PDF fallback also failed: {pdf_error2}")
         
-        # HTML fallback (always works)
         try:
             fig.write_html(html_path)
             print(f"🌐 Plot saved as HTML (interactive format): {html_path}")
@@ -124,15 +113,11 @@ def _find_enrichment_file(analysis: str, cell_type: str, condition: str = None) 
     """
     base = analysis.lower()
     
-    # If specific condition is provided, use that folder
     if condition:
         folder = f"scchatbot/enrichment/{condition}"
         fname = f"results_summary_{cell_type}.csv"
     else:
-        # Use default folder structure based on analysis type
         if base == "go":
-            # For GO, we need to handle domain-specific subfolders
-            # This is a simplified version - the calling function should handle domain logic
             folder = f"scchatbot/enrichment/go_bp"  # Default to BP
             fname = f"results_summary_{cell_type}.csv"
         elif base.startswith("go_"):
@@ -144,23 +129,18 @@ def _find_enrichment_file(analysis: str, cell_type: str, condition: str = None) 
     
     path = os.path.join(folder, fname)
     
-    # Check if file exists, if not try alternative naming
     if not os.path.exists(path):
         fname_alt = f"{base}_results_summary_{cell_type}.csv"
         path_alt = os.path.join(folder, fname_alt)
         if os.path.exists(path_alt):
             return path_alt
     
-    # If still not found for GSEA, try extensive glob patterns for library-specific folders
     if base == "gsea" and not os.path.exists(path):
         search_patterns = [
-            # Library-specific patterns: gsea_{lib}/results_summary_{cell_type}_{lib}.csv
             f"scchatbot/enrichment/gsea_*/results_summary_{cell_type}_*.csv",
             f"scchatbot/enrichment/gsea*/results_summary_{cell_type}_*.csv",
-            # Legacy patterns: gsea_{lib}/results_summary_{cell_type}.csv
             f"scchatbot/enrichment/gsea_*/results_summary_{cell_type}.csv",
             f"scchatbot/enrichment/gsea*/results_summary_{cell_type}.csv",
-            # Backup patterns
             f"scchatbot/enrichment/gsea/results_summary_*.csv",
             f"scchatbot/enrichment/gsea*/results_summary_*.csv"
         ]
@@ -197,27 +177,23 @@ def display_enrichment_visualization(
         HTML string containing the plot(s)
     """
     
-    # Handle GO domain logic
     if analysis.lower() == "go":
         if domain is None:
             return "Error: `domain` must be provided for GO analysis (BP, MF, or CC)."
         analysis = f"go_{domain.lower()}"
     
-    # Find the data file
     file_path = _find_enrichment_file(analysis, cell_type, condition)
     
     if not file_path:
         return f"Enrichment data not available for {analysis} analysis of {cell_type}. Please run the enrichment analysis first."
     
     try:
-        # Load and process data
         df = pd.read_csv(file_path)
         df["minus_log10_p"] = -np.log10(df["p_value"])
         top = df.nsmallest(top_n, "p_value")
         
         plots_html = []
         
-        # Generate bar plot if requested
         if plot_type in ["bar", "both"]:
             print(f"📊 Generating bar plot with {len(top)} terms")
             bar_fig = px.bar(
@@ -237,21 +213,18 @@ def display_enrichment_visualization(
                 autosize=True
             )
 
-            # Update colorbar for bar plot
             bar_fig.update_coloraxes(
                 colorbar_title="-log10(p-value)",
                 colorbar_thickness=15,
                 colorbar_len=0.8
             )
             
-            # Save bar plot as PDF
             _save_plot_as_pdf(bar_fig, f"{analysis}_{cell_type}_bar_plot")
             
             bar_html = pio.to_html(bar_fig, full_html=False, include_plotlyjs="cdn")
             plots_html.append(bar_html)
             print(f"✅ Bar plot HTML generated: {len(bar_html)} characters")
         
-        # Generate dot plot if requested
         if plot_type in ["dot", "both"]:
             print(f"🔴 Generating dot plot with {len(top)} terms")
             print(f"📊 Data sample: gene_ratio range: {top['gene_ratio'].min():.3f}-{top['gene_ratio'].max():.3f}")
@@ -272,7 +245,6 @@ def display_enrichment_visualization(
                 orientation="h",
                 color_continuous_scale=_seurat_colorscale_to_plotly()
             )
-            # Ensure points are visible by setting minimum sizes and proper ranges
             dot_fig.update_traces(
                 marker=dict(
                     sizemin=4,  # Minimum point size
@@ -287,27 +259,23 @@ def display_enrichment_visualization(
                 autosize=True
             )
 
-            # Update colorbar title separately
             dot_fig.update_coloraxes(
                 colorbar_title="-log10(p-value)",
                 colorbar_thickness=15,
                 colorbar_len=0.8
             )
             
-            # Save dot plot as PDF
             _save_plot_as_pdf(dot_fig, f"{analysis}_{cell_type}_dot_plot")
             
             dot_html = pio.to_html(dot_fig, full_html=False, include_plotlyjs="cdn")
             plots_html.append(dot_html)
             print(f"✅ Dot plot HTML generated: {len(dot_html)} characters")
         
-        # Handle multiple plots if both requested
         if plot_type == "both":
             print(f"🔗 Creating separate plot objects for {len(plots_html)} plots")
             print(f"📊 Bar plot size: {len(plots_html[0])} chars")
             print(f"🔴 Dot plot size: {len(plots_html[1])} chars") 
             
-            # Return multiple plots structure for backend processing
             multiple_plots_result = {
                 "multiple_plots": True,
                 "plots": [

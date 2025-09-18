@@ -66,13 +66,11 @@ def chat_with_ai(request):
             
             # Pass room name to chatbot for progress updates
             response_text = chatbot_instance.send_message(user_message, session_id=room_name)
-            # print("chat_with_ai: Chatbot response (first 300 chars):", response_text[:300])
             
             try:
                 parsed_response = json.loads(response_text)
                 # Trim the output for logging purposes.
                 trimmed_response = {k: (v[:300] + '...') if isinstance(v, str) and len(v) > 300 else v for k, v in parsed_response.items()}
-                # print("chat_with_ai: Parsed chatbot response as JSON (trimmed):", trimmed_response)
             except json.JSONDecodeError as e:
                 print("chat_with_ai: JSON decode error - response is not valid JSON (first 300 chars):", response_text[:300], "Error:", e)
                 parsed_response = {"response": response_text}

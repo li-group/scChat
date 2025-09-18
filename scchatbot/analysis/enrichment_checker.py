@@ -10,7 +10,6 @@ except ImportError:
     NEO4J_AVAILABLE = False
     GraphDatabase = None
 
-# Vector search dependencies
 try:
     import pickle
     import faiss
@@ -54,10 +53,8 @@ class EnrichmentChecker:
     
     def __init__(self, confidence_threshold=0.8, config_path=None):
         """Initialize enrichment checker with Neo4j connection and vector search."""
-        # Load configuration from specification_graph.json
         if config_path is None:
             current_dir = os.path.dirname(os.path.abspath(__file__))
-            # Go up two levels: analysis/ -> scchatbot/ -> project_root/
             project_root = os.path.dirname(os.path.dirname(current_dir))
             config_path = os.path.join(project_root, "media", "specification_graph.json")
         
@@ -65,7 +62,6 @@ class EnrichmentChecker:
             with open(config_path, 'r') as f:
                 config = json.load(f)
             
-            # Validate required configuration fields
             required_fields = ["url", "username", "password", "pathway_rag"]
             missing_fields = [field for field in required_fields if field not in config]
             
@@ -85,20 +81,17 @@ class EnrichmentChecker:
         self.driver = None
         self.connection_status = "disconnected"
         
-        # Vector search initialization
         self.vector_model = None
         self.vector_index = None
         self.pathway_data = None
         self.vector_search_status = "not_loaded"
         
-        # Initialize Neo4j connection if available
         if NEO4J_AVAILABLE:
             try:
                 self.driver = GraphDatabase.driver(
                     self.neo4j_uri, 
                     auth=(self.neo4j_user, self.neo4j_password)
                 )
-                # Test connection
                 with self.driver.session(database=self.neo4j_database) as session:
                     result = session.run("MATCH (p:Pathway) RETURN count(p) as count LIMIT 1")
                     count = result.single()
@@ -113,7 +106,6 @@ class EnrichmentChecker:
             print("⚠️ EnrichmentChecker: Neo4j module not available")
             self.connection_status = "neo4j_unavailable"
         
-        # Initialize vector search if available
         if VECTOR_SEARCH_AVAILABLE:
             self._load_vector_search_model()
         else:
@@ -122,16 +114,13 @@ class EnrichmentChecker:
     def _load_vector_search_model(self):
         """Load vector search model and pathway data from pre-built files."""
         try:
-            # Path to vector search files - relative to project root
             import os
             current_dir = os.path.dirname(os.path.abspath(__file__))  # /path/to/scChat_v2/scchatbot/analysis
-            # Go up two levels: analysis/ -> scchatbot/ -> project_root/
             project_root = os.path.dirname(os.path.dirname(current_dir))  # /path/to/scChat_v2  
             media_path = os.path.join(project_root, "media")
             pathway_data_path = os.path.join(media_path, "pathway_data.pkl")
             pathway_index_path = os.path.join(media_path, "pathway_index.faiss")
             
-            # Check if files exist
             if not os.path.exists(pathway_data_path):
                 print(f"⚠️ EnrichmentChecker: Pathway data not found at {pathway_data_path}")
                 self.vector_search_status = "data_not_found"
@@ -142,14 +131,11 @@ class EnrichmentChecker:
                 self.vector_search_status = "index_not_found"
                 return
             
-            # Load pathway data
             with open(pathway_data_path, 'rb') as f:
                 self.pathway_data = pickle.load(f)
             
-            # Load FAISS index
             self.vector_index = faiss.read_index(pathway_index_path)
             
-            # Load sentence transformer model (same as used for creating embeddings)
             self.vector_model = SentenceTransformer('all-MiniLM-L6-v2')
             
             self.vector_search_status = "loaded"
@@ -178,14 +164,11 @@ class EnrichmentChecker:
             return []
         
         try:
-            # Encode the query
             query_embedding = self.vector_model.encode([pathway_query])
             query_embedding = np.array(query_embedding).astype('float32')
             
-            # Search in FAISS index
             similarities, indices = self.vector_index.search(query_embedding, k)
             
-            # Convert results to pathway matches
             pathway_matches = []
             for i, (similarity, idx) in enumerate(zip(similarities[0], indices[0])):
                 if idx < len(self.pathway_data):
@@ -201,7 +184,6 @@ class EnrichmentChecker:
                     })
             
             print(f"🔍 EnrichmentChecker: Vector search found {len(pathway_matches)} matches for '{pathway_query}'")
-            # Debug: Show exact names from vector search
             for match in pathway_matches[:3]:
                 print(f"   📌 Vector result {match['rank']}: '{match['pathway_name']}' (score: {match['similarity_score']:.3f})")
             return pathway_matches
@@ -226,7 +208,6 @@ class EnrichmentChecker:
             return []
 
         try:
-            # Get unique gene set libraries from Neo4j database
             unique_libraries = self._get_gene_set_libraries_from_neo4j()
 
             if not unique_libraries:
@@ -235,7 +216,6 @@ class EnrichmentChecker:
 
             print(f"🔍 Searching gene set libraries for '{library_query}' among {len(unique_libraries)} available libraries")
 
-            # Encode the query
             query_embedding = self.vector_model.encode([library_query])
             query_embedding = np.array(query_embedding).astype('float32')
 

@@ -84,10 +84,8 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
     if not significant_genes:
         return results
     
-    # Initialize gProfiler
     gp_reactome = GProfiler(return_dataframe=True)
     
-    # Run Reactome enrichment analysis
     reactome_enrichment_results = gp_reactome.profile(
         organism='hsapiens',
         query=significant_genes,
@@ -102,10 +100,8 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
     results['raw_results'] = reactome_enrichment_results
     
     if not reactome_enrichment_results.empty:
-        # Filter for significant results only
         significant_raw_results = reactome_enrichment_results[reactome_enrichment_results['p_value'] < significance_threshold]
         
-        # Save raw Reactome results (only significant)
         if save_raw and not significant_raw_results.empty:
             # raw_output_filename = f"{output_prefix}_results_raw_{cell_type}.csv"
             raw_output_filename = os.path.join(
@@ -115,17 +111,14 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
             significant_raw_results.to_csv(raw_output_filename, index=False)
 
         
-        # Post-processing - only process significant results
         reactome_enrichment_dict = {}
         for index, row in reactome_enrichment_results.iterrows():
-            # Skip non-significant results
             if row['p_value'] >= significance_threshold:
                 continue
             term_id = row['native']
             if not all(col in row for col in ['name', 'p_value', 'source', 'intersection_size', 'intersections']):
                 continue
             
-            # Process intersections
             intersecting_genes = []
             if isinstance(row['intersections'], list):
                 intersecting_genes = row['intersections']
@@ -134,7 +127,6 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
             else:
                 continue
             
-            # Calculate average log2FC
             avg_log2fc = 0
             gene_count_in_term = 0
             if intersecting_genes:
@@ -162,7 +154,6 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
             }
         
         if reactome_enrichment_dict:
-            # Create output dataframe
             reactome_output_df = pd.DataFrame([
                 {
                     'Term_ID': term_id,
@@ -177,13 +168,10 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
                 for term_id, info in reactome_enrichment_dict.items()
             ])
             
-            # Sort by p-value and filter for significant results only
             reactome_output_df = reactome_output_df.sort_values('p_value')
-            # Filter for significant results in summary
             reactome_output_df = reactome_output_df[reactome_output_df['p_value'] < significance_threshold]
             results['summary_results'] = reactome_output_df
             
-            # Save summarized results
             if save_summary:
                 # summary_output_filename = f'{output_prefix}_results_summary_{cell_type}.csv'
                 summary_output_filename = os.path.join(
@@ -192,30 +180,23 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
                 )
                 reactome_output_df.to_csv(summary_output_filename, index=False)
             
-            # Visualization
             if save_plots:
-                # Filter for significant terms
                 significant_df = reactome_output_df[reactome_output_df['p_value'] < p_value_threshold].copy()
                 
                 if not significant_df.empty:
-                    # Handle potential zero p-values
                     if (significant_df['p_value'] == 0).any():
                         min_non_zero_p = significant_df[significant_df['p_value'] > 0]['p_value'].min()
                         replacement_p = min_non_zero_p / 1000 if pd.notna(min_non_zero_p) and min_non_zero_p > 0 else 1e-300
                         significant_df['p_value'] = significant_df['p_value'].replace(0, replacement_p)
                     
-                    # Calculate -log10(p-value)
                     significant_df['-log10(p_value)'] = -np.log10(significant_df['p_value'])
                     
-                    # Select top N terms
                     significant_df = significant_df.sort_values('p_value', ascending=True)
                     top_n_actual = min(top_n_terms, len(significant_df))
                     
                     if top_n_actual > 0:
                         plot_df = significant_df.head(top_n_actual)
                         
-                        # --- Bar chart ---
-                        # Sort by gene_ratio for bar plot ordering
                         plot_df_bar = plot_df.sort_values('gene_ratio', ascending=False)
                         plt.figure(figsize=(10, max(6, top_n_actual * 0.5)))  # Adjust height based on N
                         sns.barplot(
@@ -234,8 +215,6 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
                         plt.close()
                         print(f"Saved bar plot to {barplot_filename}")
                         
-                        # --- Dot plot ---
-                        # Sort by gene_ratio for dot plot ordering
                         plot_df_dot = plot_df.sort_values('gene_ratio', ascending=False)
                         plt.figure(figsize=(12, max(6, top_n_actual * 0.5)))  # Adjust height
                         scatter = sns.scatterplot(
@@ -324,14 +303,12 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
     if not significant_genes:
         return results
     
-    # Domain to source mapping
     domain_sources = {
         'BP': ['GO:BP'],
         'MF': ['GO:MF'],
         'CC': ['GO:CC']
     }
     
-    # Initialize gProfiler
     gp = GProfiler(return_dataframe=True)
     
     for domain in go_domains:
@@ -341,7 +318,6 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
         sources = domain_sources[domain]
         domain_prefix = f"{output_prefix}_{domain.lower()}"
         os.makedirs(domain_prefix, exist_ok=True)
-        # Run GO enrichment analysis
         go_enrichment_results = gp.profile(
             organism='hsapiens',
             query=significant_genes,
@@ -356,10 +332,8 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
         results['raw_results'][domain] = go_enrichment_results
         
         if not go_enrichment_results.empty:
-            # Filter for significant results only
             significant_raw_results = go_enrichment_results[go_enrichment_results['p_value'] < significance_threshold]
             
-            # Save raw GO results (only significant)
             if save_raw and not significant_raw_results.empty:
                 # raw_output_filename = f"{domain_prefix}_results_raw_{cell_type}.csv"
                 raw_output_filename = os.path.join(
@@ -368,18 +342,15 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                 )
                 significant_raw_results.to_csv(raw_output_filename, index=False)
             
-            # Post-processing - only process significant results
-            go_enrichment_dict = {}
+                go_enrichment_dict = {}
             for index, row in go_enrichment_results.iterrows():
-                # Skip non-significant results
-                if row['p_value'] >= significance_threshold:
+                    if row['p_value'] >= significance_threshold:
                     continue
                 term_id = row['native']
                 if not all(col in row for col in ['name', 'p_value', 'source', 'intersection_size', 'intersections']):
                     continue
                 
-                # Process intersections
-                intersecting_genes = []
+                    intersecting_genes = []
                 if isinstance(row['intersections'], list):
                     intersecting_genes = row['intersections']
                 elif isinstance(row['intersections'], str):
@@ -387,8 +358,7 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                 else:
                     continue
                 
-                # Calculate average log2FC
-                avg_log2fc = 0
+                    avg_log2fc = 0
                 gene_count_in_term = 0
                 if intersecting_genes:
                     sum_log2fc = 0
@@ -415,8 +385,7 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                 }
             
             if go_enrichment_dict:
-                # Create output dataframe
-                go_output_df = pd.DataFrame([
+                    go_output_df = pd.DataFrame([
                     {
                         'Term_ID': term_id,
                         'Term': info['name'],
@@ -430,17 +399,14 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                     for term_id, info in go_enrichment_dict.items()
                 ])
                 
-                # Sort by p-value and filter for significant results only
-                go_output_df = go_output_df.sort_values('p_value')
+                    go_output_df = go_output_df.sort_values('p_value')
                 original_count = len(go_output_df)
-                # Filter for significant results in summary
-                go_output_df = go_output_df[go_output_df['p_value'] < significance_threshold]
+                    go_output_df = go_output_df[go_output_df['p_value'] < significance_threshold]
                 filtered_count = len(go_output_df)
                 print(f"📊 GO {domain}: {filtered_count}/{original_count} terms passed significance threshold (p < {significance_threshold})")
                 results['summary_results'][domain] = go_output_df
                 
-                # Save summarized results
-                if save_summary:
+                    if save_summary:
                     # summary_output_filename = f'{domain_prefix}_results_summary_{cell_type}.csv'
                     summary_output_filename = os.path.join(
                         domain_prefix,
@@ -448,31 +414,24 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                     )
                     go_output_df.to_csv(summary_output_filename, index=False)
                 
-                # Visualization
-                if save_plots:
-                    # Filter for significant terms
-                    significant_df = go_output_df[go_output_df['p_value'] < p_value_threshold].copy()
+                    if save_plots:
+                        significant_df = go_output_df[go_output_df['p_value'] < p_value_threshold].copy()
                     
                     if not significant_df.empty:
-                        # Handle potential zero p-values
-                        if (significant_df['p_value'] == 0).any():
+                            if (significant_df['p_value'] == 0).any():
                             min_non_zero_p = significant_df[significant_df['p_value'] > 0]['p_value'].min()
                             replacement_p = min_non_zero_p / 1000 if pd.notna(min_non_zero_p) and min_non_zero_p > 0 else 1e-300
                             significant_df['p_value'] = significant_df['p_value'].replace(0, replacement_p)
                         
-                        # Calculate -log10(p-value)
-                        significant_df['-log10(p_value)'] = -np.log10(significant_df['p_value'])
+                            significant_df['-log10(p_value)'] = -np.log10(significant_df['p_value'])
                         
-                        # Select top N terms
-                        significant_df = significant_df.sort_values('p_value', ascending=True)
+                            significant_df = significant_df.sort_values('p_value', ascending=True)
                         top_n_actual = min(top_n_terms, len(significant_df))
                         
                         if top_n_actual > 0:
                             plot_df = significant_df.head(top_n_actual)
                             
-                            # --- Bar chart ---
-                            # Sort by gene_ratio for bar plot ordering
-                            plot_df_bar = plot_df.sort_values('gene_ratio', ascending=False)
+                                    plot_df_bar = plot_df.sort_values('gene_ratio', ascending=False)
                             plt.figure(figsize=(10, max(6, top_n_actual * 0.5)))  # Adjust height based on N
                             sns.barplot(
                                 x='gene_ratio',
@@ -490,9 +449,7 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                             plt.close()
                             print(f"Saved bar plot to {barplot_filename}")
                             
-                            # --- Dot plot ---
-                            # Sort by gene_ratio for dot plot ordering
-                            plot_df_dot = plot_df.sort_values('gene_ratio', ascending=False)
+                                    plot_df_dot = plot_df.sort_values('gene_ratio', ascending=False)
                             plt.figure(figsize=(12, max(6, top_n_actual * 0.5)))  # Adjust height
                             scatter = sns.scatterplot(
                                 data=plot_df_dot,
@@ -579,10 +536,8 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
     if not significant_genes:
         return results
     
-    # Initialize gProfiler
     gp_kegg = GProfiler(return_dataframe=True)
     
-    # Run KEGG enrichment analysis
     kegg_enrichment_results = gp_kegg.profile(
         organism='hsapiens',
         query=significant_genes,
@@ -600,7 +555,6 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
         # Filter for significant results only
         significant_raw_results = kegg_enrichment_results[kegg_enrichment_results['p_value'] < significance_threshold]
         
-        # Save raw KEGG results (only significant)
         if save_raw and not significant_raw_results.empty:
             # raw_output_filename = f"{output_prefix}_results_raw_{cell_type}.csv"
             raw_output_filename = os.path.join(
@@ -609,17 +563,14 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
             )
             significant_raw_results.to_csv(raw_output_filename, index=False)
         
-        # Post-processing - only process significant results
         kegg_enrichment_dict = {}
         for index, row in kegg_enrichment_results.iterrows():
-            # Skip non-significant results
             if row['p_value'] >= significance_threshold:
                 continue
             term_id = row['native']
             if not all(col in row for col in ['name', 'p_value', 'source', 'intersection_size', 'intersections']):
                 continue
             
-            # Process intersections
             intersecting_genes = []
             if isinstance(row['intersections'], list):
                 intersecting_genes = row['intersections']
@@ -628,7 +579,6 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
             else:
                 continue
             
-            # Calculate average log2FC
             avg_log2fc = 0
             gene_count_in_term = 0
             if intersecting_genes:
@@ -656,7 +606,6 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
             }
         
         if kegg_enrichment_dict:
-            # Create output dataframe
             kegg_output_df = pd.DataFrame([
                 {
                     'Term_ID': term_id,
@@ -671,13 +620,10 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
                 for term_id, info in kegg_enrichment_dict.items()
             ])
             
-            # Sort by p-value and filter for significant results only
             kegg_output_df = kegg_output_df.sort_values('p_value')
-            # Filter for significant results in summary
             kegg_output_df = kegg_output_df[kegg_output_df['p_value'] < significance_threshold]
             results['summary_results'] = kegg_output_df
             
-            # Save summarized results
             if save_summary:
                 # summary_output_filename = f'{output_prefix}_results_summary_{cell_type}.csv'
                 summary_output_filename = os.path.join(
@@ -686,30 +632,23 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
                 )
                 kegg_output_df.to_csv(summary_output_filename, index=False)
             
-            # Visualization
             if save_plots:
-                # Filter for significant terms
                 significant_df = kegg_output_df[kegg_output_df['p_value'] < p_value_threshold].copy()
                 
                 if not significant_df.empty:
-                    # Handle potential zero p-values
                     if (significant_df['p_value'] == 0).any():
                         min_non_zero_p = significant_df[significant_df['p_value'] > 0]['p_value'].min()
                         replacement_p = min_non_zero_p / 1000 if pd.notna(min_non_zero_p) and min_non_zero_p > 0 else 1e-300
                         significant_df['p_value'] = significant_df['p_value'].replace(0, replacement_p)
                     
-                    # Calculate -log10(p-value)
                     significant_df['-log10(p_value)'] = -np.log10(significant_df['p_value'])
                     
-                    # Select top N terms
                     significant_df = significant_df.sort_values('p_value', ascending=True)
                     top_n_actual = min(top_n_terms, len(significant_df))
                     
                     if top_n_actual > 0:
                         plot_df = significant_df.head(top_n_actual)
                         
-                        # --- Bar chart ---
-                        # Sort by gene_ratio for bar plot ordering
                         plot_df_bar = plot_df.sort_values('gene_ratio', ascending=False)
                         plt.figure(figsize=(10, max(6, top_n_actual * 0.5)))  # Adjust height based on N
                         sns.barplot(
@@ -728,8 +667,6 @@ def kegg_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thresho
                         plt.close()
                         print(f"Saved bar plot to {barplot_filename}")
                         
-                        # --- Dot plot ---
-                        # Sort by gene_ratio for dot plot ordering
                         plot_df_dot = plot_df.sort_values('gene_ratio', ascending=False)
                         plt.figure(figsize=(12, max(6, top_n_actual * 0.5)))  # Adjust height
                         scatter = sns.scatterplot(

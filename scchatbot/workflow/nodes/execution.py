@@ -39,20 +39,14 @@ class ExecutorNode(BaseWorkflowNode):
     def executor_node(self, state: ChatState) -> ChatState:
         """Execute the current step in the plan with hierarchy awareness and validation"""
         self._log_node_start("Executor", state)
-        # Initialize progress manager
         session_id = state.get("session_id", "default")
         progress_manager = ProgressManager(session_id)
         
-        # Set total steps for progress tracking
         total_steps = len(state.get("execution_plan", {}).get("steps", []))
         progress_manager.set_total_steps(total_steps)
         progress_manager.update_stage("execution", "Starting analysis execution...")
         
-        #ADDEDAUG
-        #No steps required - planner had 0 function calls essentially - we can skip nodes.
         # === Fast-path: no actionable steps -> direct LLM answer ===
-        # If the planner produced zero steps, mark this as a no-tool answer so the
-        # final evaluator/router can jump straight to the response generator.
 
         plan = state.get("execution_plan") or {}
         steps = plan.get("steps") or []
@@ -61,8 +55,6 @@ class ExecutorNode(BaseWorkflowNode):
             state["conversation_complete"] = True  # ensures final evaluator won't loop
             self._log_node_complete("Executor", state)
             return state
-        #ADDEDAUG
-
         # Continue executing while there are steps, with special handling for supplementary steps
         steps_executed = 0
         continue_execution = True
@@ -74,14 +66,12 @@ class ExecutorNode(BaseWorkflowNode):
                 
             step_data = state["execution_plan"]["steps"][state["current_step_index"]]
             
-            # Check if this step should be skipped
             if hasattr(step_data, 'skip_reason') and step_data.skip_reason:
                 self._handle_skipped_step(state, step_data)
                 steps_executed += 1
                 state["current_step_index"] += 1
                 continue
             
-            # Convert to ExecutionStep if not already
             if isinstance(step_data, ExecutionStep):
                 step = step_data
             else:
@@ -89,21 +79,17 @@ class ExecutorNode(BaseWorkflowNode):
             
             logger.info(f"🔄 Executing step {state['current_step_index'] + 1}: {step.description}")
 
-            #ADDEDAUG
             if not getattr(step, "function_name", None):
                 logger.info("ℹ️ No function for this step; treating as direct-answer/no-op.")
                 result_text = step.description or ""
-                # Build a dict we can safely store
                 if hasattr(step, "__dict__"):
                     safe_step = dict(step.__dict__)
                 elif isinstance(step_data, dict):
                     safe_step = copy.deepcopy(step_data)
                 else:
                     safe_step = {"description": step.description or ""}
-                # Force a safe function name and params
                 safe_step["function_name"] = safe_step.get("function_name") or "direct_answer"
                 safe_step["parameters"] = safe_step.get("parameters", {}) or {}
-                # Record execution as successful text result
                 self._record_execution(state, safe_step, result_text, True, None, "direct_answer")
                 state["current_step_index"] += 1
                 steps_executed += 1
@@ -112,7 +98,6 @@ class ExecutorNode(BaseWorkflowNode):
             #ADDEDAUG
 
             
-            # DEBUG: Log the original function name to track mutations
             original_function_name = getattr(step_data, 'function_name', 'unknown') if hasattr(step_data, 'function_name') else step_data.get("function_name", "unknown")
             logger.info(f"🔍 STORAGE DEBUG: Original function_name from plan: '{original_function_name}'")
             
@@ -121,7 +106,6 @@ class ExecutorNode(BaseWorkflowNode):
             error_msg = None
             
             try:
-                # Send progress update for current step
                 step_num = state['current_step_index'] + 1
                 progress_manager.send_custom_update(
                     f"Executing step {step_num}: {step.description}"
@@ -132,7 +116,6 @@ class ExecutorNode(BaseWorkflowNode):
                 if success:
                     logger.info(f"✅ Step {state['current_step_index'] + 1} completed successfully")
                     self._handle_successful_step(state, step, result)
-                    # Update progress after successful step
                     progress_manager.increment_step(f"Completed: {step.description}")
                 
             except Exception as e:
@@ -141,10 +124,8 @@ class ExecutorNode(BaseWorkflowNode):
                 logger.info(f"❌ Step {state['current_step_index'] + 1} failed: {error_msg}")
                 state["errors"].append(f"Step {state['current_step_index'] + 1} failed: {error_msg}")
             
-            # Record execution
             self._record_execution(state, step_data, result, success, error_msg, original_function_name)
             
-            # Simple error handling - always advance to prevent infinite retry loop
             state["current_step_index"] += 1
             steps_executed += 1
             

@@ -26,17 +26,11 @@ def unified_cell_type_handler(cell_type):
     """
     if not cell_type or not isinstance(cell_type, str):
         return "Unknown cell"
-    # Clean and normalize input
     clean_type = cell_type.strip()
-    # Handle CD markers: convert all formats to -positive/-negative
-    # Convert + to -positive
     clean_type = re.sub(r'\bCD(\d+)\+', r'CD\1-positive', clean_type, flags=re.IGNORECASE)
-    # Convert - to -negative
     clean_type = re.sub(r'\bCD(\d+)-(?!positive|negative)', r'CD\1-negative', clean_type, flags=re.IGNORECASE)
-    # Convert space-separated format
     clean_type = re.sub(r'\bCD(\d+) positive\b', r'CD\1-positive', clean_type, flags=re.IGNORECASE)
     clean_type = re.sub(r'\bCD(\d+) negative\b', r'CD\1-negative', clean_type, flags=re.IGNORECASE)
-    # Remove trailing "cell" or "cells" for processing
     flag = 0
     if clean_type.lower().endswith(' cells'):
         base_type = clean_type[:-6].strip()
@@ -47,14 +41,11 @@ def unified_cell_type_handler(cell_type):
     else:
         base_type = clean_type
         flag = 3
-    # Split into words for processing
     words = base_type.split()
     if not words:
         return "Unknown cell"
-    # Process each word
     processed_words = []
     for i, word in enumerate(words):
-        # Strip trailing punctuation for processing
         punct = ''
         m = re.match(r'^(.*?)([,.\.;:])$', word)
         if m:
@@ -63,12 +54,10 @@ def unified_cell_type_handler(cell_type):
             core_word = word
         word_to_process = core_word
         word_lower = word_to_process.lower()
-        # Special handling for CD markers: uppercase CD and number, lowercase suffix
         cd_match = re.match(r'^(cd\d+)(?:[+\-]|(-positive|-negative))$', word_to_process, flags=re.IGNORECASE)
         if cd_match:
             cd_part = cd_match.group(1).upper()
             suffix = ''
-            # handle explicit suffix (e.g., "-positive" or "-negative")
             suff_match = re.search(r'(-positive|-negative)', word_to_process, flags=re.IGNORECASE)
             if suff_match:
                 suffix = suff_match.group(1).lower()
@@ -88,15 +77,12 @@ def unified_cell_type_handler(cell_type):
             processed_core = word_to_process
             processed_words.append(processed_core + punct)
         else:
-            # Capitalize first letter of regular words
             if i == 0 or words[i-1].lower() in ['and', 'or']:
                 processed_core = word_to_process.capitalize()
             else:
                 processed_core = word_to_process.lower()
             processed_words.append(processed_core + punct)
-    # Join words and add "cell" at the end (singular)
     result = ' '.join(processed_words)
-    # Special cases: immunocyte names should always be singular
     special = [
         'platelet', 'platelets',
         'erythrocyte', 'erythrocytes',
@@ -107,10 +93,8 @@ def unified_cell_type_handler(cell_type):
         'basophil', 'basophils'
     ]
     if result.lower() in special:
-        # singularize by stripping trailing 's'
         singular = result.lower().rstrip('s')
         return singular.capitalize()
-    # Ensure it ends with "cell" (singular)
     if flag == 1 or flag == 2:
         result += ' cell'
     return result
@@ -122,12 +106,10 @@ def standardize_cell_type(cell_type):
     Converts to lowercase and handles CD markers consistently.
     """
     clean_type = cell_type.lower().strip()
-    # Normalize CD markers to -positive/-negative format
     clean_type = re.sub(r'\bcd(\d+)\+', r'cd\1-positive', clean_type)
     clean_type = re.sub(r'\bcd(\d+)-(?!positive|negative)', r'cd\1-negative', clean_type)
     clean_type = re.sub(r'\bcd(\d+) positive\b', r'cd\1-positive', clean_type)
     clean_type = re.sub(r'\bcd(\d+) negative\b', r'cd\1-negative', clean_type)
-    # Remove "cells" or "cell" suffix for base form
     if clean_type.endswith(' cells'):
         clean_type = clean_type[:-6].strip()
     elif clean_type.endswith(' cell'):

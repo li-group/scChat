@@ -137,19 +137,15 @@ def get_h5ad(directory_path, extension):
 def extract_genes(data):
     genes = []
     if isinstance(data, dict):
-        # Check if this is a cell type dictionary with a 'markers' key
         if 'markers' in data:
-            # If markers is directly a list of gene names
             if isinstance(data['markers'], list):
                 genes.extend(data['markers'])
         
-        # Recurse into nested dictionaries
         for key, value in data.items():
             if isinstance(value, (dict, list)):
                 genes.extend(extract_genes(value))
                 
     elif isinstance(data, list):
-        # Process each item in the list
         for item in data:
             genes.extend(extract_genes(item))
             
@@ -169,7 +165,6 @@ def get_rag():
         print("specification not found")
         return {}
     
-    # Load Neo4j credentials from configuration
     required_keys = ["url", "username", "password"]
     missing_keys = [key for key in required_keys if key not in specification or not specification[key]]
     
@@ -184,20 +179,16 @@ def get_rag():
     
     database = specification['database']
     
-    # Check if we have multiple sources or single source (backward compatibility)
     if 'sources' in specification:
-        # Multiple sources
         sources = specification['sources']
         print(f"🔍 Querying markers from {len(sources)} sources")
     else:
-        # Single source (backward compatibility)
         sources = [{'system': specification['system'], 'organ': specification['organ']}]
         print(f"🔍 Querying Level 1 markers for organ: {specification['organ']}")
     
     combined_data = {}
     try:
         with driver.session(database=database) as session:
-            # Loop through each source
             for source in sources:
                 system = source['system']
                 organ = source['organ']
@@ -215,16 +206,12 @@ def get_rag():
                     marker_genes = record["marker_list"] or []
                     
                     if cell_name not in combined_data:
-                        # New cell type
                         combined_data[cell_name] = {"markers": marker_genes}
                     else:
-                        # Cell type exists - merge markers (union)
                         existing_markers = combined_data[cell_name]["markers"]
-                        # Take union of markers, removing duplicates
                         merged_markers = list(set(existing_markers + marker_genes))
                         combined_data[cell_name]["markers"] = merged_markers
             
-            # Print summary
             total_cell_types = len(combined_data)
             print(f"✅ Retrieved {total_cell_types} unique cell types from {len(sources)} source(s)")
             
@@ -249,7 +236,6 @@ def get_cell_type_markers(cell_type, top_k=5):
         print("specification not found")
         return []
     
-    # Load Neo4j credentials from configuration
     required_keys = ["url", "username", "password"]
     missing_keys = [key for key in required_keys if key not in specification or not specification[key]]
     
@@ -266,10 +252,8 @@ def get_cell_type_markers(cell_type, top_k=5):
     
     # Check if we have multiple sources or single source
     if 'sources' in specification:
-        # Multiple sources
         sources = specification['sources']
     else:
-        # Single source (backward compatibility)
         sources = [{'system': specification['system'], 'organ': specification['organ']}]
         
     all_markers = []
@@ -289,7 +273,6 @@ def get_cell_type_markers(cell_type, top_k=5):
                     marker_genes = record["marker_list"] or []
                     all_markers.extend(marker_genes)
                     
-        # Remove duplicates and limit to top_k
         unique_markers = list(dict.fromkeys(all_markers))  # Preserves order
         return unique_markers[:top_k] if top_k else unique_markers
                 
@@ -313,7 +296,6 @@ def get_subtypes(cell_type):
         print("specification not found")
         return {}
     
-    # Load Neo4j credentials from configuration
     required_keys = ["url", "username", "password"]
     missing_keys = [key for key in required_keys if key not in specification or not specification[key]]
     
@@ -330,16 +312,13 @@ def get_subtypes(cell_type):
     
     # Check if we have multiple sources or single source
     if 'sources' in specification:
-        # Multiple sources
         sources = specification['sources']
     else:
-        # Single source (backward compatibility)
         sources = [{'system': specification['system'], 'organ': specification['organ']}]
         
     subtypes_data = {}
     try:
         with driver.session(database=database) as session:
-            # Loop through each source
             for source in sources:
                 organ = source['organ']
                 

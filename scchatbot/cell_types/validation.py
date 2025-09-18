@@ -39,7 +39,6 @@ def extract_cell_types_from_question(question: str, hierarchy_manager=None) -> L
     if not question or not hierarchy_manager:
         return []
     
-    # Get all valid cell types from Neo4j database
     valid_cell_types = getattr(hierarchy_manager, 'valid_cell_types', [])
     if not valid_cell_types:
         print("⚠️ No valid cell types available from Neo4j database")
@@ -47,7 +46,6 @@ def extract_cell_types_from_question(question: str, hierarchy_manager=None) -> L
     
     print(f"🔍 Analyzing question against {len(valid_cell_types)} valid cell types from Neo4j...")
     
-    # Use LLM to identify which valid cell types are mentioned in the question
     llm_prompt = f"""
                     You are a cell biology expert. Analyze this user question and identify which specific cell types are mentioned.
                     
@@ -80,26 +78,22 @@ def extract_cell_types_from_question(question: str, hierarchy_manager=None) -> L
         from langchain_openai import ChatOpenAI
         from langchain_core.messages import SystemMessage, HumanMessage
         
-        # Create messages in LangChain format
         messages = [
             SystemMessage(content="You are an expert in single-cell analysis and cell type identification. Generate responses in JSON format."),
             HumanMessage(content=llm_prompt)
         ]
         
-        # Initialize model
         model = ChatOpenAI(
             model="gpt-4o",
             temperature=0.1,
             model_kwargs={"response_format": {"type": "json_object"}}
         )
         
-        # Get response
         response = model.invoke(messages)
         result = json.loads(response.content)
         identified_types = result.get("identified_cell_types", [])
         reasoning = result.get("reasoning", "")
         
-        # Validate that all identified types are actually in the valid list
         validated_types = []
         for cell_type in identified_types:
             if cell_type in valid_cell_types:
@@ -172,7 +166,6 @@ def create_cell_discovery_steps(needed_cell_types: List[str], available_cell_typ
             print(f"✅ '{needed_type}' already available, no discovery needed")
             continue
         
-        # Find processing path using hierarchy manager
         processing_path = None
         best_parent = None
         
@@ -184,12 +177,10 @@ def create_cell_discovery_steps(needed_cell_types: List[str], available_cell_typ
                 break
         
         if processing_path and len(processing_path) > 1:
-            # Add process_cells steps for the path (skip the last element as it's the target)
             for i in range(len(processing_path) - 1):
                 current_type = processing_path[i]
                 target_type = processing_path[i + 1]
                 
-                # Only add step if we haven't already added it for this current_type
                 existing_step = None
                 for step in discovery_steps:
                     if (step.get("function_name") == "process_cells" and 

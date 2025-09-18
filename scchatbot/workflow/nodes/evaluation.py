@@ -29,19 +29,15 @@ class EvaluatorNode(BaseWorkflowNode):
     
     def execute(self, state: ChatState) -> ChatState:
         """Handle both validation steps AND critic analysis."""
-        # Check if current step is a validation step  
         execution_plan = state.get("execution_plan", {})
-        # steps = execution_plan.get("steps", [])
         steps = execution_plan.get("steps", []) or []
 
         current_index = state.get("current_step_index", 0)
         
         # --- NEW: fast-path for "no-tool / direct-answer" plans ---
-        # (a) truly empty plan, or (b) all steps lack a function_name
         has_callable = any((s.get("function_name") or "").strip() for s in steps)
         if not steps or not has_callable:
             logger.info("ℹ️ Evaluator: no callable steps in plan; skipping critic analysis.")
-            # Provide a stub so downstream never sees None
             state["critic"] = {
                 "mentioned_cell_types": [],
                 "supplementary_steps": [],
@@ -56,11 +52,9 @@ class EvaluatorNode(BaseWorkflowNode):
         if current_index < len(steps):
             current_step = steps[current_index]
             if current_step.get("step_type") == "validation":
-                # Handle validation step (moved from ExecutorNode)
                 return self._execute_validation_step(state, current_step)
         
         # CRITICAL FIX: Only run critic analysis when ALL steps are complete
-        # Check if we've reached the end of ALL steps (including any supplementary ones)
         if current_index >= len(steps):
             logger.info(f"🎯 All steps complete ({current_index}/{len(steps)}), running critic analysis")
             return self.evaluator_node(state)
@@ -598,9 +592,21 @@ class EvaluatorNode(BaseWorkflowNode):
                                 VISUALIZATION FUNCTIONS:
                                 - display_enrichment_visualization: PREFERRED function for showing comprehensive enrichment visualization with both barplot and dotplot. Use after running enrichment analyses to visualize results.
 
-                                - display_dotplot: Display dotplot for annotated results. Use when user wants to see gene expression patterns across cell types.
+                                - display_feature_plot: Display gene expression on UMAP for specific genes. Use when user asks to visualize specific gene expression patterns or wants to see where certain genes are expressed.
+
+                                - display_violin_plot: Display violin plots showing gene expression across leiden clusters with treatment comparison. Use when user wants to compare gene expression distributions across clusters or conditions.
 
                                 - display_processed_umap: Display UMAP with cell type annotations. Use when user wants to see cell type annotations on UMAP.
+
+                                - display_leiden_umap: Display UMAP colored by leiden clustering. Use when user wants to see clustering results or cluster-based analysis.
+
+                                - display_overall_umap: Display overall UMAP with various coloring options (cell_type, leiden, sample). Use for general UMAP visualization requests.
+
+                                - display_dotplot: Display dotplot for annotated results. Use when user wants to see gene expression patterns across cell types.
+
+                                - display_dea_heatmap: Display DEA heatmap showing top differentially expressed genes. Use when user wants to see differential expression results as a heatmap.
+
+                                - display_cell_count_stacked_plot: Display stacked bar plots of cell type counts across conditions. Use when user wants to see cell type abundance or proportions across experimental conditions.
 
                                 SEARCH FUNCTIONS:
                                 - search_enrichment_semantic: Search all enrichment terms semantically to find specific pathways or biological processes. Use when user asks about specific pathways, terms, or biological processes that might not appear in standard top results.
@@ -610,23 +616,44 @@ class EvaluatorNode(BaseWorkflowNode):
                                 IMPORTANT: The cell type "{cell_type}" already exists in the dataset. DO NOT suggest process_cells for this cell type.
 
                                 Consider based on question type:
-                                1. Gene/marker questions (differentiate X from Y, markers of X, gene expression) → Use dea_split_by_condition ONLY
-                                2. Pathway/biological process questions → Use perform_enrichment_analyses + search_enrichment_semantic
-                                3. Cell abundance questions → Use compare_cell_counts
-                                4. Specific pathway search → Use search_enrichment_semantic
+                                1. Gene/marker questions (differentiate X from Y, markers of X, gene expression) → Use dea_split_by_condition + display_dea_heatmap
+                                2. Pathway/biological process questions → Use perform_enrichment_analyses + search_enrichment_semantic + display_enrichment_visualization
+                                3. Cell abundance questions → Use compare_cell_counts + display_cell_count_stacked_plot
+                                4. Specific gene expression questions → Use display_feature_plot or display_violin_plot
+                                5. UMAP/clustering visualization requests → Use display_processed_umap, display_leiden_umap, or display_overall_umap
+                                6. Specific pathway search → Use search_enrichment_semantic
+                                7. If the question is about finding cell types (requires process_cells) → Return empty array []
 
                                 CRITICAL GUIDELINES FOR GENE/MARKER QUESTIONS:
-                                - For gene/marker questions, ONLY use dea_split_by_condition
+                                - For gene/marker questions, use dea_split_by_condition + display_dea_heatmap
                                 - DO NOT include enrichment analyses for marker identification
                                 - DO NOT suggest process_cells for already-available cell types
-                                - Visualization is optional for gene/marker questions
+                                - Include relevant visualization functions for gene expression results
+
+                                CRITICAL GUIDELINES FOR CELL TYPE DISCOVERY QUESTIONS:
+                                - If the question is about finding/discovering cell types that require process_cells, return empty array []
+                                - The critic should NOT suggest analyses for cell types that don't exist yet
+                                - Cell type discovery is handled by the planner, not the critic
+
+                                VISUALIZATION GUIDELINES:
+                                - For enrichment results: display_enrichment_visualization
+                                - For gene expression: display_feature_plot, display_violin_plot, or display_dea_heatmap
+                                - For cell type visualization: display_processed_umap, display_leiden_umap, display_overall_umap
+                                - For cell counts: display_cell_count_stacked_plot
+                                - For gene patterns across cell types: display_dotplot
 
                                 GENERAL GUIDELINES:
+                                - Include appropriate visualization functions based on the analysis type
                                 - Only include display_enrichment_visualization ONCE per cell type
+                                - Choose the most relevant UMAP function based on what user wants to see
                                 - Return ONLY a valid JSON array of function names, nothing else
 
-                                Example response for pathway question: ["perform_enrichment_analyses", "search_enrichment_semantic", "display_enrichment_visualization"]
-                                Example response for all kinds of markers: ["dea_split_by_condition"]
+                                Example responses:
+                                - Pathway question: ["perform_enrichment_analyses", "search_enrichment_semantic", "display_enrichment_visualization"]
+                                - Marker gene question: ["dea_split_by_condition", "display_dea_heatmap"]
+                                - Gene expression visualization: ["display_feature_plot"]
+                                - Cell type UMAP: ["display_processed_umap"]
+                                - Cell abundance: ["compare_cell_counts", "display_cell_count_stacked_plot"]
 
                                 Required analyses for {cell_type}:"""
         

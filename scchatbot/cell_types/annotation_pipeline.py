@@ -115,7 +115,6 @@ def rank_genes(adata, groupby='leiden', method='wilcoxon', n_genes=25, key_added
         sc.tl.rank_genes_groups(adata, groupby, method=method, n_genes=n_genes, key_added=key_added, use_raw=False)
     except ValueError as e:
         print(f"ERROR in rank_genes_groups: {e}")
-        # Fallback to t-test if 'wilcoxon' fails due to small group size
         adata.obs = adata.obs.copy()
         sc.tl.rank_genes_groups(adata, groupby, method='t-test', n_genes=n_genes, key_added=key_added, use_raw=False)
 
@@ -129,7 +128,6 @@ def create_marker_anndata(adata, markers, copy_uns=True, copy_obsm=True):
     import scipy
     filtered_markers, updated_adata = filter_existing_genes(adata, markers)
     
-    # Remove duplicates from markers
     filtered_markers = list(set(filtered_markers))
     
     if len(filtered_markers) == 0:
@@ -139,9 +137,7 @@ def create_marker_anndata(adata, markers, copy_uns=True, copy_obsm=True):
             obs=updated_adata.obs.copy()
         ), [], updated_adata
     
-    # Determine which data source to use and get gene indices
     if hasattr(updated_adata, 'raw') and updated_adata.raw is not None:
-        # Use raw data
         raw_var_names = updated_adata.raw.var_names
         raw_indices = [i for i, name in enumerate(raw_var_names) if name in filtered_markers]
         
@@ -152,12 +148,10 @@ def create_marker_anndata(adata, markers, copy_uns=True, copy_obsm=True):
                 obs=updated_adata.obs.copy()
             ), [], updated_adata
         
-        # Extract expression data
         if hasattr(updated_adata.raw, 'layers') and 'log1p' in updated_adata.raw.layers:
             X = updated_adata.raw.layers['log1p'][:, raw_indices].copy()
         else:
             X = updated_adata.raw.X[:, raw_indices].copy()
-            # Check if data needs log transformation
             if scipy.sparse.issparse(X):
                 max_val = X.max()
             else:
@@ -166,11 +160,9 @@ def create_marker_anndata(adata, markers, copy_uns=True, copy_obsm=True):
                 print("Log-transforming marker data...")
                 X = np.log1p(X)
         
-        # Get variable metadata
         var = updated_adata.raw.var.iloc[raw_indices].copy()
         
     else:
-        # Use main data
         main_var_names = updated_adata.var_names
         main_indices = [i for i, name in enumerate(main_var_names) if name in filtered_markers]
         
@@ -185,13 +177,11 @@ def create_marker_anndata(adata, markers, copy_uns=True, copy_obsm=True):
         var = updated_adata.var.iloc[main_indices].copy()
     
     
-    # Create the marker AnnData object
     marker_adata = anndata.AnnData(
         X=X,
         obs=updated_adata.obs.copy(),
         var=var
     )   
-    # Copy additional data if requested
     if copy_uns:
         marker_adata.uns = updated_adata.uns.copy()
     
@@ -254,7 +244,6 @@ def initial_cell_annotation(resolution=1):
     adata = preprocess_data(adata, sample_mapping)
     adata = perform_clustering(adata, resolution=resolution)
     
-    # Assign accumulative leiden for initial clustering
     unique_clusters = adata.obs['leiden'].unique()
     cluster_mapping = {str(cluster): global_cluster_counter + int(cluster) 
                       for cluster in unique_clusters}
@@ -274,7 +263,6 @@ def initial_cell_annotation(resolution=1):
         sc.tl.dendrogram(adata, groupby='leiden', use_rep=use_rep)
     else:
         sc.tl.dendrogram(adata, groupby='leiden')
-    # Convert categorical to object type before setting cell_type
     if hasattr(adata.obs.get('cell_type', None), 'cat'):
         adata.obs['cell_type'] = adata.obs['cell_type'].astype(str)
     adata.obs['cell_type'] = 'Unknown'
@@ -320,10 +308,8 @@ def initial_cell_annotation(resolution=1):
     annotation_result = results.content
     adata = label_clusters(adata=adata, cell_type="Overall", annotation_result=annotation_result)
 
-    #adding
     explanation = explain_gene(gene_dict=gene_dict, marker_tree=marker_tree, annotation_result=annotation_result)
     print ("EXPLANATION", explanation)
-    #done adding
 
     return gene_dict, marker_tree, adata, explanation, annotation_result
 
@@ -339,9 +325,7 @@ def process_cells(adata, cell_type, resolution=None):
     
     # Get subtypes from database
     markers_tree = get_subtypes(cell_type)
-    # print(f"🔍 Retrieved markers_tree: {markers_tree}")
     
-    # 🚨 NEW: Check if cell type has no subtypes (leaf node)
     if not markers_tree or len(markers_tree) == 0:
         print(f"✅ '{cell_type}' is a leaf node with no subtypes.")
         print(f"✅ No further refinement possible.")
@@ -367,10 +351,8 @@ def process_cells(adata, cell_type, resolution=None):
     
     print(f"🔍 Found {mask.sum()} cells of type '{standardized}'")
     
-    # Rest of the original function continues...
     filtered = adata[mask].copy()
     
-    # Convert categorical to object type immediately after copying to avoid assignment errors
     if hasattr(filtered.obs['cell_type'], 'cat'):
         filtered.obs['cell_type'] = filtered.obs['cell_type'].astype(str)
     
@@ -381,7 +363,6 @@ def process_cells(adata, cell_type, resolution=None):
     sc.pp.neighbors(filtered)
     filtered = perform_clustering(filtered, resolution=resolution)
     
-    # Create hierarchical cluster names to avoid collisions
     parent_cell_type = standardize_cell_type(cell_type).replace(" ", "_").lower()
     hierarchical_clusters = [f"{parent_cell_type}_cluster_{cluster}" 
                            for cluster in filtered.obs['leiden']]
@@ -408,7 +389,6 @@ def process_cells(adata, cell_type, resolution=None):
         if g in adata.raw.var_names or g in adata.obs.columns
     ]
     
-    # 🚨 NEW: Additional check for sufficient markers
     if len(existing_markers) < 3:
         print(f"⚠️ Only {len(existing_markers)} markers available for '{cell_type}' subtypes.")
         print(f"⚠️ Insufficient markers for reliable subtype annotation.")
@@ -473,15 +453,12 @@ def process_cells(adata, cell_type, resolution=None):
         cell_type=cell_type,
         adata=filtered
     ) 
-    # Convert categorical to object type to allow new values before assignment
     if hasattr(adata.obs['cell_type'], 'cat'):
         adata.obs['cell_type'] = adata.obs['cell_type'].astype(str)
     
     adata.obs.loc[mask, 'cell_type'] = annotated_filtered.obs['cell_type']
     
-    # Copy hierarchical leiden clusters and accumulative leiden back to main dataset
     if 'hierarchical_leiden' in annotated_filtered.obs.columns:
-        # Convert hierarchical_leiden to object type if needed
         if 'hierarchical_leiden' not in adata.obs.columns:
             adata.obs['hierarchical_leiden'] = 'Unknown'
         elif hasattr(adata.obs['hierarchical_leiden'], 'cat'):
@@ -489,7 +466,6 @@ def process_cells(adata, cell_type, resolution=None):
         adata.obs.loc[mask, 'hierarchical_leiden'] = annotated_filtered.obs['hierarchical_leiden']
         
     if 'accumulative_leiden' in annotated_filtered.obs.columns:
-        # Convert accumulative_leiden to object type if needed  
         if 'accumulative_leiden' not in adata.obs.columns:
             adata.obs['accumulative_leiden'] = -1
         elif hasattr(adata.obs['accumulative_leiden'], 'cat'):
@@ -519,7 +495,6 @@ def process_cells(adata, cell_type, resolution=None):
     overall_df.to_csv(csv_path, index=False)
     df_check = pd.read_csv(csv_path)
 
-    #adding
     explanation = explain_gene(gene_dict=gene_dict, marker_tree=markers_tree, annotation_result=annotation_result)
     final_result = (
         f"Annotation complete for {cell_type}.\n"
@@ -527,8 +502,7 @@ def process_cells(adata, cell_type, resolution=None):
         f"• Top-genes per cluster: {gene_dict}\n"
         f"• Marker-tree: {markers_tree}\n"
         f"• Explanation: {explanation}"
-    )    #done adding
-    return final_result
+    )    return final_result
 
 
 def handle_process_cells_result(adata, cell_type, resolution=None):
@@ -596,7 +570,6 @@ def label_clusters(annotation_result, cell_type, adata):
         # Ensure all keys are strings
         map2 = {str(key): value for key, value in map2.items()}
         if base_form == "overall":
-            # Convert categorical to object type to allow new values
             if hasattr(adata.obs['cell_type'], 'cat'):
                 adata.obs['cell_type'] = adata.obs['cell_type'].astype(str)
             adata.obs['cell_type'] = 'Unknown'
@@ -613,7 +586,6 @@ def label_clusters(annotation_result, cell_type, adata):
                 pickle.dump(adata, file)
         else:
             specific_cells = adata.copy()
-            # Convert categorical to object type to allow new values
             if hasattr(specific_cells.obs['cell_type'], 'cat'):
                 specific_cells.obs['cell_type'] = specific_cells.obs['cell_type'].astype(str)
             specific_cells.obs['cell_type'] = 'Unknown'

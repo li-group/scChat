@@ -9,7 +9,6 @@ from typing import Dict, Any, List
 
 from ..cell_types.models import ChatState, ExecutionStep
 
-# Import individual node implementations
 from .nodes import (
     InputProcessorNode,
     PlannerNode,
@@ -18,7 +17,6 @@ from .nodes import (
     EvaluatorNode
 )
 
-# Import EnrichmentChecker with error handling
 try:
     from ..analysis.enrichment_checker import EnrichmentChecker
     ENRICHMENT_CHECKER_AVAILABLE = True
@@ -42,7 +40,6 @@ class CoreNodes:
                  function_descriptions, function_mapping, visualization_functions):
         """Initialize the orchestrator and all node instances."""
         
-        # Store common dependencies
         self.initial_annotation_content = initial_annotation_content
         self.initial_cell_types = initial_cell_types
         self.adata = adata
@@ -53,7 +50,6 @@ class CoreNodes:
         self.function_mapping = function_mapping
         self.visualization_functions = visualization_functions
         
-        # Initialize EnrichmentChecker with error handling
         self.enrichment_checker = None
         self.enrichment_checker_available = False
         
@@ -71,7 +67,6 @@ class CoreNodes:
         else:
             print("⚠️ EnrichmentChecker module not available")
         
-        # Initialize individual node instances
         self._initialize_nodes()
     
     def _initialize_nodes(self):
@@ -98,7 +93,6 @@ class CoreNodes:
         
         print("✅ All workflow nodes initialized successfully")
     
-    # Orchestrator methods that delegate to individual nodes
     
     def input_processor_node(self, state: ChatState) -> ChatState:
         """Process incoming user message - delegates to InputProcessorNode."""
@@ -125,14 +119,11 @@ class CoreNodes:
         print("🔄 Orchestrator: Delegating to ResponseGeneratorNode")
         return self.response_generator.execute(state)
     
-    # Validation methods that delegate to EvaluatorNode
     
     def validate_processing_results(self, processed_parent: str, expected_children: List[str]) -> Dict[str, Any]:
         """Validate processing results - delegates to EvaluatorNode."""
         return self.evaluator.validate_processing_results(processed_parent, expected_children)
     
-    # Legacy compatibility methods - these ensure backward compatibility
-    # with existing code that might call these methods directly
     
     def _call_llm(self, prompt: str, model_name: str = "gpt-4o") -> str:
         """Legacy LLM call method - uses base node implementation."""
@@ -140,7 +131,6 @@ class CoreNodes:
     
     def _classify_question_type(self, question: str) -> str:
         """Legacy question classification - simplified implementation."""
-        # This could be enhanced or removed if no longer needed
         return "analysis"  # Default classification
     
     def _store_execution_result(self, step_data: Dict, result: Any, success: bool, original_function_name: str = None) -> Dict[str, Any]:
@@ -155,7 +145,6 @@ class CoreNodes:
         """Legacy step update - delegates to EvaluatorNode."""
         return self.evaluator.update_remaining_steps_with_discovered_types(state, validation_result)
     
-    # Additional orchestrator utilities
     
     def get_node_status(self) -> Dict[str, str]:
         """Get status of all workflow nodes."""
@@ -172,17 +161,13 @@ class CoreNodes:
         print("🔄 Orchestrator: Resetting all workflow nodes")
         self._initialize_nodes()
     
-    # Utility methods for backward compatibility with existing workflows
     
     def get_unified_results_for_synthesis(self, execution_history: List[Dict]) -> str:
         """Get unified results for synthesis - delegates to response generator."""
-        # This could be moved to a utility module later
         from .unified_result_accessor import get_unified_results_for_synthesis
         return get_unified_results_for_synthesis(execution_history)
 
 
-# For backward compatibility, maintain the same interface
-# This allows existing code to continue working without changes
 def create_core_nodes(*args, **kwargs):
     """Factory function for creating CoreNodes instances."""
     return CoreNodes(*args, **kwargs)

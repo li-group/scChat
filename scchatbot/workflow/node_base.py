@@ -41,7 +41,6 @@ class BaseWorkflowNode(ABC):
         self.enrichment_checker = enrichment_checker
         self.enrichment_checker_available = enrichment_checker_available
         
-        # Initialize LLM
         self.llm = ChatOpenAI(
             model="gpt-4o",
             temperature=0
@@ -114,7 +113,6 @@ class BaseWorkflowNode(ABC):
             return None
         
         try:
-            # Clean up markdown code blocks
             clean_json = json_string.strip()
             
             if clean_json.startswith('```json'):
@@ -157,7 +155,6 @@ class ProcessingNodeMixin:
         logger.info(f"🔍 CONTEXT BUILDER: Building session context...")
         context_parts = []
         
-        # Available cell types with better formatting
         available_cell_types = list(state.get("available_cell_types", []))
         logger.info(f"🔍 CONTEXT BUILDER: Found {len(available_cell_types)} cell types: {available_cell_types}")
         
@@ -167,7 +164,6 @@ class ProcessingNodeMixin:
                 context_parts.append(f"  • {cell_type}")
             context_parts.append("")  # Add spacing
         
-        # Recent execution history with better context
         execution_history = state.get("execution_history", [])
         if execution_history:
             recent_steps = execution_history[-3:]  # Last 3 steps for brevity
@@ -180,7 +176,6 @@ class ProcessingNodeMixin:
                     params = step.get("parameters", {})
                     cell_type = params.get("cell_type", "")
                     
-                    # Create more natural descriptions
                     if function_name == "perform_enrichment_analyses":
                         desc = f"Enrichment analysis completed for {cell_type}"
                     elif function_name == "process_cells":

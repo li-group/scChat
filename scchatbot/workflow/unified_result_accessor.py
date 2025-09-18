@@ -30,7 +30,6 @@ def _normalize_viz_result(result):
             return {"kind": "file_ref", "path": result.get("path")}
         if result.get("multiple_plots"):
             return {"kind": "bundle", "count": len(result.get("plots", []))}
-    # fallback
     return {"kind": "unknown"}
 
 
@@ -62,7 +61,6 @@ class EnrichmentResultAccessor(ResultAccessorBase):
     def get_results(self, execution_step: Dict[str, Any]) -> Dict[str, Any]:
         """Get enrichment results from CSV files (reliable) + vector DB availability"""
         try:
-            # Extract parameters from execution step
             step_data = execution_step.get("step", {})
             parameters = step_data.get("parameters", {})
             cell_type = parameters.get("cell_type", "unknown")
@@ -75,10 +73,8 @@ class EnrichmentResultAccessor(ResultAccessorBase):
                 "source": "enrichment_csv_files"
             }
             
-            # Get conditions dynamically from sample mapping
             conditions = self._load_conditions_from_mapping()
             
-            # Map analysis types to their directory names (both full dataset and condition-specific)
             analysis_dirs = {
                 "go": ["go_bp", "go_cc", "go_mf"] + [f"go_{condition}" for condition in conditions],
                 "kegg": ["kegg"] + [f"kegg_{condition}" for condition in conditions],
@@ -88,10 +84,8 @@ class EnrichmentResultAccessor(ResultAccessorBase):
 
             for analysis_type in analyses:
                 if analysis_type == "gsea":
-                    # Special handling for GSEA with library-specific folders
                     import glob
 
-                    # Try library-specific folders first
                     search_patterns = [
                         f"scchatbot/enrichment/gsea_*/results_summary_{cell_type}_*.csv",
                         f"scchatbot/enrichment/gsea*/results_summary_{cell_type}_*.csv",
@@ -102,20 +96,17 @@ class EnrichmentResultAccessor(ResultAccessorBase):
                     for pattern in search_patterns:
                         found_files.extend(glob.glob(pattern))
 
-                    # Process found files
                     for csv_path in found_files:
                         if os.path.exists(csv_path):
                             try:
                                 df = pd.read_csv(csv_path)
                                 if len(df) > 0:
-                                    # Handle different column name variations across analysis types
                                     term_column = None
                                     for col_name in ["term_name", "Term", "pathway", "term"]:
                                         if col_name in df.columns:
                                             term_column = col_name
                                             break
 
-                                    # Handle p-value column variations
                                     p_value_column = None
                                     for col_name in ["adj_p_value", "p_value", "pvalue", "FDR"]:
                                         if col_name in df.columns:
@@ -123,10 +114,8 @@ class EnrichmentResultAccessor(ResultAccessorBase):
                                             break
 
                                     if term_column and p_value_column:
-                                        # Get folder name for key (e.g., gsea_MSigDBHallmark2020)
                                         folder_name = os.path.basename(os.path.dirname(csv_path))
 
-                                        # Get top terms with their statistics
                                         results["analysis_types"][folder_name] = {
                                             "top_terms": df[term_column].head(10).tolist(),
                                             "p_values": df[p_value_column].head(10).tolist(),
@@ -140,32 +129,27 @@ class EnrichmentResultAccessor(ResultAccessorBase):
                             except Exception as e:
                                 logger.info(f"⚠️ Error reading {csv_path}: {e}")
 
-                    # Fallback to simple structure if no library-specific files found
                     if not results["analysis_types"] and analysis_type in analysis_dirs:
                         for subdir in analysis_dirs[analysis_type]:
                             csv_path = f"scchatbot/enrichment/{subdir}/results_summary_{cell_type}.csv"
                             if os.path.exists(csv_path):
-                                # Process fallback files (same logic as other analyses)
                                 try:
                                     df = pd.read_csv(csv_path)
                                     if len(df) > 0:
-                                        # Handle different column name variations across analysis types
-                                        term_column = None
+                                            term_column = None
                                         for col_name in ["term_name", "Term", "pathway", "term"]:
                                             if col_name in df.columns:
                                                 term_column = col_name
                                                 break
 
-                                        # Handle p-value column variations
-                                        p_value_column = None
+                                            p_value_column = None
                                         for col_name in ["adj_p_value", "p_value", "pvalue", "FDR"]:
                                             if col_name in df.columns:
                                                 p_value_column = col_name
                                                 break
 
                                         if term_column and p_value_column:
-                                            # Get top terms with their statistics
-                                            results["analysis_types"][subdir] = {
+                                                results["analysis_types"][subdir] = {
                                                 "top_terms": df[term_column].head(10).tolist(),
                                                 "p_values": df[p_value_column].head(10).tolist(),
                                                 "total_significant": len(df),
@@ -179,7 +163,6 @@ class EnrichmentResultAccessor(ResultAccessorBase):
                                     logger.info(f"⚠️ Error reading {csv_path}: {e}")
 
                 elif analysis_type in analysis_dirs:
-                    # Original logic for GO, KEGG, Reactome
                     for subdir in analysis_dirs[analysis_type]:
                         csv_path = f"scchatbot/enrichment/{subdir}/results_summary_{cell_type}.csv"
 
@@ -187,14 +170,12 @@ class EnrichmentResultAccessor(ResultAccessorBase):
                             try:
                                 df = pd.read_csv(csv_path)
                                 if len(df) > 0:
-                                    # Handle different column name variations across analysis types
                                     term_column = None
                                     for col_name in ["term_name", "Term", "pathway", "term"]:
                                         if col_name in df.columns:
                                             term_column = col_name
                                             break
                                     
-                                    # Handle p-value column variations
                                     p_value_column = None
                                     for col_name in ["adj_p_value", "p_value", "pvalue", "FDR"]:
                                         if col_name in df.columns:
@@ -202,7 +183,6 @@ class EnrichmentResultAccessor(ResultAccessorBase):
                                             break
                                     
                                     if term_column and p_value_column:
-                                        # Get top terms with their statistics
                                         results["analysis_types"][subdir] = {
                                             "top_terms": df[term_column].head(10).tolist(),
                                             "p_values": df[p_value_column].head(10).tolist(),
@@ -239,7 +219,6 @@ class EnrichmentResultAccessor(ResultAccessorBase):
             total = data.get("total_significant", 0)
             
             if top_terms:
-                # Format top terms with p-values
                 formatted_terms = []
                 for i, term in enumerate(top_terms[:5]):  # Top 5 terms
                     pval = p_values[i] if i < len(p_values) else "N/A"
@@ -264,14 +243,12 @@ class EnrichmentResultAccessor(ResultAccessorBase):
                 with open(mapping_file, 'r') as f:
                     mapping_data = json.load(f)
                 
-                # Get conditions from Sample categories or Sample description
                 conditions = []
                 if "Sample categories" in mapping_data:
                     conditions.extend(mapping_data["Sample categories"].keys())
                 elif "Sample description" in mapping_data:
                     conditions.extend(mapping_data["Sample description"].keys())
                 
-                # Keep original format as enrichment function saves with spaces, not underscores
                 conditions = list(conditions)
                 
                 logger.info(f"🔍 ENRICHMENT: Loaded {len(conditions)} conditions from mapping file: {conditions}")
@@ -292,7 +269,6 @@ class DEAResultAccessor(ResultAccessorBase):
     def get_results(self, execution_step: Dict[str, Any]) -> Dict[str, Any]:
         """Get DEA results from CSV files"""
         try:
-            # Extract cell type from execution step
             step_data = execution_step.get("step", {})
             parameters = step_data.get("parameters", {})
             cell_type = parameters.get("cell_type", "unknown")
@@ -303,8 +279,6 @@ class DEAResultAccessor(ResultAccessorBase):
                 "source": "dea_csv_files"
             }
             
-            # Look for condition-specific marker files
-            # Load conditions dynamically from sample mapping file
             potential_conditions = self._load_conditions_from_mapping()
             
             for condition in potential_conditions:
@@ -314,15 +288,11 @@ class DEAResultAccessor(ResultAccessorBase):
                     try:
                         df = pd.read_csv(csv_path)
                         if len(df) > 0:
-                            # Debug: Print column names
                             logger.info(f"📊 DEA CSV columns for {condition}: {list(df.columns)}")
                             
-                            # Determine the correct column names
                             logfc_col = "log_fc" if "log_fc" in df.columns else "logFC" if "logFC" in df.columns else "logfoldchanges"
                             pval_col = "p_adj" if "p_adj" in df.columns else "FDR" if "FDR" in df.columns else "pvals_adj"
                             
-                            # Separate upregulated and downregulated genes
-                            # Extract top 50 genes to ensure important genes like CFD are included
                             df_up = df[df[logfc_col] > 0].nlargest(100, logfc_col)
                             df_down = df[df[logfc_col] < 0].nsmallest(100, logfc_col)
                             
@@ -353,17 +323,14 @@ class DEAResultAccessor(ResultAccessorBase):
             return f"  No DEA results found for {cell_type}"
         
         for condition, data in conditions.items():
-            # Special handling for bulk analysis
             if condition == "bulk":
                 condition_name = "Bulk Analysis (All Conditions Combined)"
             else:
                 condition_name = condition.replace("_", " ").title()
             lines.append(f"  {condition_name}:")
             
-            # Format upregulated genes - provide ALL extracted genes for complete LLM analysis
             all_up_genes = data.get("upregulated_genes", [])
             if all_up_genes:
-                # Show top 10 for summary
                 top_genes = all_up_genes[:10]
                 gene_strs = []
                 for gene in top_genes:
@@ -372,11 +339,9 @@ class DEAResultAccessor(ResultAccessorBase):
                     gene_strs.append(f"{gene_name} (FC={log_fc:.2f})")
                 lines.append(f"    Top 10 upregulated: {', '.join(gene_strs)}")
                 
-                # Provide ALL upregulated genes for LLM analysis (not just a subset)
                 total_up = len(all_up_genes)
                 lines.append(f"    Total upregulated genes available: {total_up}")
                 
-                # Include ALL genes in formatted output for complete LLM access
                 all_gene_strs = []
                 for gene in all_up_genes:
                     gene_name = gene.get("names", gene.get("gene", gene.get("Gene", "Unknown")))
@@ -387,7 +352,6 @@ class DEAResultAccessor(ResultAccessorBase):
             # Format downregulated genes - provide ALL extracted genes for complete LLM analysis
             all_down_genes = data.get("downregulated_genes", [])
             if all_down_genes:
-                # Show top 10 for summary
                 top_genes = all_down_genes[:10]
                 gene_strs = []
                 for gene in top_genes:
@@ -400,7 +364,6 @@ class DEAResultAccessor(ResultAccessorBase):
                 total_down = len(all_down_genes)
                 lines.append(f"    Total downregulated genes available: {total_down}")
                 
-                # Include ALL genes in formatted output for complete LLM access
                 all_gene_strs = []
                 for gene in all_down_genes:
                     gene_name = gene.get("names", gene.get("gene", gene.get("Gene", "Unknown")))
@@ -424,7 +387,6 @@ class DEAResultAccessor(ResultAccessorBase):
                 with open(mapping_file, 'r') as f:
                     mapping_data = json.load(f)
                 
-                # Get conditions from Sample categories or Sample description
                 conditions = []
                 if "Sample categories" in mapping_data:
                     conditions.extend(mapping_data["Sample categories"].values())

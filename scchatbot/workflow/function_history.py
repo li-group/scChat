@@ -33,28 +33,21 @@ class FunctionHistoryManager:
     """
     
     def __init__(self, history_dir: str = "function_history"):
-        # Initialize basic function history
         self.history_dir = history_dir
         self.history_file = os.path.join(history_dir, "execution_history.json")
         
-        # Create directory if it doesn't exist
         os.makedirs(history_dir, exist_ok=True)
         
-        # Load existing function execution history
         self.history = self._load_history()
         
-        # Additional files for conversation history
         self.conversation_file = os.path.join(history_dir, "conversation_history.json")
         
-        # Vector database for conversation history and enrichment results
         self.vector_db_dir = os.path.join(history_dir, "conversation_vectors")
         self._setup_vector_db()
         self._setup_enrichment_vector_db()
         
-        # Load conversation history
         self.conversation_history = self._load_conversation_history()
     
-    # ========== BASIC FUNCTION HISTORY METHODS ==========
     
     def _load_history(self) -> List[Dict[str, Any]]:
         """Load function history from JSON file"""
@@ -86,10 +79,8 @@ class FunctionHistoryManager:
             "result_summary": str(result)[:500] if result else None,  # Truncate long results
         }
         
-        # Add to persistent history only
         self.history.append(execution_record)
         
-        # Save to file
         self._save_history()
     
     def has_been_executed(self, function_name: str, parameters: Dict[str, Any]) -> bool:
@@ -141,7 +132,6 @@ class FunctionHistoryManager:
         
         return results_summary
     
-    # ========== CONVERSATION HISTORY METHODS ==========
     
     def _setup_vector_db(self):
         """Initialize vector database with fallback options"""
@@ -149,14 +139,12 @@ class FunctionHistoryManager:
         self.embedder = None
         
         try:
-            # Use a reliable sentence transformer model
             self.embedder = HuggingFaceEmbeddings(
                 model_name="sentence-transformers/all-MiniLM-L6-v2",  # Fast and reliable
                 model_kwargs={'device': 'cpu'},
                 encode_kwargs={'normalize_embeddings': True}
             )
             
-            # Initialize Chroma vector database
             self.conversation_vector_db = Chroma(
                 collection_name="scrna_conversation_history",
                 embedding_function=self.embedder,
@@ -172,7 +160,6 @@ class FunctionHistoryManager:
             logger.info(f"⚠️ Failed to initialize vector database: {e}")
             logger.info("   Falling back to simple conversation storage")
             
-        # Always ensure these are set
         if self.conversation_vector_db is None:
             logger.info("📝 Using fallback: conversations will be stored in JSON only")
             self.vector_db_available = False
@@ -202,7 +189,6 @@ class FunctionHistoryManager:
                                        analysis_context: Dict = None):
         """Record conversation in both JSON and vector database"""
         
-        # 1. Traditional JSON storage
         conversation_entry = {
             "timestamp": datetime.now().isoformat(),
             "user_message": user_message,
@@ -211,14 +197,12 @@ class FunctionHistoryManager:
             "analysis_context": analysis_context or {}
         }
         
-        # 2. Vector database storage (if available)
         if self.conversation_vector_db and self.embedder:
             try:
                 self._store_conversation_vectors(user_message, bot_response, conversation_entry)
             except Exception as e:
                 logger.info(f"⚠️ Failed to store in vector database: {e}")
         
-        # 3. Traditional storage
         self.conversation_history.append(conversation_entry)
         self._save_conversation_history()
     
@@ -226,7 +210,6 @@ class FunctionHistoryManager:
                                    metadata: Dict):
         """Store conversation as vectors with rich metadata"""
         
-        # Create different embeddings for different query types
         conversation_chunks = [
             {
                 "content": f"User Question: {user_message}",
@@ -241,7 +224,6 @@ class FunctionHistoryManager:
         ]
         
         for chunk in conversation_chunks:
-            # Flatten metadata to only include simple types (ChromaDB requirement)
             flattened_metadata = self._flatten_metadata(metadata)
             enhanced_metadata = {
                 **flattened_metadata,
@@ -249,10 +231,8 @@ class FunctionHistoryManager:
                 "full_exchange": chunk["full_exchange"]
             }
             
-            # Generate unique ID
             doc_id = f"conv_{uuid.uuid4().hex[:8]}_{chunk['type']}"
             
-            # Store in vector DB
             self.conversation_vector_db.add_texts(
                 texts=[chunk["content"]],
                 metadatas=[enhanced_metadata],
@@ -267,12 +247,10 @@ class FunctionHistoryManager:
             logger.info("⚠️ Vector database not available, falling back to recent history")
             return self._get_recent_conversation_fallback(top_k)
         
-        # Build search filters
         filter_dict = {}
         if session_filter:
             filter_dict["session_id"] = session_filter
         
-        # Semantic search in vector database
         try:
             results = self.conversation_vector_db.similarity_search(
                 current_query, 
@@ -280,7 +258,6 @@ class FunctionHistoryManager:
                 filter=filter_dict if filter_dict else None
             )
             
-            # Post-process results for relevance and deduplication
             relevant_context = self._process_search_results(results, current_query)
             
             return relevant_context
@@ -295,7 +272,6 @@ class FunctionHistoryManager:
         if not results:
             return ""
         
-        # Group by conversation exchange to avoid fragmented context
         exchanges = {}
         for result in results:
             exchange = result.metadata.get("full_exchange", "")
@@ -303,7 +279,6 @@ class FunctionHistoryManager:
             if exchange and exchange not in exchanges:
                 exchanges[exchange] = timestamp
         
-        # Sort by recency and build context
         sorted_exchanges = sorted(
             exchanges.items(), 
             key=lambda x: x[1], 

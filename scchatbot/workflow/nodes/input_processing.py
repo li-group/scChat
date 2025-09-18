@@ -35,21 +35,17 @@ class InputProcessorNode(BaseWorkflowNode, ProcessingNodeMixin):
         """Process incoming user message with conversation-aware state preservation"""
         self._log_node_start("InputProcessor", state)
         
-        # Initialize state if this is a new conversation
         if not state.get("messages"):
             state["messages"] = [AIMessage(content=self.initial_annotation_content)]
         
         current_message = state["current_message"]
         state["has_conversation_context"] = False
         
-        # Use LLM to determine what context information is needed
         if hasattr(self.history_manager, 'search_conversations'):
             self._process_conversation_context(state, current_message)
         
-        # Add user message
         state["messages"].append(HumanMessage(content=state["current_message"]))
         
-        # Continue with the rest of input processing
         self._continue_input_processing(state)
         
         self._log_node_complete("InputProcessor", state)
@@ -57,7 +53,6 @@ class InputProcessorNode(BaseWorkflowNode, ProcessingNodeMixin):
     
     def _process_conversation_context(self, state: ChatState, current_message: str):
         """Process conversation context using LLM-driven context analysis."""
-        # Provide current session state information to LLM
         available_cell_types = list(state.get("available_cell_types", []))
         recent_analyses = [h.get("function_name") for h in state.get("execution_history", [])[-3:]]
         
@@ -84,7 +79,6 @@ class InputProcessorNode(BaseWorkflowNode, ProcessingNodeMixin):
                                     """
         
         try:
-            # LLM decides if context is needed and what to search for
             search_queries_json = self._call_llm(context_analysis_prompt)
             logger.info(f"🔍 LLM search query response: '{search_queries_json}'")
             
@@ -98,12 +92,10 @@ class InputProcessorNode(BaseWorkflowNode, ProcessingNodeMixin):
                 self._add_context_to_state(state, search_queries)
                 
         except Exception as e:
-            # Silent fail - continue without context
             logger.info(f"⚠️ Context retrieval skipped: {e}")
     
     def _add_context_to_state(self, state: ChatState, search_queries: List[str]):
         """Add context information to state based on search queries."""
-        # 🧹 CLEAR OLD CONTEXT: Remove any existing context messages to avoid accumulation
         messages_to_keep = []
         context_messages_removed = 0
         
@@ -121,16 +113,13 @@ class InputProcessorNode(BaseWorkflowNode, ProcessingNodeMixin):
         
         context_parts = []
         
-        # Handle different types of context requests  
         for query in search_queries:
             if query == "current_session_state":
-                # Add current session state information
                 session_context = self._build_session_state_context(state)
                 context_parts.append(f"CURRENT_SESSION_STATE: {session_context}")
                 logger.info(f"✅ Added current session state context ({len(session_context)} chars)")
                 logger.info(f"🔍 SESSION CONTEXT DEBUG: First 100 chars: '{session_context[:100]}...'")
             else:
-                # Treat as conversation search query
                 results = self.history_manager.search_conversations(query, k=2)
                 if results:
                     formatted_results = self.history_manager.format_search_results(results)
@@ -138,7 +127,6 @@ class InputProcessorNode(BaseWorkflowNode, ProcessingNodeMixin):
                     logger.info(f"✅ Added conversation context for '{query}' ({len(formatted_results)} chars)")
         
         if context_parts:
-            # Add fresh context to state
             full_context = "\n\n".join(context_parts)
             state["messages"].append(AIMessage(content=full_context))
             state["has_conversation_context"] = True
@@ -146,22 +134,17 @@ class InputProcessorNode(BaseWorkflowNode, ProcessingNodeMixin):
     
     def _continue_input_processing(self, state: ChatState):
         """Continue the input processing after context retrieval"""
-        # ✅ SMART INITIALIZATION: Preserve discovered cell types across questions
         if not state.get("available_cell_types"):
-            # First question or state is empty - use initial types
             state["available_cell_types"] = self.initial_cell_types
             logger.info(f"🔄 Initialized with {len(self.initial_cell_types)} initial cell types")
         else:
-            # Subsequent questions - preserve existing discovered types
             existing_count = len(state["available_cell_types"])
             logger.info(f"✅ Preserving {existing_count} discovered cell types from previous operations")
             
-            # Optional: Debug logging to track what types are preserved
             logger.info(f"   Preserved types: {sorted(state['available_cell_types'])}")
         
         state["adata"] = self.adata
         
-        # Reset only transient state for new questions, preserve conversation context
         state["execution_plan"] = None
         state["current_step_index"] = 0
         state["execution_history"] = []  # Clear for new question
@@ -171,12 +154,10 @@ class InputProcessorNode(BaseWorkflowNode, ProcessingNodeMixin):
         state["conversation_complete"] = False
         state["errors"] = []
         
-        # Load function history and memory context
         state["function_history_summary"] = self.history_manager.get_available_results()
         state["missing_cell_types"] = []
         state["required_preprocessing"] = []
         
-        # Initialize unavailable cell types tracking
         state["unavailable_cell_types"] = []
         
         return state

@@ -47,7 +47,6 @@ class PlannerNode(BaseWorkflowNode):
         function_history = state["function_history_summary"]
         unavailable_cell_types = state.get("unavailable_cell_types", [])
         
-        # 🧬 Enhanced cell type awareness logging
         initial_count = len(self.initial_cell_types)
         current_count = len(available_cell_types)
         discovered_count = current_count - initial_count
@@ -59,14 +58,12 @@ class PlannerNode(BaseWorkflowNode):
         if unavailable_cell_types:
             logger.info(f"   • Failed discoveries: {len(unavailable_cell_types)} - {', '.join(unavailable_cell_types)}")
         
-        # Show discovered types if any
         if discovered_count > 0:
             discovered_types = set(available_cell_types) - set(self.initial_cell_types)
             logger.info(f"   • New types discovered: {', '.join(sorted(discovered_types))}")
         
         logger.info(f"🧬 Planning for question: '{message}'")
         
-        # Enhanced LLM-based planning without artificial query type constraints
         plan_result = self._create_enhanced_plan(state, message, available_functions, available_cell_types, function_history, unavailable_cell_types)
         
         self._log_node_complete("Planner", state)
@@ -76,11 +73,9 @@ class PlannerNode(BaseWorkflowNode):
     def _create_enhanced_plan(self, state: ChatState, message: str, available_functions: List, available_cell_types: List[str], function_history: Dict, unavailable_cell_types: List[str]) -> ChatState:
         """Create enhanced plan using semantic LLM understanding without artificial query type constraints"""
         
-        # Extract conversation context for semantic search awareness
         conversation_context = ""
         has_conversation_context = state.get("has_conversation_context", False)
         if has_conversation_context:
-            # Extract conversation context from messages
             for msg in state.get("messages", []):
                 if hasattr(msg, 'content') and msg.content.startswith("CONVERSATION_CONTEXT:"):
                     conversation_context = msg.content[len("CONVERSATION_CONTEXT: "):]
@@ -92,36 +87,29 @@ class PlannerNode(BaseWorkflowNode):
         )
         
         try:
-            # Create messages in LangChain format
             messages = [
                 SystemMessage(content="You are a bioinformatics analysis planner. Generate execution plans in JSON format."),
                 HumanMessage(content=planning_prompt)
             ]
             
-            # Initialize model
             model = ChatOpenAI(
                 model="gpt-4o",
                 temperature=0.1,
                 model_kwargs={"response_format": {"type": "json_object"}}
             )
             
-            # Get response
             response = model.invoke(messages)
             plan_data = json.loads(response.content)
             
-            # Process and enhance the plan
             enhanced_plan = self._process_plan(plan_data, message, available_cell_types, unavailable_cell_types)
             
-            # Store as execution plan directly (planner now outputs final plan)
             state["execution_plan"] = enhanced_plan
             state["execution_plan"]["original_question"] = message
             
-            # Log plan statistics
             self._log_plan_statistics(enhanced_plan)
             
         except Exception as e:
             logger.info(f"Planning error: {e}")
-            # Fallback: create a simple conversational response plan
             state["execution_plan"] = self._create_fallback_plan()
             
         return state
@@ -343,10 +331,8 @@ class PlannerNode(BaseWorkflowNode):
     def _process_plan(self, plan_data: Dict[str, Any], message: str, 
                      available_cell_types: List[str], unavailable_cell_types: List[str]) -> Dict[str, Any]:
         """Process and enhance the plan with various optimizations."""
-        # 🧬 ENHANCED PLANNER: Add cell discovery if needed 
         enhanced_plan = self._add_cell_discovery_to_plan(plan_data, message, available_cell_types)
         
-        # Let enrichment_checker handle all pathway intelligence
         enrichment_steps = [s for s in enhanced_plan.get('steps', []) if s.get('function_name') == 'perform_enrichment_analyses']
         logger.info(f"🔍 ENRICHMENT DEBUG: Found {len(enrichment_steps)} enrichment steps")
         

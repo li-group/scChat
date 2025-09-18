@@ -29,35 +29,27 @@ class HierarchicalCellTypeManager:
     def __init__(self, adata, config_file="media/specification_graph.json"):
         self.adata = adata
         
-        # Neo4j connection setup (absorbed from CellTypeChecker)
         self.driver = None
         self.valid_cell_types = []
         self.config = self._load_config(config_file)
         
-        # Database configuration
         self.db_name = self.config.get("database")
         
-        # Support both single and multiple sources
         if 'sources' in self.config:
-            # Multiple sources
             self.sources = self.config['sources']
             self.organ = self.sources[0]['organ'] if self.sources else None  # Default to first organ for backward compatibility
         else:
-            # Single source (backward compatibility)
             self.organ = self.config.get("organ")
             self.sources = [{'system': self.config.get('system'), 'organ': self.organ}] if self.organ else []
         
-        # Initialize Neo4j connection
         self._initialize_neo4j_connection()
         
-        # Core hierarchical data structures
         self.cell_lineages: Dict[str, CellTypeLineage] = {}  # cell_id -> lineage
         self.type_hierarchy_cache: Dict[str, Dict] = {}  # cell_type -> hierarchy info
         self.ancestor_descendant_map: Dict[str, Set[str]] = {}  # type -> all descendants
         self.processing_snapshots: List[Dict] = []  # Snapshots after each process_cells
         self.path_cache: Dict[Tuple[str, str], Optional[List[str]]] = {}  # Cache for paths
         
-        # Initialize with current state
         self._initialize_lineages()
         self._build_hierarchy_cache()
         print(f"🧬 Initialized HierarchicalCellTypeManager with {len(self.cell_lineages)} cells and {len(self.valid_cell_types)} known cell types")
@@ -109,7 +101,6 @@ class HierarchicalCellTypeManager:
         all_cell_types = set()
         try:
             with self.driver.session(database=self.db_name) as session:
-                # Query each source
                 for source in self.sources:
                     organ = source['organ']
                     cypher = """
@@ -150,10 +141,8 @@ class HierarchicalCellTypeManager:
             
         try:
             with self.driver.session(database=self.db_name) as session:
-                # Build hierarchy cache for all sources
                 for source in self.sources:
                     organ = source['organ']
-                    # Get full hierarchy for each organ
                     query = """
                     MATCH (o:Organ {name: $organ})-[:HAS_CELL]->(root:CellType)
                     MATCH path = (root)-[:DEVELOPS_TO*0..]->(descendant:CellType)
@@ -169,11 +158,9 @@ class HierarchicalCellTypeManager:
                         root_type = record["root_type"]
                         descendants = set(record["all_descendants"])
                         
-                        # Build ancestor-descendant mappings for each cell type
                         for desc in descendants:
                             if desc not in self.ancestor_descendant_map:
                                 self.ancestor_descendant_map[desc] = set()
-                            # Each cell type maps to all its descendants
                             descendant_query = """
                             MATCH path = (start:CellType {name: $cell_type})-[:DEVELOPS_TO*0..]->(desc:CellType)
                             RETURN collect(DISTINCT desc.name) as descendants
@@ -183,7 +170,6 @@ class HierarchicalCellTypeManager:
                             if desc_record:
                                 self.ancestor_descendant_map[desc] = set(desc_record["descendants"])
                 
-                # Cache hierarchy info for each type
                 for cell_type in self.valid_cell_types:
                     if cell_type not in self.type_hierarchy_cache:
                         ancestor_path = self._get_ancestor_path(cell_type)
@@ -234,7 +220,6 @@ class HierarchicalCellTypeManager:
         best_parent = None
         shortest_length = float('inf')
         
-        # First check if target_type is a parent of any available types
         # (i.e., can we use an available subtype to represent the parent?)
         for available_type in available_types:
             # Check if available_type is a descendant of target_type

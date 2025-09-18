@@ -40,16 +40,13 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         logger.info("🎯 UNIFIED: Generating LLM-synthesized response with conversation awareness...")
         
         try:
-            # 1. Extract relevant results using unified result accessor (NEW SYSTEM)
             execution_history = state.get("execution_history", [])
             if not isinstance(execution_history, list):
                 execution_history = list(execution_history) if hasattr(execution_history, '__iter__') else []
             
-            # Use new unified accessor that handles mixed storage patterns
             formatted_findings = get_unified_results_for_synthesis(execution_history)
             logger.info("✅ Unified results extracted and formatted successfully")
             
-            # No legacy fallback - unified accessor is the only method
             if not formatted_findings or len(formatted_findings.strip()) < 50:
                 logger.info("⚠️ Unified accessor returned minimal results")
                 formatted_findings = "No analysis results available for synthesis"
@@ -59,7 +56,6 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             formatted_findings = f"Error extracting analysis results: {e}"
         
         try:
-            # 3. Get failed analyses for transparency
             failed_analyses = self._get_failed_analyses(state)
             logger.info("✅ Failed analyses retrieved")
         except Exception as e:
@@ -67,11 +63,9 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             failed_analyses = []
         
         try:
-            # 4. Extract unified context (should now be clean with no accumulation)
             conversation_context = None
             messages = state.get("messages", [])
             
-            # Since we now clean old context, there should be at most ONE context message
             for msg in messages:
                 if isinstance(msg, AIMessage) and any(prefix in msg.content for prefix in 
                     ["CURRENT_SESSION_STATE:", "CONVERSATION_HISTORY:", "CONVERSATION_CONTEXT:"]):
@@ -85,7 +79,6 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             conversation_context = None
         
         try:
-            # 5. Search for cell type discoveries if this is a "find X cell" query
             discovery_context = self._search_for_cell_discoveries(state)
             logger.info(f"✅ Discovery search completed")
         except Exception as e:
@@ -93,12 +86,10 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             discovery_context = None
 
         try:
-            # 6. Get critic analysis results for question type and relevance hints
             post_eval = state.get("critic", {})
             question_type = post_eval.get("question_type")
             analysis_relevance = post_eval.get("analysis_relevance", {})
 
-            # 7. Generate synthesis prompt with conversation awareness and relevance hints
             synthesis_prompt = self._create_enhanced_synthesis_prompt_with_formatted_findings(
                 original_question=state.get("current_message", ""),
                 formatted_findings=formatted_findings,
@@ -113,14 +104,12 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             logger.info(f"❌ Error creating synthesis prompt: {e}")
             synthesis_prompt = f"Please answer the user's question: {state.get('current_message', '')}"
         
-        # 6. Get LLM response (text only, no plots yet)
         try:
             response_text = self._call_llm_for_synthesis(synthesis_prompt)
         except Exception as e:
             logger.info(f"❌ LLM synthesis failed: {e}")
             response_text = "I encountered an error generating the response. Please try again."
         
-        # 7. Collect plots as individual objects
         try:
             plots = self._extract_html_plots_from_execution(state)  # Returns List[Dict]
             logger.info(f"🎯 ResponseGeneratorNode: Found {len(plots)} individual plots")
@@ -128,14 +117,11 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             logger.info(f"❌ Error extracting plots: {e}")
             plots = []
         
-        # 8. NEW: Create multiple messages structure for separate rendering
         if plots and len(plots) > 0:
             logger.info(f"🎨 Creating multiple messages structure: {len(plots)} plots + 1 text (plots first)")
             
-            # Create comprehensive response with separate messages array
             multiple_messages = []
             
-            # Add each plot as separate message entry FIRST
             for i, plot in enumerate(plots):
                 multiple_messages.append({
                     "message_type": "plot",
@@ -146,21 +132,18 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                     "graph_html": f"<div class='plot-container'><h4>{plot.get('description', '')}</h4>{plot.get('html', '')}</div>"
                 })
             
-            # Add text message as LAST entry
             multiple_messages.append({
                 "message_type": "text",
                 "response": response_text,
                 "response_type": "llm_synthesized_answer"
             })
             
-            # Create response with multiple messages structure
             response_data = {
                 "response": response_text,  # Main text response for backward compatibility
                 "response_type": "multiple_messages",
                 "plots_version": "3.0",  # New version for multiple messages
                 "messages": multiple_messages,
                 "total_messages": len(multiple_messages),
-                # Backward compatibility fields
                 "plots": plots,
                 "graph_html": self._combine_plots_for_legacy(plots)
             }
@@ -168,7 +151,6 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             logger.info(f"🎨 Created multiple messages structure with {len(multiple_messages)} total messages (plots first, then text)")
             
         else:
-            # No plots - single text response
             response_data = {
                 "response": response_text,
                 "response_type": "llm_synthesized_answer",
@@ -183,44 +165,33 @@ class ResponseGeneratorNode(BaseWorkflowNode):
     def add_plots_to_final_response(self, state: ChatState) -> ChatState:
         """Add plots to response after generation."""
         
-        # This method is only called when workflow routes to plot_integration,
-        # which means the response has been approved (either normally or by iteration limit)
         logger.info("🎨 PLOT INTEGRATION: Adding plots to final response...")
         
-        # Parse the JSON response
         try:
             response_data = json.loads(state.get("response", "{}"))
             response_text = response_data.get("response", "")
         except json.JSONDecodeError:
-            # Fallback if response is not JSON
             response_text = state.get("response", "")
             response_data = {"response": response_text}
         
-        # Extract plots as individual objects
         plots = self._extract_html_plots_from_execution(state)
         
         if plots:
-            # Store individual plots and maintain backward compatibility
             response_data["plots"] = plots
             response_data["graph_html"] = self._combine_plots_for_legacy(plots)
             
-            # Keep response text clean - only add a simple note about available plots
-            # response_text remains unchanged to avoid HTML contamination
             
             logger.info(f"🎨 PLOT INTEGRATION: Successfully stored {len(plots)} individual plots separately from response")
         else:
             logger.info("🎨 PLOT INTEGRATION: No plots found in execution history")
             response_data["plots"] = []
         
-        # Store back as JSON with size checking
         response_json = json.dumps(response_data)
         response_size = len(response_json)
         
-        # Check final response size
         MAX_RESPONSE_SIZE = 50 * 1024 * 1024  # 50MB maximum
         if response_size > MAX_RESPONSE_SIZE:
             logger.info(f"🎨 PLOT INTEGRATION: WARNING - Response too large ({response_size:,} chars > {MAX_RESPONSE_SIZE:,})")
-            # Remove plots if response is too large
             response_data_fallback = {
                 "response": response_data.get("response", ""),
                 "response_type": response_data.get("response_type", ""),
@@ -233,7 +204,6 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         
         state["response"] = response_json
         
-        # Add response to message history for conversation continuity (text only, no HTML)
         try:
             from langchain_core.messages import AIMessage
             state["messages"].append(AIMessage(content=response_text))
@@ -248,7 +218,6 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         
         successful_steps = [h for h in state["execution_history"] if h["success"]]
         
-        # Debug: Show all function names in execution history
         all_function_names = [h["step"]["function_name"] for h in successful_steps]
         logger.info(f"🔍 Plot collection: Function names in execution history: {all_function_names}")
         logger.info(f"🔍 Plot collection: Visualization functions set: {self.visualization_functions}")
@@ -269,23 +238,18 @@ class ResponseGeneratorNode(BaseWorkflowNode):
             function_name = step["step"]["function_name"]
             result = step.get("result", "")
             
-            # Check if this was a visualization step
             if function_name in self.visualization_functions:
-                # Add plot description to summary
                 plot_info = f"📊 {step_desc}"
                 if step["step"].get("parameters", {}).get("cell_type"):
                     plot_info += f" (for {step['step']['parameters']['cell_type']})"
                 summary += f"{i}. {plot_info}\n"
                 
-                # Debug: Check what we have in result
                 logger.info(f"🔍 Plot collection debug - Function: {function_name}")
                 logger.info(f"🔍 Result type: {type(result)}, length: {len(str(result)) if result else 0}")
                 logger.info(f"🔍 Has HTML markers: <div={bool('<div' in str(result))}, <html={bool('<html' in str(result))}")
                 logger.info(f"🔍 Result preview: {str(result)[:200]}...")
                 
-                # Collect the HTML plot if it's valid HTML
                 if result and isinstance(result, str) and ("<div" in result or "<html" in result):
-                    # Check if this is a duplicate plot
                     if step_desc not in plot_descriptions:
                         collected_plots.append(f"<div class='plot-container'><h4>{step_desc}</h4>{result}</div>")
                         plot_descriptions.append(step_desc)
@@ -295,18 +259,15 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                 else:
                     logger.info(f"❌ Plot NOT collected for {step_desc} - invalid HTML or empty result")
             else:
-                # Regular analysis step
                 summary += f"{i}. {step_desc}\n"
         
         summary += "\nAll analyses have been completed successfully."
         
-        # Add plot information to summary if we have plots
         if plot_descriptions:
             summary += f"\n\n📊 Generated {len(plot_descriptions)} visualization(s):"
             for desc in plot_descriptions:
                 summary += f"\n• {desc}"
         
-        # Combine all plots into a single HTML string
         combined_plots = "\n".join(collected_plots) if collected_plots else ""
         
         logger.info(f"🔍 Plot collection summary: Collected {len(collected_plots)} plots, total HTML length: {len(combined_plots)}")
@@ -320,19 +281,15 @@ class ResponseGeneratorNode(BaseWorkflowNode):
         failed_analyses = []
         
         for step in state.get("execution_history", []):
-            # Skip if step is not a dictionary
             if not isinstance(step, dict):
                 continue
                 
             if not step.get("success", True):  # Failed step
-                # Extract function name - handle both nested and flat structures
                 step_data = step.get("step", {})
                 if isinstance(step_data, dict) and "function_name" in step_data:
-                    # New nested structure
                     function_name = step_data.get("function_name", "unknown")
                     parameters = step_data.get("parameters", {})
                 elif "function_name" in step:
-                    # Flat structure (fallback)
                     function_name = step.get("function_name", "unknown")
                     parameters = step.get("parameters", {})
                 else:
@@ -360,7 +317,6 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                     USER'S QUESTION: "{original_question}"
                     """
         
-        # Add question type and guidance if available
         if question_type and analysis_relevance:
             guidance = analysis_relevance.get("guidance", "")
             prompt += f"""
@@ -368,7 +324,6 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                         RESPONSE GUIDANCE: {guidance}
                         """
             
-            # Add analysis relevance hints
             relevance_categories = analysis_relevance.get("relevance_categories", {})
             if relevance_categories:
                 prompt += """
@@ -377,7 +332,6 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                         - Secondary analyses (use for support): """ + str(relevance_categories.get("secondary", [])) + """
                         """
 
-        # Add conversation context if available
         if conversation_context:
             prompt += f"""
                         CURRENT SESSION CONTEXT:
@@ -391,7 +345,6 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                     {formatted_findings}
                     """
 
-        # Add failed analyses if any
         if failed_analyses:
             prompt += "\n\nFAILED ANALYSES:\n"
             for failure in failed_analyses:
@@ -406,14 +359,12 @@ class ResponseGeneratorNode(BaseWorkflowNode):
                 5. Be comprehensive but concise
                 6. Focus on answering the specific question asked, not providing general information"""
         
-        # Add conversation-aware instructions if context exists
         if conversation_context:
             prompt += """
                     7. Consider the conversation history and maintain continuity
                     8. Reference specific previous discussions when relevant
                     9. If the user is referring to something from earlier, address it specifically"""
 
-        # Add discovery context if available
         if discovery_context:
             prompt += f"""
 
