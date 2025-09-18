@@ -21,50 +21,60 @@ If you found this work useful, please cite this [preprint](https://arxiv.org/abs
 ## Table of Contents
 - [Overview](#overview)
 - [Tutorial](#tutorial)
-- [Chat Example](#chat-example)
 - [Datasets](#datasets)
-- [Citation](#citation)
 
 # Overview
 <a name="overview"></a>
-## Motivation
+## 1. Motivation
 Data-driven methods such as unsupervised and supervised learning are essential tools in single-cell RNA sequencing (scRNA-seq) analysis. However, these methods often lack the ability to incorporate research context, which can lead to overlooked insights. scChat addresses this by integrating contextualized conversation with data analysis to provide a deeper understanding of experimental results. It supports the exploration of research hypotheses and generates actionable insights for future experiments.
 
 Please read our [scChat paper](https://www.biorxiv.org/content/10.1101/2024.10.01.616063v1) for more motivation and details about how the scChat works.
 
-## Scope
+## 2. Scope
 Model: scChat currently supports analysis using AnnData-formatted single-cell RNA sequencing datasets.
 
 Capabilities: scChat integrates an LLM mutli-agent system with specialized tools to enable tasks, such as cell type annotation, enrichment analysis, and result visualization, all through conversational interactions.
 
+## 3. Methodology
+<a name="system overview"></a>
+<p align="center">
+<img src="scchat framework.png" alt="drawing" width="500"/>
+</p>
+ scChat – a multi-agent scRNA-seq research co-scientist – that can autonomously generate executable plans for multi-step analyses, ranging from data preprocessing and follow-up analysis to results visualization.
+ scChat includes five main agents in it:
+ - ** Planner: Searches for function execution and conversation history, parses the query, and decomposes it to generate a plan with several function calls arranged as steps in sequence.
+ - ** Executor: Performs the function specified in the plan iteratively.
+ - ** Evaluator: Validates the outcome of each function from the executor, handling errors and interrupting the plan to pass error messages to the response generator if needed. Additionally, it checks the availability of remaining steps and determines the next step in the workflow.
+ - ** Critic: Identifies potentially missing functions by creating a separate plan based on the function results, ensuring targeted analyses of specific cell types with all necessary downstream steps.
+ - ** Response generator: Compiles all relevant function results to generate the final response to the user’s query. After generating the response, it stores the final response and the function execution results in conversation and function histories, respectively.
 
 # Tutorial 
 
 To set up the project environment and run the server, follow these steps:
 
-1. Install the required dependencies:
+### Step 1: Install the required dependencies:
    ```bash
    pip3 install -r requirements.txt
+   ```
 
-Follow these steps to utilize the application effectively:
-### Step 1: Set the OPENAI Key Environment Variable 
+### Step 2: Set the OPENAI Key Environment Variable 
 - Type and enter export OPENAI_API_KEY='your_openai_api_key' in your terminal
 
   
-### Step 2: Download Neo4j Desktop 2
+### Step 3: Download Neo4j Desktop 2
 - Download Neo4j Desktop 2 (https://neo4j.com/download/)
 - Download required dump files (https://drive.google.com/drive/folders/17UCKv95G3tFqeyce1oQAo3ss2vS7uZQE)
 - Create a new instance on Neo4j (this step asks you set the password)
 - Import the dump files as new databases in the created instance.
 - Start the database
 
-### Step 3: Upload and update files
+### Step 4: Upload and update files
 - Upload scRNA-seq adata file (.h5ad)
 - Upload the pathway vector-based model (.pkl and .faiss), which can be found in this link: https://drive.google.com/drive/u/4/folders/1OklM2u5T5FsjiUvvYRYyWxrssQIb84Ky
 - Update specification_graph.json with your Neo4j username, password, system and organ relevant to the database you are using with specific format
 - Update sample_mapping.json with adata file corresponding "Sample name", which can be found in adata.obs, and write descriptions for each condition.
 
-### Step 4: Build the specification.json and sample_mapping.json for RAG specifications
+### Step 5: Build the specification.json and sample_mapping.json for RAG specifications
 - Build the specification_graph.json with your Neo4j username, password, database(`human` or `mouse`), system and organ relevant to the file you are going to test with following format:
 ```json
 {
@@ -125,11 +135,11 @@ It's also allowed to pass multiple system and organ to the RAG. For example:
 ```
 Notably, the available systems, organs and tissues are listed in available_cell_RAG.json.
 
-### Step 5: Initialize the Application
+### Step 6: Initialize the Application
 - Run python3 manage.py migrate (For the first time as you install scChat)
 - Run python3 manage.py runserver
 
-### Step 6: Access the Application
+### Step 7: Access the Application
 - Open your web browser and navigate to:
   `http://127.0.0.1:8000/schatbot`
   
@@ -153,10 +163,3 @@ Notably, the available systems, organs and tissues are listed in available_cell_
 # Datasets
 The datasets used for testing and examples for sample_mapping.json and specification_graph.json can be found at [https://docs.google.com/spreadsheets/d/1NwN5GydHn0B3-W0DLcAfvnNtZVJEMUgBW9YyzXnS83A/edit?usp=sharing
 ](https://drive.google.com/drive/u/4/folders/1RJRETtwI3zxsOJK0Lop197JGm3Isl4iB)
-
-## Citation
-The `cell type RAG` files were generated using data from:
-
-**CellMarker: a manually curated resource of cell markers in human and mouse**  
-*Published in Nucleic Acids Research, 2018*  
-DOI: [10.1093/nar/gky900](https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gky900/5115823)
