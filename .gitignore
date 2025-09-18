@@ -43,6 +43,7 @@ media/
 umaps/
 !umaps/annotated
 !umaps/annotated/.gitkeep
+!/scchatbot/scvi_model/.gitkeep
 
 # DBs
 db.sqlite3
