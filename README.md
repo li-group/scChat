@@ -76,9 +76,9 @@ To set up the project environment and run the server, follow these steps:
    ```
 
 ### Step 2: Set the OPENAI Key Environment Variable 
-- Type and enter export 
+Type and enter export in your terminal
   ```bash
-  OPENAI_API_KEY='your_openai_api_key' in your terminal
+  OPENAI_API_KEY='your_openai_api_key' 
   ```
   
 ### Step 3: Download Neo4j Desktop 2
