@@ -493,7 +493,7 @@ class PlannerNode(BaseWorkflowNode):
             if "cell_type" in params:
                 original_name = params["cell_type"]
                 
-                        if original_name in needed_cell_types:
+                if original_name in needed_cell_types:
                     corrected_name = original_name
                     used_cell_types.add(corrected_name)
                 else:
