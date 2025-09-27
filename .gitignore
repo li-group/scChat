@@ -43,6 +43,7 @@ media/
 umaps/
 !umaps/annotated
 !umaps/annotated/.gitkeep
+!umaps/.gitkeep
 !/scchatbot/scvi_model/.gitkeep
 !/scchatbot/deg_res/.gitkeep
 !/scchatbot/enrichment/.gitkeep

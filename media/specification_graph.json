@@ -6,8 +6,12 @@
     "pathway_rag": "pathways",
     "sources": [
         {
+            "system": "Lymphatic System",
+            "organ": "Peripheral blood"
+        },
+        {
             "system": "Nervous System",
-            "organ": "Eye"
+            "organ": "Brain"
         }
     ]
 }
