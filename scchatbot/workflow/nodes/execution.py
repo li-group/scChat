@@ -66,7 +66,15 @@ class ExecutorNode(BaseWorkflowNode):
                 
             step_data = state["execution_plan"]["steps"][state["current_step_index"]]
             
-            if hasattr(step_data, 'skip_reason') and step_data.skip_reason:
+            # Check for skip_reason in both object attributes and dictionary keys
+            skip_reason = None
+            if hasattr(step_data, 'skip_reason'):
+                skip_reason = step_data.skip_reason
+            elif isinstance(step_data, dict) and 'skip_reason' in step_data:
+                skip_reason = step_data['skip_reason']
+
+            if skip_reason:
+                logger.info(f"⏭️ Skipping step {state['current_step_index'] + 1}: {skip_reason}")
                 self._handle_skipped_step(state, step_data)
                 steps_executed += 1
                 state["current_step_index"] += 1

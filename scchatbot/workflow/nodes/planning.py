@@ -165,6 +165,11 @@ class PlannerNode(BaseWorkflowNode):
                 - Cell count visualization requests → display_cell_count_stacked_plot (direct visualization)
                 - Explanation/interpretation questions → Conversational response
                 - When unclear, consider what type of biological question is being asked
+
+                CRITICAL CONSTRAINT:
+                - ONLY plan analysis for cell types that exist in the "Currently available cell types" list above
+                - DO NOT plan for cell types that are not in the available list, even if they exist in the knowledge base
+                - If the user asks for a cell type not in the available list, create process_cells steps to discover it first
                 
                 Create a plan in this JSON format:
                 {{
