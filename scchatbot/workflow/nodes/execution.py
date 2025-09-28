@@ -71,7 +71,19 @@ class ExecutorNode(BaseWorkflowNode):
                 steps_executed += 1
                 state["current_step_index"] += 1
                 continue
-            
+
+            # Check if this step should be skipped due to aggregation
+            steps_to_skip = state.get("_steps_to_skip", set())
+            if state["current_step_index"] in steps_to_skip:
+                logger.info(f"⏭️ Skipping step {state['current_step_index'] + 1}: Already included in aggregated visualization")
+                # Create a skip reason and handle as skipped step
+                step_data_copy = step_data.copy() if isinstance(step_data, dict) else step_data.__dict__.copy()
+                step_data_copy["skip_reason"] = "Already included in aggregated display_cell_count_stacked_plot"
+                self._handle_skipped_step(state, step_data_copy)
+                steps_executed += 1
+                state["current_step_index"] += 1
+                continue
+
             if isinstance(step_data, ExecutionStep):
                 step = step_data
             else:
@@ -305,19 +317,19 @@ class ExecutorNode(BaseWorkflowNode):
         # Special handling for display_cell_count_comparison - aggregate results from compare_cell_counts steps
         if step.function_name == "display_cell_count_comparison":
             logger.info(f"🔍 AGGREGATION: Handling display_cell_count_comparison - aggregating compare_cell_counts results")
-            
+
             execution_history = state.get("execution_history", [])
             cell_types_data = {}
-            
+
             # Find all successful compare_cell_counts executions
             for execution in execution_history:
                 step_data = execution.get("step", {})
-                if (execution.get("success") and 
+                if (execution.get("success") and
                     step_data.get("function_name") == "compare_cell_counts"):
-                    
+
                     cell_type = step_data.get("parameters", {}).get("cell_type")
                     result = execution.get("result")
-                    
+
                     if cell_type and result:
                         # Handle different result formats
                         if isinstance(result, dict) and "count_results" in result:
@@ -327,7 +339,7 @@ class ExecutorNode(BaseWorkflowNode):
                             # Direct format from compare_cell_count function
                             cell_types_data[cell_type] = result
                         logger.info(f"🔍 AGGREGATION: Added data for {cell_type}: {len(result) if isinstance(result, list) else 'dict'} entries")
-            
+
             if cell_types_data:
                 enhanced_params["cell_types_data"] = cell_types_data
                 logger.info(f"✅ AGGREGATION: Successfully aggregated data for {len(cell_types_data)} cell types")
@@ -335,6 +347,62 @@ class ExecutorNode(BaseWorkflowNode):
                 logger.info(f"❌ AGGREGATION: No compare_cell_counts results found to aggregate")
                 enhanced_params["_should_fail"] = True
                 enhanced_params["_fail_reason"] = "No compare_cell_counts results available to visualize"
+
+        # Special handling for display_cell_count_stacked_plot - aggregate all related cell types
+        if step.function_name == "display_cell_count_stacked_plot":
+            logger.info(f"🔍 STACKED AGGREGATION: Handling display_cell_count_stacked_plot - aggregating cell types for single plot")
+
+            # Check if this step already has multiple cell types specified
+            existing_cell_types = enhanced_params.get("cell_types", [])
+            if not existing_cell_types:
+                # Convert single cell_type to list if needed
+                single_cell_type = enhanced_params.get("cell_type")
+                if single_cell_type:
+                    existing_cell_types = [single_cell_type]
+
+            # Look for other pending display_cell_count_stacked_plot steps in the execution plan
+            execution_plan = state.get("execution_plan", {})
+            current_step_index = state.get("current_step_index", 0)
+
+            aggregated_cell_types = set(existing_cell_types)
+            steps_to_skip = []
+
+            # Check upcoming steps for more cell types to include in the same plot
+            if "steps" in execution_plan:
+                for i, future_step_data in enumerate(execution_plan["steps"][current_step_index + 1:], start=current_step_index + 1):
+                    future_step = future_step_data if hasattr(future_step_data, 'function_name') else type('obj', (object,), future_step_data)()
+
+                    if (hasattr(future_step, 'function_name') and
+                        future_step.function_name == "display_cell_count_stacked_plot"):
+
+                        # Get cell types from future step
+                        future_params = getattr(future_step, 'parameters', {}) or future_step_data.get('parameters', {})
+                        future_cell_types = future_params.get("cell_types", [])
+                        if not future_cell_types:
+                            future_cell_type = future_params.get("cell_type")
+                            if future_cell_type:
+                                future_cell_types = [future_cell_type]
+
+                        # Add to aggregated list
+                        aggregated_cell_types.update(future_cell_types)
+                        steps_to_skip.append(i)
+                        logger.info(f"🔍 STACKED AGGREGATION: Found future step {i} with cell types: {future_cell_types}")
+
+            # Update parameters with aggregated cell types
+            if aggregated_cell_types:
+                enhanced_params["cell_types"] = list(aggregated_cell_types)
+                # Remove cell_type parameter if it exists (use cell_types instead)
+                enhanced_params.pop("cell_type", None)
+                logger.info(f"✅ STACKED AGGREGATION: Aggregated {len(aggregated_cell_types)} cell types for single plot: {list(aggregated_cell_types)}")
+
+                # Mark future steps to be skipped
+                if steps_to_skip:
+                    state.setdefault("_steps_to_skip", set()).update(steps_to_skip)
+                    logger.info(f"🚫 STACKED AGGREGATION: Marked steps {steps_to_skip} for skipping (already included in aggregated plot)")
+            else:
+                logger.info(f"⚠️ STACKED AGGREGATION: No cell types found for stacked plot")
+                enhanced_params["_should_fail"] = True
+                enhanced_params["_fail_reason"] = "No cell types specified for stacked plot"
         
         return enhanced_params
     
