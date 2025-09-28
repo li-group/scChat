@@ -458,14 +458,38 @@ class EvaluatorNode(BaseWorkflowNode):
         Cell-type specific LLM-powered gap analysis - Critic Agent
         """
         logger.info("🔍 Starting critic analysis...")
-        
+
         original_question = state["execution_plan"]["original_question"]
-        
+
         # Import the extraction function
         from ...cell_types.validation import extract_cell_types_from_question
-        
-        # Step 1: Extract mentioned cell types using existing function
-        mentioned_types = extract_cell_types_from_question(original_question, self.hierarchy_manager)
+
+        # CRITICAL FIX: Compare question-mentioned vs discovered types to populate unavailable_cell_types
+        question_mentioned_types = extract_cell_types_from_question(original_question, self.hierarchy_manager)
+        discovered_types = set(state.get("available_cell_types", []))
+        current_unavailable = set(state.get("unavailable_cell_types", []))
+
+        # Find types mentioned in question but not discovered in dataset
+        missing_from_dataset = [t for t in question_mentioned_types if t not in discovered_types]
+        if missing_from_dataset:
+            updated_unavailable = current_unavailable.union(set(missing_from_dataset))
+            state["unavailable_cell_types"] = list(updated_unavailable)
+            logger.info(f"🚫 Added question-mentioned but undiscovered cell types to unavailable list: {missing_from_dataset}")
+
+        # Step 1: Use LLM-powered semantic matching instead of exact intersection
+        if question_mentioned_types and discovered_types:
+            relevant_types = self._find_semantically_relevant_types(
+                original_question, question_mentioned_types, list(discovered_types)
+            )
+        else:
+            relevant_types = []
+
+        logger.info(f"📋 Question mentioned types: {question_mentioned_types}")
+        logger.info(f"🧬 Discovered types: {list(discovered_types)}")
+        logger.info(f"🎯 Critic will analyze semantically relevant types: {relevant_types}")
+        logger.info(f"🚫 Unavailable types: {state.get('unavailable_cell_types', [])}")
+
+        mentioned_types = relevant_types
         
         # Classify question type for better result filtering
         question_type = self._classify_question_type(original_question)
@@ -476,7 +500,12 @@ class EvaluatorNode(BaseWorkflowNode):
         
         supplementary_steps = []
         evaluation_details = {}
-        
+
+        # CRITICAL FIX: Infinite loop prevention - track previously attempted supplementary steps
+        previously_attempted = state.get("previously_attempted_supplementary_steps", set())
+        if isinstance(previously_attempted, list):
+            previously_attempted = set(previously_attempted)  # Convert from list if needed
+
         # Get unavailable cell types to skip them
         unavailable_cell_types = state.get("unavailable_cell_types", [])
         
@@ -485,6 +514,31 @@ class EvaluatorNode(BaseWorkflowNode):
             # Skip cell types that were marked as unavailable during validation
             if cell_type in unavailable_cell_types:
                 logger.info(f"⏭️ Skipping critic analysis for unavailable cell type: {cell_type}")
+
+                # INTELLIGENT SUBSTITUTION: Ask critic LLM for alternative cell types
+                available_cell_types = state.get("available_cell_types", [])
+                substitution_steps = self._ask_critic_for_substitution(
+                    original_question, cell_type, available_cell_types
+                )
+
+                # CRITICAL FIX: Filter out previously attempted steps to prevent infinite loops
+                new_substitution_steps = []
+                for step in substitution_steps:
+                    step_signature = f"{step.get('function_name')}_{step.get('parameters', {}).get('cell_type', '')}"
+                    if step_signature not in previously_attempted:
+                        new_substitution_steps.append(step)
+                        previously_attempted.add(step_signature)
+                    else:
+                        logger.info(f"🔄 Skipping previously attempted substitution step: {step_signature}")
+
+                supplementary_steps.extend(new_substitution_steps)
+
+                evaluation_details[cell_type] = {
+                    "required_analyses": [],
+                    "performed_analyses": [],
+                    "missing_steps_count": len(substitution_steps),
+                    "substitution_generated": len(substitution_steps) > 0
+                }
                 continue
                 
             logger.info(f"🔍 Evaluating coverage for cell type: {cell_type}")
@@ -499,14 +553,24 @@ class EvaluatorNode(BaseWorkflowNode):
             missing_steps = self._generate_missing_steps_for_cell_type(
                 cell_type, required_analyses, performed_analyses, state
             )
-            
-            supplementary_steps.extend(missing_steps)
+
+            # CRITICAL FIX: Filter out previously attempted steps to prevent infinite loops
+            new_missing_steps = []
+            for step in missing_steps:
+                step_signature = f"{step.get('function_name')}_{step.get('parameters', {}).get('cell_type', '')}"
+                if step_signature not in previously_attempted:
+                    new_missing_steps.append(step)
+                    previously_attempted.add(step_signature)
+                else:
+                    logger.info(f"🔄 Skipping previously attempted missing step: {step_signature}")
+
+            supplementary_steps.extend(new_missing_steps)
             evaluation_details[cell_type] = {
                 "required_analyses": required_analyses,
                 "performed_analyses": performed_analyses,
                 "missing_steps_count": len(missing_steps)
             }
-            
+
             if missing_steps:
                 logger.info(f"📋 Found {len(missing_steps)} missing steps for {cell_type}")
             else:
@@ -558,7 +622,15 @@ class EvaluatorNode(BaseWorkflowNode):
         elif not new_unique_steps and supplementary_steps:
             logger.info(f"⚠️ All {len(supplementary_steps)} supplementary steps have been tried before and failed, stopping")
             state["conversation_complete"] = True
-        
+        elif not supplementary_steps:
+            # CRITICAL FIX: Handle case where no supplementary steps are needed (complete coverage)
+            logger.info(f"✅ No supplementary steps needed - analysis is complete for all cell types")
+            state["conversation_complete"] = True
+
+        # CRITICAL FIX: Persist previously attempted steps to prevent infinite loops
+        state["previously_attempted_supplementary_steps"] = list(previously_attempted)
+        logger.info(f"💾 Tracking {len(previously_attempted)} previously attempted supplementary steps")
+
         return {
             "mentioned_cell_types": mentioned_types,
             "evaluation_details": evaluation_details,
@@ -702,6 +774,7 @@ class EvaluatorNode(BaseWorkflowNode):
         """Check what analyses were actually performed for a specific cell type"""
         
         performed_analyses = []
+        skipped_analyses = []
         unavailable_cell_types = state.get("unavailable_cell_types", [])
         execution_history = state.get("execution_history", [])
         
@@ -723,13 +796,32 @@ class EvaluatorNode(BaseWorkflowNode):
                 step_data = ex.get("step", {})
                 function_name = step_data.get("function_name")
                 params = step_data.get("parameters", {})
+
+                # CRITICAL FIX: Check both single cell_type and aggregated cell_types
                 ex_cell_type = params.get("cell_type")
-                
+                ex_cell_types = params.get("cell_types", [])
+
+                # Check if this execution matches the cell type we're looking for
+                execution_matches = (
+                    ex_cell_type == cell_type or  # Single cell type match
+                    cell_type in ex_cell_types    # Aggregated cell types match
+                )
+
                 # Debug logging for each matching execution
-                if ex_cell_type == cell_type and function_name:
+                if execution_matches and function_name:
                     status = "skipped" if skipped else "successful"
-                    logger.info(f"📋 Found {status} analysis for {cell_type}: {function_name} (execution {i+1})")
-                    performed_analyses.append(function_name)
+                    if ex_cell_types:
+                        logger.info(f"📋 Found {status} analysis for {cell_type}: {function_name} (execution {i+1}) [aggregated with {ex_cell_types}]")
+                    else:
+                        logger.info(f"📋 Found {status} analysis for {cell_type}: {function_name} (execution {i+1})")
+
+                    # CRITICAL FIX: Only count successful executions as performed analysis
+                    # Skipped steps are NOT performed analysis!
+                    if success and not skipped:
+                        performed_analyses.append(function_name)
+                    elif skipped:
+                        # Track skipped functions separately for intelligent substitution
+                        skipped_analyses.append(function_name)
                     
                     # Additional debug for successful enrichment analyses
                     if function_name == "perform_enrichment_analyses" and success:
@@ -763,10 +855,128 @@ class EvaluatorNode(BaseWorkflowNode):
                     for param_key, param_value in params.items():
                         if isinstance(param_value, str) and cell_type.lower() in param_value.lower():
                             logger.info(f"🔍 Found related execution: {function_name} with {param_key}='{param_value}'")
-        
+
+        # INTELLIGENT SUBSTITUTION: Check for missed opportunities when planned cell type failed
+        if not unique_performed and skipped_analyses:
+            logger.info(f"🔍 SUBSTITUTION OPPORTUNITY: All analyses for '{cell_type}' were skipped")
+            logger.info(f"   Skipped analyses: {skipped_analyses}")
+
+            # Let LLM decide if there are suitable alternative cell types
+            available_cell_types = state.get("available_cell_types", [])
+            logger.info(f"💡 RECOMMENDATION: LLM should evaluate available cell types {available_cell_types} for potential substitution")
+
         return unique_performed
 
-    def _generate_missing_steps_for_cell_type(self, cell_type: str, required_analyses: List[str], 
+    def _ask_critic_for_substitution(self, original_question: str, unavailable_cell_type: str,
+                                   available_cell_types: List[str]) -> List[Dict[str, Any]]:
+        """Ask critic LLM to suggest alternative cell types when planned type is unavailable."""
+
+        substitution_prompt = f"""
+        User asked: "{original_question}"
+
+        The analysis was planned for '{unavailable_cell_type}' but this cell type was not found in the dataset.
+
+        Available cell types: {', '.join(sorted(available_cell_types))}
+
+        Should we analyze any of the available cell types instead to answer the user's question?
+
+        Consider biological relevance and semantic similarity.
+
+        If yes, return the most appropriate cell type name exactly as it appears in the available list.
+        If no suitable alternative, return "none".
+
+        Cell type or "none":
+        """
+
+        try:
+            response = self._call_llm(substitution_prompt)
+            suggested_type = response.strip().strip('"\'')
+
+            if suggested_type == "none" or suggested_type not in available_cell_types:
+                logger.info(f"🚫 Critic substitution: No alternative found for '{unavailable_cell_type}'")
+                return []
+
+            logger.info(f"🎯 CRITIC SUBSTITUTION: '{unavailable_cell_type}' → '{suggested_type}'")
+
+            # Get required analyses for the substituted cell type
+            required_analyses = self._get_llm_analysis_requirements(original_question, suggested_type)
+
+            # Generate steps for the suggested cell type
+            substitution_steps = []
+            for required_function in required_analyses:
+                step = {
+                    "step_type": "analysis" if not required_function.startswith("display_") else "visualization",
+                    "function_name": required_function,
+                    "parameters": {"cell_type": suggested_type},
+                    "description": f"Critic substitution: {required_function} for {suggested_type} (originally planned for {unavailable_cell_type})",
+                    "expected_outcome": f"Analysis for available cell type {suggested_type}",
+                    "target_cell_type": suggested_type
+                }
+                substitution_steps.append(step)
+
+            return substitution_steps
+
+        except Exception as e:
+            logger.info(f"❌ Critic substitution failed: {e}")
+            return []
+
+    def _find_semantically_relevant_types(self, original_question: str, question_mentioned_types: List[str],
+                                         discovered_types: List[str]) -> List[str]:
+        """Use LLM to determine which discovered cell types are relevant to answer the user's question."""
+
+        if not question_mentioned_types or not discovered_types:
+            return []
+
+        semantic_prompt = f"""
+User question: "{original_question}"
+
+Question mentioned cell types: {question_mentioned_types}
+Available discovered cell types in dataset: {discovered_types}
+
+Which of the discovered cell types are relevant for answering the user's question?
+
+Guidelines:
+- For questions about "CD8+ T cells" or "CD8-positive T cells", include ALL CD8-positive subtypes
+- For questions about "T cells" generally, include ALL T cell subtypes
+- For questions about "exhausted T cells", include ALL exhaustion-related subtypes
+- Use biological knowledge to determine semantic relationships
+- Include parent types if they exist (e.g., if question asks for "T cell" and it's in the list)
+- Include child types that belong to the questioned category
+
+Return ONLY the relevant cell type names as a JSON list, using exact names from the discovered types list.
+Example: ["CD8-positive effector T cell", "CD8-positive effector memory T cell"]
+
+JSON list:
+"""
+
+        try:
+            response = self._call_llm(semantic_prompt)
+
+            # Parse JSON response
+            import json
+            # Clean response to extract JSON
+            response = response.strip()
+            if response.startswith('```json'):
+                response = response[7:]
+            if response.endswith('```'):
+                response = response[:-3]
+            response = response.strip()
+
+            relevant_types = json.loads(response)
+
+            # Validate that all returned types are actually in discovered types
+            valid_relevant_types = [t for t in relevant_types if t in discovered_types]
+
+            logger.info(f"🧠 LLM identified {len(valid_relevant_types)} semantically relevant types from {len(discovered_types)} discovered types")
+
+            return valid_relevant_types
+
+        except Exception as e:
+            logger.info(f"❌ Semantic matching failed, falling back to exact intersection: {e}")
+            # Fallback to exact intersection if LLM fails
+            return [t for t in question_mentioned_types if t in discovered_types]
+
+    def _generate_missing_steps_for_cell_type(self, cell_type: str, required_analyses: List[str],
                                             performed_analyses: List[str], state: ChatState) -> List[Dict[str, Any]]:
         """Generate supplementary steps for missing analyses for a specific cell type"""
         

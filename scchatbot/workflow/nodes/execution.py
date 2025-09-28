@@ -245,7 +245,20 @@ class ExecutorNode(BaseWorkflowNode):
         
         func = self.function_mapping[step.function_name]
         result = func(**enhanced_params)
-        
+
+        # CRITICAL FIX: Check result status for process_cells to properly handle failures
+        if step.function_name == "process_cells":
+            if isinstance(result, dict) and "status" in result:
+                status = result.get("status")
+                # Mark as failed for error statuses, but leaf_node is success
+                if status in ["no_cells_found", "insufficient_markers"]:
+                    error_msg = result.get("message", f"process_cells failed with status: {status}")
+                    logger.info(f"❌ process_cells failed: {error_msg}")
+                    return False, result, error_msg
+                elif status == "leaf_node":
+                    logger.info(f"✅ process_cells succeeded (leaf node): {result.get('message', '')}")
+                    # Continue as success for leaf nodes
+
         return True, result, None
     
     def _enhance_visualization_params(self, state: ChatState, step: ExecutionStep) -> Dict[str, Any]:

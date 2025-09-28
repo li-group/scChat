@@ -428,7 +428,18 @@ class PlannerNode(BaseWorkflowNode):
                 else:
                     logger.info(f"🚫 Removed step: {step.get('function_name')}({step_cell_type})")
             llm_analysis_steps = filtered_analysis_steps
-        
+
+            # CRITICAL FIX: Also filter other_steps (visualizations) for undiscoverable cell types
+            logger.info(f"🚫 Filtering out visualization steps for undiscoverable types: {undiscoverable_types}")
+            filtered_other_steps = []
+            for step in other_steps:
+                step_cell_type = step.get("parameters", {}).get("cell_type")
+                if step_cell_type not in undiscoverable_types:
+                    filtered_other_steps.append(step)
+                else:
+                    logger.info(f"🚫 Removed step: {step.get('function_name')}({step_cell_type})")
+            other_steps = filtered_other_steps
+
         # Step 5: Create discovery steps ONLY for discoverable types
         discovery_steps = []
         if needs_cell_discovery(discoverable_types, available_cell_types):
