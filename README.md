@@ -158,8 +158,9 @@ Notably, the available systems, organs and tissues are listed in **available_cel
 ### Step 6: Initialize the Application
 - Run 
 ```bash
-python3 manage.py migrate (For the first time as you install scChat)
+python3 manage.py migrate 
 ```
+For the first time as you install scChat
 - Then run 
 ```bash
 python3 manage.py runserver
