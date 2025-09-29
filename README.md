@@ -156,8 +156,14 @@ It's also allowed to pass multiple system and organ to the RAG. For example:
 Notably, the available systems, organs and tissues are listed in **available_cell_RAG.json**.
 
 ### Step 6: Initialize the Application
-- Run python3 manage.py migrate (For the first time as you install scChat)
-- Run python3 manage.py runserver
+- Run 
+```bash
+python3 manage.py migrate (For the first time as you install scChat)
+```
+- Then run 
+```bash
+python3 manage.py runserver
+```
 
 ### Step 7: Access the Application
 - Open your web browser and navigate to:
