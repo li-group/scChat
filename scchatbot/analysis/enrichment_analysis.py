@@ -182,7 +182,7 @@ def reactome_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_thr
             
             if save_plots:
                 significant_df = reactome_output_df[reactome_output_df['p_value'] < p_value_threshold].copy()
-                
+
                 if not significant_df.empty:
                     if (significant_df['p_value'] == 0).any():
                         min_non_zero_p = significant_df[significant_df['p_value'] > 0]['p_value'].min()
@@ -416,79 +416,79 @@ def go_enrichment(cell_type, significant_genes, gene_to_logfc, p_value_threshold
                 
                     if save_plots:
                         significant_df = go_output_df[go_output_df['p_value'] < p_value_threshold].copy()
-                    
-                    if not significant_df.empty:
-                        if (significant_df['p_value'] == 0).any():
-                            min_non_zero_p = significant_df[significant_df['p_value'] > 0]['p_value'].min()
-                            replacement_p = min_non_zero_p / 1000 if pd.notna(min_non_zero_p) and min_non_zero_p > 0 else 1e-300
-                            significant_df['p_value'] = significant_df['p_value'].replace(0, replacement_p)
 
-                        significant_df['-log10(p_value)'] = -np.log10(significant_df['p_value'])
+                        if not significant_df.empty:
+                            if (significant_df['p_value'] == 0).any():
+                                min_non_zero_p = significant_df[significant_df['p_value'] > 0]['p_value'].min()
+                                replacement_p = min_non_zero_p / 1000 if pd.notna(min_non_zero_p) and min_non_zero_p > 0 else 1e-300
+                                significant_df['p_value'] = significant_df['p_value'].replace(0, replacement_p)
 
-                        significant_df = significant_df.sort_values('p_value', ascending=True)
-                        top_n_actual = min(top_n_terms, len(significant_df))
+                            significant_df['-log10(p_value)'] = -np.log10(significant_df['p_value'])
 
-                        if top_n_actual > 0:
-                            plot_df = significant_df.head(top_n_actual)
+                            significant_df = significant_df.sort_values('p_value', ascending=True)
+                            top_n_actual = min(top_n_terms, len(significant_df))
 
-                            plot_df_bar = plot_df.sort_values('gene_ratio', ascending=False)
-                            plt.figure(figsize=(10, max(6, top_n_actual * 0.5)))  # Adjust height based on N
-                            sns.barplot(
-                                x='gene_ratio',
-                                y='Term',
-                                data=plot_df_bar,
-                                palette='viridis',
-                                orient='h'
-                            )
-                            plt.title(f'Top {top_n_actual} Enriched GO {domain} Terms ({cell_type}) by Gene Ratio')
-                            plt.xlabel('Gene Ratio')
-                            plt.ylabel(f'GO {domain} Term')
-                            plt.tight_layout()
-                            barplot_filename = os.path.join(domain_prefix, f'barplot_{cell_type}.png')
-                            plt.savefig(barplot_filename, dpi=300, bbox_inches='tight')
-                            plt.close()
-                            print(f"Saved bar plot to {barplot_filename}")
+                            if top_n_actual > 0:
+                                plot_df = significant_df.head(top_n_actual)
 
-                            plot_df_dot = plot_df.sort_values('gene_ratio', ascending=False)
-                            plt.figure(figsize=(12, max(6, top_n_actual * 0.5)))  # Adjust height
-                            scatter = sns.scatterplot(
-                                data=plot_df_dot,
-                                y='Term',
-                                x='gene_ratio',
-                                size='intersection_size',
-                                hue='-log10(p_value)',
-                                palette='viridis_r',
-                                sizes=(40, 400),
-                                edgecolor='grey',
-                                linewidth=0.5,
-                                alpha=0.8
-                            )
-                            plt.title(f'Top {top_n_actual} Enriched GO {domain} Terms ({cell_type})')
-                            plt.ylabel(f'GO {domain} Term')
-                            plt.xlabel('Gene Ratio')
-                            plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., title='Legend')
-                            handles, labels = scatter.get_legend_handles_labels()
-                            legend_title_map = {'size': 'Intersection Size', 'hue': '-log10(P-value)'}
-                            new_handles = []
-                            new_labels = []
-                            for i, label in enumerate(labels):
-                                if label in legend_title_map:
-                                    new_labels.append(legend_title_map[label])
-                                    new_handles.append(handles[i])
-                                elif handles[i] is not None:
-                                    new_labels.append(label)
-                                    new_handles.append(handles[i])
-                            scatter.legend(new_handles, new_labels, bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
-                            plt.grid(True, axis='y', linestyle='--', alpha=0.6)
-                            plt.tight_layout(rect=[0, 0, 0.85, 1])
-                            dotplot_filename = os.path.join(domain_prefix, f'dotplot_{cell_type}.png')
-                            plt.savefig(dotplot_filename, dpi=300, bbox_inches='tight')
-                            plt.close()
-                            print(f"Saved dot plot to {dotplot_filename}")
+                                plot_df_bar = plot_df.sort_values('gene_ratio', ascending=False)
+                                plt.figure(figsize=(10, max(6, top_n_actual * 0.5)))  # Adjust height based on N
+                                sns.barplot(
+                                    x='gene_ratio',
+                                    y='Term',
+                                    data=plot_df_bar,
+                                    palette='viridis',
+                                    orient='h'
+                                )
+                                plt.title(f'Top {top_n_actual} Enriched GO {domain} Terms ({cell_type}) by Gene Ratio')
+                                plt.xlabel('Gene Ratio')
+                                plt.ylabel(f'GO {domain} Term')
+                                plt.tight_layout()
+                                barplot_filename = os.path.join(domain_prefix, f'barplot_{cell_type}.png')
+                                plt.savefig(barplot_filename, dpi=300, bbox_inches='tight')
+                                plt.close()
+                                print(f"Saved bar plot to {barplot_filename}")
+
+                                plot_df_dot = plot_df.sort_values('gene_ratio', ascending=False)
+                                plt.figure(figsize=(12, max(6, top_n_actual * 0.5)))  # Adjust height
+                                scatter = sns.scatterplot(
+                                    data=plot_df_dot,
+                                    y='Term',
+                                    x='gene_ratio',
+                                    size='intersection_size',
+                                    hue='-log10(p_value)',
+                                    palette='viridis_r',
+                                    sizes=(40, 400),
+                                    edgecolor='grey',
+                                    linewidth=0.5,
+                                    alpha=0.8
+                                )
+                                plt.title(f'Top {top_n_actual} Enriched GO {domain} Terms ({cell_type})')
+                                plt.ylabel(f'GO {domain} Term')
+                                plt.xlabel('Gene Ratio')
+                                plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., title='Legend')
+                                handles, labels = scatter.get_legend_handles_labels()
+                                legend_title_map = {'size': 'Intersection Size', 'hue': '-log10(P-value)'}
+                                new_handles = []
+                                new_labels = []
+                                for i, label in enumerate(labels):
+                                    if label in legend_title_map:
+                                        new_labels.append(legend_title_map[label])
+                                        new_handles.append(handles[i])
+                                    elif handles[i] is not None:
+                                        new_labels.append(label)
+                                        new_handles.append(handles[i])
+                                scatter.legend(new_handles, new_labels, bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+                                plt.grid(True, axis='y', linestyle='--', alpha=0.6)
+                                plt.tight_layout(rect=[0, 0, 0.85, 1])
+                                dotplot_filename = os.path.join(domain_prefix, f'dotplot_{cell_type}.png')
+                                plt.savefig(dotplot_filename, dpi=300, bbox_inches='tight')
+                                plt.close()
+                                print(f"Saved dot plot to {dotplot_filename}")
+                            else:
+                                print(f"No significant terms found for plotting after filtering (p < {p_value_threshold}) for {cell_type}, {domain}.")
                         else:
-                            print(f"No significant terms found for plotting after filtering (p < {p_value_threshold}) for {cell_type}, {domain}.")
-                    else:
-                        print(f"No significant terms found passing p-value threshold {p_value_threshold} for {cell_type}, {domain}.")
+                            print(f"No significant terms found passing p-value threshold {p_value_threshold} for {cell_type}, {domain}.")
     
     return results
 

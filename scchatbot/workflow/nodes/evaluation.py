@@ -502,9 +502,13 @@ class EvaluatorNode(BaseWorkflowNode):
         evaluation_details = {}
 
         # CRITICAL FIX: Infinite loop prevention - track previously attempted supplementary steps
-        previously_attempted = state.get("previously_attempted_supplementary_steps", set())
-        if isinstance(previously_attempted, list):
-            previously_attempted = set(previously_attempted)  # Convert from list if needed
+        previously_attempted_raw = state.get("previously_attempted_supplementary_steps", [])
+        if isinstance(previously_attempted_raw, list):
+            previously_attempted = set(previously_attempted_raw)  # Convert from list to set
+        else:
+            previously_attempted = set(previously_attempted_raw) if previously_attempted_raw else set()
+
+        logger.info(f"🔄 Loaded {len(previously_attempted)} previously attempted steps: {list(previously_attempted)}")
 
         # Get unavailable cell types to skip them
         unavailable_cell_types = state.get("unavailable_cell_types", [])
@@ -524,10 +528,16 @@ class EvaluatorNode(BaseWorkflowNode):
                 # CRITICAL FIX: Filter out previously attempted steps to prevent infinite loops
                 new_substitution_steps = []
                 for step in substitution_steps:
-                    step_signature = f"{step.get('function_name')}_{step.get('parameters', {}).get('cell_type', '')}"
+                    # CRITICAL FIX: More robust step signature that includes all parameters
+                    params = step.get('parameters', {})
+                    cell_type_param = params.get('cell_type', 'no_cell_type')
+                    param_signature = f"cell_type={cell_type_param}"
+                    step_signature = f"{step.get('function_name')}_{param_signature}"
+
                     if step_signature not in previously_attempted:
                         new_substitution_steps.append(step)
                         previously_attempted.add(step_signature)
+                        logger.info(f"✅ Adding new substitution step: {step_signature}")
                     else:
                         logger.info(f"🔄 Skipping previously attempted substitution step: {step_signature}")
 
@@ -557,10 +567,17 @@ class EvaluatorNode(BaseWorkflowNode):
             # CRITICAL FIX: Filter out previously attempted steps to prevent infinite loops
             new_missing_steps = []
             for step in missing_steps:
-                step_signature = f"{step.get('function_name')}_{step.get('parameters', {}).get('cell_type', '')}"
+                # CRITICAL FIX: More robust step signature that includes all parameters
+                params = step.get('parameters', {})
+                cell_type_param = params.get('cell_type', 'no_cell_type')
+                # Include additional parameters to make signature unique
+                param_signature = f"cell_type={cell_type_param}"
+                step_signature = f"{step.get('function_name')}_{param_signature}"
+
                 if step_signature not in previously_attempted:
                     new_missing_steps.append(step)
                     previously_attempted.add(step_signature)
+                    logger.info(f"✅ Adding new step: {step_signature}")
                 else:
                     logger.info(f"🔄 Skipping previously attempted missing step: {step_signature}")
 
