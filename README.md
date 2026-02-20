@@ -6,15 +6,16 @@ Watch the demo of scChat in action below:
 
 [![scChat Video Demo](https://img.youtube.com/vi/4LDdncq-sp8/0.jpg)](https://youtu.be/4LDdncq-sp8)
 
-If you found this work useful, please cite this [preprint](https://arxiv.org/abs/2308.12923) as:
+If you found this work useful, please cite this [paper](https://arxiv.org/abs/2308.12923) as:
 ```bibtex
-@misc{lu2024scchat,
-    title={scChat: A Large Language Model-Powered Co-Pilot for Contextualized Single-Cell RNA Sequencing Analysis},
-    author={Yen-Chun Lu and Ashley Varghese and Rahul Nahar and Hao Chen and Kunming Shao and Xiaoping Bao and Can Li},
-    year={2024},
-    eprint={2024.10.01.616063},
-    archivePrefix={bioRxiv},
-    doi={10.1101/2024.10.01.616063}
+@article{chiu2024scchat,
+  title={scChat: A large language model-powered co-pilot for contextualized single-cell RNA sequencing analysis},
+  author={Chiu, Hsuan-Han and Varghese, Ashley and Shao, Kunming and Lu, Yen-Chun and Nahar, Rahul and Chen, Hao and Deng, Qing and Bao, Xiaoping and Li, Can},
+  journal={AIChE Journal},
+  pages={e70285},
+  year={2024},
+  publisher={Wiley Online Library},
+  doi={10.1002/aic.18593}
 }
 ```
 
@@ -28,7 +29,7 @@ If you found this work useful, please cite this [preprint](https://arxiv.org/abs
 ## 1. Motivation
 Data-driven methods such as unsupervised and supervised learning are essential tools in single-cell RNA sequencing (scRNA-seq) analysis. However, these methods often lack the ability to incorporate research context, which can lead to overlooked insights. scChat addresses this by integrating contextualized conversation with data analysis to provide a deeper understanding of experimental results. It supports the exploration of research hypotheses and generates actionable insights for future experiments.
 
-Please read our [scChat paper](https://www.biorxiv.org/content/10.1101/2024.10.01.616063v1) for more motivation and details about how the scChat works.
+Please read our [scChat paper](https://aiche.onlinelibrary.wiley.com/doi/full/10.1002/aic.70285) for more motivation and details about how the scChat works.
 
 ## 2. Scope
 Model: scChat currently supports analysis using AnnData-formatted single-cell RNA sequencing datasets.
